@@ -307,7 +307,7 @@ mem[44] = 32'h0000006F; // JAL   x0, 0          -> infinite loop (end of program
     // mem[1] = 32'h00B62423;
 
 //Bubble sort
-
+/*
 mem[0]  = 32'h00000093;  // addi x1, x0, 0
 
 mem[1]  = 32'h00900313;  // addi x6, x0, 9
@@ -368,7 +368,60 @@ mem[34] = 32'h0100A703;  // lw x14, 16(x1)
 
 mem[35] = 32'h0000006F;  // jal x0, 0 (infinite loop)
 
+*/
+/*
+mem[0]  = 32'h00A00093; // addi x1, x0, 10
+mem[1]  = 32'h00300113; // addi x2, x0, 3
 
+mem[2]  = 32'h022081B3; // mul x3, x1, x2
+mem[3]  = 32'h02209233; // mulh x4, x1, x2
+mem[4]  = 32'h0220A2B3; // mulhu x5, x1, x2
+
+mem[5]  = 32'h0220C333; // div x6, x1, x2
+mem[6]  = 32'h0220E3B3; // rem x7, x1, x2
+
+mem[7]  = 32'hFEC00413; // addi x8, x0, -20
+mem[8]  = 32'h00600493; // addi x9, x0, 6
+
+mem[9]  = 32'h02944533; // div x10, x8, x9
+mem[10] = 32'h029465B3; // rem x11, x8, x9
+
+mem[11] = 32'h02940633; // mul x12, x8, x9
+
+mem[12] = 32'h00000013; // nop
+*/
+mem[0]  = 32'h00A00093; // addi x1, x0, 10
+mem[1]  = 32'h00300113; // addi x2, x0, 3
+
+// -------- Multiplication (positive) --------
+mem[2]  = 32'h022081B3; // mul   x3,  x1, x2   -> 30
+mem[3]  = 32'h02209233; // mulh  x4,  x1, x2   -> 0
+mem[4]  = 32'h0220A2B3; // mulhu x5,  x1, x2   -> 0
+mem[5]  = 32'h0220B333; // mulhsu x6, x1, x2   -> 0
+
+// -------- Division (positive) --------
+mem[6]  = 32'h0220C3B3; // div   x7,  x1, x2   -> 3
+mem[7]  = 32'h0220D433; // divu  x8,  x1, x2   -> 3
+mem[8]  = 32'h0220E4B3; // rem   x9,  x1, x2   -> 1
+mem[9]  = 32'h0220F533; // remu  x10, x1, x2   -> 1
+
+// -------- Negative operand setup --------
+mem[10] = 32'hFF600593; // addi x11, x0, -10
+mem[11] = 32'h00600613; // addi x12, x0, 6
+
+// -------- Multiplication (signed cases) --------
+mem[12] = 32'h02C586B3; // mul   x13, x11, x12   -> -60
+mem[13] = 32'h02C59733; // mulh  x14, x11, x12   -> high bits (signed)
+mem[14] = 32'h02C5B7B3; // mulhu x15, x11, x12   -> unsigned high
+mem[15] = 32'h02C5A833; // mulhsu x16, x11, x12  -> mixed signed
+
+// -------- Division (signed vs unsigned) --------
+mem[16] = 32'h02C5C8B3; // div   x17, x11, x12   -> -1
+mem[17] = 32'h02C5D933; // divu  x18, x11, x12   -> large positive
+mem[18] = 32'h02C5E9B3; // rem   x19, x11, x12   -> -4
+mem[19] = 32'h02C5FA33; // remu  x20, x11, x12   -> positive remainder
+
+mem[20] = 32'h00000013; // nop
   end
 
 endmodule

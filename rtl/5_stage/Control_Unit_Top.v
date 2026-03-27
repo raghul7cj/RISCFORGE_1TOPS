@@ -32,7 +32,9 @@ module Control_Unit_Top(
     ALUControl,
     LUISrcE,
     isLUIE,
-    illegal_instr
+    illegal_instr,
+    
+    is_M_instruction
 );
 
     // ==================================================
@@ -62,6 +64,9 @@ module Control_Unit_Top(
     output LUISrcE;         // Exposed opcode bit 5
     output isLUIE;          // U-type indicator
     output illegal_instr;
+    
+    
+    output is_M_instruction;
 
     // ==================================================
     // Internal wires
@@ -87,7 +92,9 @@ module Control_Unit_Top(
         .Jumpe(Jumpe),
         .LUISrcE(LUISrcE),
         .isLUIE(isLUIE),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        
+        .is_M_instruction(is_M_instruction)
     );
 
     // ==================================================

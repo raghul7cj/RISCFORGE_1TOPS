@@ -32,7 +32,9 @@ module decode_cycle(
     JumpE, lsunitE,
     RS1_D, RS2_D,
     FlushE, LUISrcE, isLUIE,
-    illegal_instr
+    illegal_instr,
+    
+    is_M_instruction,op
 );
 
     // ==================================================
@@ -79,6 +81,12 @@ module decode_cycle(
     output LUISrcE;
     output isLUIE;
     output illegal_instr;
+    
+    output is_M_instruction;
+    output [2:0] op;
+    
+    wire [2:0] opD;
+    assign opD=InstrD[14:12];
 
     // ==================================================
     // Decode-stage combinational signals
@@ -124,7 +132,8 @@ module decode_cycle(
         .lsunit(lsunitD),
         .LUISrcE(LUISrcD),
         .isLUIE(isLUID),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        .is_M_instruction(is_M_instructionD)
     );
 
     // ==================================================
@@ -162,6 +171,8 @@ module decode_cycle(
     reg [4:0] RD_D_r, RS1_D_r, RS2_D_r, lsunitD_r;
     reg [31:0] PCD_r, PCPlus4D_r;
     reg LUISrc_r, isLUI_r;
+    reg is_M_instruction_r;
+    reg [2:0] op_r;
 
     always @(posedge clk or negedge rst) begin
         if (!rst /*|| FlushE*/) begin
@@ -183,6 +194,8 @@ module decode_cycle(
             PCPlus4D_r    <= 32'h00000000;
             LUISrc_r      <= 1'b0;
             isLUI_r       <= 1'b0;
+            is_M_instruction_r<=1'b0;
+            op_r<=1'b0;
         end
         else if(FlushE)
         begin
@@ -204,6 +217,8 @@ module decode_cycle(
             PCPlus4D_r    <= 32'h00000000;
             LUISrc_r      <= 1'b0;
             isLUI_r       <= 1'b0;
+            is_M_instruction_r<=1'b0;
+            op_r<=1'b0;
         end
         else begin
             RegWriteD_r   <= RegWriteD;
@@ -224,6 +239,8 @@ module decode_cycle(
             PCPlus4D_r    <= PCPlus4D;
             LUISrc_r      <= LUISrcD;
             isLUI_r       <= isLUID;
+            is_M_instruction_r<=is_M_instructionD;
+            op_r<=opD;
         end
     end
 
@@ -252,5 +269,7 @@ module decode_cycle(
     assign lsunitE     = lsunitD_r;
     assign LUISrcE     = LUISrc_r;
     assign isLUIE      = isLUI_r;
-
+    
+    assign is_M_instruction =is_M_instruction_r;
+    assign op=op_r;
 endmodule

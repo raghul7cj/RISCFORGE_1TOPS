@@ -25,7 +25,9 @@ module Main_Decoder(
     Jumpe,
     LUISrcE,
     isLUIE,
-    illegal_instr
+    illegal_instr,
+    
+    is_M_instruction
 );
 
     // ==================================================
@@ -50,6 +52,11 @@ module Main_Decoder(
     output LUISrcE;    // Exposes Op[5] (used for LUI/AUIPC distinction)
     output isLUIE;     // Indicates U-type instructions (LUI/AUIPC)
     output illegal_instr;
+    
+    output is_M_instruction;
+    
+    
+    assign is_M_instruction=(Op==7'b0110011)?1:0;
 
     // ==================================================
     // U-type detection (LUI / AUIPC)
@@ -76,6 +83,7 @@ module Main_Decoder(
                        Op == 7'b1101111 |  // JAL
                        Op == 7'b1100111 |  // JALR
                        Op == 7'b0010011 |  // I-type ALU
+                       Op == 7'b0110011 |
                        Op == 7'b0110011) ? // R-type ALU
                        1'b1 : 1'b0;
 

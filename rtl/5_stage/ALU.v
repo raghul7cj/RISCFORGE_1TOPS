@@ -35,6 +35,9 @@ module ALU(A, B, Result, ALUControl, Zero);
     assign {Result} =
         (ALUControl == 4'b0000) ? A + B :                  // ADD
         (ALUControl == 4'b0001) ? A - B :                  // SUB
+//        (ALUControl == 4'b0010) ?mul
+//        (ALUControl == 4'b0011) ?mulh
+
         (ALUControl == 4'b0100) ? A & B :                  // AND
         (ALUControl == 4'b0101) ? A | B :                  // OR
         (ALUControl == 4'b0110) ? (A + B) & (~32'd1) :     // JALR (clear LSB)
@@ -44,7 +47,7 @@ module ALU(A, B, Result, ALUControl, Zero);
         (ALUControl == 4'b1010) ? A_signed >>> B[4:0] :    // SRA
         (ALUControl == 4'b1100) ? A < B :                  // SLTU
         (ALUControl == 4'b1111) ? A_signed < B_signed :    // SLT
-        {33{1'b0}};                                        // Default
+        {32{1'b0}};                                        // Default
 
     // --------------------------------------------------
     // Zero flag

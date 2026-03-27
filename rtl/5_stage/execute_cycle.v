@@ -20,7 +20,9 @@
 module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, ResultSrcE, BranchE, ALUControlE, 
     RD1_E, RD2_E, Imm_Ext_E, RD_E, PCE, PCPlus4E, PCSrcE, PCTargetE, RegWriteM, MemWriteM, 
     lsunitE,JumpE,ResultSrcM, RD_M, PCPlus4M, WriteDataM, ALU_ResultM,lsunitM, 
-    ResultW, ForwardA_E, ForwardB_E);  
+    ResultW, ForwardA_E, ForwardB_E,
+    
+    is_M_instruction,op,stallM);  
 
     // ------------------------
     // Inputs
@@ -34,6 +36,8 @@ module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, Re
     input [3:0] BranchE;
     input [4:0] lsunitE;
     input [3:0] ALUControlE;
+    input is_M_instruction;
+    input [2:0] op;
 
     // Data signals from Decode stage
     input [31:0] RD1_E, RD2_E, Imm_Ext_E;
@@ -53,6 +57,13 @@ module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, Re
     output [4:0] RD_M, lsunitM;
     output [31:0] PCPlus4M, WriteDataM, ALU_ResultM;
     output [31:0] PCTargetE;       // Next PC target if taken
+    
+    output stallM;
+    
+    
+    //wire regwrite1;
+    
+    
 
     // ==================================================
     // Internal Wires
@@ -112,6 +123,43 @@ module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, Re
     );
 
     // ==================================================
+    // M extension
+    // ==================================================
+    
+    reg prev_M;
+    wire [32:0] result_M;
+    reg busy_M,done_M;
+
+    always @(posedge clk) begin
+        prev_M <= is_M_instruction;
+    end
+
+    assign start = is_M_instruction & ~prev_M;
+    wire valid_M;
+    wire [4:0] rd_me;
+    
+    rv32m_unit m(
+    .clk(clk),
+    .rst_n(rst),
+ 
+    // From EX stage decoder
+    .rs1(Src_A),
+    .rs2(Src_B),
+    .funct3(op),       // 3-bit M-ext op code
+    .rd_in(RD_E),
+    .valid_in(start),//is_M_instruction),     // 1 = this is an M-ext instruction
+ 
+    // To hazard/stall unit
+    .stall(stallM),        // 1 = freeze upstream pipeline stages
+ 
+    // To WB stage
+    .result(result_M),
+    .rd_out(rd_me),
+    .valid_out(valid_M)
+);
+    wire [4:0] RD_E1=(valid_M)?rd_me:RD_E;
+    wire RegWriteE1=(is_M_instruction)?0:(valid_M)?1:RegWriteE;
+    // ==================================================
     // Branch Target Calculation (PC + Imm)
     // ==================================================
 
@@ -163,7 +211,7 @@ module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, Re
 
     // If instruction is LUI/AUIPC, override ALU result
     wire [31:0] ResultE;
-    assign ResultE = (isLUIE) ? LUI_result_E : alu_r;
+    assign ResultE = (isLUIE) ? LUI_result_E : ((valid_M)?result_M:alu_r);
 
     // ==================================================
     // EX → MEM Pipeline Registers
@@ -186,10 +234,10 @@ module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, Re
             ResultE_r <= 32'h00000000;
         end
         else begin
-            RegWriteE_r <= RegWriteE;
+            RegWriteE_r <= RegWriteE1;
             MemWriteE_r <= MemWriteE;
             ResultSrcE_r <= ResultSrcE;
-            RD_E_r <= RD_E;
+            RD_E_r <= RD_E1;
             lsunitE_r <= lsunitE;
             PCPlus4E_r <= PCPlus4E;
 

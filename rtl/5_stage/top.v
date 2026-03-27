@@ -97,6 +97,8 @@ module top(
 
     wire LUISrcE;
     wire isLUIE;
+    
+    wire [2:0] op;
 
     assign PCSrcE1 = PCSrcE;
 
@@ -149,7 +151,9 @@ module top(
         .FlushE(FlushE),
         .LUISrcE(LUISrcE),
         .isLUIE(isLUIE),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        .is_M_instruction(is_M_instruction),
+        .op(op)
     );
 
     // ---------------- EX ----------------
@@ -184,7 +188,10 @@ module top(
         .JumpE(JumpE),
         .lsunitM(lsunitM),
         .LUISrcE(LUISrcE),
-        .isLUIE(isLUIE)
+        .isLUIE(isLUIE),
+        .stallM(stallM),
+        .is_M_instruction(is_M_instruction),
+        .op(op)
     );
 
     // ---------------- MEM ----------------
@@ -238,7 +245,8 @@ module top(
         .StallD(StallD),
         .FlushE(FlushE),
         .FlushD(FlushD),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        .stallM(stallM)
     );
 
 endmodule

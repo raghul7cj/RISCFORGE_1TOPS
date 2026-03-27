@@ -59,7 +59,9 @@ module hazard_unit(
     StallD,
     FlushE,
     FlushD,
-    illegal_instr
+    illegal_instr,
+    
+    stallM
 );
 
     // ==================================================
@@ -77,6 +79,8 @@ module hazard_unit(
     input [4:0] Rs1_D, Rs2_D;
     input [4:0] RdE;
     input illegal_instr;
+    
+    input stallM;
 
     // ==================================================
     // Outputs
@@ -120,8 +124,8 @@ module hazard_unit(
         ((Rs1_D == RdE) || (Rs2_D == RdE)) &&
         (RdE != 5'd0);
 
-    assign StallF = lwstall;
-    assign StallD = lwstall;
+    assign StallF = lwstall | stallM;
+    assign StallD = lwstall | stallM;
 
     // ==================================================
     // Control Hazard Handling
@@ -130,7 +134,7 @@ module hazard_unit(
     //      - Flush Decode stage
     //      - Flush Execute stage
 
-    assign FlushE = lwstall | PCSrcE | illegal_instr;
+    assign FlushE = lwstall | PCSrcE | illegal_instr | stallM;
     assign FlushD = PCSrcE;
 
 endmodule
