@@ -167,8 +167,10 @@ assign corr = {
     assign l0[16] = s1_pp[16]; assign l0[17] = s1_corr;
  
     // -- Level 1: 18 → 12 (reduce 6 via 6 FAs) --
-    wire [65:0] l1s0, l1c0, l1s1, l1c1, l1s2, l1c2,
-                l1s3, l1c3, l1s4, l1c4, l1s5, l1c5;
+    wire [65:0] l1s0,  l1s1,  l1s2, 
+                l1s3,  l1s4,  l1s5;
+                
+    wire [64:0] l1c0,l1c1,l1c2,l1c3,l1c4,l1c5;
     csa u_l1_0(.a(l0[0]), .b(l0[1]),  .c(l0[2]),  .s(l1s0), .co(l1c0));
     csa u_l1_1(.a(l0[3]), .b(l0[4]),  .c(l0[5]),  .s(l1s1), .co(l1c1));
     csa u_l1_2(.a(l0[6]), .b(l0[7]),  .c(l0[8]),  .s(l1s2), .co(l1c2));
@@ -178,7 +180,9 @@ assign corr = {
     // 12 rows: l1s0-5, {l1c0-5 << 1}
  
     // -- Level 2: 12 → 8 (reduce 4 via 4 FAs) --
-    wire [65:0] l2s0, l2c0, l2s1, l2c1, l2s2, l2c2, l2s3, l2c3;
+    wire [65:0] l2s0, l2s1, l2s2, l2s3;
+    wire [64:0] l2c0, l2c1, l2c2, l2c3;
+    
     csa u_l2_0(.a(l1s0),        .b(l1s1),        .c({l1c0[64:0],1'b0}), .s(l2s0), .co(l2c0));
     csa u_l2_1(.a(l1s2),        .b(l1s3),        .c({l1c1[64:0],1'b0}), .s(l2s1), .co(l2c1));
     csa u_l2_2(.a(l1s4),        .b(l1s5),        .c({l1c2[64:0],1'b0}), .s(l2s2), .co(l2c2));
@@ -186,13 +190,15 @@ assign corr = {
     // 8 rows: l2s0-3, {l2c0-3 << 1}
  
     // -- Level 3: 8 → 6 (reduce 2 via 2 FAs) --
-    wire [65:0] l3s0, l3c0, l3s1, l3c1;
+    wire [65:0] l3s0, l3s1;
+    wire [64:0] l3c0, l3c1;
     csa u_l3_0(.a(l2s0), .b(l2s1), .c({l2c0[64:0],1'b0}), .s(l3s0), .co(l3c0));
     csa u_l3_1(.a(l2s2), .b(l2s3), .c({l2c1[64:0],1'b0}), .s(l3s1), .co(l3c1));
     // 6 rows: l3s0-1, {l3c0-1<<1}, {l2c2<<1}, {l2c3<<1}
  
     // -- Level 4: 6 → 4 (reduce 2 via 2 FAs) --
-    wire [65:0] l4s0, l4c0, l4s1, l4c1;
+    wire [65:0] l4s0, l4s1;
+    wire [64:0] l4c0, l4c1;
     wire [65:0] l2c2_sh = {l2c2[64:0], 1'b0};
     wire [65:0] l2c3_sh = {l2c3[64:0], 1'b0};
     csa u_l4_0(.a(l3s0), .b(l3s1), .c({l3c0[64:0],1'b0}), .s(l4s0), .co(l4c0));
@@ -200,12 +206,14 @@ assign corr = {
     // 4 rows: l4s0, l4s1, {l4c0<<1}, {l4c1<<1}
  
     // -- Level 5: 4 → 3 (reduce 1 via 1 FA) --
-    wire [65:0] l5s0, l5c0;
+    wire [65:0] l5s0;
+    wire [64:0] l5c0;
     csa u_l5_0(.a(l4s0), .b(l4s1), .c({l4c0[64:0],1'b0}), .s(l5s0), .co(l5c0));
     // 3 rows: l5s0, {l5c0<<1}, {l4c1<<1}
  
     // -- Level 6: 3 → 2 (1 FA) --
-    wire [65:0] final_sum, final_cout;
+    wire [65:0] final_sum;
+    wire [64:0] final_cout;
     wire [65:0] l4c1_sh = {l4c1[64:0], 1'b0};
     csa u_l6(.a(l5s0), .b({l5c0[64:0],1'b0}), .c(l4c1_sh), .s(final_sum), .co(final_cout));
     // Result: final_sum + (final_cout << 1)  → feed to CPA in Stage 3
@@ -235,7 +243,10 @@ assign corr = {
     //  Using Verilog '+' here - synthesiser maps to a fast carry-lookahead
     //  or parallel-prefix adder at 65nm (Kogge-Stone / Han-Carlson).
     // =========================================================================
-    wire [65:0] product = s2_sum + s2_carry;
+    
+    wire [63:0] product_full = s2_sum + s2_carry;   // full precision, no ASSIGN-1
+    wire [63:0] product      = product_full[63:0];   // explicit slice, not arithmetic
+    //wire [65:0] product = s2_sum + s2_carry;
  
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

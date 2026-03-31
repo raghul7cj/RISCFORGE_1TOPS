@@ -127,8 +127,8 @@ module execute_cycle(clk, rst, RegWriteE, ALUSrcE, MemWriteE, LUISrcE,isLUIE, Re
     // ==================================================
     
     reg prev_M;
-    wire [32:0] result_M;
-    reg busy_M,done_M;
+    wire [31:0] result_M;
+    //reg busy_M,done_M;
 
     always @(posedge clk) begin
         prev_M <= is_M_instruction;

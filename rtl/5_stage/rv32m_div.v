@@ -19,179 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
-//module rv32m_div (
-//    input         clk,
-//    input         rst_n,
- 
-//    // Handshake
-//    input         valid_in,      // EX stage: start a new division
-//    output reg    stall,         // to hazard unit: freeze pipeline
-//    output reg    valid_out,
- 
-//    // Operands and operation
-//    input  [31:0] rs1,
-//    input  [31:0] rs2,
-//    input  [2:0]  funct3,        // DIV=100, DIVU=101, REM=110, REMU=111
-//    input  [4:0]  rd_in,
- 
-//    // Result
-//    output reg [31:0] result,
-//    output reg [4:0]  rd_out
-//);
-//    // -------------------------------------------------------------------------
-//    //  Operation decode
-//    // -------------------------------------------------------------------------
-//    wire is_div  = (funct3 == 3'b100);
-//    wire is_divu = (funct3 == 3'b101);
-//    wire is_rem  = (funct3 == 3'b110);
-//    wire is_remu = (funct3 == 3'b111);
-//    wire signed_op = is_div | is_rem;
- 
-//    // -------------------------------------------------------------------------
-//    //  Edge case detection (computed combinationally in IDLE)
-//    // -------------------------------------------------------------------------
-//    wire div_by_zero  = (rs2 == 32'b0);
-//    wire signed_ovf   = signed_op
-//                        & (rs1 == 32'h8000_0000)
-//                        & (rs2 == 32'hFFFF_FFFF);
- 
-//    // -------------------------------------------------------------------------
-//    //  Working registers
-//    // -------------------------------------------------------------------------
-//    reg [32:0] P;          // partial remainder (33 bits, 1 sign bit)
-//    reg [31:0] divisor_r;
-//    reg [31:0] quotient;
-//    reg [5:0]  cnt;        // 0..31
-//    reg        neg_dividend, neg_divisor;
-//    reg [2:0]  op_r;
-//    reg [4:0]  rd_r;
-//    reg        edge_case;
-//    reg [31:0] edge_result;
- 
-//    // -------------------------------------------------------------------------
-//    //  FSM
-//    // -------------------------------------------------------------------------
-//    localparam IDLE    = 2'd0;
-//    localparam COMPUTE = 2'd1;
-//    localparam CORRECT = 2'd2;
-//    localparam DONE    = 2'd3;
- 
-//    reg [1:0] state;
- 
-//    // Non-restoring step wires
-//    wire        p_sign   = P[32];          // 1 = negative
-//    wire [32:0] p_shl    = {P[31:0], 1'b0};  // 2P
-//    wire [32:0] div_ext  = {1'b0, divisor_r};
-//    wire [32:0] p_add    = p_shl + div_ext;   // 2P + D
-//    wire [32:0] p_sub    = p_shl - div_ext;   // 2P - D
-//    wire        q_bit    = ~p_sign;            // quotient bit this cycle
- 
-//    reg [31:0] q_final;
-//    reg [31:0] r_final;
-//    reg [32:0] p_corrected;
-    
-//    always @(posedge clk or negedge rst_n) begin
-//        if (!rst_n) begin
-//            state     <= IDLE;
-//            stall     <= 0;
-//            valid_out <= 0;
-//        end else begin
-//            case (state)
- 
-//                // -------------------------------------------------------
-//                //  IDLE: handle edge cases or start computation
-//                // -------------------------------------------------------
-//                IDLE: begin
-//                    valid_out <= 0;
-//                    if (valid_in) begin
-//                        rd_r  <= rd_in;
-//                        op_r  <= funct3;
-//                        cnt   <= 6'd0;
- 
-//                        if (div_by_zero) begin
-//                            // Spec: DIV/DIVU → all-ones, REM/REMU → rs1
-//                            edge_case  <= 1;
-//                            edge_result <= (is_rem | is_remu) ? rs1 : 32'hFFFF_FFFF;
-//                            state      <= DONE;
-//                            stall      <= 1;
-//                        end else if (signed_ovf) begin
-//                            // Spec: INT_MIN/-1 → INT_MIN, REM → 0
-//                            edge_case  <= 1;
-//                            edge_result <= is_rem ? 32'h0 : 32'h8000_0000;
-//                            state      <= DONE;
-//                            stall      <= 1;
-//                        end else begin
-//                            // Normal case: work in unsigned, track signs
-//                            edge_case <= 0;
-//                            neg_dividend <= signed_op & rs1[31];
-//                            neg_divisor  <= signed_op & rs2[31];
-//                            // Make inputs positive for unsigned core
-//                            divisor_r <= (signed_op & rs2[31]) ? (~rs2 + 1) : rs2;
-//                            // P starts as sign-extended |rs1| (33 bits)
-//                            P <= {1'b0, (signed_op & rs1[31]) ? (~rs1 + 1) : rs1};
-//                            quotient  <= 32'b0;
-//                            stall     <= 1;
-//                            state     <= COMPUTE;
-//                        end
-//                    end
-//                end
- 
-//                // -------------------------------------------------------
-//                //  COMPUTE: 32 non-restoring iterations
-//                // -------------------------------------------------------
-//                COMPUTE: begin
-//                    // Shift quotient left, insert new bit
-//                    quotient <= {quotient[30:0], q_bit};
-//                    // Update partial remainder
-//                    P <= p_sign ? p_add : p_sub;
-//                    cnt <= cnt + 1;
-//                    if (cnt == 6'd31)
-//                        state <= CORRECT;
-//                end
- 
-//                // -------------------------------------------------------
-//                //  CORRECT: restore remainder if negative, apply signs
-//                // -------------------------------------------------------
-//                CORRECT: begin
-//                    // Non-restoring correction: if P < 0, add back divisor
-//                    // and subtract 1 from quotient
-////                    reg [31:0] q_final;
-////                    reg [31:0] r_final;
-////                    reg [32:0] p_corrected;
- 
-//                    p_corrected = P[32] ? (P + {1'b0, divisor_r}) : P;
-//                    q_final = P[32] ? (quotient - 1) : quotient;
-//                    r_final = p_corrected[31:0];
- 
-//                    // Apply signs
-//                    // Quotient sign: negative if operand signs differ
-//                    if ((is_div | is_rem) && (neg_dividend ^ neg_divisor))
-//                        q_final = ~q_final + 1;
-//                    // Remainder sign: matches dividend
-//                    if ((is_rem) && neg_dividend)
-//                        r_final = ~r_final + 1;
- 
-//                    edge_result <= (is_div | is_divu) ? q_final : r_final;
-//                    state       <= DONE;
-//                end
- 
-//                // -------------------------------------------------------
-//                //  DONE: write result, release stall
-//                // -------------------------------------------------------
-//                DONE: begin
-//                    result    <= edge_result;
-//                    rd_out    <= rd_r;
-//                    valid_out <= 1;
-//                    stall     <= 0;
-//                    state     <= IDLE;
-//                end
- 
-//            endcase
-//        end
-//    end
-//endmodule
-
 `timescale 1ns / 1ps
 module rv32m_div (
     input         clk,
@@ -240,6 +67,9 @@ module rv32m_div (
     // Module-level temporaries for CORRECT state (Verilog-2001)
     reg [31:0] q_final;
     reg [31:0] r_final;
+    reg [32:0] temp;
+    reg temp1;
+
 
     localparam IDLE    = 2'd0;
     localparam COMPUTE = 2'd1;
@@ -363,7 +193,9 @@ module rv32m_div (
 
                     // Step 2: If remainder is negative, restore it and adjust Q
                     if (P[32]) begin
-                        r_final = P[31:0] + divisor_r;  // P + D
+                        temp={P[31:0]} + {divisor_r};//P[31:0]+divisor_r;
+                        temp1=temp[32];
+                        r_final = temp[31:0];//P[31:0] + divisor_r;  // P + D
                         q_final = q_final - 1'b1;       // Q decimal - 1
                     end else begin
                         r_final = P[31:0];
