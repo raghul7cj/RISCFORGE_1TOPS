@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    participant IF as IF
+    participant ID as ID
+    participant EX as EX
+    participant MEM as MEM
+    participant WB as WB commit controller
+    participant CSR as csr_regfile
+    participant PC as IF PC mux
+    participant HZ as hazard_unit
+
+    Note over ID,WB: Precise synchronous exception flows with the instruction
+
+    ID->>EX: exc_valid, exc_cause, exc_tval, exc_pc propagate
+    EX->>MEM: same sideband preserved
+    MEM->>WB: final sideband preserved
+
+    loop while exception is in flight
+        WB->>HZ: flush_pipeline_onehot = 4'b1111? no, not yet
+        HZ->>ID: FlushD = 1 for younger instructions
+        HZ->>EX: FlushE = 1 when exception reaches MEM
+    end
+
+    WB->>WB: trap_commit = valid_W & exc_valid_W
+    WB->>CSR: trap_valid, trap_cause, trap_pc, trap_addr, trap_addr_valid
+    WB->>PC: wb_trap_redirect = 1, trap_target = mtvec.BASE
+    WB->>HZ: flush_pipeline_onehot = 4'b1111
+    CSR->>CSR: write mepc = exc_pc_W
+    CSR->>CSR: write mcause = {1'b0, exc_cause_W}
+    CSR->>CSR: write mtval = exc_tval_W or 0
+    CSR->>CSR: mstatus.MIE <- 0, MPIE <- old MIE, MPP <- 11
+    PC->>IF: redirect fetch to mtvec
+    WB-->>IF: younger instructions removed from pipeline
