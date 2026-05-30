@@ -1,0 +1,14 @@
+# Ignore everything by default
+*
+
+# Allow traversing into directories
+!*/
+
+# Ignore riscv-arch-test directory completely
+riscv-arch-test/
+
+# Do not ignore Verilog source files inside riscof_rtl_5/
+!riscof_rtl_5/*.v
+
+# Do not ignore the .gitignore file itself
+!.gitignore
