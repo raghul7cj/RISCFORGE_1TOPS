@@ -1,0 +1,184 @@
+% =============================================================================
+% Chapter 8: How to Observe the Design
+% =============================================================================
+\chapter{How to Observe the Design}
+\label{ch:observation}
+
+\section{Key Signals to Monitor}
+
+When running simulation with waveform viewing (SimVision, DVE, GTKWave), the following signal
+groups should be monitored to understand IP behavior:
+
+\subsection{APB Bus Signals}
+
+\begin{table}[H]
+\centering
+\caption{APB Bus Signals to Monitor}
+\label{tab:apb_signals}
+\begin{tabularx}{\textwidth}{@{}llX@{}}
+\toprule
+\textbf{Signal} & \textbf{Width} & \textbf{What to Look For} \\
+\midrule
+\texttt{HCLK}     & 1  & System clock---all timing is referenced to this. \\
+\texttt{HRESETn}  & 1  & Active-low reset---verify clean assertion and release. \\
+\texttt{PADDR}    & 12 & Register address during APB transactions. \\
+\texttt{PWDATA}   & 32 & Write data---verify correct values during TXFIFO writes. \\
+\texttt{PRDATA}   & 32 & Read data---verify correct values during RXFIFO reads. \\
+\texttt{PWRITE}   & 1  & 1 = write, 0 = read. \\
+\texttt{PSEL}     & 1  & Slave select---marks start of APB transaction. \\
+\texttt{PENABLE}  & 1  & Access phase---data transfer occurs when PSEL \& PENABLE. \\
+\texttt{PREADY}   & 1  & Should be always 1 (no wait states in this IP). \\
+\texttt{PSLVERR}  & 1  & Should be always 0 (no errors in this IP). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{SPI Interface Signals}
+
+\begin{table}[H]
+\centering
+\caption{SPI Interface Signals to Monitor}
+\label{tab:spi_signals}
+\begin{tabularx}{\textwidth}{@{}llX@{}}
+\toprule
+\textbf{Signal} & \textbf{Width} & \textbf{What to Look For} \\
+\midrule
+\texttt{spi\_clk}  & 1 & SPI clock output. Verify frequency matches CLKDIV setting. \\
+\texttt{spi\_csn0} & 1 & CS0 active-low. Should go low during CS0 transactions. \\
+\texttt{spi\_csn1} & 1 & CS1 active-low. Verify TC11 behavior. \\
+\texttt{spi\_csn2} & 1 & CS2 active-low. \\
+\texttt{spi\_csn3} & 1 & CS3 active-low. \\
+\texttt{spi\_mode} & 2 & 00=STD, 01=QUAD\_TX, 10=QUAD\_RX. Verify during quad tests. \\
+\texttt{spi\_sdo0} & 1 & Master data out (MOSI in standard mode). Verify TX data. \\
+\texttt{spi\_sdo1--3} & 1 each & Additional data lines for quad mode. \\
+\texttt{spi\_sdi0} & 1 & Master data in (loopback from sdo0). \\
+\texttt{spi\_sdi1} & 1 & Master data in (MISO in standard mode). Key for RX verification. \\
+\texttt{spi\_sdi2--3} & 1 each & Additional data inputs for quad mode. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Event and Interrupt Signals}
+
+\begin{table}[H]
+\centering
+\caption{Event and Interrupt Signals}
+\label{tab:event_signals}
+\begin{tabularx}{\textwidth}{@{}llX@{}}
+\toprule
+\textbf{Signal} & \textbf{Width} & \textbf{What to Look For} \\
+\midrule
+\texttt{events\_o[0]} & 1 & Interrupt output. Should be 0 unless threshold crossed and INT enabled. \\
+\texttt{events\_o[1]} & 1 & EOT pulse. Should be exactly 1 cycle wide at end of each transfer. \\
+\texttt{eot\_flag}     & 1 & Testbench sticky latch. Should go high on EOT and stay high until cleared. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Internal Debug Signals (Hierarchical Access)}
+
+These signals require hierarchical access and are especially useful when debugging
+data-integrity issues:
+
+\begin{table}[H]
+\centering
+\caption{Internal Debug Signals (via DUT Hierarchy)}
+\label{tab:debug_signals}
+\small
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Hierarchical Path} & \textbf{Purpose} \\
+\midrule
+\texttt{dut.u\_spictrl.state} & Controller FSM state (0=IDLE through 7=WAIT\_EDGE). \\
+\texttt{dut.u\_spictrl.spi\_en\_rx} & RX enable---1 when controller is in DATA\_RX. \\
+\texttt{dut.u\_spictrl.spi\_en\_tx} & TX enable---1 during CMD, ADDR, DUMMY, DATA\_TX. \\
+\texttt{dut.u\_spictrl.eot} & Raw EOT signal from controller (before registration). \\
+\texttt{dut.u\_spictrl.u\_rxreg.rx\_CS} & RX FSM state (IDLE, RECEIVE, WAIT\_FIFO, WAIT\_FIFO\_DONE). \\
+\texttt{dut.u\_spictrl.u\_rxreg.counter} & RX bit counter---should count from 0 to target-1. \\
+\texttt{dut.u\_spictrl.u\_rxreg.counter\_trgt} & RX target count. \\
+\texttt{dut.u\_spictrl.u\_rxreg.data\_int} & RX shift register contents (accumulated data). \\
+\texttt{dut.u\_spictrl.u\_txreg.tx\_CS} & TX FSM state (IDLE, TRANSMIT). \\
+\texttt{dut.u\_spictrl.u\_txreg.data\_int} & TX shift register contents. \\
+\texttt{dut.u\_spictrl.u\_clkgen.counter\_trgt} & Clock divider target. \\
+\texttt{dut.u\_spictrl.u\_clkgen.spi\_rise} & Internal SPI rising edge (precedes spi\_clk by 1 cycle). \\
+\texttt{dut.u\_txfifo.elements} & TX FIFO occupancy. \\
+\texttt{dut.u\_rxfifo.elements} & RX FIFO occupancy. \\
+\texttt{dut.u\_rxfifo.buffer[0]} & First FIFO slot contents. \\
+\texttt{dut.u\_rxfifo.pointer\_out} & FIFO read pointer. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Interpreting the Xcelium Console Log}
+
+The testbench produces structured console output. Here is how to interpret each element:
+
+\subsection{Testcase Headers}
+
+\begin{verbatim}
+========== TC4: RX path deep diagnostic ==========
+\end{verbatim}
+Each testcase begins with a header showing the testcase number and name.
+
+\subsection{Pass/Fail Messages}
+
+\begin{verbatim}
+  [PASS] TC4: RX=0xFF when sdi1 forced high  got=0x000000ff  exp=0x000000ff
+  [FAIL] example  got=0x00000000  exp=0x000000ff (mask=0x000000ff)
+\end{verbatim}
+\texttt{[PASS]} indicates the masked comparison succeeded. \texttt{[FAIL]} shows both the actual
+value and expected value with the mask applied.
+
+\subsection{Debug Probes}
+
+\begin{verbatim}
+  [DBG] DURING: ctrl state=6, spi_en_rx=1, rx_CS=1, spi_clk=1, sdi1=1
+\end{verbatim}
+\texttt{[DBG]} lines show internal signal values at specific time points. Use these to trace
+the FSM progression and data flow.
+
+\subsection{Info Messages}
+
+\begin{verbatim}
+  [INFO] TC4: RX raw = 0x000000ff
+  [INFO] RX word 0 = 0x00000000
+\end{verbatim}
+\texttt{[INFO]} lines show intermediate values that are informational but not checked.
+
+\subsection{Warning Messages}
+
+\begin{verbatim}
+  [WARN] wait_eot: timeout after 20000 cycles
+\end{verbatim}
+\texttt{[WARN]} indicates a potential problem (timeout, unexpected value) that does not
+directly fail a check but should be investigated.
+
+\subsection{Final Summary}
+
+\begin{verbatim}
+========================================
+  PASSED: 28 / FAILED: 0
+========================================
+
+*** ALL TESTS PASSED ***
+Simulation complete via $finish(1) at time 27435 NS + 0
+\end{verbatim}
+
+The summary shows total pass/fail counts. The \texttt{\$finish} message shows the exact
+simulation time at completion.
+
+\section{Waveform Analysis Tips}
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Start with the EOT signal:} Find each EOT pulse to identify testcase boundaries.
+  \item \textbf{Zoom into CS edges:} CS assertion marks the start of a transfer, CS deassertion
+        marks the end.
+  \item \textbf{Count SPI clocks:} For an 8-bit transfer with CLKDIV=4, expect 8 SPI clock cycles,
+        each 10 system clocks wide (5 high + 5 low).
+  \item \textbf{Check sdi1 alignment:} In standard read mode, verify that sdi1 transitions occur
+        on the falling edge of spi\_clk (setup time) and are stable at the rising edge (sample time).
+  \item \textbf{Use analog display for counters:} Display the RX/TX counters in analog mode to
+        visually confirm linear counting.
+  \item \textbf{Check FIFO elements:} The \texttt{elements} signal should increment on push and
+        decrement on pop, never exceeding \texttt{BUFFER\_DEPTH} or going negative.
+\end{enumerate}
