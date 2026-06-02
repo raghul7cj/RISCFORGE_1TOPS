@@ -265,11 +265,11 @@ module execute_cycle (
             m_started <= 1'b0;
         end else if (m_valid_out) begin
             m_started <= 1'b0;
-        end else if (is_M_instruction_E && !m_started && !FlushM) begin
+        end else if (is_M_instruction_E && !m_started && !FlushE) begin
             m_started <= 1'b1;
         end
     end
-    wire start_M = is_M_instruction_E && !m_started && !FlushM;
+    wire start_M = is_M_instruction_E && !m_started && !FlushE;
 
     rv32m_unit m_unit (
         .clk(clk),
@@ -290,7 +290,7 @@ module execute_cycle (
     assign csr_new_val_E = csr_imm_mode_E ? {27'b0, csr_rs1_uimm_E} : Src_A;
     assign csr_write_en_E = csr_valid_E && (csr_op_E != 2'b00);
 
-    always @(posedge clk) begin
+    always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             RegWriteE_r <= 1'b0;
             MemWriteE_r <= 1'b0;

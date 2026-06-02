@@ -65,8 +65,13 @@ module rv32m_div (
     reg s_is_div, s_is_divu, s_is_rem, s_is_remu;
 
     // Module-level temporaries for CORRECT state (Verilog-2001)
-    reg [31:0] q_final;
-    reg [31:0] r_final;
+    wire [31:0] q_final_sd       = quotient - (~quotient);   // KEY: SD to binary
+    wire [31:0] q_final_restored = P[33] ? (q_final_sd - 1'b1) : q_final_sd;
+    wire [31:0] r_final_restored = P[33] ? (P[31:0] + divisor_r) : P[31:0];
+
+    wire [31:0] q_final = (s_is_div && (neg_dividend ^ neg_divisor)) ? (~q_final_restored + 1'b1) : q_final_restored;
+    wire [31:0] r_final = (s_is_rem && neg_dividend) ? (~r_final_restored + 1'b1) : r_final_restored;
+
     reg [32:0] temp;
     reg temp1;
 
@@ -188,26 +193,6 @@ module rv32m_div (
                 //  BUG 4 FIX: uses s_is_* (saved in IDLE), not live is_* wires
                 // -------------------------------------------------------------
                 CORRECT: begin
-                    // Step 1: Signed-digit → binary conversion
-                    q_final = quotient - (~quotient);   // KEY: SD to binary
-
-                    // Step 2: If remainder is negative, restore it and adjust Q
-                    if (P[33]) begin
-                        r_final = P[31:0] + divisor_r;  // P + D
-                        q_final = q_final - 1'b1;       // Q decimal - 1
-                    end else begin
-                        r_final = P[31:0];
-                    end
-
-                    // Step 3: Apply signs for signed operations
-                    // Quotient negated when dividend and divisor signs differ
-                    if (s_is_div && (neg_dividend ^ neg_divisor))
-                        q_final = ~q_final + 1'b1;
-
-                    // Remainder sign matches dividend (RISC-V spec)
-                    if (s_is_rem && neg_dividend)
-                        r_final = ~r_final + 1'b1;
-
                     edge_result <= (s_is_div | s_is_divu) ? q_final : r_final;
                     state       <= DONE;
                 end
