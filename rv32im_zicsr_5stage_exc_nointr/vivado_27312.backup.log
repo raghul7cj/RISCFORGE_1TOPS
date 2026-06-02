@@ -1,0 +1,391 @@
+#-----------------------------------------------------------
+# Vivado v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Tue Jun  2 23:34:06 2026
+# Process ID: 27312
+# Current directory: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06
+# Command line: vivado.exe -mode batch -source lint_export.tcl
+# Log file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/vivado.log
+# Journal file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06\vivado.jou
+# Running On: DESKTOP-BSAEVVC, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 12, Host memory: 16779 MB
+#-----------------------------------------------------------
+source lint_export.tcl
+# read_verilog -sv {
+#   ALU.v
+#   ALU_Decoder.v
+#   booth_enc.v
+#   clic.sv
+#   Control_Unit_Top.v
+#   csa.v
+#   csr_regfile.v
+#   Data_Memory.v
+#   decode_cycle.v
+#   execute_cycle.v
+#   fetch_cycle.v
+#   hazard_unit.v
+#   Instruction_Memory.v
+#   JB_unit.v
+#   ls_unit.v
+#   Main_Decoder.v
+#   memory_cycle.v
+#   Mux2.v
+#   Mux_3_by_1.v
+#   opcode_check.v
+#   PC.v
+#   PC_Adder.v
+#   pp_gen.v
+#   Register_File.v
+#   rv32m_div.v
+#   rv32m_mul.v
+#   rv32m_unit.v
+#   Sign_Extend.v
+#   top.v
+#   wb_trap_mret_commit_controller.v
+#   writeback_cycle.v
+# }
+# synth_design -rtl -top top
+Command: synth_design -rtl -top top
+Starting synth_design
+Using part: xc7a12ticsg325-1L
+INFO: [Device 21-403] Loading part xc7a12ticsg325-1L
+INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [C:/Xilinx/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1185.000 ; gain = 421.215
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'top' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:24]
+INFO: [Synth 8-6157] synthesizing module 'fetch_cycle' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/fetch_cycle.v:26]
+INFO: [Synth 8-6157] synthesizing module 'PC' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/PC.v:25]
+INFO: [Synth 8-6155] done synthesizing module 'PC' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/PC.v:25]
+INFO: [Synth 8-6157] synthesizing module 'Instruction_Memory' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:25]
+INFO: [Synth 8-6155] done synthesizing module 'Instruction_Memory' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:25]
+INFO: [Synth 8-6157] synthesizing module 'PC_Adder' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/PC_Adder.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'PC_Adder' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/PC_Adder.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'fetch_cycle' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/fetch_cycle.v:26]
+INFO: [Synth 8-6157] synthesizing module 'decode_cycle' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/decode_cycle.v:24]
+INFO: [Synth 8-6157] synthesizing module 'Control_Unit_Top' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Control_Unit_Top.v:20]
+INFO: [Synth 8-6157] synthesizing module 'Main_Decoder' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Main_Decoder.v:25]
+INFO: [Synth 8-6157] synthesizing module 'opcode_check' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/opcode_check.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'opcode_check' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/opcode_check.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'Main_Decoder' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Main_Decoder.v:25]
+INFO: [Synth 8-6157] synthesizing module 'ALU_Decoder' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/ALU_Decoder.v:26]
+INFO: [Synth 8-6155] done synthesizing module 'ALU_Decoder' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/ALU_Decoder.v:26]
+INFO: [Synth 8-6155] done synthesizing module 'Control_Unit_Top' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Control_Unit_Top.v:20]
+INFO: [Synth 8-6157] synthesizing module 'Register_File' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Register_File.v:17]
+INFO: [Synth 8-6155] done synthesizing module 'Register_File' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Register_File.v:17]
+INFO: [Synth 8-6157] synthesizing module 'Sign_Extend' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Sign_Extend.v:22]
+INFO: [Synth 8-6155] done synthesizing module 'Sign_Extend' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Sign_Extend.v:22]
+INFO: [Synth 8-6155] done synthesizing module 'decode_cycle' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/decode_cycle.v:24]
+INFO: [Synth 8-6157] synthesizing module 'execute_cycle' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/execute_cycle.v:20]
+INFO: [Synth 8-6157] synthesizing module 'Mux_3_by_1' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Mux_3_by_1.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'Mux_3_by_1' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Mux_3_by_1.v:23]
+INFO: [Synth 8-6157] synthesizing module 'Mux2' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Mux2.v:25]
+INFO: [Synth 8-6155] done synthesizing module 'Mux2' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Mux2.v:25]
+INFO: [Synth 8-6157] synthesizing module 'ALU' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/ALU.v:21]
+INFO: [Synth 8-6155] done synthesizing module 'ALU' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/ALU.v:21]
+WARNING: [Synth 8-7071] port 'Zero' of module 'ALU' is unconnected for instance 'alu_inst' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/execute_cycle.v:232]
+WARNING: [Synth 8-7023] instance 'alu_inst' of module 'ALU' has 6 connections declared, but only 5 given [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/execute_cycle.v:232]
+INFO: [Synth 8-6157] synthesizing module 'JB_unit' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/JB_unit.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'JB_unit' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/JB_unit.v:2]
+INFO: [Synth 8-6157] synthesizing module 'rv32m_unit' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_unit.v:2]
+INFO: [Synth 8-6157] synthesizing module 'rv32m_mul' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:23]
+INFO: [Synth 8-6157] synthesizing module 'booth_enc' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/booth_enc.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'booth_enc' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/booth_enc.v:2]
+INFO: [Synth 8-6157] synthesizing module 'pp_gen' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/pp_gen.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'pp_gen' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/pp_gen.v:23]
+INFO: [Synth 8-6157] synthesizing module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/csa.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'csa' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/csa.v:2]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:174]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:175]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:176]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:177]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:178]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:179]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:186]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:187]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:188]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:189]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:195]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:196]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:204]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:205]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:211]
+WARNING: [Synth 8-689] width (65) of port connection 'co' does not match port width (66) of module 'csa' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:218]
+INFO: [Synth 8-6155] done synthesizing module 'rv32m_mul' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:23]
+INFO: [Synth 8-6157] synthesizing module 'rv32m_div' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'rv32m_div' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'rv32m_unit' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_unit.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'execute_cycle' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/execute_cycle.v:20]
+INFO: [Synth 8-6157] synthesizing module 'memory_cycle' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/memory_cycle.v:23]
+INFO: [Synth 8-6157] synthesizing module 'ls_unit' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/ls_unit.v:33]
+INFO: [Synth 8-6155] done synthesizing module 'ls_unit' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/ls_unit.v:33]
+INFO: [Synth 8-6157] synthesizing module 'Data_Memory' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Data_Memory.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'Data_Memory' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Data_Memory.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'memory_cycle' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/memory_cycle.v:23]
+INFO: [Synth 8-6157] synthesizing module 'writeback_cycle' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/writeback_cycle.v:23]
+INFO: [Synth 8-6155] done synthesizing module 'writeback_cycle' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/writeback_cycle.v:23]
+INFO: [Synth 8-6157] synthesizing module 'wb_trap_mret_commit_controller' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/wb_trap_mret_commit_controller.v:22]
+INFO: [Synth 8-6155] done synthesizing module 'wb_trap_mret_commit_controller' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/wb_trap_mret_commit_controller.v:22]
+INFO: [Synth 8-6157] synthesizing module 'csr_regfile' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/csr_regfile.v:1]
+	Parameter XLEN bound to: 32 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'csr_regfile' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/csr_regfile.v:1]
+WARNING: [Synth 8-7071] port 'mie_out_o' of module 'csr_regfile' is unconnected for instance 'csr_file' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:436]
+WARNING: [Synth 8-7071] port 'mip_out_o' of module 'csr_regfile' is unconnected for instance 'csr_file' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:436]
+WARNING: [Synth 8-7071] port 'mstatus_mie_out_o' of module 'csr_regfile' is unconnected for instance 'csr_file' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:436]
+WARNING: [Synth 8-7071] port 'mcause_out_o' of module 'csr_regfile' is unconnected for instance 'csr_file' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:436]
+WARNING: [Synth 8-7023] instance 'csr_file' of module 'csr_regfile' has 27 connections declared, but only 23 given [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:436]
+INFO: [Synth 8-6157] synthesizing module 'hazard_unit' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/hazard_unit.v:43]
+INFO: [Synth 8-6155] done synthesizing module 'hazard_unit' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/hazard_unit.v:43]
+INFO: [Synth 8-6155] done synthesizing module 'top' (0#1) [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/top.v:24]
+WARNING: [Synth 8-4767] Trying to implement RAM ' ' in registers. Block RAM or DRAM implementation is not possible; see log for reasons.
+	1: Unable to determine number of words or word size in RAM. 
+	2: No valid read/write found for RAM. 
+RAM dissolved into registers
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+WARNING: [Synth 8-3848] Net mem in module/entity Instruction_Memory does not have driver. [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/Instruction_Memory.v:31]
+INFO: [Common 17-14] Message 'Synth 8-3848' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+WARNING: [Synth 8-7137] Register csr_addr_r_reg in module decode_cycle has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/decode_cycle.v:326]
+WARNING: [Synth 8-7137] Register rd_index_r_reg in module decode_cycle has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/decode_cycle.v:327]
+WARNING: [Synth 8-6014] Unused sequential element s1_funct3_reg was removed.  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:139]
+WARNING: [Synth 8-6014] Unused sequential element s2_funct3_reg was removed.  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:233]
+WARNING: [Synth 8-7137] Register s1_rd_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:140]
+WARNING: [Synth 8-7137] Register s1_upper_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:141]
+WARNING: [Synth 8-7137] Register s1_corr_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:142]
+WARNING: [Synth 8-7137] Register s1_pp_reg[0] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[1] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[2] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[3] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[4] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[5] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[6] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[7] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[8] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[9] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[10] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[11] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[12] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[13] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[14] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[15] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s1_pp_reg[16] in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:144]
+WARNING: [Synth 8-7137] Register s2_rd_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:234]
+WARNING: [Synth 8-7137] Register s2_upper_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:235]
+WARNING: [Synth 8-7137] Register s2_sum_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:236]
+WARNING: [Synth 8-7137] Register s2_carry_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:237]
+WARNING: [Synth 8-7137] Register rd_out_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:256]
+WARNING: [Synth 8-7137] Register result_reg in module rv32m_mul has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_mul.v:257]
+WARNING: [Synth 8-6014] Unused sequential element s_is_remu_reg was removed.  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:115]
+WARNING: [Synth 8-6014] Unused sequential element q_final_reg was removed.  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:192]
+WARNING: [Synth 8-6014] Unused sequential element r_final_reg was removed.  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:196]
+WARNING: [Synth 8-7137] Register rd_r_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:109]
+WARNING: [Synth 8-7137] Register cnt_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:110]
+WARNING: [Synth 8-7137] Register s_is_div_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:112]
+WARNING: [Synth 8-7137] Register s_is_divu_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:113]
+WARNING: [Synth 8-7137] Register s_is_rem_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:114]
+WARNING: [Synth 8-7137] Register edge_result_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:118]
+WARNING: [Synth 8-7137] Register neg_dividend_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:128]
+WARNING: [Synth 8-7137] Register neg_divisor_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:129]
+WARNING: [Synth 8-7137] Register divisor_r_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:90]
+WARNING: [Synth 8-7137] Register P_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:88]
+WARNING: [Synth 8-7137] Register quotient_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:88]
+WARNING: [Synth 8-7137] Register result_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:219]
+WARNING: [Synth 8-7137] Register rd_out_reg in module rv32m_div has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code  [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/risc5_02_06/rv32m_div.v:220]
+WARNING: [Synth 8-7129] Port illegal_instr in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[11] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[10] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[9] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[8] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[7] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[6] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[5] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[4] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[3] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[2] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[1] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_E[0] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[11] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[10] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[9] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[8] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[7] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[6] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[5] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[4] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[3] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[2] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[1] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port csr_raddr_W[0] in module hazard_unit is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mtvec_i[1] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mtvec_i[0] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mepc_i[1] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mepc_i[0] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mstatus_i[12] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mstatus_i[11] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port mstatus_i[3] in module wb_trap_mret_commit_controller is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[29] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[28] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[27] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[26] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[25] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[24] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[23] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[22] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[21] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[20] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[19] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[18] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[17] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[16] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[15] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[14] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[13] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[12] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[11] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[10] in module Data_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[29] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[28] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[27] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[26] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[25] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[24] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[23] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[22] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[21] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[20] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[19] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[18] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[17] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[16] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[15] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[14] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[13] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[12] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[11] in module Instruction_Memory is either unconnected or has no load
+WARNING: [Synth 8-7129] Port A[10] in module Instruction_Memory is either unconnected or has no load
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1291.328 ; gain = 527.543
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1291.328 ; gain = 527.543
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1291.328 ; gain = 527.543
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.198 . Memory (MB): peak = 1291.328 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Completed Processing XDC Constraints
+
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1375.391 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+RTL Elaboration Complete:  : Time (s): cpu = 00:00:08 ; elapsed = 00:00:08 . Memory (MB): peak = 1375.391 ; gain = 611.605
+66 Infos, 242 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:10 ; elapsed = 00:00:24 . Memory (MB): peak = 1375.391 ; gain = 998.066
+INFO: [Common 17-206] Exiting Vivado at Tue Jun  2 23:34:35 2026...
