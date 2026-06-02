@@ -57,7 +57,3 @@ The RTL is organized as a flat delivery directory to simplify imports into Elect
 * **`Instruction_Memory.v`**: Local simulation Instruction ROM.
 * **`Data_Memory.v`**: Local simulation RAM.
 
-
-
-```
-The scoreboard monitors the Writeback stage commits, updating its internal model and checking retired instruction register writes, memory updates, and PC flows.
