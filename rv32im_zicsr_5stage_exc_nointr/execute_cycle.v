@@ -255,21 +255,19 @@ module execute_cycle (
     assign PCSrcE = yesE & valid_E & ~exc_valid_E;
 
     assign LUI_result_E = (LUISrcE) ? Imm_Ext_E : PCTarget_jb;
-    assign ResultE = (is_M_instruction_E) ? result_M : ((isLUIE) ? LUI_result_E : alu_r);
+    assign ResultE = (m_valid_out) ? result_M : ((isLUIE) ? LUI_result_E : alu_r);
 
     // M-extension transaction tracker and module instantiation
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             m_started <= 1'b0;
-        end else if (FlushE) begin
-            m_started <= 1'b0;
         end else if (m_valid_out) begin
             m_started <= 1'b0;
-        end else if (is_M_instruction_E && !m_started && !FlushE) begin
+        end else if (is_M_instruction_E && !m_started) begin
             m_started <= 1'b1;
         end
     end
-    wire start_M = is_M_instruction_E && !m_started && !FlushE;
+    wire start_M = is_M_instruction_E && !m_started;
 
     rv32m_unit m_unit (
         .clk(clk),
@@ -286,6 +284,10 @@ module execute_cycle (
     );
 
     assign stallM = stallM_internal;
+
+    wire [4:0]  RD_E1        = (m_valid_out) ? rd_me : RD_E;
+    wire        RegWriteE1   = (is_M_instruction_E && !m_valid_out) ? 1'b0 : 
+                               (m_valid_out) ? 1'b1 : RegWriteE;
 
     assign csr_new_val_E = csr_imm_mode_E ? {27'b0, csr_rs1_uimm_E} : Src_A;
     assign csr_write_en_E = csr_valid_E && (csr_op_E != 2'b00);
@@ -332,14 +334,14 @@ module execute_cycle (
             exc_pc_r <= 32'h00000000;
             is_mret_r <= 1'b0;
         end else begin
-            RegWriteE_r <= RegWriteE;
+            RegWriteE_r <= RegWriteE1;
             MemWriteE_r <= MemWriteE;
             ResultSrcE_r <= ResultSrcE;
-            RD_E_r <= RD_E;
+            RD_E_r <= RD_E1;
             lsunitE_r <= lsunitE;
             PCE_r <= PCE;
             PCPlus4E_r <= PCPlus4E;
-            RD2_E_r <= RD2_E;  // ✅ FIXED: Store original RD2_E, not forwarded Src_B_interim
+            RD2_E_r <= Src_B_interim;
             ResultE_r <= ResultE;
             csr_write_en_E_r <= csr_write_en_E;
             csr_addr_E_r <= csr_addr_E;

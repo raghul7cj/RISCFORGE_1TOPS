@@ -186,7 +186,7 @@ module hazard_unit(
 
     // Control hazard / younger-kill policy.
     // NOTE: illegal_instr is handled as an exception sideband, not as an immediate flush here.
-    assign FlushE = lwstall | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1];
+    assign FlushE = lwstall | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallM;
     assign FlushD = PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | flush_pipeline_onehot[0];
     assign FlushM = wb_redirect | flush_pipeline_onehot[2] | stallM;
     assign FlushW = wb_redirect | flush_pipeline_onehot[3];
