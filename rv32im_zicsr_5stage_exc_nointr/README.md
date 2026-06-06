@@ -17,7 +17,7 @@ This folder contains a verified, synthesizable RTL implementation of a **5-stage
 | **Arithmetic / ALU** | **Validated** | 32-bit ALU with branch flags output and dual-port compatibility. |
 | **M-Extension (Mul)** | **Validated** | Booth-encoded 3-stage pipelined multiplier with sign-extension fix. |
 | **M-Extension (Div)** | **Validated** | 32-cycle sequential non-restoring divider with overflow/underflow checks. |
-| **Precise Traps / Exceptions** | **Validated** | Precise "propagate-and-commit" exception bus handling `ecall`, `ebreak`, and `illegal_instr`. |
+| **Precise Traps / Exceptions** | **under validation** | Precise "propagate-and-commit" exception bus handling `ecall`, `ebreak`, and `illegal_instr`. |
 | **Interrupts** | **Stubbed** | Asynchronous interrupts are disabled/bypassed. CLIC is stubbed out via `clic.sv`. |
 
 ---
