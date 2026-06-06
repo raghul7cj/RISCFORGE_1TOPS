@@ -161,15 +161,25 @@ module hazard_unit(
         ((Rs1_D == RdE) || (Rs2_D == RdE)) &&
         (RdE != 5'd0);
 
+    // CSR-to-CSR stall: next CSR instruction reads a CSR being written in EX/MEM/WB
     wire csr_stall;
     assign csr_stall = csr_valid_D &&
                           ((csr_raddr_D == csr_addr_E && csr_write_en_E) ||
                             (csr_raddr_D == csr_addr_M && csr_write_en_M) ||
                             (csr_raddr_D == csr_addr_W && csr_write_en_W));
 
+    // CSR-use GPR stall: a CSR instruction in EX or MEM writes a GPR (old_csr result)
+    // that cannot be forwarded via ALU_ResultM. Stall until it retires to WB.
+    wire csr_gpr_stall;
+    assign csr_gpr_stall =
+        // CSR in EX writing GPR that Decode-stage reads
+        (ResultSrcE == 2'b11) &&
+        ((Rs1_D == RdE) || (Rs2_D == RdE)) &&
+        (RdE != 5'd0);
+
     // On WB redirect (trap/mret), override stalls so IF can take redirect immediately.
-    assign StallF = wb_redirect ? 1'b0 : (lwstall | csr_stall | stallM);
-    assign StallD = wb_redirect ? 1'b0 : (lwstall | csr_stall | stallM);
+    assign StallF = wb_redirect ? 1'b0 : (lwstall | csr_stall | csr_gpr_stall | stallM);
+    assign StallD = wb_redirect ? 1'b0 : (lwstall | csr_stall | csr_gpr_stall | stallM);
 
     // ==================================================
     // Control Hazard Handling
@@ -186,7 +196,7 @@ module hazard_unit(
 
     // Control hazard / younger-kill policy.
     // NOTE: illegal_instr is handled as an exception sideband, not as an immediate flush here.
-    assign FlushE = lwstall | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallM;
+    assign FlushE = lwstall | csr_gpr_stall | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallM;
     assign FlushD = PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | flush_pipeline_onehot[0];
     assign FlushM = wb_redirect | flush_pipeline_onehot[2] | stallM;
     assign FlushW = wb_redirect | flush_pipeline_onehot[3];

@@ -377,10 +377,12 @@ module decode_cycle(
     assign is_M_instruction_E = is_M_instruction_r;
     assign op_E = op_r;
 
-    assign new_exc_valid_D = illegal_instr || is_ecall || is_ebreak;
-    assign new_exc_cause_D = illegal_instr ? 5'd2 : (is_ecall ? 5'd11 : (is_ebreak ? 5'd3 : 5'd0));
-    assign new_exc_tval_D = illegal_instr ? InstrD : 32'h00000000;
-    assign new_exc_pc_D = PCD;
+    assign new_exc_valid_D = valid_D && (illegal_instr || is_ecall || is_ebreak);
+    assign new_exc_cause_D = (valid_D && illegal_instr) ? 5'd2 : 
+                             (valid_D && is_ecall) ? 5'd11 : 
+                             (valid_D && is_ebreak) ? 5'd3 : 5'd0;
+    assign new_exc_tval_D  = (valid_D && illegal_instr) ? InstrD : 32'h00000000;
+    assign new_exc_pc_D    = valid_D ? PCD : 32'h00000000;
 
     assign next_exc_valid_D = exc_valid_D | new_exc_valid_D;
     assign next_exc_cause_D = exc_valid_D ? exc_cause_D : new_exc_cause_D;

@@ -29,6 +29,9 @@ module tb_riscof();
         rst = 0;
         cycle_count = 0;
 
+        $dumpfile("sim_trace.vcd");
+        $dumpvars(0, tb_riscof);
+
         #20;
         rst = 1;
     end
@@ -42,6 +45,8 @@ module tb_riscof();
     always @(posedge clk) begin
         if (rst) begin
             cycle_count = cycle_count + 1;
+            
+            $display("[DEBUG-TB] Cycle=%0d PC_W=0x%08x valid_W=%b exc_valid_W=%b is_mret_W=%b", cycle_count, uut.PC_W, uut.valid_W, uut.exc_valid_W, uut.is_mret_W);
 
             if (uut.Memory.dmem.WE) begin
                 $display("[DEBUG-TB] Mem Write: Addr=0x%08x, Val=0x%08x at cycle %0d", {uut.Memory.dmem.A, 2'b00}, uut.Memory.dmem.WD, cycle_count);
