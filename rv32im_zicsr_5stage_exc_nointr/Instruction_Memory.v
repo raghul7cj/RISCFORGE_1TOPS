@@ -8,7 +8,7 @@ module Instruction_Memory(rst,A,RD);
 
   reg [31:0] mem [1048575:0];
   
-  assign RD = (!rst) ? {32{1'b0}} : mem[A];
+  assign RD = (!rst) ? {32{1'b0}} : mem[A - 30'h20000000];
 
   initial begin : init_block
     integer i;

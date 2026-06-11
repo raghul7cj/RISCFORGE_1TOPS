@@ -81,7 +81,7 @@ module tb_riscof();
             $fwrite(debug_fd, "begin_sig=%08x end_sig=%08x tohost=%08x cycle_count=%d\n", begin_sig, end_sig, tohost_addr, cycle_count);
             // Dump the words between begin_sig and end_sig
             for (i = begin_sig; i < end_sig; i = i + 4) begin
-                $fwrite(fd, "%08x\n", uut.Memory.dmem.mem[(i - 32'h1000) >> 2]);
+                $fwrite(fd, "%08x\n", uut.Memory.dmem.mem[(i - 32'h80001000) >> 2]);
             end
             $fclose(fd);
             $fclose(debug_fd);

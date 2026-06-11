@@ -11,7 +11,7 @@ module Data_Memory(clk,rst,WE,WD,A,RD,WSTRB);
     // DMEM base address (word-aligned): 0x1000 >> 2 = 0x400
     // The linker places .data at 0x1000, but dmem.hex is rebased to 0x0000.
     // We subtract the base so address 0x1000 maps to mem[0].
-    localparam DMEM_BASE = 30'h400;  // 0x1000 >> 2
+    localparam DMEM_BASE = 30'h20000400;  // 0x80001000 >> 2
 
     wire [29:0] local_addr = A - DMEM_BASE;
 

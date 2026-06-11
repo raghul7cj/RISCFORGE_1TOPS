@@ -31,7 +31,7 @@ module PC(clk,rst,PC,PC_Next,StallF);
     always @(posedge clk or negedge rst)
     begin
         if(!rst) //== 1'b0)
-            PC <= {32{1'b0}};
+            PC <= 32'h80000000;
         else if(StallF==0)
             PC <= PC_Next;
         else
