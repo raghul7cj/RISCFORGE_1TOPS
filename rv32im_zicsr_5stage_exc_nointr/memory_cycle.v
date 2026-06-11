@@ -152,7 +152,7 @@ module memory_cycle(
     Data_Memory dmem (
         .clk(clk),
         .rst(rst),
-        .WE(MemWriteM & valid_M & ~exc_valid_M),
+        .WE(MemWriteM & valid_M & ~exc_valid_mem_final),
         .WD((lsunitM[4:3] == 2'b11) ? out_s : WriteDataM),
        // .A(ALU_ResultM),
         .A(ALU_ResultM[31:2]),
@@ -182,11 +182,24 @@ module memory_cycle(
     // Basic misalignment check: 
     // LW/SW must be 4-byte aligned (addr[1:0] == 00)
     // LH/SH must be 2-byte aligned (addr[0] == 0)
-    wire misaligned_load  = is_load  && ((lsunitM[2:0] == 3'b010 && ALU_ResultM[1:0] != 2'b00) || (lsunitM[2:0] == 3'b001 && ALU_ResultM[0] != 1'b0));
-    wire misaligned_store = is_store && ((lsunitM[2:0] == 3'b010 && ALU_ResultM[1:0] != 2'b00) || (lsunitM[2:0] == 3'b001 && ALU_ResultM[0] != 1'b0));
+    wire misaligned_load  = is_load  && (
+        (lsunitM[2:0] == 3'b010 && ALU_ResultM[1:0] != 2'b00) || // LW (010)
+        (lsunitM[2:0] == 3'b001 && ALU_ResultM[0]   != 1'b0)  || // LH (001)
+        (lsunitM[2:0] == 3'b101 && ALU_ResultM[0]   != 1'b0)     // LHU (101)
+    );
+
+    wire misaligned_store = is_store && (
+        (lsunitM[2:0] == 3'b010 && ALU_ResultM[1:0] != 2'b00) || // SW (010)
+        (lsunitM[2:0] == 3'b001 && ALU_ResultM[0]   != 1'b0)     // SH (001)
+    );
 
     wire exc_valid_mem_local = (misaligned_load | misaligned_store) & valid_M;
-    wire [4:0] exc_cause_mem_local = misaligned_load ? 5'd4 : 5'd6; // 4: Load misalign, 6: Store misalign
+
+    wire [4:0] exc_cause_mem_local =
+        misaligned_load  ? 5'd4 :
+        misaligned_store ? 5'd6 :
+                           5'd0; // 4: Load misalign, 6: Store misalign
+
     wire [31:0] exc_tval_mem_local = ALU_ResultM; // Faulting address
 
     // Merge with propagated exception (first wins)

@@ -182,6 +182,16 @@ module execute_cycle (
     wire stallM_internal;
     reg m_started;
 
+    // Exception internal nets
+    wire next_exc_valid_E;
+    wire new_exc_valid_E;
+    wire [4:0] next_exc_cause_E;
+    wire [4:0] new_exc_cause_E;
+    wire [31:0] next_exc_tval_E;
+    wire [31:0] new_exc_tval_E;
+    wire [31:0] next_exc_pc_E;
+    wire [31:0] new_exc_pc_E;
+
     // Pipeline registers
     reg RegWriteE_r;
     reg MemWriteE_r;
@@ -256,6 +266,8 @@ module execute_cycle (
 
     assign LUI_result_E = (LUISrcE) ? Imm_Ext_E : PCTarget_jb;
     assign ResultE = (m_valid_out) ? result_M : ((isLUIE) ? LUI_result_E : alu_r);
+
+
 
     // M-extension transaction tracker and module instantiation
     always @(posedge clk or negedge rst_n) begin
@@ -351,10 +363,10 @@ module execute_cycle (
             new_csr_E_r <= csr_new_val_E;
             old_csr_E_r <= csr_rdata_i;
             valid_M_r <= valid_E;
-            exc_valid_r <= exc_valid_E;
-            exc_cause_r <= exc_cause_E;
-            exc_tval_r <= exc_tval_E;
-            exc_pc_r <= exc_pc_E;
+            exc_valid_r <= next_exc_valid_E;
+            exc_cause_r <= next_exc_cause_E;
+            exc_tval_r <= next_exc_tval_E;
+            exc_pc_r <= next_exc_pc_E;
             is_mret_r <= is_mret_E;
         end
     end
@@ -380,4 +392,16 @@ module execute_cycle (
     assign csr_addr_M = csr_addr_E_r;
     assign new_csr_M = new_csr_E_r;
     assign old_csr_M = old_csr_E_r;
+
+
+    assign next_exc_valid_E = exc_valid_E | new_exc_valid_E;
+    assign next_exc_cause_E = exc_valid_E ? exc_cause_E : new_exc_cause_E;
+    assign next_exc_tval_E  = exc_valid_E ? exc_tval_E : new_exc_tval_E;
+    assign next_exc_pc_E    = exc_valid_E ? exc_pc_E : new_exc_pc_E;
+
+    assign new_exc_valid_E = PCSrcE && PCTargetE[1:0] != 2'b00;
+    assign new_exc_cause_E = 5'b00000;
+    assign new_exc_tval_E  = PCTargetE;
+    assign new_exc_pc_E    = PCE;
+
 endmodule

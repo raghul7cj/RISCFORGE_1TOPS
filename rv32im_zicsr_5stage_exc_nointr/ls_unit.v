@@ -1,165 +1,114 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Module Name : ls_unit
-//
-// Description:
-//  Load/Store data alignment and formatting unit for RV32I.
-//
-//  Responsibilities:
-//      1. Format load data (byte/half/word)
-//      2. Generate byte-enable strobes for stores
-//      3. Align store data to correct byte lanes
-//
-//  lsunit Encoding:
-//      lsunit[4]   : Load/Store enable
-//      lsunit[3]   : Opcode bit[5] (distinguishes load vs store)
-//      lsunit[2:0] : funct3 field
-//
-//      lsunit[4:3] = 2'b10 → LOAD
-//      lsunit[4:3] = 2'b11 → STORE
-//
-//  Inputs:
-//      in       : 32-bit data read from memory
-//      address  : Effective memory address
-//      in_s     : Store data (register value)
-//
-//  Outputs:
-//      out      : Formatted load result
-//      strobe   : Byte write enable signals
-//      out_s    : Aligned store data
-//
+// Description : Clean, non-nested, highly debuggable Load/Store Unit for RV32I
 //////////////////////////////////////////////////////////////////////////////////
 
-module ls_unit(in, lsunit, out, strobe, address, in_s,out_s);
+module ls_unit(
+    input  [31:0] in,       // Data read from memory (for loads)
+    input  [1:0]  address,  // Effective memory address lower bits [1:0]
+    input  [31:0] in_s,     // Store data from register
+    input  [4:0]  lsunit,   // Load/Store control bus: [4]=en, [3]=is_store, [2:0]=funct3
+    
+    output reg [31:0] out,    // Formatted load result
+    output reg [31:0] out_s,  // Aligned store data
+    output reg [3:0]  strobe  // Byte-enable signals
+);
 
-    // --------------------------------------------------
-    // Inputs
-    // --------------------------------------------------
-    input  [31:0] in;        // Data from memory (for loads)
-    //input  [31:0] address;   // Effective memory address
-    input  [1:0] address;   // Effective memory address
-    input  [31:0] in_s;      // Store data from register
-    input  [4:0]  lsunit;    // Load/Store control bus
-
-    // --------------------------------------------------
-    // Outputs
-    // --------------------------------------------------
-    output [31:0] out;       // Formatted load result
-    output [31:0] out_s;     // Aligned store data
-    output [3:0]  strobe;    // Byte-enable signals
-
-    // ==================================================
-    // LOAD DATA FORMATTING
-    // ==================================================
-    // Active when lsunit[4:3] == 2'b10
-    // Uses funct3 (lsunit[2:0]) to determine width/type
-
-    assign out = (lsunit[4:3] == 2'b10) ?
-
-        // --------------------------------------------------
-        // LB  (funct3 = 000) - Load Byte (sign-extended)
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b000) ?
-            (address[1:0] == 2'b00) ? {{24{in[7]}},  in[7:0]}   :
-            (address[1:0] == 2'b01) ? {{24{in[15]}}, in[15:8]}  :
-            (address[1:0] == 2'b10) ? {{24{in[23]}}, in[23:16]} :
-                                      {{24{in[31]}}, in[31:24]} :
-
-        // --------------------------------------------------
-        // LH  (funct3 = 001) - Load Halfword (sign-extended)
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b001) ?
-            (address[1] == 1'b0) ?
-                {{16{in[15]}}, in[15:0]} :
-                {{16{in[31]}}, in[31:16]} :
-
-        // --------------------------------------------------
-        // LW  (funct3 = 010) - Load Word
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b010) ?
-            in :
-
-        // --------------------------------------------------
-        // LBU (funct3 = 100) - Load Byte (zero-extended)
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b100) ?
-            (address[1:0] == 2'b00) ? {{24{1'b0}}, in[7:0]}   :
-            (address[1:0] == 2'b01) ? {{24{1'b0}}, in[15:8]}  :
-            (address[1:0] == 2'b10) ? {{24{1'b0}}, in[23:16]} :
-                                      {{24{1'b0}}, in[31:24]} :
-
-        // --------------------------------------------------
-        // LHU (funct3 = 101) - Load Halfword (zero-extended)
-        // --------------------------------------------------
-            (address[1] == 1'b0) ?
-                {{16{1'b0}}, in[15:0]} :
-                {{16{1'b0}}, in[31:16]} :
-
-        // Not a load → output zero
-        32'd0;
-
+    // Unpack control lines for readability
+    wire        ls_en    = lsunit[4];
+    wire        is_store = lsunit[4] & lsunit[3] ;
+    wire        is_load  = lsunit[4] & !lsunit[3] ;
+    wire [2:0]  funct3   = lsunit[2:0];
 
     // ==================================================
-    // STORE BYTE-ENABLE (STROBE) GENERATION
+    // LOAD DATA FORMATTING (Behavioral Mux)
     // ==================================================
-    // Active when lsunit[4:3] == 2'b11
-
-    assign strobe = (lsunit[4:3] == 2'b11) ?
-
-        // --------------------------------------------------
-        // SB (funct3 = 000)
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b000) ?
-            (address[1:0] == 2'b00) ? 4'b0001 :
-            (address[1:0] == 2'b01) ? 4'b0010 :
-            (address[1:0] == 2'b10) ? 4'b0100 :
-                                      4'b1000 :
-
-        // --------------------------------------------------
-        // SH (funct3 = 001)
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b001) ?
-            (address[1] == 1'b0) ? 4'b0011 :
-                                   4'b1100 :
-
-        // --------------------------------------------------
-        // SW (default)
-        // --------------------------------------------------
-            4'b1111 :
-
-        // Not a store → default strobe
-        4'b1111;
-
+    always @(*) begin
+        if (is_load) begin
+            case (funct3)
+                3'b000: begin // LB (Load Byte, Sign-Extended)
+                    case (address)
+                        2'b00:   out = {{24{in[7]}},  in[7:0]};
+                        2'b01:   out = {{24{in[15]}}, in[15:8]};
+                        2'b10:   out = {{24{in[23]}}, in[23:16]};
+                        default: out = {{24{in[31]}}, in[31:24]};
+                    endcase
+                end
+                
+                3'b001: begin // LH (Load Halfword, Sign-Extended)
+                    if (address[1] == 1'b0)
+                        out = {{16{in[15]}}, in[15:0]};
+                    else
+                        out = {{16{in[31]}}, in[31:16]};
+                end
+                
+                3'b010: begin // LW (Load Word)
+                    out = in; 
+                end
+                
+                3'b100: begin // LBU (Load Byte, Zero-Extended)
+                    case (address)
+                        2'b00:   out = {24'b0, in[7:0]};
+                        2'b01:   out = {24'b0, in[15:8]};
+                        2'b10:   out = {24'b0, in[23:16]};
+                        default: out = {24'b0, in[31:24]};
+                    endcase
+                end
+                
+                3'b101: begin // LHU (Load Halfword, Zero-Extended)
+                    if (address[1] == 1'b0)
+                        out = {16'b0, in[15:0]};
+                    else
+                        out = {16'b0, in[31:16]};
+                end
+                
+                default: out = 32'd0; // Safe fallback for undefined loads
+            endcase
+        end else begin
+            out = 32'd0;
+        end
+    end
 
     // ==================================================
-    // STORE DATA ALIGNMENT
+    // STORE DATA ALIGNMENT & STROBE GENERATION
     // ==================================================
-    // Aligns store data to correct byte lanes
-
-    assign out_s = (lsunit[4:3] == 2'b11) ?
-
-        // --------------------------------------------------
-        // SB
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b000) ?
-            (address[1:0] == 2'b00) ? in_s :
-            (address[1:0] == 2'b01) ? in_s << 8  :
-            (address[1:0] == 2'b10) ? in_s << 16 :
-                                      in_s << 24 :
-
-        // --------------------------------------------------
-        // SH
-        // --------------------------------------------------
-        (lsunit[2:0] == 3'b001) ?
-            (address[1] == 1'b0) ? in_s :
-                                   (in_s << 16) :
-
-        // --------------------------------------------------
-        // SW
-        // --------------------------------------------------
-            in_s :
-
-        // Not a store → pass-through
-        in_s;
+    always @(*) begin
+        if (is_store) begin
+            case (funct3)
+                3'b000: begin // SB (Store Byte)
+                    case (address)
+                        2'b00:   begin strobe = 4'b0001; out_s = in_s;         end
+                        2'b01:   begin strobe = 4'b0010; out_s = in_s << 8;    end
+                        2'b10:   begin strobe = 4'b0100; out_s = in_s << 16;   end
+                        default: begin strobe = 4'b1000; out_s = in_s << 24;   end
+                    endcase
+                end
+                
+                3'b001: begin // SH (Store Halfword)
+                    if (address[1] == 1'b0) begin
+                        strobe = 4'b0011;
+                        out_s  = in_s;
+                    end else begin
+                        strobe = 4'b1100;
+                        out_s  = in_s << 16;
+                    end
+                end
+                
+                3'b010: begin // SW (Store Word)
+                    strobe = 4'b1111;
+                    out_s  = in_s;
+                end
+                
+                default: begin // Safe fallback if control bus is garbage/corrupted
+                    strobe = 4'b0000; 
+                    out_s  = 32'd0;
+                end
+            endcase
+        end else begin
+            strobe = 4'b0000; // Force zero write enables when not executing a store
+            out_s  = in_s;    // Default pass-through
+        end
+    end
 
 endmodule
