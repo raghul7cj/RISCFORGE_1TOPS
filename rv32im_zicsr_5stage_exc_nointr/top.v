@@ -453,7 +453,7 @@ module top(
         
         .instr_retired_i(valid_W & ~exc_valid_W), // Increment minstret on retirement
         
-        .timer_intr_i(1'b0),
+        .timer_intr_i(1'b1),
         .ext_intr_i(1'b0),
         .msft_intr_i(1'b0),
         .mtvec_out_o(csr_mtvec_sb),

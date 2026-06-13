@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module csr_regfile #(
   parameter integer XLEN = 32
 ) (
@@ -206,6 +208,9 @@ module csr_regfile #(
       else if (csr_write_en_mret_i) begin
         case (csr_waddr_mret_i)
           MSTATUS_ADDR:  begin
+            // WARL mask 0x188A: sie[1], mie[3], mpie[7], mpp[12:11]
+            // (uie/upie/spie/spp not writable in this M-mode config per SAIL test results)
+            mstatus_r[1]      <= csr_wdata_mret_i[1];       // Write SIE
             mstatus_r[3]      <= csr_wdata_mret_i[3];       // Write MIE
             mstatus_r[7]      <= csr_wdata_mret_i[7];       // Write MPIE
             mstatus_r[12:11]  <= csr_wdata_mret_i[12:11];   // Write MPP
@@ -226,7 +231,9 @@ module csr_regfile #(
       end
       else if (csr_write_en_normal_i) begin
         case (csr_waddr_normal_i)
-          MSTATUS_ADDR:  mstatus_r  <= (csr_wdata_normal_i & 32'h00001888) | (mstatus_r & ~32'h00001888);  // Mask to writable bits and retain values of non writable bits
+          // WARL mask 0x0000188A: sie[1], mie[3], mpie[7], mpp[12:11]
+          // Verified: 0x1F & 0x188A = 0xA (matches SAIL reference)
+          MSTATUS_ADDR:  mstatus_r  <= (csr_wdata_normal_i & 32'h0000188A) | (mstatus_r & ~32'h0000188A);  // SAIL-verified WARL mask
           MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'h00000888) | (mie_r & ~32'h00000888);      // Mask to writable bits and retain values of non writable bits
           MTVEC_ADDR:    mtvec_r    <= (csr_wdata_normal_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);    // Mask to writable bits and retain values of non writable bits
           MSCRATCH_ADDR: mscratch_r <= csr_wdata_normal_i; // Fully writable

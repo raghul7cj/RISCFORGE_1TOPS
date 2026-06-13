@@ -301,7 +301,11 @@ module execute_cycle (
     wire        RegWriteE1   = (is_M_instruction_E && !m_valid_out) ? 1'b0 : 
                                (m_valid_out) ? 1'b1 : RegWriteE;
 
-    assign csr_new_val_E = csr_imm_mode_E ? {27'b0, csr_rs1_uimm_E} : Src_A;
+    wire [31:0] csr_op_val = csr_imm_mode_E ? {27'b0, csr_rs1_uimm_E} : Src_A;
+    assign csr_new_val_E = (csr_op_E == 2'b01) ? csr_op_val :
+                           (csr_op_E == 2'b10) ? (csr_rdata_i | csr_op_val) :
+                           (csr_op_E == 2'b11) ? (csr_rdata_i & ~csr_op_val) :
+                           csr_rdata_i;
     assign csr_write_en_E = csr_valid_E && (
                             (csr_op_E == 2'b01) || // CSRRW/CSRRWI always writes
                             ((csr_op_E == 2'b10 || csr_op_E == 2'b11) && (csr_rs1_uimm_E != 5'b0)) // CSRRS/CSRRC/CSRRSI/CSRRCI only writes if rs1/uimm != 0

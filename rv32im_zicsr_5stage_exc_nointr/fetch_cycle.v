@@ -184,9 +184,9 @@ module fetch_cycle(
     assign exc_pc_D = exc_pc_reg;
     assign exc_tval_D = exc_tval_reg;
 
-    assign exc_valid_F = (PCF[1:0] != 2'b00);
+    assign exc_valid_F = (PC_F[1:0] != 2'b00);
     assign exc_cause_F = 5'b00000;
-    assign exc_pc_F = PCF;
-    assign exc_tval_F = PCF;
+    assign exc_pc_F = PC_F;
+    assign exc_tval_F = PC_F;
 
 endmodule

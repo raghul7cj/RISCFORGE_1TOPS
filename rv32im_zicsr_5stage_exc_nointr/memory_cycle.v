@@ -143,36 +143,6 @@ module memory_cycle(
     );
 
     // ==================================================
-    // Data Memory
-    // ==================================================
-    // WE      : Controlled by MemWriteM
-    // WD      : Aligned store data for stores
-    // WSTRB   : Byte enables from ls_unit
-
-    Data_Memory dmem (
-        .clk(clk),
-        .rst(rst),
-        .WE(MemWriteM & valid_M & ~exc_valid_mem_final),
-        .WD((lsunitM[4:3] == 2'b11) ? out_s : WriteDataM),
-       // .A(ALU_ResultM),
-        .A(ALU_ResultM[31:2]),
-        .RD(ReadDataM),
-        .WSTRB(strobe)
-    );
-
-    // ==================================================
-    // Load Result Selection
-    // If load → use formatted lsout
-    // Otherwise pass raw memory data
-    // ==================================================
-
-    wire [31:0] result;
-
-    assign result = (lsunitM[4:3] == 2'b10) ?
-                    lsout :
-                    ReadDataM;
-
-    // ==================================================
     // MEM-Stage Exception Detection (Misalignment)
     // ==================================================
     
@@ -206,6 +176,36 @@ module memory_cycle(
     wire exc_valid_mem_final = exc_valid_M | exc_valid_mem_local;
     wire [4:0] exc_cause_mem_final = exc_valid_M ? exc_cause_M : exc_cause_mem_local;
     wire [31:0] exc_tval_mem_final = exc_valid_M ? exc_tval_M : exc_tval_mem_local;
+
+    // ==================================================
+    // Data Memory
+    // ==================================================
+    // WE      : Controlled by MemWriteM
+    // WD      : Aligned store data for stores
+    // WSTRB   : Byte enables from ls_unit
+
+    Data_Memory dmem (
+        .clk(clk),
+        .rst(rst),
+        .WE(MemWriteM & valid_M & ~exc_valid_mem_final),
+        .WD((lsunitM[4:3] == 2'b11) ? out_s : WriteDataM),
+       // .A(ALU_ResultM),
+        .A(ALU_ResultM[31:2]),
+        .RD(ReadDataM),
+        .WSTRB(strobe)
+    );
+
+    // ==================================================
+    // Load Result Selection
+    // If load → use formatted lsout
+    // Otherwise pass raw memory data
+    // ==================================================
+
+    wire [31:0] result;
+
+    assign result = (lsunitM[4:3] == 2'b10) ?
+                    lsout :
+                    ReadDataM;
 
     // Dummy pins for future extensions (Access Faults, etc.)
     wire dummy_mem_access_fault = 1'b0;

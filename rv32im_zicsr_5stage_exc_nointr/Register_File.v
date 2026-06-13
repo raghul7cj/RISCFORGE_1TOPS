@@ -49,6 +49,7 @@ module Register_File(clk, rst, WE3, WD3, A1, A2, A3, RD1, RD2);
                  (WE3 && A2 == A3 && (A3 != 5'd0)) ? WD3 :
                  Register[A2];
 
+`ifndef SYNTHESIS
     // Initialize all registers to 0 for deterministic simulation
     integer idx;
     initial begin
@@ -56,5 +57,6 @@ module Register_File(clk, rst, WE3, WD3, A1, A2, A3, RD1, RD2);
             Register[idx] = 32'h00000000;
         end
     end
+`endif
 
 endmodule

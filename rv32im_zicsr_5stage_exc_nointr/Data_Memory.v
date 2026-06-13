@@ -13,9 +13,14 @@ module Data_Memory(clk,rst,WE,WD,A,RD,WSTRB);
     // We subtract the base so address 0x1000 maps to mem[0].
     localparam DMEM_BASE = 30'h20000400;  // 0x80001000 >> 2
 
-    wire [29:0] local_addr = A - DMEM_BASE;
-
+    wire [29:0] local_addr_full = A - DMEM_BASE;
+`ifdef SYNTHESIS
+    wire [11:0] local_addr = local_addr_full[11:0];
+    reg [31:0] mem [4095:0];
+`else
+    wire [19:0] local_addr = local_addr_full[19:0];
     reg [31:0] mem [1048575:0];
+`endif
 
     always @ (posedge clk)
     begin
@@ -29,6 +34,7 @@ module Data_Memory(clk,rst,WE,WD,A,RD,WSTRB);
 
     assign RD = (~rst) ? 32'd0 : mem[local_addr];
 
+`ifndef SYNTHESIS
     initial begin : init_block
         integer i;
         for (i = 0; i < 1048576; i = i + 1) begin
@@ -36,5 +42,6 @@ module Data_Memory(clk,rst,WE,WD,A,RD,WSTRB);
         end
         $readmemh("dmem.hex", mem);
     end
+`endif
 
 endmodule
