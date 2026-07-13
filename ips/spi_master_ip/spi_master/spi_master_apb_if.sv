@@ -21,7 +21,7 @@
 `define REG_INTCFG 4'b1001 // BASEREG + 0x24
 `define REG_INTSTA 4'b1010 // BASEREG + 0x28
 
-module spi_master_apb_if //apb register slave file
+module spi_master_apb_if
 #(
     parameter BUFFER_DEPTH   = 10,
     parameter APB_ADDR_WIDTH = 12,  //APB slaves are 4KB by default
@@ -76,10 +76,25 @@ module spi_master_apb_if //apb register slave file
     assign write_address = PADDR[5:2];
     assign read_address  = PADDR[5:2];
 
+logic rxfifo_rd_sel;
+logic txfifo_wr_sel;
+logic rxfifo_rd_access;
+logic txfifo_wr_access;
+
+assign rxfifo_rd_sel = PSEL & ~PWRITE & (read_address == `REG_RXFIFO);
+assign txfifo_wr_sel = PSEL &  PWRITE & (write_address == `REG_TXFIFO);
+
     assign PSLVERR = 1'b0;
-    assign PREADY  = 1'b1;
+//    assign PREADY  = 1'b1;
+
+assign PREADY = (rxfifo_rd_sel & ~spi_data_rx_valid) ? 1'b0 :
+                (txfifo_wr_sel & ~spi_data_tx_ready) ? 1'b0 :
+                1'b1;
 
     assign spi_int_rd_sta = PSEL & PENABLE & ~PWRITE & (read_address  == `REG_INTSTA);
+
+
+// bus error - if read operation and two spi slaves are selected, second error - out of 16 only 10 registers are initialized
 
     always @( posedge HCLK or negedge HRESETn )
     begin
@@ -213,7 +228,11 @@ module spi_master_apb_if //apb register slave file
     end // SLAVE_REG_READ_PROC
 
     assign spi_data_tx       = PWDATA;
-    assign spi_data_tx_valid = PSEL & PENABLE &  PWRITE & (write_address == `REG_TXFIFO);
-    assign spi_data_rx_ready = PSEL & PENABLE & ~PWRITE & (read_address  == `REG_RXFIFO);
+
+assign rxfifo_rd_access = rxfifo_rd_sel & PENABLE;
+assign txfifo_wr_access = txfifo_wr_sel & PENABLE;
+
+assign spi_data_tx_valid = txfifo_wr_access & PREADY;
+assign spi_data_rx_ready = rxfifo_rd_access & PREADY;
 
 endmodule
