@@ -21,17 +21,22 @@ module axi_lite_sram_if #(
 )(
   input  logic      clk_i,
   input  logic      rst_ni,
+  input  logic      soft_rst_ni,   // SRAM WE clamp during soft reset
   input  axi_req_t  axi_req_i,
   output axi_resp_t axi_resp_o,
   output logic                        sram_req_o,
   input  logic                        sram_gnt_i,
-  output logic                        sram_we_o,
+  output logic                        sram_we_o,     // clamped by soft_rst_ni
   output logic [SRAM_ADDR_WIDTH-1:0]  sram_addr_o,
   output logic [AXI_DATA_WIDTH-1:0]   sram_wdata_o,
   output logic [STRB_WIDTH-1:0]       sram_be_o,
   input  logic [AXI_DATA_WIDTH-1:0]   sram_rdata_i,
   input  logic                        sram_rvalid_i
 );
+
+  // Internal WE signal — clamped at the output
+  logic sram_we_int;
+  assign sram_we_o = sram_we_int & soft_rst_ni;
 
   typedef enum logic [2:0] {
     S_IDLE, S_WRITE_WAIT_W, S_WRITE_WAIT_AW,
@@ -54,7 +59,7 @@ module axi_lite_sram_if #(
     state_d      = state_q;
     axi_resp_o   = '0;
     sram_req_o   = 1'b0;
-    sram_we_o    = 1'b0;
+    sram_we_int  = 1'b0;
     sram_addr_o  = addr_q;
     sram_wdata_o = wdata_q;
     sram_be_o    = wstrb_q;
@@ -93,7 +98,7 @@ module axi_lite_sram_if #(
 
       S_READ_REQ: begin
         sram_req_o  = 1'b1;
-        sram_we_o   = 1'b0;
+        sram_we_int = 1'b0;
         sram_addr_o = addr_q;
         if (sram_gnt_i) state_d = S_READ_RESP;
       end
@@ -108,7 +113,7 @@ module axi_lite_sram_if #(
 
       S_WRITE_REQ: begin
         sram_req_o   = 1'b1;
-        sram_we_o    = 1'b1;
+        sram_we_int  = 1'b1;
         sram_addr_o  = addr_q;
         sram_wdata_o = wdata_q;
         sram_be_o    = wstrb_q;

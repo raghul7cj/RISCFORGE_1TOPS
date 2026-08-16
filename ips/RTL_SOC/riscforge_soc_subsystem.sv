@@ -8,8 +8,11 @@
 //     - Data memory port      → sram_mux[DSRAM] port 0 → DSRAM (4 KB)
 //     - AXI-Lite master       → axi_lite_xbar SLV[0]
 //
-//   Bootloader (stub):
-//     - AXI-Lite master       → axi_lite_xbar SLV[1]
+//   Bootloader (real):
+//     - AXI-Lite master       → axi_lite_xbar SLV[1]   (SRAM writes only)
+//     - APB slave  ← APB bridge slot 4 (SPI address space)
+//     - APB master → apb_spi_master  (boot: FSM drives; runtime: passthrough)
+//     - Outputs: core_rst_ni, periph_rst_ni (clean-slate reset after load)
 //
 //   axi_lite_xbar (2 SLV → 3 MST):
 //     MST[0] → axi_lite_sram_if → sram_mux[ISRAM] port 1 → ISRAM
@@ -19,7 +22,7 @@
 //               ├─ APB[1] → Timer
 //               ├─ APB[2] → UART
 //               ├─ APB[3] → GPIO
-//               ├─ APB[4] → SPI Master
+//               ├─ APB[4] → Bootloader APB slave (→ apb_spi_master)
 //               └─ APB[5] → CLIC
 //
 //   CLIC ↔ Core interrupt handshake is an internal closed loop.
@@ -37,6 +40,17 @@
 //   SPI:    0x4000_4000 – 0x4000_5000  (4 KB)
 //   CLIC:   0x4000_5000 – 0x4000_6000  (4 KB)
 //
+// Reset Topology:
+//   hard_rst_ni  → cold boot, resets everything including bootloader
+//   soft_rst_ni  → warm boot, SRAM preserved, bootloader runs clean-slate only
+//   sys_rst_n    = hard_rst_ni & soft_rst_ni → crossbar, bridges, muxes
+//   core_rst_n   ← bootloader output → RISC-V core
+//   periph_rst_n ← bootloader output → non-boot peripherals (I2C, Timer, UART,
+//                                       GPIO, CLIC)
+//   spi_rst_n    ← bootloader output → SPI master (independent timing: HIGH
+//                                       during boot, pulsed LOW for clean-slate,
+//                                       HIGH for runtime)
+//
 // =============================================================================
 
 module riscforge_soc_subsystem
@@ -48,6 +62,10 @@ module riscforge_soc_subsystem
   parameter int unsigned CLIC_INTCTLBITS   = 8,
   parameter int unsigned TIMER_CNT         = 2,
   parameter int unsigned SPI_BUFFER_DEPTH  = 10,
+  // Bootloader firmware image parameters (passed to bootloader)
+  parameter int unsigned NUM_INSTR_WORDS   = 64,
+  parameter int unsigned NUM_DATA_WORDS    = 0,
+  parameter int unsigned FLASH_POWERUP_CYCLES = 30_000,
   // Derived — do not override
   localparam int unsigned AXI_STRB_WIDTH   = AXI_DATA_WIDTH / 8,
   localparam int unsigned NR_GPIOS         = GPIOCount,
@@ -57,7 +75,8 @@ module riscforge_soc_subsystem
   // Global
   // =========================================================================
   input  logic                          clk_i,
-  input  logic                          rst_ni,
+  input  logic                          hard_rst_ni,
+  input  logic                          soft_rst_ni,
   input  logic                          test_mode_i,
 
   // =========================================================================
@@ -67,14 +86,9 @@ module riscforge_soc_subsystem
   input  logic [31:0]                   boot_addr_i,
 
   // =========================================================================
-  // Bootloader Control & SPI Flash
+  // Bootloader Status
   // =========================================================================
   output logic                          boot_done_o,
-  output logic                          boot_spi_clk_o,
-  output logic                          boot_spi_csn_o,
-  output logic [3:0]                    boot_spi_sdo_o,
-  input  logic [3:0]                    boot_spi_sdi_i,
-  output logic [1:0]                    boot_spi_mode_o,
 
   // =========================================================================
   // I2C External Interface
@@ -276,7 +290,19 @@ module riscforge_soc_subsystem
   localparam int unsigned BYTE_OFFSET      = $clog2(AXI_DATA_WIDTH/8); // 2
 
   // ===========================================================================
-  //  Section 6 — Internal Signals
+  //  Section 6 — Internal Reset Signals
+  // ===========================================================================
+
+  // Derived internal resets
+  logic sys_rst_n;             // For crossbar, SRAM bridges, SRAM mux
+  logic core_rst_n;            // For RISC-V core (from bootloader)
+  logic periph_rst_n;          // For non-boot peripherals (from bootloader)
+  logic spi_rst_n;             // For SPI master (from bootloader, independent timing)
+
+  assign sys_rst_n = hard_rst_ni & soft_rst_ni;  // Reset on either external reset
+
+  // ===========================================================================
+  //  Section 7 — Internal Signals
   // ===========================================================================
 
   // Crossbar ports
@@ -315,27 +341,6 @@ module riscforge_soc_subsystem
   logic [1:0]                riscv_r_resp;
   logic                      riscv_r_valid;
   logic                      riscv_r_ready;
-
-  // --- Bootloader AXI-Lite flat signals (bootloader → crossbar SLV[1]) ---
-  logic [AXI_ADDR_WIDTH-1:0] boot_aw_addr;
-  logic [2:0]                boot_aw_prot;
-  logic                      boot_aw_valid;
-  logic                      boot_aw_ready;
-  logic [AXI_DATA_WIDTH-1:0] boot_w_data;
-  logic [AXI_STRB_WIDTH-1:0] boot_w_strb;
-  logic                      boot_w_valid;
-  logic                      boot_w_ready;
-  logic [1:0]                boot_b_resp;
-  logic                      boot_b_valid;
-  logic                      boot_b_ready;
-  logic [AXI_ADDR_WIDTH-1:0] boot_ar_addr;
-  logic [2:0]                boot_ar_prot;
-  logic                      boot_ar_valid;
-  logic                      boot_ar_ready;
-  logic [AXI_DATA_WIDTH-1:0] boot_r_data;
-  logic [1:0]                boot_r_resp;
-  logic                      boot_r_valid;
-  logic                      boot_r_ready;
 
   // --- Core instruction fetch port (core → ISRAM mux port 0) ---
   logic        core_instr_req;
@@ -395,9 +400,16 @@ module riscforge_soc_subsystem
   logic [AXI_DATA_WIDTH-1:0]   dsram_rdata;
 
   // Peripheral intermediate signals for APB response construction
-  logic [31:0] i2c_prdata,   timer_prdata,   uart_prdata,   spi_prdata;
-  logic        i2c_pready,   timer_pready,   uart_pready,   spi_pready;
-  logic        i2c_pslverr,  timer_pslverr,  uart_pslverr,  spi_pslverr;
+  logic [31:0] i2c_prdata,   timer_prdata,   uart_prdata;
+  logic        i2c_pready,   timer_pready,   uart_pready;
+  logic        i2c_pslverr,  timer_pslverr,  uart_pslverr;
+
+  // SPI Master APB signals (from/to bootloader APB master port)
+  apb_req_t  spi_apb_req;
+  apb_resp_t spi_apb_resp;
+  logic [31:0] spi_prdata;
+  logic        spi_pready;
+  logic        spi_pslverr;
 
   // CLIC intermediate signals
   logic [31:0] clic_prdata;
@@ -413,7 +425,7 @@ module riscforge_soc_subsystem
   assign default_mst    = '0;
 
   // ===========================================================================
-  //  Section 7 — Address Maps
+  //  Section 8 — Address Maps
   // ===========================================================================
 
   // Crossbar address map
@@ -426,11 +438,11 @@ module riscforge_soc_subsystem
   assign apb_addr_map[1] = '{idx: 32'd1, start_addr: 32'h4000_1000, end_addr: 32'h4000_2000}; // Timer
   assign apb_addr_map[2] = '{idx: 32'd2, start_addr: 32'h4000_2000, end_addr: 32'h4000_3000}; // UART
   assign apb_addr_map[3] = '{idx: 32'd3, start_addr: 32'h4000_3000, end_addr: 32'h4000_4000}; // GPIO
-  assign apb_addr_map[4] = '{idx: 32'd4, start_addr: 32'h4000_4000, end_addr: 32'h4000_5000}; // SPI Master
+  assign apb_addr_map[4] = '{idx: 32'd4, start_addr: 32'h4000_4000, end_addr: 32'h4000_5000}; // SPI Master (via bootloader)
   assign apb_addr_map[5] = '{idx: 32'd5, start_addr: 32'h4000_5000, end_addr: 32'h4000_6000}; // CLIC
 
   // ===========================================================================
-  //  Section 8 — Flat ↔ Struct Packing (RISC-V Core Stub → Crossbar SLV[0])
+  //  Section 9 — Flat ↔ Struct Packing (RISC-V Core Stub → Crossbar SLV[0])
   // ===========================================================================
 
   assign xbar_slv_req[0] = '{
@@ -454,30 +466,6 @@ module riscforge_soc_subsystem
   assign riscv_r_valid  = xbar_slv_resp[0].r_valid;
 
   // ===========================================================================
-  //  Section 9 — Flat ↔ Struct Packing (Bootloader Stub → Crossbar SLV[1])
-  // ===========================================================================
-
-  assign xbar_slv_req[1] = '{
-    aw:       '{addr: boot_aw_addr, prot: axi_pkg::prot_t'(boot_aw_prot)},
-    aw_valid: boot_aw_valid,
-    w:        '{data: boot_w_data, strb: boot_w_strb},
-    w_valid:  boot_w_valid,
-    b_ready:  boot_b_ready,
-    ar:       '{addr: boot_ar_addr, prot: axi_pkg::prot_t'(boot_ar_prot)},
-    ar_valid: boot_ar_valid,
-    r_ready:  boot_r_ready
-  };
-
-  assign boot_aw_ready = xbar_slv_resp[1].aw_ready;
-  assign boot_w_ready  = xbar_slv_resp[1].w_ready;
-  assign boot_b_resp   = xbar_slv_resp[1].b.resp;
-  assign boot_b_valid  = xbar_slv_resp[1].b_valid;
-  assign boot_ar_ready = xbar_slv_resp[1].ar_ready;
-  assign boot_r_data   = xbar_slv_resp[1].r.data;
-  assign boot_r_resp   = xbar_slv_resp[1].r.resp;
-  assign boot_r_valid  = xbar_slv_resp[1].r_valid;
-
-  // ===========================================================================
   //  Section 10 — Instruction SRAM Subsystem
   //  (Crossbar MST[0] → AXI bridge → mux port 1; Core fetch → mux port 0)
   // ===========================================================================
@@ -491,7 +479,8 @@ module riscforge_soc_subsystem
     .axi_resp_t     ( axi_resp_t     )
   ) i_isram_axi_if (
     .clk_i      ( clk_i              ),
-    .rst_ni     ( rst_ni             ),
+    .rst_ni     ( sys_rst_n          ),
+    .soft_rst_ni( soft_rst_ni        ),
     .axi_req_i  ( xbar_mst_req[0]    ),
     .axi_resp_o ( xbar_mst_resp[0]   ),
     .sram_req_o    ( isram_axi_req    ),
@@ -510,7 +499,7 @@ module riscforge_soc_subsystem
     .DATA_WIDTH ( AXI_DATA_WIDTH  )
   ) i_isram_mux (
     .clk_i          ( clk_i       ),
-    .rst_ni         ( rst_ni      ),
+    .rst_ni         ( sys_rst_n   ),
     // Port 0 — Core instruction fetch (read-only)
     .port0_req_i    ( core_instr_req   ),
     .port0_gnt_o    ( core_instr_gnt   ),
@@ -538,12 +527,14 @@ module riscforge_soc_subsystem
     .sram_rdata_i   ( isram_rdata      )
   );
 
-  // Instruction SRAM (4 KB)
-  sram_sp #(
-    .NUM_WORDS  ( ISRAM_NUM_WORDS ),
-    .DATA_WIDTH ( AXI_DATA_WIDTH  )
+  // Instruction Memory (Instruction_Memory_new via sram_sp-compatible wrapper)
+  imem_sram_wrapper #(
+    .NUM_WORDS      ( ISRAM_NUM_WORDS ),
+    .DATA_WIDTH     ( AXI_DATA_WIDTH  ),
+    .IMEM_BASE_BYTE ( 32'h0000_0000  )   // Match crossbar ISRAM address map
   ) i_isram (
     .clk_i   ( clk_i       ),
+    .rst_ni  ( sys_rst_n   ),
     .cs_i    ( isram_cs     ),
     .we_i    ( isram_we     ),
     .addr_i  ( isram_addr   ),
@@ -566,7 +557,8 @@ module riscforge_soc_subsystem
     .axi_resp_t     ( axi_resp_t     )
   ) i_dsram_axi_if (
     .clk_i      ( clk_i              ),
-    .rst_ni     ( rst_ni             ),
+    .rst_ni     ( sys_rst_n          ),
+    .soft_rst_ni( soft_rst_ni        ),
     .axi_req_i  ( xbar_mst_req[1]    ),
     .axi_resp_o ( xbar_mst_resp[1]   ),
     .sram_req_o    ( dsram_axi_req    ),
@@ -585,7 +577,7 @@ module riscforge_soc_subsystem
     .DATA_WIDTH ( AXI_DATA_WIDTH  )
   ) i_dsram_mux (
     .clk_i          ( clk_i       ),
-    .rst_ni         ( rst_ni      ),
+    .rst_ni         ( sys_rst_n   ),
     // Port 0 — Core data port (read/write)
     .port0_req_i    ( core_data_req    ),
     .port0_gnt_o    ( core_data_gnt    ),
@@ -643,7 +635,7 @@ module riscforge_soc_subsystem
     .rule_t     ( rule_t     )
   ) i_axi_lite_xbar (
     .clk_i                ( clk_i           ),
-    .rst_ni               ( rst_ni          ),
+    .rst_ni               ( sys_rst_n       ),
     .test_i               ( test_mode_i     ),
     .slv_ports_req_i      ( xbar_slv_req    ),
     .slv_ports_resp_o     ( xbar_slv_resp   ),
@@ -672,7 +664,7 @@ module riscforge_soc_subsystem
     .rule_t          ( rule_t          )
   ) i_axi_lite_to_apb (
     .clk_i          ( clk_i             ),
-    .rst_ni         ( rst_ni            ),
+    .rst_ni         ( sys_rst_n         ),
     .axi_lite_req_i ( xbar_mst_req[2]   ),
     .axi_lite_resp_o( xbar_mst_resp[2]  ),
     .apb_req_o      ( apb_req           ),
@@ -688,7 +680,7 @@ module riscforge_soc_subsystem
     .APB_ADDR_WIDTH ( 12 )
   ) i_apb_i2c (
     .HCLK       ( clk_i                    ),
-    .HRESETn    ( rst_ni                   ),
+    .HRESETn    ( periph_rst_n             ),
     .PADDR      ( apb_req[0].paddr[11:0]   ),
     .PWDATA     ( apb_req[0].pwdata        ),
     .PWRITE     ( apb_req[0].pwrite        ),
@@ -717,7 +709,7 @@ module riscforge_soc_subsystem
     .TIMER_CNT      ( TIMER_CNT )
   ) i_apb_timer (
     .HCLK    ( clk_i                    ),
-    .HRESETn ( rst_ni                   ),
+    .HRESETn ( periph_rst_n             ),
     .PADDR   ( apb_req[1].paddr[11:0]   ),
     .PWDATA  ( apb_req[1].pwdata        ),
     .PWRITE  ( apb_req[1].pwrite        ),
@@ -739,7 +731,7 @@ module riscforge_soc_subsystem
 
   apb_uart i_apb_uart (
     .CLK     ( clk_i                    ),
-    .RSTN    ( rst_ni                   ),
+    .RSTN    ( periph_rst_n             ),
     .PSEL    ( apb_req[2].psel          ),
     .PENABLE ( apb_req[2].penable       ),
     .PWRITE  ( apb_req[2].pwrite        ),
@@ -775,7 +767,7 @@ module riscforge_soc_subsystem
     .apb_rsp_t  ( apb_resp_t     )
   ) i_gpio_apb_wrap (
     .clk_i                 ( clk_i                       ),
-    .rst_ni                ( rst_ni                      ),
+    .rst_ni                ( periph_rst_n                 ),
     .gpio_in               ( gpio_in_i                   ),
     .gpio_out              ( gpio_out_o                  ),
     .gpio_tx_en_o          ( gpio_tx_en_o                ),
@@ -787,41 +779,44 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 18 — APB[4]: SPI Master
+  //  Section 18 — APB[4]: SPI Master (via Bootloader APB mux)
+  //  The bootloader sits between the APB bridge and the SPI master.
+  //  During boot: bootloader drives SPI master directly
+  //  At runtime: APB bridge slot 4 passes through bootloader to SPI master
   // ===========================================================================
 
   apb_spi_master #(
     .BUFFER_DEPTH   ( SPI_BUFFER_DEPTH ),
     .APB_ADDR_WIDTH ( 12               )
   ) i_apb_spi_master (
-    .HCLK    ( clk_i                    ),
-    .HRESETn ( rst_ni                   ),
-    .PADDR   ( apb_req[4].paddr[11:0]   ),
-    .PWDATA  ( apb_req[4].pwdata        ),
-    .PWRITE  ( apb_req[4].pwrite        ),
-    .PSEL    ( apb_req[4].psel          ),
-    .PENABLE ( apb_req[4].penable       ),
-    .PRDATA  ( spi_prdata               ),
-    .PREADY  ( spi_pready               ),
-    .PSLVERR ( spi_pslverr              ),
-    .events_o( spi_events_o             ),
-    .spi_clk ( spi_clk_o                ),
-    .spi_csn0( spi_csn0_o               ),
-    .spi_csn1( spi_csn1_o               ),
-    .spi_csn2( spi_csn2_o               ),
-    .spi_csn3( spi_csn3_o               ),
-    .spi_mode( spi_mode_o               ),
-    .spi_sdo0( spi_sdo0_o               ),
-    .spi_sdo1( spi_sdo1_o               ),
-    .spi_sdo2( spi_sdo2_o               ),
-    .spi_sdo3( spi_sdo3_o               ),
-    .spi_sdi0( spi_sdi0_i               ),
-    .spi_sdi1( spi_sdi1_i               ),
-    .spi_sdi2( spi_sdi2_i               ),
-    .spi_sdi3( spi_sdi3_i               )
+    .HCLK    ( clk_i                        ),
+    .HRESETn ( spi_rst_n                    ),
+    .PADDR   ( spi_apb_req.paddr[11:0]      ),
+    .PWDATA  ( spi_apb_req.pwdata           ),
+    .PWRITE  ( spi_apb_req.pwrite           ),
+    .PSEL    ( spi_apb_req.psel             ),
+    .PENABLE ( spi_apb_req.penable          ),
+    .PRDATA  ( spi_prdata                   ),
+    .PREADY  ( spi_pready                   ),
+    .PSLVERR ( spi_pslverr                  ),
+    .events_o( spi_events_o                 ),
+    .spi_clk ( spi_clk_o                    ),
+    .spi_csn0( spi_csn0_o                   ),
+    .spi_csn1( spi_csn1_o                   ),
+    .spi_csn2( spi_csn2_o                   ),
+    .spi_csn3( spi_csn3_o                   ),
+    .spi_mode( spi_mode_o                   ),
+    .spi_sdo0( spi_sdo0_o                   ),
+    .spi_sdo1( spi_sdo1_o                   ),
+    .spi_sdo2( spi_sdo2_o                   ),
+    .spi_sdo3( spi_sdo3_o                   ),
+    .spi_sdi0( spi_sdi0_i                   ),
+    .spi_sdi1( spi_sdi1_i                   ),
+    .spi_sdi2( spi_sdi2_i                   ),
+    .spi_sdi3( spi_sdi3_i                   )
   );
 
-  assign apb_resp[4] = '{pready: spi_pready, prdata: spi_prdata, pslverr: spi_pslverr};
+  assign spi_apb_resp = '{pready: spi_pready, prdata: spi_prdata, pslverr: spi_pslverr};
 
   // ===========================================================================
   //  Section 19 — APB[5]: CLIC (Core-Local Interrupt Controller)
@@ -836,7 +831,7 @@ module riscforge_soc_subsystem
     .REG_BUS_DATA_WIDTH ( AXI_DATA_WIDTH  )
   ) i_clic_apb (
     .clk_i       ( clk_i                     ),
-    .rst_ni      ( rst_ni                    ),
+    .rst_ni      ( periph_rst_n              ),
     .penable_i   ( apb_req[5].penable        ),
     .pwrite_i    ( apb_req[5].pwrite         ),
     .paddr_i     ( apb_req[5].paddr          ),
@@ -852,7 +847,7 @@ module riscforge_soc_subsystem
     .irq_ready_i    ( core_irq_ready         ),  // from core (was: top-level input)
     .irq_id_o       ( clic_irq_id_o          ),
     .irq_level_o    ( clic_irq_level_o       ),
-    .irq_shv_o      ( clic_irq_shv_o         ),
+    .irq_shv_o      ( clic_irq_shv_o        ),
     .irq_priv_o     ( clic_irq_priv_o        ),
     .irq_kill_req_o ( clic_irq_kill_req_o    ),
     .irq_kill_ack_i ( core_irq_kill_ack      )   // from core (was: top-level input)
@@ -869,7 +864,7 @@ module riscforge_soc_subsystem
     .AXI_DATA_WIDTH ( AXI_DATA_WIDTH )
   ) i_riscv_core (
     .clk_i          ( clk_i             ),
-    .rst_ni         ( rst_ni            ),
+    .rst_ni         ( core_rst_n        ),
     // Instruction fetch port (direct to ISRAM mux)
     .instr_req_o    ( core_instr_req    ),
     .instr_gnt_i    ( core_instr_gnt    ),
@@ -920,43 +915,44 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 21 — Bootloader Stub
+  //  Section 21 — Bootloader (Real Implementation)
+  //  Connects directly via struct-based AXI-Lite to crossbar SLV[1].
+  //  APB mux: during boot, FSM drives SPI master; at runtime, passthrough.
   // ===========================================================================
 
-  bootloader_stub #(
-    .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
-    .AXI_DATA_WIDTH ( AXI_DATA_WIDTH )
+  bootloader #(
+    .axi_req_t           ( axi_req_t           ),
+    .axi_resp_t          ( axi_resp_t          ),
+    .apb_req_t           ( apb_req_t           ),
+    .apb_resp_t          ( apb_resp_t          ),
+    .AXI_ADDR_WIDTH      ( AXI_ADDR_WIDTH      ),
+    .AXI_DATA_WIDTH      ( AXI_DATA_WIDTH      ),
+    .ISRAM_BASE_ADDR     ( 32'h0000_0000       ),
+    .DSRAM_BASE_ADDR     ( 32'h0001_0000       ),
+    .ISRAM_NUM_WORDS     ( ISRAM_NUM_WORDS     ),
+    .DSRAM_NUM_WORDS     ( DSRAM_NUM_WORDS     ),
+    .NUM_INSTR_WORDS     ( NUM_INSTR_WORDS     ),
+    .NUM_DATA_WORDS      ( NUM_DATA_WORDS      ),
+    .FLASH_POWERUP_CYCLES( FLASH_POWERUP_CYCLES)
   ) i_bootloader (
-    .clk_i          ( clk_i             ),
-    .rst_ni         ( rst_ni            ),
-    // AXI-Lite master
-    .axi_aw_addr_o  ( boot_aw_addr      ),
-    .axi_aw_prot_o  ( boot_aw_prot      ),
-    .axi_aw_valid_o ( boot_aw_valid     ),
-    .axi_aw_ready_i ( boot_aw_ready     ),
-    .axi_w_data_o   ( boot_w_data       ),
-    .axi_w_strb_o   ( boot_w_strb       ),
-    .axi_w_valid_o  ( boot_w_valid      ),
-    .axi_w_ready_i  ( boot_w_ready      ),
-    .axi_b_resp_i   ( boot_b_resp       ),
-    .axi_b_valid_i  ( boot_b_valid      ),
-    .axi_b_ready_o  ( boot_b_ready      ),
-    .axi_ar_addr_o  ( boot_ar_addr      ),
-    .axi_ar_prot_o  ( boot_ar_prot      ),
-    .axi_ar_valid_o ( boot_ar_valid     ),
-    .axi_ar_ready_i ( boot_ar_ready     ),
-    .axi_r_data_i   ( boot_r_data       ),
-    .axi_r_resp_i   ( boot_r_resp       ),
-    .axi_r_valid_i  ( boot_r_valid      ),
-    .axi_r_ready_o  ( boot_r_ready      ),
-    // Boot control
-    .boot_done_o    ( boot_done_o       ),
-    // SPI Flash (direct external)
-    .spi_clk_o      ( boot_spi_clk_o    ),
-    .spi_csn_o      ( boot_spi_csn_o    ),
-    .spi_sdo_o      ( boot_spi_sdo_o    ),
-    .spi_sdi_i      ( boot_spi_sdi_i    ),
-    .spi_mode_o     ( boot_spi_mode_o   )
+    .clk_i           ( clk_i             ),
+    .hard_rst_ni     ( hard_rst_ni       ),
+    .soft_rst_ni     ( soft_rst_ni       ),
+    // AXI-Lite master (struct, not flat wires) — SRAM writes only
+    .axi_req_o       ( xbar_slv_req[1]   ),
+    .axi_resp_i      ( xbar_slv_resp[1]  ),
+    // APB slave (from APB bridge slot 4)
+    .apb_slv_req_i   ( apb_req[4]        ),
+    .apb_slv_resp_o  ( apb_resp[4]       ),
+    // APB master (to apb_spi_master)
+    .apb_mst_req_o   ( spi_apb_req       ),
+    .apb_mst_resp_i  ( spi_apb_resp      ),
+    // Reset outputs
+    .core_rst_ni_o   ( core_rst_n        ),
+    .periph_rst_ni_o ( periph_rst_n      ),
+    .spi_rst_ni_o    ( spi_rst_n         ),
+    // Boot status
+    .boot_done_o     ( boot_done_o       )
   );
 
 endmodule

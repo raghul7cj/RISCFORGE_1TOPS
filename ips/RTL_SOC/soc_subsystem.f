@@ -179,12 +179,14 @@
 sram_sp.sv
 sram_mux.sv
 axi_lite_sram_if.sv
+../instr_module/Instruction_Memory.v
+imem_sram_wrapper.sv
 
 // =============================================================================
-// Section 14: Stub IPs (hollow — to be replaced later)
+// Section 14: Stub IPs and Real Bootloader
 // =============================================================================
 riscv_core_stub.sv
-bootloader_stub.sv
+../bootloader/bootloader.sv
 
 // =============================================================================
 // Section 15: SoC Subsystem Top-Level

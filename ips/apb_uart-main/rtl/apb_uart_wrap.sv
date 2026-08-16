@@ -10,7 +10,8 @@
 // A UART with APB struct ports.
 module apb_uart_wrap #(
   parameter type apb_req_t = logic,
-  parameter type apb_rsp_t = logic
+  parameter type apb_rsp_t = logic,
+  parameter int unsigned AddrWidth = 5  // $bits(apb_req_t.paddr) — set explicitly for Xcelium
 ) (
   input  logic clk_i,
   input  logic rst_ni,
@@ -34,7 +35,7 @@ module apb_uart_wrap #(
 );
 
   localparam obi_pkg::obi_cfg_t ObiCfg = obi_pkg::obi_default_cfg(
-      $bits(apb_req_i.paddr),
+      AddrWidth,
       32,
       1,
       obi_pkg::ObiMinimalOptionalConfig
@@ -83,3 +84,4 @@ module apb_uart_wrap #(
   );
 
 endmodule
+
