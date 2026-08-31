@@ -36,7 +36,7 @@ module decode_cycle(
     PCE, PCPlus4E, RS1_E, RS2_E,
     JumpE, lsunitE,
     RS1_D, RS2_D,
-    FlushE, LUISrcE, isLUIE,
+    FlushE, StallE, LUISrcE, isLUIE,
     illegal_instr,
     csr_valid_E,
     csr_imm_mode_E,
@@ -59,6 +59,7 @@ module decode_cycle(
     input clk;
     input rst;           // Active-low reset
     input FlushE;        // Pipeline flush
+    input StallE;        // Pipeline stall
 
     input RegWriteW;
     input [4:0]  RDW;
@@ -69,7 +70,7 @@ module decode_cycle(
     input [31:0] PCPlus4D;
     input valid_D;
     input exc_valid_D;
-    input [4:0] exc_cause_D;
+    input [5:0] exc_cause_D;
     input [31:0] exc_tval_D;
     input [31:0] exc_pc_D;
 
@@ -110,7 +111,7 @@ module decode_cycle(
     output wire is_mret_E;
     output valid_E;
     output [31:0] exc_tval_E; // Exception-specific value (e.g., bad address for load/store exceptions)
-    output [4:0] exc_cause_E;       // Exception cause code
+    output [5:0] exc_cause_E;       // Exception cause code
     output [31:0] exc_pc_E;     // PC at which exception occurred
     output exc_valid_E;       // Exception valid signal
     output is_M_instruction_E;
@@ -151,11 +152,11 @@ module decode_cycle(
     wire is_ebreak = (InstrD == 32'h00100073); // EBREAK instruction encoding
 
     wire new_exc_valid_D;
-    wire [4:0] new_exc_cause_D;
+    wire [5:0] new_exc_cause_D;
     wire [31:0] new_exc_tval_D;
     wire [31:0] new_exc_pc_D;
     wire next_exc_valid_D;
-    wire [4:0] next_exc_cause_D;
+    wire [5:0] next_exc_cause_D;
     wire [31:0] next_exc_tval_D;
     wire [31:0] next_exc_pc_D;
 
@@ -231,7 +232,7 @@ module decode_cycle(
     reg is_mret_r;
     reg valid_E_r;
     reg exc_valid_r;
-    reg [4:0] exc_cause_r;
+    reg [5:0] exc_cause_r;
     reg [31:0] exc_tval_r;
     reg [31:0] exc_pc_r;
     reg is_M_instruction_r;
@@ -263,7 +264,7 @@ module decode_cycle(
             is_mret_r <= 1'b0;
             valid_E_r <= 1'b0;
             exc_valid_r <= 1'b0;
-            exc_cause_r <= 5'd0;
+            exc_cause_r <= 6'd0;
             exc_tval_r <= 32'h00000000;
             exc_pc_r <= 32'h00000000;
             is_M_instruction_r <= 1'b0;
@@ -295,11 +296,45 @@ module decode_cycle(
             is_mret_r <= 1'b0;
             valid_E_r <= 1'b0;
             exc_valid_r <= 1'b0;
-            exc_cause_r <= 5'd0;
+            exc_cause_r <= 6'd0;
             exc_tval_r <= 32'h00000000;
             exc_pc_r <= 32'h00000000;
             is_M_instruction_r <= 1'b0;
             op_r <= 3'd0;
+        end
+        else if(StallE)
+        begin
+            RegWriteD_r   <= RegWriteD_r;
+            ALUSrcD_r     <= ALUSrcD_r;
+            MemWriteD_r   <= MemWriteD_r;
+            ResultSrcD_r  <= ResultSrcD_r;
+            JumpD_r       <= JumpD_r;
+            BranchD_r     <= BranchD_r;
+            ALUControlD_r <= ALUControlD_r;
+            RD1_D_r       <= RD1_D_r;
+            RD2_D_r       <= RD2_D_r;
+            Imm_Ext_D_r   <= Imm_Ext_D_r;
+            RD_D_r        <= RD_D_r;
+            RS1_D_r       <= RS1_D_r;
+            RS2_D_r       <= RS2_D_r;
+            lsunitD_r     <= lsunitD_r;
+            PCD_r         <= PCD_r;
+            PCPlus4D_r    <= PCPlus4D_r;
+            LUISrc_r      <= LUISrc_r;
+            isLUI_r       <= isLUI_r;
+            csr_imm_mode_r <= csr_imm_mode_r;
+            csr_op_r <= csr_op_r;
+            csr_valid_r <= csr_valid_r;
+            csr_addr_r <= csr_addr_r;
+            rd_index_r <= rd_index_r;
+            is_mret_r <= is_mret_r;
+            valid_E_r <= valid_E_r;
+            exc_valid_r <= exc_valid_r;
+            exc_cause_r <= exc_cause_r;
+            exc_tval_r <= exc_tval_r;
+            exc_pc_r <= exc_pc_r;
+            is_M_instruction_r <= is_M_instruction_r;
+            op_r <= op_r;
         end
         else begin
             RegWriteD_r   <= RegWriteD;
@@ -378,9 +413,9 @@ module decode_cycle(
     assign op_E = op_r;
 
     assign new_exc_valid_D = valid_D && (illegal_instr || is_ecall || is_ebreak);
-    assign new_exc_cause_D = (valid_D && illegal_instr) ? 5'd2 : 
-                             (valid_D && is_ecall) ? 5'd11 : 
-                             (valid_D && is_ebreak) ? 5'd3 : 5'd0;
+    assign new_exc_cause_D = (valid_D && illegal_instr) ? 6'd2 : 
+                             (valid_D && is_ecall) ? 6'd11 : 
+                             (valid_D && is_ebreak) ? 6'd3 : 6'd0;
     assign new_exc_tval_D  = (valid_D && illegal_instr) ? InstrD :
                              (valid_D && is_ebreak)      ? PCD : 32'h00000000;
     assign new_exc_pc_D    = valid_D ? PCD : 32'h00000000;

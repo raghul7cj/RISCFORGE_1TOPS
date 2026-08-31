@@ -8,6 +8,7 @@ module csr_regfile #(
   // ============================================================================
   input  wire        clk_i,
   input  wire        rst_n_i,
+  output wire        csr_valid_o,
 
   // ============================================================================
   // PORT A: Combinational Read (for Execute stage CSR reads)
@@ -45,6 +46,7 @@ module csr_regfile #(
   input  wire        timer_intr_i,           // Timer interrupt pending (for mip)
   input  wire        ext_intr_i,             // External interrupt pending (for mip)
   input  wire        msft_intr_i,            // Software interrupt pending (for mip, set by writes to mip MSIP bit)
+  input  wire [15:0] fast_intr_i,            // Fast local interrupts pending for mip[31:16] (UART, SPI, I2C, GPIO, etc.)
   // ============================================================================
   // Control Outputs (for PC module - driven by exception controller, not CSR file)
   // NOTE: CSR file is passive storage only. PC control decisions belong in 
@@ -215,16 +217,16 @@ module csr_regfile #(
             mstatus_r[7]      <= csr_wdata_mret_i[7];       // Write MPIE
             mstatus_r[12:11]  <= csr_wdata_mret_i[12:11];   // Write MPP
           end
-          MIE_ADDR:      mie_r      <= (csr_wdata_mret_i & 32'h00000888) | (mie_r & ~32'h00000888);         // Mask to writable bits and retain values of non writable bits
-          MTVEC_ADDR:    mtvec_r    <= (csr_wdata_mret_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);       // Mask to writable bits and retain values of non writable bits
-          MSCRATCH_ADDR: mscratch_r <= csr_wdata_mret_i; // Fully writable
-          MEPC_ADDR:     mepc_r     <= csr_wdata_mret_i; // Fully writable
-          MCAUSE_ADDR:   mcause_r   <= csr_wdata_mret_i; // Fully writable
-          MTVAL_ADDR:    mtval_r    <= csr_wdata_mret_i; // Fully writable
-          MCYCLE_ADDR:    mcycle_r[31:0]  <= csr_wdata_mret_i;
-          MCYCLEH_ADDR:   mcycle_r[63:32] <= csr_wdata_mret_i;
-          MINSTRET_ADDR:  minstret_r[31:0] <= csr_wdata_mret_i;
-          MINSTRETH_ADDR: minstret_r[63:32] <= csr_wdata_mret_i;
+          // MIE_ADDR:      mie_r      <= (csr_wdata_mret_i & 32'h00000888) | (mie_r & ~32'h00000888);         // Mask to writable bits and retain values of non writable bits
+          // MTVEC_ADDR:    mtvec_r    <= (csr_wdata_mret_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);       // Mask to writable bits and retain values of non writable bits
+          // MSCRATCH_ADDR: mscratch_r <= csr_wdata_mret_i; // Fully writable
+          // MEPC_ADDR:     mepc_r     <= csr_wdata_mret_i; // Fully writable
+          // MCAUSE_ADDR:   mcause_r   <= csr_wdata_mret_i; // Fully writable
+          // MTVAL_ADDR:    mtval_r    <= csr_wdata_mret_i; // Fully writable
+          // MCYCLE_ADDR:    mcycle_r[31:0]  <= csr_wdata_mret_i;
+          // MCYCLEH_ADDR:   mcycle_r[63:32] <= csr_wdata_mret_i;
+          // MINSTRET_ADDR:  minstret_r[31:0] <= csr_wdata_mret_i;
+          // MINSTRETH_ADDR: minstret_r[63:32] <= csr_wdata_mret_i;
           default: // Ignore writes to read-only or non-existent CSRs
             ;
         endcase
@@ -234,7 +236,7 @@ module csr_regfile #(
           // WARL mask 0x0000188A: sie[1], mie[3], mpie[7], mpp[12:11]
           // Verified: 0x1F & 0x188A = 0xA (matches SAIL reference)
           MSTATUS_ADDR:  mstatus_r  <= (csr_wdata_normal_i & 32'h0000188A) | (mstatus_r & ~32'h0000188A);  // SAIL-verified WARL mask
-          MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'h00000888) | (mie_r & ~32'h00000888);      // Mask to writable bits and retain values of non writable bits
+          MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'hFFFF0888) | (mie_r & ~32'hFFFF0888);      // Mask to writable bits (FLI [31:16], MEIE [11], MTIE [7], MSIE [3])
           MTVEC_ADDR:    mtvec_r    <= (csr_wdata_normal_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);    // Mask to writable bits and retain values of non writable bits
           MSCRATCH_ADDR: mscratch_r <= csr_wdata_normal_i; // Fully writable
           MEPC_ADDR:     mepc_r     <= csr_wdata_normal_i; // Fully writable
@@ -253,12 +255,13 @@ module csr_regfile #(
 
   // ============================================================================
   // PHASE 4: Interrupt Pending Update (mip_r)
-  // Combine software interrupt bit (mip_r[3]) with hardware inputs (timer, external)
+  // Combine software interrupt bit (mip_r[3]) with hardware inputs (timer, external, fast local)
   // ============================================================================
   //   In the write block or combinationally, update mip_r:
-  //   mip_r[3]  ← always updated by write logic (software controlled)
-  //   mip_r[7]  ← timer_intr_i (read-only, driven by MTI)
-  //   mip_r[11] ← ext_intr_i   (read-only, driven by PLIC)
+  //   mip_r[3]     ← always updated by write logic (software controlled)
+  //   mip_r[7]     ← timer_intr_i (read-only, driven by MTI)
+  //   mip_r[11]    ← ext_intr_i   (read-only, driven by external PLIC/platform)
+  //   mip_r[31:16] ← fast_intr_i  (read-only, driven by Fast Local Interrupt sources)
   // Only MSIP is a real register — needs to survive across cycles
   reg msip_r;
 
@@ -271,8 +274,8 @@ module csr_regfile #(
       msip_r <= csr_wdata_normal_i[3];
   end
 
-  // mip_r is just a wire — single driver, no storage, no latch
-  assign mip_w = {20'b0, ext_intr_i, 3'b0, timer_intr_i, 3'b0, (msip_r || msft_intr_i), 3'b0};
+  // mip_r is a wire combining hardware inputs and software MSIP
+  assign mip_w = {fast_intr_i, 4'b0, ext_intr_i, 3'b0, timer_intr_i, 3'b0, (msip_r || msft_intr_i), 3'b0};
 
   // csr_branch is handled in trap handler
 
@@ -288,5 +291,19 @@ module csr_regfile #(
   assign mepc_out_o        = mepc_r;
   assign mcause_out_o      = mcause_r;
   assign mstatus_out_o     = mstatus_r;     // Full mstatus for MRET logic in trap controller
+
+  // Combinational validity check of the CSR access address
+  assign csr_valid_o = (csr_raddr_i == MSTATUS_ADDR)   ||
+                       (csr_raddr_i == MIE_ADDR)       ||
+                       (csr_raddr_i == MTVEC_ADDR)     ||
+                       (csr_raddr_i == MSCRATCH_ADDR)  ||
+                       (csr_raddr_i == MEPC_ADDR)      ||
+                       (csr_raddr_i == MCAUSE_ADDR)    ||
+                       (csr_raddr_i == MTVAL_ADDR)     ||
+                       (csr_raddr_i == MIP_ADDR)       ||
+                       (csr_raddr_i == MCYCLE_ADDR)    ||
+                       (csr_raddr_i == MINSTRET_ADDR)  ||
+                       (csr_raddr_i == MCYCLEH_ADDR)   ||
+                       (csr_raddr_i == MINSTRETH_ADDR);
 
 endmodule

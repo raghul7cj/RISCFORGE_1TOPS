@@ -36,8 +36,9 @@ assign valid_opcode =
        (opcode == 7'b0000011) ||  // LOAD
        (opcode == 7'b0100011) ||  // STORE
        (opcode == 7'b0010011) ||  // OP-IMM
-    (opcode == 7'b0110011) ||  // OP
-    (opcode == 7'b1110011);    // SYSTEM (CSR/MRET)
+       (opcode == 7'b0110011) ||  // OP
+       (opcode == 7'b0001111) ||  // FENCE
+       (opcode == 7'b1110011);    // SYSTEM (CSR/MRET)
 
 assign illegal_instr = ~valid_opcode;
 

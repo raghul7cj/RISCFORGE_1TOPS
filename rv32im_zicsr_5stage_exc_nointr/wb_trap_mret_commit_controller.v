@@ -22,15 +22,11 @@
 module wb_trap_mret_commit_controller (
     input  wire        valid_W,
     input  wire        exc_valid_W,
-    input  wire [4:0]  exc_cause_W,
+    input  wire [5:0]  exc_cause_W,
     input  wire [31:0] exc_tval_W,
     input  wire [31:0] exc_pc_W,
 
     input  wire        is_mret_W,
-
-    // CLIC Interrupt inputs - currently primitive, but will be integrated in the future
-    input  wire        irq_valid_i,
-    input  wire [30:0] irq_id_i,
 
     input  wire [31:0] mtvec_i,
     input  wire [31:0] mepc_i,
@@ -62,29 +58,33 @@ module wb_trap_mret_commit_controller (
 
     wire trap_commit;
     wire mret_commit;
-    wire irq_commit;
 
     assign trap_commit = valid_W & exc_valid_W;
     assign mret_commit = valid_W & is_mret_W & ~exc_valid_W;
-    
-    // Interrupt is committed at the retirement boundary of a non-faulting instruction
-    assign irq_commit  = valid_W & irq_valid_i & ~exc_valid_W & ~is_mret_W;
 
-    assign wb_trap_redirect_o = trap_commit | mret_commit | irq_commit;
-    
-    // Redirect to mtvec for both exceptions and interrupts
-    assign trap_target_o      = (trap_commit | irq_commit) ? {mtvec_i[31:2], 2'b00} : {mepc_i[31:2], 2'b00};
-
-    // Empty the pipeline when trap/mret/irq commits
-    assign flush_pipeline_onehot_o = wb_trap_redirect_o ? 4'b1111 : 4'b0000;
+    assign wb_trap_redirect_o = trap_commit | mret_commit;
 
     // Drive CSR trap-entry write bundle
-    assign trap_valid_o        = trap_commit | irq_commit;
-    assign trap_is_interrupt_o = irq_commit;
-    assign trap_cause_o        = trap_commit ? {26'b0, exc_cause_W} : irq_id_i;
+    assign trap_valid_o        = trap_commit;
+    assign trap_is_interrupt_o = exc_cause_W[5] & exc_valid_W;
+    assign trap_cause_o        = {25'b0, exc_cause_W[4:0]};
     assign trap_pc_o           = exc_pc_W;
     assign trap_addr_o         = exc_tval_W;
-    assign trap_addr_valid_o   = trap_commit; // mtval only valid for exceptions
+    assign trap_addr_valid_o   = trap_commit & ~exc_cause_W[5]; // mtval only valid for exceptions (bit[5]==0)
+
+    // Trap target resolution:
+    // - MRET: mepc
+    // - Direct Mode (mtvec[1:0] == 2'b00) or exceptions: base address (mtvec[31:2] << 2)
+    // - Vectored Mode (mtvec[1:0] == 2'b01) for interrupts: base address + (4 * cause)
+    wire        is_vectored_interrupt = (mtvec_i[1:0] == 2'b01) & trap_is_interrupt_o;
+    wire [31:0] trap_base_addr        = {mtvec_i[31:2], 2'b00};
+    wire [31:0] trap_target_addr      = is_vectored_interrupt ? (trap_base_addr + {25'b0, exc_cause_W[4:0], 2'b00})
+                                                              : trap_base_addr;
+
+    assign trap_target_o = trap_commit ? trap_target_addr : {mepc_i[31:2], 2'b00};
+
+    // Empty the pipeline when trap or mret commits
+    assign flush_pipeline_onehot_o = wb_trap_redirect_o ? 4'b1111 : 4'b0000;
 
     // ====================================
     // PORT C: MRET CSR Write Interface

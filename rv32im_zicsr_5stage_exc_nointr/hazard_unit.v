@@ -10,34 +10,17 @@
 //      2. Load-use hazard detection (stall generation)
 //      3. Control hazard handling (flush on branch/jump)
 //
-//  Inputs:
-//      RegWriteM  : MEM stage register write enable
-//      RegWriteW  : WB stage register write enable
-//      RD_M       : Destination register in MEM stage
-//      RD_W       : Destination register in WB stage
+//  Stall signals (freeze registers):
+//      StallF  : freeze PC register (IF stage)
+//      StallD  : freeze IF/ID register
+//      StallE  : freeze ID/EX register (during M-ext or mem stall)
+//      StallM  : freeze EX/MEM register (during mem stall only)
 //
-//      Rs1_E      : Source register 1 in EX stage
-//      Rs2_E      : Source register 2 in EX stage
-//
-//      Rs1_D      : Source register 1 in Decode stage
-//      Rs2_D      : Source register 2 in Decode stage
-//      RdE        : Destination register in EX stage
-//
-//      ResultSrcE : Determines if EX instruction is load
-//                   (2'b01 → load instruction)
-//
-//      PCSrcE     : Branch/jump taken signal
-//
-//  Outputs:
-//      ForwardAE  : Forward select for ALU source A
-//      ForwardBE  : Forward select for ALU source B
-//
-//      StallF     : Stall Fetch stage
-//      StallD     : Stall Decode stage
-//
-//      FlushE     : Flush Execute stage
-//      FlushD     : Flush Decode stage
-//
+//  Flush signals (insert NOP bubbles):
+//      FlushD  : flush IF/ID  (branch taken, exception in-flight)
+//      FlushE  : flush ID/EX  (load-use, CSR hazard, branch taken)
+//      FlushM  : flush EX/MEM (M-ext done, wb redirect)
+//      FlushW  : flush MEM/WB (mem stall, wb redirect)
 //////////////////////////////////////////////////////////////////////////////////
 
 module hazard_unit(
@@ -57,6 +40,8 @@ module hazard_unit(
     PCSrcE,
     StallF,
     StallD,
+    StallE,
+    StallM,
     FlushD,
     FlushE,
     FlushM,
@@ -82,8 +67,11 @@ module hazard_unit(
     exc_valid_M,
     wb_redirect,
 
-    // M-extension stall
-    stallM
+    // M-extension stall (multiplier/divider busy)
+    stallMUL,
+
+    // LSU / memory-bridge stall (AXI multi-cycle, SRAM wait-states)
+    mem_stall_i
 );
 
     // ==================================================
@@ -117,14 +105,15 @@ module hazard_unit(
     input valid_M;
     input exc_valid_M;
     input wb_redirect;
-    input stallM;
+    input stallMUL;     // M-extension (multiply/divide) multi-cycle stall
+    input mem_stall_i;  // LSU stall: freeze EX/MEM and downstream
 
     // ==================================================
     // Outputs
     // ==================================================
 
     output [1:0] ForwardAE, ForwardBE;
-    output StallF, StallD;
+    output StallF, StallD, StallE, StallM;
     output FlushE, FlushD, FlushM, FlushW;
 
     // ==================================================
@@ -178,15 +167,16 @@ module hazard_unit(
         (RdE != 5'd0);
 
     // On WB redirect (trap/mret), override stalls so IF can take redirect immediately.
-    assign StallF = wb_redirect ? 1'b0 : (lwstall | csr_stall | csr_gpr_stall | stallM);
-    assign StallD = wb_redirect ? 1'b0 : (lwstall | csr_stall | csr_gpr_stall | stallM);
+    assign StallF = wb_redirect ? 1'b0 : (lwstall | csr_stall | csr_gpr_stall | stallMUL | mem_stall_i);
+    assign StallD = wb_redirect ? 1'b0 : (lwstall | csr_stall | csr_gpr_stall | stallMUL | mem_stall_i);
+    // StallE: hold ID/EX while M-ext or LSU is busy (keeps the stalled instruction in EX)
+    assign StallE = wb_redirect ? 1'b0 : ( mem_stall_i);
+    // StallM: hold EX/MEM while LSU is waiting for memory (keeps valid_M=1 active)
+    assign StallM = wb_redirect ? 1'b0 : mem_stall_i;
 
     // ==================================================
     // Control Hazard Handling
     // ==================================================
-    // On branch/jump taken (PCSrcE):
-    //      - Flush Decode stage
-    //      - Flush Execute stage
 
     // Continuous flush "wake" behind an exception-tagged instruction.
     wire exc_inflight_E;
@@ -194,11 +184,18 @@ module hazard_unit(
     assign exc_inflight_E = valid_E & exc_valid_E;
     assign exc_inflight_M = valid_M & exc_valid_M;
 
-    // Control hazard / younger-kill policy.
-    // NOTE: illegal_instr is handled as an exception sideband, not as an immediate flush here.
-    assign FlushE = lwstall | csr_gpr_stall | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallM;
+    // FlushE: kill ID/EX when we have a data hazard bubble, branch taken, or
+    //         CSR hazard, or M-extension stall (multiplier busy).
+    assign FlushE = lwstall | (csr_gpr_stall & ~mem_stall_i) | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL;
+    // FlushD: kill IF/ID when branch taken, exception in-flight, or wb redirect.
+    //         exc_inflight_E included so that the wrongly-fetched instruction after
+    //         a misaligned-branch exception (where PCSrcE was suppressed) is removed.
     assign FlushD = PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | flush_pipeline_onehot[0];
-    assign FlushM = wb_redirect | flush_pipeline_onehot[2] | stallM;
+    // FlushM: insert NOP into EX/MEM when M-ext stall completes or wb redirect.
+    //         mem_stall_i excluded — EX/MEM is HELD via StallM, not flushed.
+    assign FlushM = wb_redirect | flush_pipeline_onehot[2] | stallMUL;
+    // FlushW: insert NOP into MEM/WB on wb redirect or pipeline flush.
+    //         mem_stall_i excluded — memory_cycle self-holds via lsu_core_stall instead.
     assign FlushW = wb_redirect | flush_pipeline_onehot[3];
 
 endmodule

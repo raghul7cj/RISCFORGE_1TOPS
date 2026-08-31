@@ -43,6 +43,9 @@ module execute_cycle (
     exc_tval_E,
     exc_pc_E,
     is_mret_E,
+    irq_pending_i,
+    irq_id_i,
+    irq_flush_frontend_o,
     ResultW,
     ForwardA_E,
     ForwardB_E,
@@ -82,7 +85,8 @@ module execute_cycle (
     // M-extension ports
     is_M_instruction_E,
     op_E,
-    stallM,
+    stallMUL,
+    StallM,
     FlushE
 );
 
@@ -90,6 +94,7 @@ module execute_cycle (
     input rst_n;
     input FlushM;
     input FlushE;
+    input StallM;
 
     input RegWriteE;
     input ALUSrcE;
@@ -110,10 +115,13 @@ module execute_cycle (
     input [31:0] PCPlus4E;
     input valid_E;
     input exc_valid_E;
-    input [4:0] exc_cause_E;
+    input [5:0] exc_cause_E;
     input [31:0] exc_tval_E;
     input [31:0] exc_pc_E;
     input is_mret_E;
+    input irq_pending_i;
+    input [30:0] irq_id_i;
+    output irq_flush_frontend_o;
 
     input [31:0] ResultW;
     input [1:0] ForwardA_E;
@@ -129,7 +137,7 @@ module execute_cycle (
     // M-extension inputs/outputs
     input is_M_instruction_E;
     input [2:0] op_E;
-    output stallM;
+    output stallMUL; // M-extension multiply/divide stall output
 
     //csr read interface
     output [11:0] csr_raddr_o;
@@ -149,7 +157,7 @@ module execute_cycle (
     output [4:0] lsunitM;
     output valid_M;
     output exc_valid_M;
-    output [4:0] exc_cause_M;
+    output [5:0] exc_cause_M;
     output [31:0] exc_tval_M;
     output [31:0] exc_pc_M;
 
@@ -185,12 +193,13 @@ module execute_cycle (
     // Exception internal nets
     wire next_exc_valid_E;
     wire new_exc_valid_E;
-    wire [4:0] next_exc_cause_E;
-    wire [4:0] new_exc_cause_E;
+    wire [5:0] next_exc_cause_E;
+    wire [5:0] new_exc_cause_E;
     wire [31:0] next_exc_tval_E;
     wire [31:0] new_exc_tval_E;
     wire [31:0] next_exc_pc_E;
     wire [31:0] new_exc_pc_E;
+    wire irq_accept_E;
 
     // Pipeline registers
     reg RegWriteE_r;
@@ -208,7 +217,7 @@ module execute_cycle (
     reg [31:0] old_csr_E_r;
     reg valid_M_r;
     reg exc_valid_r;
-    reg [4:0] exc_cause_r;
+    reg [5:0] exc_cause_r;
     reg [31:0] exc_tval_r;
     reg [31:0] exc_pc_r;
     reg is_mret_r;
@@ -261,8 +270,17 @@ module execute_cycle (
         .JALR(JALRE)
     );
 
-    assign PCTargetE = (JALRE) ? alu_r : PCTarget_jb;
-    assign PCSrcE = yesE & valid_E & ~exc_valid_E;
+    // Detect misaligned target BEFORE gating PCSrcE — on RV32I without C extension
+    // all targets must be 4-byte aligned. A misaligned branch/jump must NOT redirect
+    // the PC; instead it raises cause-0 (instruction-address-misaligned).
+    wire branch_taken_raw = yesE & valid_E & ~exc_valid_E;
+    wire [31:0] PCTarget_tentative = (JALRE) ? alu_r : PCTarget_jb;
+    wire target_misaligned_E = (PCTarget_tentative[1:0] != 2'b00);
+
+    assign PCTargetE = PCTarget_tentative;
+    // PCSrcE suppressed only when target is misaligned (exception takes over)
+    // Do NOT gate with StallM — branch redirect must fire even if MEM is stalled
+    assign PCSrcE = branch_taken_raw & ~target_misaligned_E;
 
     assign LUI_result_E = (LUISrcE) ? Imm_Ext_E : PCTarget_jb;
     assign ResultE = (m_valid_out) ? result_M : ((isLUIE) ? LUI_result_E : alu_r);
@@ -295,7 +313,7 @@ module execute_cycle (
         .valid_out(m_valid_out)
     );
 
-    assign stallM = stallM_internal;
+    assign stallMUL = stallM_internal;
 
     wire [4:0]  RD_E1        = (m_valid_out) ? rd_me : RD_E;
     wire        RegWriteE1   = (is_M_instruction_E && !m_valid_out) ? 1'b0 : 
@@ -328,7 +346,7 @@ module execute_cycle (
             old_csr_E_r <= 32'h00000000;
             valid_M_r <= 1'b0;
             exc_valid_r <= 1'b0;
-            exc_cause_r <= 5'd0;
+            exc_cause_r <= 6'd0;
             exc_tval_r <= 32'h00000000;
             exc_pc_r <= 32'h00000000;
             is_mret_r <= 1'b0;
@@ -348,13 +366,33 @@ module execute_cycle (
             old_csr_E_r <= 32'h00000000;
             valid_M_r <= 1'b0;
             exc_valid_r <= 1'b0;
-            exc_cause_r <= 5'd0;
+            exc_cause_r <= 6'd0;
             exc_tval_r <= 32'h00000000;
             exc_pc_r <= 32'h00000000;
             is_mret_r <= 1'b0;
+        end else if (StallM) begin
+            RegWriteE_r <= RegWriteE_r;
+            MemWriteE_r <= MemWriteE_r;
+            ResultSrcE_r <= ResultSrcE_r;
+            RD_E_r <= RD_E_r;
+            lsunitE_r <= lsunitE_r;
+            PCE_r <= PCE_r;
+            PCPlus4E_r <= PCPlus4E_r;
+            RD2_E_r <= RD2_E_r;
+            ResultE_r <= ResultE_r;
+            csr_write_en_E_r <= csr_write_en_E_r;
+            csr_addr_E_r <= csr_addr_E_r;
+            new_csr_E_r <= new_csr_E_r;
+            old_csr_E_r <= old_csr_E_r;
+            valid_M_r <= valid_M_r;
+            exc_valid_r <= exc_valid_r;
+            exc_cause_r <= exc_cause_r;
+            exc_tval_r <= exc_tval_r;
+            exc_pc_r <= exc_pc_r;
+            is_mret_r <= is_mret_r;
         end else begin
-            RegWriteE_r <= RegWriteE1;
-            MemWriteE_r <= MemWriteE;
+            RegWriteE_r <= next_exc_valid_E ? 1'b0 : RegWriteE1;
+            MemWriteE_r <= next_exc_valid_E ? 1'b0 : MemWriteE;
             ResultSrcE_r <= ResultSrcE;
             RD_E_r <= RD_E1;
             lsunitE_r <= lsunitE;
@@ -362,7 +400,7 @@ module execute_cycle (
             PCPlus4E_r <= PCPlus4E;
             RD2_E_r <= Src_B_interim;
             ResultE_r <= ResultE;
-            csr_write_en_E_r <= csr_write_en_E;
+            csr_write_en_E_r <= next_exc_valid_E ? 1'b0 : csr_write_en_E;
             csr_addr_E_r <= csr_addr_E;
             new_csr_E_r <= csr_new_val_E;
             old_csr_E_r <= csr_rdata_i;
@@ -398,13 +436,30 @@ module execute_cycle (
     assign old_csr_M = old_csr_E_r;
 
 
-    assign next_exc_valid_E = exc_valid_E | new_exc_valid_E;
-    assign next_exc_cause_E = exc_valid_E ? exc_cause_E : new_exc_cause_E;
-    assign next_exc_tval_E  = exc_valid_E ? exc_tval_E : new_exc_tval_E;
-    assign next_exc_pc_E    = exc_valid_E ? exc_pc_E : new_exc_pc_E;
+    // IRQ acceptance: accept IRQ only on a valid, un-excepted instruction when not stalled by multi-cycle M-unit
+    assign irq_accept_E = valid_E & irq_pending_i & ~new_exc_valid_E & ~exc_valid_E & ~stallMUL;
+    assign irq_flush_frontend_o = irq_accept_E;
 
-    assign new_exc_valid_E = PCSrcE && PCTargetE[1:0] != 2'b00;
-    assign new_exc_cause_E = 5'b00000;
+    // Three-way priority chain:
+    // 1. Local exception in EX (misaligned branch/jump target)
+    // 2. Synchronous exception from ID/IF (illegal instruction, fetch fault)
+    // 3. Accepted IRQ (converts instruction in EX to an interrupt trap packet)
+    assign next_exc_valid_E = new_exc_valid_E | exc_valid_E | irq_accept_E;
+    assign next_exc_cause_E = new_exc_valid_E ? new_exc_cause_E :
+                              exc_valid_E     ? exc_cause_E :
+                              irq_accept_E    ? {1'b1, irq_id_i[4:0]} :
+                                                6'd0;
+    assign next_exc_tval_E  = new_exc_valid_E ? new_exc_tval_E :
+                              exc_valid_E     ? exc_tval_E :
+                              irq_accept_E    ? 32'h0 :
+                                                32'h0;
+    assign next_exc_pc_E    = new_exc_valid_E ? new_exc_pc_E :
+                              exc_valid_E     ? exc_pc_E :
+                              irq_accept_E    ? PCE :
+                                                PCE;
+
+    assign new_exc_valid_E = branch_taken_raw & target_misaligned_E;
+    assign new_exc_cause_E = 6'b000000;  // cause 0: instruction-address-misaligned (bit[5]=0 exception)
     assign new_exc_tval_E  = PCTargetE;
     assign new_exc_pc_E    = PCE;
 

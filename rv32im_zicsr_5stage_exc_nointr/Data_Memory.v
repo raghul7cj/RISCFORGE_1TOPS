@@ -1,46 +1,67 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Module Name : Data_Memory
+// Description : Synchronous 1-cycle Native SRAM Data Memory for RV32I.
+//               Parameterized depth for easy resizing. Base-subtraction maps
+//               the byte address space to zero-indexed array.
+//
+// ── Memory Map ──────────────────────────────────────────────────────────────
+//   DMEM_BASE_BYTE : First byte address of this SRAM (default 0x8000_1000)
+//   MEM_DEPTH      : Number of 32-bit words  (default 262144 = 1 MB)
+//   Address range  : DMEM_BASE_BYTE  ..  DMEM_BASE_BYTE + MEM_DEPTH*4 - 1
+//                    0x8000_1000     ..  0x8010_0FFF  (1 MB default)
+//////////////////////////////////////////////////////////////////////////////////
 
-module Data_Memory(clk,rst,WE,WD,A,RD,WSTRB);
- 
-    input [3:0]  WSTRB;     // Byte write strobes
-    input clk,rst,WE;
-    input [29:0]A;
-    input [31:0]WD;
-    output [31:0]RD;
+module Data_Memory #(
+    // ── Sizing parameters — change ONE place to resize ──────────────────────
+    parameter integer MEM_DEPTH      = 6048576,       // words  (4 MB default)
+    parameter [31:0]  DMEM_BASE_BYTE = 32'h8000_1000  // byte base address
+) (
+    input             clk,
+    input             rst_n,          // Active-low reset
+    input             sram_en,        // Chip Enable / Request
+    input             sram_we,        // Write Enable (1=Write, 0=Read)
+    input      [3:0]  sram_wmask,     // Byte-write strobes
+    input      [29:0] sram_addr,      // Word address (core_addr[31:2])
+    input      [31:0] sram_wdata,     // Write data
+    output     [31:0] sram_rdata      // Read data — valid 1 cycle after request
+);
 
-    // DMEM base address (word-aligned): 0x1000 >> 2 = 0x400
-    // The linker places .data at 0x1000, but dmem.hex is rebased to 0x0000.
-    // We subtract the base so address 0x1000 maps to mem[0].
-    localparam DMEM_BASE = 30'h20000400;  // 0x80001000 >> 2
+    // ── Derived constants ────────────────────────────────────────────────────
+    // Word-aligned base: strip the 2 LSBs of the byte address
+    localparam [29:0] DMEM_BASE_WORD = DMEM_BASE_BYTE[31:2];
 
-    wire [29:0] local_addr_full = A - DMEM_BASE;
-`ifdef SYNTHESIS
-    wire [11:0] local_addr = local_addr_full[11:0];
-    reg [31:0] mem [4095:0];
-`else
-    wire [19:0] local_addr = local_addr_full[19:0];
-    reg [31:0] mem [1048575:0];
-`endif
+    // Address width required to index MEM_DEPTH words
+    // $clog2(262144) = 18 bits
+    localparam ADDR_W = $clog2(MEM_DEPTH);
 
-    always @ (posedge clk)
-    begin
-        if (WE) begin
-            if (WSTRB[0]) mem[local_addr][7:0]   <= WD[7:0];
-            if (WSTRB[1]) mem[local_addr][15:8]  <= WD[15:8];
-            if (WSTRB[2]) mem[local_addr][23:16] <= WD[23:16];
-            if (WSTRB[3]) mem[local_addr][31:24] <= WD[31:24];
+    // ── Internal memory array ────────────────────────────────────────────────
+    reg [31:0] mem_array [0:MEM_DEPTH-1];
+
+    // Byte→word offset inside this SRAM
+    wire [29:0] local_addr_full = sram_addr - DMEM_BASE_WORD;
+    wire [ADDR_W-1:0] local_addr = local_addr_full[ADDR_W-1:0];
+
+    // ── Synchronous byte-enable write ────────────────────────────────────────
+    always @(posedge clk) begin
+        if (rst_n && sram_en && sram_we) begin
+            if (sram_wmask[0]) mem_array[local_addr][ 7: 0] <= sram_wdata[ 7: 0];
+            if (sram_wmask[1]) mem_array[local_addr][15: 8] <= sram_wdata[15: 8];
+            if (sram_wmask[2]) mem_array[local_addr][23:16] <= sram_wdata[23:16];
+            if (sram_wmask[3]) mem_array[local_addr][31:24] <= sram_wdata[31:24];
         end
     end
 
-    assign RD = (~rst) ? 32'd0 : mem[local_addr];
+    // ── Combinational read (0-cycle, matches hybrid_mem_interface and OLD) ────
+    assign sram_rdata = (!rst_n) ? 32'd0 : mem_array[local_addr];
 
+    // ── Simulation initialisation ────────────────────────────────────────────
 `ifndef SYNTHESIS
     initial begin : init_block
         integer i;
-        for (i = 0; i < 1048576; i = i + 1) begin
-            mem[i] = 32'h0;
-        end
-        $readmemh("dmem.hex", mem);
+        for (i = 0; i < MEM_DEPTH; i = i + 1)
+            mem_array[i] = 32'h0;
+        $readmemh("dmem.hex", mem_array);
     end
 `endif
 
