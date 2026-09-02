@@ -1,0 +1,77 @@
+xrun(64): 20.09-s012: (c) Copyright 1995-2021 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	20.09-s012: Started on Aug 28, 2026 at 14:09:42 IST
+xrun
+	-64bit
+	-sv
+	-f files.f
+		-incdir ../apb_i2c-master
+		../apb_i2c-master/i2c_master_defines.sv
+		../apb_i2c-master/i2c_master_bit_ctrl.sv
+		../apb_i2c-master/i2c_master_byte_ctrl.sv
+		../apb_i2c-master/apb_i2c.sv
+		./directed_tb.sv
+	-access +rwc
+	-timescale 1ns/1ns
+	-gui
+	-l directed.log
+xmsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+
+-------------------------------------
+Relinquished control to SimVision...
+xcelium> 
+xcelium> source /home/install/XCELIUM2009/tools/xcelium/files/xmsimrc
+xcelium> database -open waves -into waves.shm -default
+Created default SHM database waves
+xcelium> probe -create -shm directed_tb.PENABLE directed_tb.HCLK directed_tb.HRESETn directed_tb.PADDR directed_tb.PRDATA directed_tb.PREADY directed_tb.PSEL directed_tb.PSLVERR directed_tb.PWDATA directed_tb.PWRITE directed_tb.fail_count directed_tb.interrupt_o directed_tb.pass_count directed_tb.scl directed_tb.scl_pad_i directed_tb.scl_pad_o directed_tb.scl_padoen_o directed_tb.sda directed_tb.sda_pad_i directed_tb.sda_pad_o directed_tb.sda_padoen_o directed_tb.slave_sda_low directed_tb.slave_seen_addr directed_tb.slave_seen_data directed_tb.slave_seen_rw directed_tb.slave_tx_data directed_tb.start_count directed_tb.stop_count
+Created probe 1
+xcelium> run
+
+================================================
+      APB-I2C DIRECTED FUNCTIONAL TEST
+================================================
+[195] PASS : I2C bus idle after reset
+[220] PASS : Prescaler reset value
+[250] PASS : Control register reset value
+[280] PASS : TX register reset value
+[370] PASS : APB prescaler write/read
+[400] PASS : APB control register write/read
+[13330] PASS : Basic I2C WRITE
+[26200] PASS : Basic I2C READ
+[39070] PASS : WRITE data 0x00
+[51940] PASS : WRITE data 0xFF
+[64810] PASS : WRITE data 0x55
+[77680] PASS : WRITE data 0xAA
+[90550] PASS : READ data 0x00
+[103420] PASS : READ data 0xFF
+[116290] PASS : READ data 0x55
+[129160] PASS : READ data 0xAA
+[142030] PASS : Back-to-back WRITE #1
+[154900] PASS : Back-to-back WRITE #2
+[167770] PASS : Back-to-back READ #1
+[180640] PASS : Back-to-back READ #2
+[193510] PASS : WRITE before READ
+[206380] PASS : READ after WRITE
+[206575] PASS : Bus idle after second reset
+[219500] PASS : WRITE after reset recovery
+[232370] PASS : READ after reset recovery
+[232565] PASS : I2C bus idle after all transfers
+[232565] PASS : START condition generated
+[232565] PASS : STOP condition generated
+
+================================================
+            DIRECTED TEST REPORT
+================================================
+PASS        = 28
+FAIL        = 0
+START COUNT = 18
+STOP COUNT  = 18
+================================================
+        APB-I2C VERIFICATION PASSED
+================================================
+Simulation complete via $finish(1) at time 232665 NS + 0
+./directed_tb.sv:544         $finish;
+xcelium> ^C
+xcelium> exit
+...Regained control from SimVision
+-------------------------------------
+TOOL:	xrun(64)	20.09-s012: Exiting on Aug 28, 2026 at 17:00:13 IST  (total: 02:50:31)

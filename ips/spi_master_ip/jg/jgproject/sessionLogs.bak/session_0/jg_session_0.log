@@ -1,0 +1,125 @@
+# ----------------------------------------
+# Jasper Version Info
+# tool      : Jasper 2025.06
+# platform  : Linux 3.10.0-1160.119.1.el7.x86_64
+# version   : 2025.06 FCS 64 bits
+# build date: 2025.06.25 13:01:28 UTC
+# ----------------------------------------
+# started   : 2026-08-30 18:23:23 IST
+# hostname  : vlsi.iiita.ac.in.(none)
+# pid       : 27365
+# arguments : '-style' 'windows' '-label' 'session_0' '-console' '//127.0.0.1:36090' '-data' 'AAAAinicY2RgYLCp////PwMYMD6A0Aw2jAyoAMRnQhUJbEChGRhYEZIgpSIMugzFDKUMBQypDEUMOQyZDHkMJUBxAThbD4iTgTwGBjYGAKZvDes=' '-bridge_url' '172.16.33.51:34470' '-proj' '/home/iiita/MALAY_SOC/rtl/spi/jg/jgproject/sessionLogs/session_0' '-init' '-hidden' '/home/iiita/MALAY_SOC/rtl/spi/jg/jgproject/.tmp/.initCmds.tcl' 'lint.tcl'
+
+Any disclosure about the Cadence Design Systems software or its use
+model to any third party violates the written Non-Disclosure Agreement
+between Cadence Design Systems, Inc. and the customer.
+
+THIS SOFTWARE CONTAINS CONFIDENTIAL INFORMATION AND TRADE SECRETS OF
+CADENCE DESIGN SYSTEMS, INC. USE, DISCLOSURE, OR REPRODUCTION IS
+PROHIBITED WITHOUT THE PRIOR EXPRESS WRITTEN PERMISSION OF CADENCE
+DESIGN SYSTEMS, INC.
+
+Copyright (C) 2000-2025 Cadence Design Systems, Inc. All Rights
+Reserved.  Unpublished -- rights reserved under the copyright laws of
+the United States.
+
+This product includes software developed by others and redistributed
+according to license agreement. See doc/third_party_readme.txt for
+further details.
+
+RESTRICTED RIGHTS LEGEND
+
+Use, duplication, or disclosure by the Government is subject to
+restrictions as set forth in subparagraph (c) (1) (ii) of the Rights in
+Technical Data and Computer Software clause at DFARS 252.227-7013 or
+subparagraphs (c) (1) and (2) of Commercial Computer Software -- Restricted
+Rights at 48 CFR 52.227-19, as applicable.
+
+
+                          Cadence Design Systems, Inc.
+                          2655 Seely Avenue
+                          San Jose, CA 95134
+                          Phone: 408.943.1234
+
+For technical assistance visit http://support.cadence.com.
+
+Jasper Apps Analysis Session - /home/iiita/MALAY_SOC/rtl/spi/jg/jgproject/sessionLogs/session_0
+
+WARNING (WG017): [session]: The system's locale is "ISO-8859-1", which is not UTF-8. Non-ASCII characters might not be handled correctly.
+WARNING (WG017): [jg_console]: The system's locale is "ISO-8859-1", which is not UTF-8. Non-ASCII characters might not be handled correctly.
+INFO: successfully checked out licenses "jasper_interactive" and "jasper_dao".
+INFO: reading configuration file "/home/iiita/.config/cadence/jasper.conf".
+% check_superlint -init
+INFO (ICD011): Message "VERI-1818" has been changed from "ignore" to "warning" level.
+% clear -all
+INFO (IPF121): Cleared environment completely for new design analysis.
+% config_rtlds -rule -disable -domain {all}
+% config_rtlds -rule -enable -domain {LINT}
+% 
+% analyze -sv -f jg_file.f
+INFO (INL011): Processing "-f" file "/home/iiita/MALAY_SOC/rtl/spi/jg/jg_file.f".
+[-- (VERI-1482)] Analyzing Verilog file '/home/install/jasper_2025.06/lib/verilog/packages/std/std.sv' into library 'std'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/apb_spi_master.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/spi_master_apb_if.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/spi_master_clkgen.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/spi_master_controller.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/spi_master_fifo.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/spi_master_rx.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master/spi_master_tx.sv'
+% elaborate -top apb_spi_master
+INFO (ISW003): Top module name is "apb_spi_master".
+[INFO (HIER-8002)] ../spi_master/apb_spi_master.sv(377): Disabling old hierarchical reference handler
+[INFO (VERI-1018)] ../spi_master/spi_master_apb_if.sv(24): compiling module 'spi_master_apb_if'
+[INFO (VERI-1018)] ../spi_master/spi_master_fifo.sv(13): compiling module 'spi_master_fifo:(BUFFER_DEPTH=10)'
+[WARN (VERI-1209)] ../spi_master/spi_master_fifo.sv(64): expression size 32 truncated to fit in target size 5
+[WARN (VERI-1209)] ../spi_master/spi_master_fifo.sv(67): expression size 32 truncated to fit in target size 5
+[WARN (VERI-1209)] ../spi_master/spi_master_fifo.sv(113): expression size 32 truncated to fit in target size 4
+[WARN (VERI-1209)] ../spi_master/spi_master_fifo.sv(126): expression size 32 truncated to fit in target size 4
+[INFO (VERI-1018)] ../spi_master/spi_master_clkgen.sv(11): compiling module 'spi_master_clkgen'
+[WARN (VERI-1209)] ../spi_master/spi_master_clkgen.sv(51): expression size 32 truncated to fit in target size 8
+[INFO (VERI-1018)] ../spi_master/spi_master_tx.sv(11): compiling module 'spi_master_tx'
+[WARN (VERI-1209)] ../spi_master/spi_master_tx.sv(84): expression size 32 truncated to fit in target size 16
+[INFO (VERI-1018)] ../spi_master/spi_master_rx.sv(11): compiling module 'spi_master_rx'
+[WARN (VERI-1209)] ../spi_master/spi_master_rx.sv(79): expression size 32 truncated to fit in target size 16
+[INFO (VERI-1018)] ../spi_master/spi_master_controller.sv(15): compiling module 'spi_master_controller'
+[INFO (VERI-1018)] ../spi_master/apb_spi_master.sv(13): compiling module 'apb_spi_master'
+INFO (INL208): Elaboration synthesis summary:
+  Number of synthesized netlists          7 (0 packages)
+  Single run mode                         On
+  Pipeline                                On (7 pipelined netlists)
+  Late hierarchical reference connection  On
+  Number of analyzed Verilog modules      7 (7 synthesized)
+  Number of analyzed VHDL entities        0 (0 synthesized)
+  Advanced Incremental run mode           Off
+INFO (INL003): Clearing all state information (assumes, stopats, and so forth).
+apb_spi_master
+[<embedded>] % 
+[<embedded>] % clock HCLK
+[<embedded>] % reset ~HRESETn
+INFO (IPM031): Clearing proof results of all properties.
+INFO (IRS006): Current reset condition is "HRESETn".
+[<embedded>] % 
+[<embedded>] % check_superlint -init
+[<embedded>] % check_superlint -extract -top
+INFO (ISL018): Started adding FE messages
+INFO (ISL018): Finished adding FE messages
+INFO (ISL018): Started extraction of structural checks
+INFO (ISL018): Started building clock tree
+INFO (ISL018): Finished building clock tree
+INFO (ISL018): Started building reset tree
+INFO (ISL018): Finished building reset tree
+INFO (ISL018): Violation Count: Errors = 1 Warnings = 86 Info = 3
+INFO (ISL018): Finished extraction of structural checks
+INFO (ISL018): Started generating formal checks
+INFO (ISL018): Finished generating formal checks
+INFO (ISL018): Started grouping violations
+INFO (ISL018): Finished grouping violations
+20
+[<embedded>] % 
+[<embedded>] % file mkdir reports
+[<embedded>] % check_superlint -report -violation -detailed -file reports/superlint_violations.txt -force
+INFO (IPL005): Received request to exit from the console.
+INFO (IPL014): Waiting for the Tcl-thread to exit.
+INFO (IPL018): The peak resident set memory use for this session was 0.335 GB.
+INFO (IPL015): The Tcl-thread exited with status 0.
+INFO (IPL016): Exiting the analysis session with status 0.

@@ -145,14 +145,14 @@ module apb_spi_master
                     if (r_counter_tx == s_cnt_tx-1)
                         r_counter_tx <= 'h0;
                     else
-                        r_counter_tx <= r_counter_tx + 1;
+                        r_counter_tx <= r_counter_tx + 1'b1;
                 end
                 if (spi_ctrl_data_rx_valid && spi_ctrl_data_rx_ready)
                 begin
                     if (r_counter_rx == s_cnt_rx-1)
                         r_counter_rx <= 'h0;
                     else
-                        r_counter_rx <= r_counter_rx + 1;
+                        r_counter_rx <= r_counter_rx + 1'b1;
                 end
             end
             else
