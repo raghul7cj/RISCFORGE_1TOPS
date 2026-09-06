@@ -1,0 +1,113 @@
+xrun(64): 22.09-s003: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	22.09-s003: Started on Jul 23, 2026 at 21:31:10 IST
+xrun
+	-f bootloader.f
+		-access +rwc
+		../SOC_FILES/include/common_cells/axi_pkg.sv
+		rtl/bootloader_tb_all_testcases.sv
+		rtl/bootloader.sv
+		../spi/spi_master/spi_master_clkgen.sv
+		../spi/spi_master/spi_master_fifo.sv
+		../spi/spi_master/spi_master_rx.sv
+		../spi/spi_master/spi_master_tx.sv
+		../spi/spi_master/spi_master_controller.sv
+		../spi/spi_master/spi_master_apb_if.sv
+		../spi/spi_master/apb_spi_master.sv
+		../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
+Recompiling... reason: file './rtl/bootloader_tb_all_testcases.sv' is newer than expected.
+	expected: Thu Jul 23 21:28:55 2026
+	actual:   Thu Jul 23 21:31:06 2026
+file: rtl/bootloader_tb_all_testcases.sv
+	module worklib.bootloader_spi_tb:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		tb_bus_pkg
+		axi_pkg
+		bootloader_spi_tb
+xmelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.bootloader:sv <0x205d1ab5>
+			streams:  33, words: 35250
+		worklib.bootloader_spi_tb:sv <0x654404f9>
+			streams:  42, words: 76290
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                     Instances  Unique
+		Modules:                    15      13
+		Verilog packages:            2       2
+		Primitives:                 12       2
+		Timing outputs:              4       4
+		Registers:                 696     691
+		Scalar wires:              268       -
+		Vectored wires:             96       -
+		Named events:                5       5
+		Always blocks:             109     106
+		Initial blocks:            134     134
+		Cont. assignments:          63     119
+		Pseudo assignments:        132     132
+		Timing checks:              44      20
+		Assertions:                  5       5
+		SV Class declarations:       3       3
+		SV Class specializations:    3       3
+		Simulation timescale:      1ps
+	Writing initial simulation snapshot: worklib.bootloader_spi_tb:sv
+Loading snapshot worklib.bootloader_spi_tb:sv .................... Done
+xmsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+xcelium> source /home/install/XCELIUM2209/tools/xcelium/files/xmsimrc
+xcelium> run
+[TB] Loading firmware image from: ../spi_slave_infinion/S25fs512s/model/ebreak_combined.mem
+xmsim: *W,LMTMSG: packed array at "bootloader_spi_tb.u_flash.SFDP_array_tmp" of 35008 elements exceeds limit of 4096 - not probed
+ Use 'probe -create -packed 35008' to adjust limit.
+xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
+            File: ./rtl/bootloader_tb_all_testcases.sv, line = 614, pos = 13
+           Scope: bootloader_spi_tb
+            Time: 0 FS + 0
+
+xmsim: *W,LMTMSG: unpacked array at "bootloader_spi_tb.u_axi_mem.mem" of 32768 elements exceeds limit of 16384 - not probed
+ Use 'probe -create -unpacked 32768' to adjust limit.
+xmsim: *W,LMTMSG: packed array at "bootloader_spi_tb.u_flash.SFDP_array_tmp" of 35008 elements exceeds limit of 4096 - not probed
+ Use 'probe -create -packed 35008' to adjust limit.
+xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
+            File: ./rtl/bootloader_tb_all_testcases.sv, line = 625, pos = 13
+           Scope: bootloader_spi_tb
+            Time: 0 FS + 0
+
+[TB] Preloaded 6156 bytes into flash from ebreak_combined.mem
+
+===== TC1: Cold Boot =====
+[TB] Cold boot: hard_rst_ni released @cycle 6
+[TC8] SPI word 0 data OK (00000097)
+[TC8] SPI word 1 data OK (13408093)
+[TC8] SPI word 2 data OK (000080e7)
+[TC8] SPI word 3 data OK (feedc0b7)
+[TC8] SPI word 4 data OK (ead08093)
+[TC1] PASS: all 1539 words (ISRAM+DSRAM) match golden image
+[TC1] Total boot cycles: 1024718
+
+===== TC3: Determinism (repeat cold boot) =====
+[TB] Cold boot: hard_rst_ni released @cycle 1024724
+[TC8] SPI word 0 data OK (00000097)
+[TC8] SPI word 1 data OK (13408093)
+[TC8] SPI word 2 data OK (000080e7)
+[TC8] SPI word 3 data OK (feedc0b7)
+[TC8] SPI word 4 data OK (ead08093)
+[TC3] PASS: all 1539 words (ISRAM+DSRAM) match golden image
+[TC3] PASS: boot cycle count deterministic (1024718 cycles both runs)
+
+===== TC2: Warm Boot =====
+[TB] Warm boot: soft_rst_ni released @cycle 2049442
+[TC2] PASS: all 1539 words (ISRAM+DSRAM) match golden image
+[TC2] boot_done asserted, SRAM preserved check complete
+
+===== TC6: APB Passthrough (post boot_done) =====
+[TC6] Passthrough read STATUS = 00000001
+
+===== All testcases complete =====
+Simulation complete via $finish(1) at time 20494515 NS + 0
+./rtl/bootloader_tb_all_testcases.sv:595     $finish;
+xcelium> exit
+TOOL:	xrun(64)	22.09-s003: Exiting on Jul 23, 2026 at 21:31:23 IST  (total: 00:00:13)

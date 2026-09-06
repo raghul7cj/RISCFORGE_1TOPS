@@ -1,0 +1,186 @@
+% =============================================================================
+% Chapter 11: Appendix
+% =============================================================================
+\chapter{Appendix}
+\label{ch:appendix}
+
+\section{Appendix A: Complete RTL File Inventory}
+
+\begin{table}[H]
+\centering
+\caption{RTL Source Files}
+\label{tab:rtl_files}
+\begin{tabularx}{\textwidth}{@{}lrX@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{Description} \\
+\midrule
+\texttt{apb\_spi\_master.sv}       & 378  & Top-level module with interrupt logic and sub-module instantiation. \\
+\texttt{spi\_master\_apb\_if.sv}   & 220  & APB register interface (address decode, read mux, write logic). \\
+\texttt{spi\_master\_controller.sv}& 561  & Controller FSM with state machine, data mux, and CS logic. \\
+\texttt{spi\_master\_clkgen.sv}    & 82   & SPI clock generator with programmable divider. \\
+\texttt{spi\_master\_tx.sv}        & 130  & TX shift register (standard and quad mode). \\
+\texttt{spi\_master\_rx.sv}        & 140  & RX shift register (standard and quad mode). \\
+\texttt{spi\_master\_fifo.sv}      & 140  & Parameterized FIFO with circular buffer. \\
+\texttt{spi\_master\_tb\_v2.sv}    & 568  & Testbench v2 with slave BFM and 14 testcases. \\
+\midrule
+\textbf{Total}                     & \textbf{2219} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Appendix B: Simulation Commands}
+
+\subsection{Compiling and Running with Xcelium}
+
+\begin{lstlisting}[language=bash,numbers=none]
+# Compile all RTL and testbench files
+xmvlog -sv spi_master_fifo.sv \
+           spi_master_clkgen.sv \
+           spi_master_tx.sv \
+           spi_master_rx.sv \
+           spi_master_controller.sv \
+           spi_master_apb_if.sv \
+           apb_spi_master.sv \
+           spi_master_tb_v2.sv
+
+# Elaborate the testbench top module
+xmelab tb_apb_spi_master
+
+# Run the simulation
+xmsim tb_apb_spi_master
+\end{lstlisting}
+
+\subsection{Using a File List}
+
+Create a file \texttt{spi\_file.f} containing:
+\begin{lstlisting}[numbers=none]
+spi_master/spi_master_fifo.sv
+spi_master/spi_master_clkgen.sv
+spi_master/spi_master_tx.sv
+spi_master/spi_master_rx.sv
+spi_master/spi_master_controller.sv
+spi_master/spi_master_apb_if.sv
+spi_master/apb_spi_master.sv
+spi_master/spi_master_tb_v2.sv
+\end{lstlisting}
+
+Then compile with:
+\begin{lstlisting}[language=bash,numbers=none]
+xmvlog -sv -f spi_file.f
+xmelab tb_apb_spi_master
+xmsim tb_apb_spi_master
+\end{lstlisting}
+
+\subsection{Viewing Waveforms in SimVision}
+
+\begin{lstlisting}[language=bash,numbers=none]
+simvision waves_v2.trn
+\end{lstlisting}
+
+\section{Appendix C: Register Quick Reference Card}
+
+\begin{table}[H]
+\centering
+\caption{Register Quick Reference}
+\label{tab:reg_quick}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Offset} & \textbf{Name} & \textbf{Key Fields} \\
+\midrule
+0x00 & STATUS  & [0]=rd, [1]=wr, [2]=qrd, [3]=qwr, [4]=swrst, [11:8]=csreg \\
+0x04 & CLKDIV  & [7:0]=divider \\
+0x08 & SPICMD  & [31:0]=command value \\
+0x0C & SPIADR  & [31:0]=address value \\
+0x10 & SPILEN  & [5:0]=cmd\_len, [13:8]=addr\_len, [31:16]=data\_len \\
+0x14 & SPIDUM  & [15:0]=dummy\_rd, [31:16]=dummy\_wr \\
+0x18 & TXFIFO  & [31:0]=write data (push) \\
+0x20 & RXFIFO  & [31:0]=read data (pop) \\
+0x24 & INTCFG  & [30]=cnt\_en, [31]=int\_en, thresholds and counters \\
+0x28 & INTSTA  & Read to re-arm interrupt FSM \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Appendix D: FSM State Encoding Quick Reference}
+
+\begin{table}[H]
+\centering
+\caption{Controller FSM State Encoding}
+\begin{tabular}{@{}cl@{}}
+\toprule
+\textbf{Value} & \textbf{State} \\
+\midrule
+0 & IDLE \\
+1 & CMD \\
+2 & ADDR \\
+3 & MODE \\
+4 & DUMMY \\
+5 & DATA\_TX \\
+6 & DATA\_RX \\
+7 & WAIT\_EDGE \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Appendix E: Testbench Task Quick Reference}
+
+\begin{table}[H]
+\centering
+\caption{Testbench Task Summary}
+\label{tab:task_ref}
+\small
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Task/Function} & \textbf{Description} \\
+\midrule
+\texttt{reg\_addr(idx)}        & Converts 4-bit register index to 12-bit APB address. \\
+\texttt{apb\_write(addr,data)} & Performs a 2-cycle APB write transaction. \\
+\texttt{apb\_read(addr,rdata)} & Performs a 2-cycle APB read transaction with correct FIFO timing. \\
+\texttt{check(msg,got,exp,mask)} & Masked comparison with pass/fail counting and formatted output. \\
+\texttt{cfg\_spi(...)}         & Writes all 5 SPI configuration registers in one call. \\
+\texttt{trigger(op,cs)}       & Writes STATUS register to start an SPI transaction. \\
+\texttt{push\_tx(data)}       & Pushes a 32-bit word into the TX FIFO. \\
+\texttt{pop\_rx(data)}        & Pops a 32-bit word from the RX FIFO. \\
+\texttt{wait\_eot(timeout)}   & Waits for the sticky EOT flag with configurable timeout. \\
+\texttt{clear\_eot\_flag}     & Resets the sticky EOT flag using force/release. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Appendix F: Known Limitations and FIXME Notes}
+
+The following FIXME comments exist in the RTL source code:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \texttt{spi\_master\_apb\_if.sv}, line 284: \texttt{spi\_data\_tx\_ready} is marked as
+        ``not used inside this module.'' The signal is used by the FIFO, not the APB interface.
+        This is informational, not a bug.
+  \item \texttt{spi\_master\_controller.sv}, line 31: \texttt{spi\_swrst} is marked as ``not used
+        at all'' within the controller. The software reset only clears the FIFOs at the top level.
+        The controller itself does not respond to software reset, which means issuing swrst during
+        an active transaction may leave the FSM in an inconsistent state.
+  \item \texttt{spi\_master\_controller.sv}, line 77: \texttt{do\_tx} is marked as ``NOT USED
+        at all.'' This signal is set but never read in any conditional logic. It can be safely
+        removed in a future cleanup.
+\end{enumerate}
+
+\section{Appendix G: Document Revision History}
+
+\begin{table}[H]
+\centering
+\caption{Document Revision History}
+\begin{tabularx}{\textwidth}{@{}cclX@{}}
+\toprule
+\textbf{Rev} & \textbf{Date} & \textbf{Author} & \textbf{Changes} \\
+\midrule
+1.0 & May 2026 & Verification Team & Initial release. 14 testcases, 28 checks, all passing. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\vfill
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}\\[0.5cm]
+{\large\textbf{End of Document}}
+\end{center}
