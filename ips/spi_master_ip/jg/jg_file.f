@@ -1,8 +1,0 @@
--sv
-../spi_master/apb_spi_master.sv
-../spi_master/spi_master_apb_if.sv
-../spi_master/spi_master_clkgen.sv
-../spi_master/spi_master_controller.sv
-../spi_master/spi_master_fifo.sv
-../spi_master/spi_master_rx.sv
-../spi_master/spi_master_tx.sv
