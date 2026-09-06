@@ -1,0 +1,22 @@
+stateDiagram-v2
+    [*] --> Normal
+
+    Normal --> TrapTagged: IF/ID/EX/MEM detects exception
+    TrapTagged --> YoungerFlushed: exc_valid in flight
+    YoungerFlushed --> TrapTagged: exception sideband advances
+    TrapTagged --> WBCommitReady: valid_W & exc_valid_W
+    WBCommitReady --> TrapRedirect: trap_target = mtvec
+    TrapRedirect --> TrapCSRWrite: write mepc/mcause/mtval/mstatus
+    TrapCSRWrite --> Normal: next instruction fetched from mtvec
+
+    Normal --> MRETTagged: decode detects MRET
+    MRETTagged --> WBReturnReady: valid_W & is_mret_W & ~exc_valid_W
+    WBReturnReady --> MRETRedirect: trap_target = mepc
+    MRETRedirect --> MRETCSRWrite: write mstatus restore bundle
+    MRETCSRWrite --> Normal: next instruction fetched from mepc
+
+    note right of TrapTagged
+        Conceptual state only.
+        Current RTL uses combinational
+        WB commit logic, not a registered FSM.
+    end note
