@@ -54,8 +54,27 @@
 //
 // BOOT FLOW:
 //   Cold Boot (hard_rst_ni LOW→HIGH):
-//     S_RESET → S_CLEAR_SRAM → SPI config → per-word SPI read/SRAM write →
+//     S_RESET → S_CLEAR_SRAM → one-time SPI config → chunked fetch →
 //     S_CLEAN_ASSERT → S_CLEAN_HOLD → S_CLEAN_RELEASE → S_DONE
+//
+// CHUNKED FETCH (replaces the original one-transaction-per-word loop):
+//   SPI NOR opcode 0x03 auto-increments the flash address across a burst, so a
+//   single command+address can stream many words. The SPI master pushes a word
+//   into its RX FIFO every 32 bits and gates SCK by itself when the FIFO backs
+//   up (spi_master_rx.sv:94-102), so the serial shift and the APB/AXI drain run
+//   as two independent loops with hardware backpressure between them.
+//
+//     per chunk : S_INIT_SPILEN → S_CFG_SPIADR → S_TRIGGER
+//     per word  : S_READ_FIFO → S_WRITE_SRAM → S_CHECK_DONE
+//
+//   Cost per word drops from CMD(8)+ADDR(24)+DATA(32)=64 SPI bits to 32, and
+//   the two APB setup writes move from once-per-word to once-per-chunk.
+//
+//   Chunking (rather than one burst for the whole image) is required because
+//   the SPI master's length register is 16 bits: 65535 bits = 2047 words at 32
+//   bits/word, while ISRAM+DSRAM in the SoC total 16384 words. MAX_CHUNK_WORDS
+//   sets the burst size; every counter is derived from the parameters, so any
+//   SRAM depth (2K/4K/8K/16K/32K...) works with no RTL change.
 //
 //   Warm Boot (soft_rst_ni LOW→HIGH):
 //     S_RESET → S_CLEAN_ASSERT → S_CLEAN_HOLD → S_CLEAN_RELEASE → S_DONE
@@ -125,7 +144,19 @@ module bootloader #(
   // so the 03 will be 00000011
   parameter logic [5:0]   ADDR_LEN_BITS    = 6'd24, // it tells which address to start
   // reading from
-  parameter logic [15:0]  DATA_LEN_BITS    = 16'd32,  // One 32-bit word per transaction
+  // Bits per firmware word. The SPI master assembles the RX stream into 32-bit
+  // entries (spi_master_rx pushes on counter[4:0]==31), so this must be 32.
+  parameter logic [15:0]  DATA_LEN_BITS    = 16'd32,
+  // Words fetched per SPI transaction. The flash auto-increments its address
+  // across a burst, so one transaction streams many words: the SPI master
+  // pushes a word to the RX FIFO every DATA_LEN_BITS bits and gates SCK by
+  // itself whenever the FIFO backs up (spi_master_rx.sv:94-102).
+  //
+  // Hard ceiling: spi_data_len is 16 bits (spi_master_apb_if.sv:50,162-163;
+  // counter_rx is [15:0] in spi_master_controller.sv:68), so a transaction
+  // cannot exceed 65535 bits = 2047 words at 32 bits/word. 1024 keeps a margin
+  // and divides evenly into 2K/4K/8K/16K/32K SRAM depths.
+  parameter int unsigned  MAX_CHUNK_WORDS  = 1024,
   parameter logic [7:0]   SPI_CLK_DIV      = 8'd4,
   parameter logic [3:0]   CS_FLASH         = 4'b0001, // CSN0 = SPI Flash
 
@@ -216,6 +247,16 @@ module bootloader #(
 
   localparam int unsigned CLEAR_CNT_W    = (TOTAL_CLEAR_WORDS > 0)// The actual SRAM clear counter
                                            ? $clog2(TOTAL_CLEAR_WORDS + 1) : 1;
+
+  // --- Chunked SPI burst sizing ---------------------------------------------
+  // Largest transaction the SPI master's 16-bit length register can express.
+  localparam int unsigned SPI_LEN_MAX_BITS  = 65535;
+  localparam int unsigned CHUNK_WORDS_LIMIT = SPI_LEN_MAX_BITS / int'(DATA_LEN_BITS);
+
+  // Counter width for "words left in the current chunk". Sized from
+  // MAX_CHUNK_WORDS, so it tracks the parameter automatically.
+  localparam int unsigned CHUNK_CNT_W = (MAX_CHUNK_WORDS > 0)
+                                        ? $clog2(MAX_CHUNK_WORDS + 1) : 1;
   localparam int unsigned FLASH_WAIT_CNT_W = (FLASH_POWERUP_CYCLES > 1)// The actual flash power-up counter
                                               ? $clog2(FLASH_POWERUP_CYCLES + 1) : 1;
   localparam int unsigned RST_HOLD_CNT_W = (RESET_HOLD_CYCLES > 1) // The actual reset hold counter
@@ -232,6 +273,16 @@ module bootloader #(
     assert (NUM_DATA_WORDS <= DSRAM_NUM_WORDS) else
       $error("bootloader: NUM_DATA_WORDS (%0d) exceeds DSRAM_NUM_WORDS (%0d)",
              NUM_DATA_WORDS, DSRAM_NUM_WORDS);
+    assert (DATA_LEN_BITS == 16'd32) else
+      $error("bootloader: DATA_LEN_BITS must be 32 - the SPI master assembles the RX stream into 32-bit entries (got %0d)",
+             DATA_LEN_BITS);
+    // Without this the chunk length silently truncates mod 65536 when written
+    // to SPILEN; at exactly 2048 words it would write 0, and
+    // spi_master_controller.sv:239 ("else if (spi_data_len != 0)") would skip
+    // the data phase entirely - a boot that fetches nothing, with no error.
+    assert (MAX_CHUNK_WORDS >= 1 && MAX_CHUNK_WORDS <= CHUNK_WORDS_LIMIT) else
+      $error("bootloader: MAX_CHUNK_WORDS (%0d) must be in 1..%0d for DATA_LEN_BITS=%0d",
+             MAX_CHUNK_WORDS, CHUNK_WORDS_LIMIT, DATA_LEN_BITS);
     assert (FLASH_POWERUP_CYCLES >= 1) else
       $error("bootloader: FLASH_POWERUP_CYCLES must be >= 1");
     assert (RESET_HOLD_CYCLES >= 1) else
@@ -271,6 +322,10 @@ module bootloader #(
   logic [AXI_ADDR_WIDTH-1:0]  dest_addr_q;      // Current SRAM write address
   logic [WORD_CNT_W-1:0]      word_cnt_q;       // Firmware words transferred
   logic [31:0]                rxfifo_data_q;    // Captured RX FIFO word
+
+  // Chunked burst tracking: words still expected from the in-flight SPI
+  // transaction. Loaded when SPILEN is programmed, decremented per word.
+  logic [CHUNK_CNT_W-1:0]     chunk_left_q;
 
   // SRAM clear pass
   logic [AXI_ADDR_WIDTH-1:0]  clear_addr_q;     // Current SRAM clear address
@@ -322,6 +377,36 @@ module bootloader #(
   wire boot_active = (state_q != S_DONE);
 
   // ===========================================================================
+  //  Chunk Sizing (combinational)
+  // ===========================================================================
+  // Words still outstanding, and the size of the chunk about to be programmed:
+  // a full MAX_CHUNK_WORDS burst, or whatever is left on the final chunk.
+  // Both scale with the parameters, so any ISRAM/DSRAM depth works unchanged.
+  // Compare/truncate at a width that covers BOTH the word counter and the chunk
+  // counter. A firmware image smaller than MAX_CHUNK_WORDS makes WORD_CNT_W the
+  // narrower of the two (e.g. TOTAL_WORDS=64 -> 7 bits vs CHUNK_CNT_W=11), so
+  // sizing on either one alone gives an out-of-range part-select.
+  localparam int unsigned REM_W = ((WORD_CNT_W + 1) > CHUNK_CNT_W)
+                                  ? (WORD_CNT_W + 1) : CHUNK_CNT_W;
+
+  logic [REM_W-1:0]       words_remaining;
+  logic [REM_W-1:0]       chunk_size_wide;
+  logic [CHUNK_CNT_W-1:0] chunk_size;
+  logic [15:0]            chunk_len_bits;
+
+  always_comb begin
+    words_remaining = REM_W'(TOTAL_WORDS) - REM_W'(word_cnt_q);
+    chunk_size_wide = (words_remaining >= REM_W'(MAX_CHUNK_WORDS))
+                      ? REM_W'(MAX_CHUNK_WORDS)
+                      : words_remaining;
+    // Never exceeds MAX_CHUNK_WORDS, so this narrowing cannot lose bits.
+    chunk_size      = chunk_size_wide[CHUNK_CNT_W-1:0];
+    // Safe against 16-bit overflow: MAX_CHUNK_WORDS <= 65535/DATA_LEN_BITS is
+    // enforced by the elaboration assertion above.
+    chunk_len_bits  = 16'(chunk_size) * DATA_LEN_BITS;
+  end
+
+  // ===========================================================================
   //  APB Boot Address / Data Mux (for SPI register access during boot)
   // ===========================================================================
   logic [AXI_ADDR_WIDTH-1:0] apb_boot_paddr;
@@ -343,9 +428,12 @@ module bootloader #(
         // MSB-aligned: top CMD_LEN_BITS bits are shifted out by spi_master_tx.
         apb_boot_pwdata      = {FLASH_READ_CMD, 24'h0};
       end
+      // Programmed once per CHUNK (not per word): the data field carries the
+      // whole burst length, so the SPI master streams chunk_size words back to
+      // back off a single command+address.
       S_INIT_SPILEN: begin
         apb_boot_paddr[11:0] = REG_SPILEN_OFF;
-        apb_boot_pwdata      = {DATA_LEN_BITS, 2'b00, ADDR_LEN_BITS,
+        apb_boot_pwdata      = {chunk_len_bits, 2'b00, ADDR_LEN_BITS,
                                 2'b00, CMD_LEN_BITS};
       end
       S_INIT_SPIDUM: begin
@@ -452,6 +540,7 @@ module bootloader #(
       flash_addr_q   <= FLASH_START_ADDR;
       dest_addr_q    <= DEST_ADDR_INIT;
       word_cnt_q     <= '0;
+      chunk_left_q   <= '0;
       rxfifo_data_q  <= '0;
       clear_addr_q   <= CLEAR_ADDR_INIT;
       clear_cnt_q    <= '0;
@@ -477,6 +566,7 @@ module bootloader #(
       flash_addr_q   <= FLASH_START_ADDR;
       dest_addr_q    <= DEST_ADDR_INIT;
       word_cnt_q     <= '0;
+      chunk_left_q   <= '0;
       rxfifo_data_q  <= '0;
       clear_addr_q   <= CLEAR_ADDR_INIT;
       clear_cnt_q    <= '0;
@@ -542,13 +632,24 @@ module bootloader #(
       // Firmware word counter / address management
       // -----------------------------------------------------------------
       if (state_q == S_CHECK_DONE) begin
+        // flash_addr_q advances per word even though the flash auto-increments
+        // within a burst: that keeps it pointing at the correct byte address to
+        // program into SPIADR at the head of the NEXT chunk.
         flash_addr_q <= flash_addr_q + 24'd4;
         word_cnt_q   <= word_cnt_q + 1'b1;
+        if (chunk_left_q != '0)
+          chunk_left_q <= chunk_left_q - 1'b1;    // one word consumed from burst
         if (word_cnt_q + 1 == NUM_INSTR_WORDS[WORD_CNT_W-1:0])
           dest_addr_q <= DSRAM_BASE_ADDR;         // Cross from ISRAM to DSRAM
         else
           dest_addr_q <= dest_addr_q + AXI_ADDR_WIDTH'(4);
       end
+
+      // -----------------------------------------------------------------
+      // Chunk word counter: armed when the burst length is programmed
+      // -----------------------------------------------------------------
+      if (state_q == S_INIT_SPILEN && apb_phase_q && apb_mst_resp_i.pready)
+        chunk_left_q <= chunk_size;
 
       // -----------------------------------------------------------------
       // Flash power-up wait counter
@@ -633,21 +734,32 @@ module bootloader #(
       end
 
       // --- One-time SPI config (APB writes) ---
+      // CLKDIV/SPICMD/SPIDUM are set once for the whole boot. SPILEN is NOT
+      // here: it carries the per-chunk burst length and so is reprogrammed at
+      // the head of every chunk (below).
       S_INIT_CLKDIV: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_INIT_SPICMD;
-      S_INIT_SPICMD: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_INIT_SPILEN;
-      S_INIT_SPILEN: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_INIT_SPIDUM;
-      S_INIT_SPIDUM: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_CFG_SPIADR;
+      S_INIT_SPICMD: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_INIT_SPIDUM;
+      S_INIT_SPIDUM: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_INIT_SPILEN;
 
-      // --- Per-word SPI read + SRAM write loop ---
+      // --- Per-CHUNK burst setup (3 APB writes per chunk, not per word) ---
+      S_INIT_SPILEN: if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_CFG_SPIADR;
       S_CFG_SPIADR:  if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_TRIGGER;
       S_TRIGGER:     if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_READ_FIFO;
+
+      // --- Per-WORD drain loop (runs chunk_size times per burst) ---
+      // The SPI master keeps shifting the burst autonomously and pushes a word
+      // every 32 bits; if this loop falls behind, spi_master_rx gates SCK until
+      // the FIFO drains. So the two loops run independently.
       S_READ_FIFO:   if (apb_phase_q && apb_mst_resp_i.pready) state_d = S_WRITE_SRAM;
       S_WRITE_SRAM:  if (axi_resp_i.b_valid)                   state_d = S_CHECK_DONE;
 
       S_CHECK_DONE: begin
-        state_d = (word_cnt_q + 1 < TOTAL_WORDS[WORD_CNT_W-1:0])
-                  ? S_CFG_SPIADR
-                  : S_CLEAN_ASSERT;
+        if (word_cnt_q + 1 >= TOTAL_WORDS[WORD_CNT_W-1:0])
+          state_d = S_CLEAN_ASSERT;        // whole image transferred
+        else if (chunk_left_q == CHUNK_CNT_W'(1))
+          state_d = S_INIT_SPILEN;         // burst exhausted -> set up next chunk
+        else
+          state_d = S_READ_FIFO;           // stay inside the current burst
       end
 
       // --- Clean-slate reset sequence ---
