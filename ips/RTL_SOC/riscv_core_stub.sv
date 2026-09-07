@@ -3,10 +3,9 @@
 // =============================================================================
 // Empty placeholder for the RISC-V core (RV32IM).
 // Exposes:
-//   - Instruction fetch port (OBI-like, read-only) → direct to ISRAM
+//   - Instruction fetch port (OBI-like, read-only) → direct to fetch demux
 //   - Data memory port (OBI-like, read/write) → direct to DSRAM
 //   - AXI-Lite master interface → crossbar (for peripheral access)
-//   - CLIC interrupt interface
 //
 // Replace this stub with the actual core implementation later.
 // =============================================================================
@@ -19,7 +18,7 @@ module riscv_core_stub #(
   input  logic                          rst_ni,
 
   // =========================================================================
-  // Instruction Fetch Port (OBI-like, read-only → ISRAM)
+  // Instruction Fetch Port (OBI-like, read-only → fetch demux → BootROM/ISRAM)
   // =========================================================================
   output logic                          instr_req_o,
   input  logic                          instr_gnt_i,
@@ -66,19 +65,7 @@ module riscv_core_stub #(
   // Core Control
   // =========================================================================
   input  logic                          fetch_enable_i,
-  input  logic [31:0]                   boot_addr_i,
-
-  // =========================================================================
-  // Interrupt Interface (from CLIC)
-  // =========================================================================
-  input  logic                          irq_valid_i,
-  output logic                          irq_ready_o,
-  input  logic [7:0]                    irq_id_i,
-  input  logic [7:0]                    irq_level_i,
-  input  logic                          irq_shv_i,
-  input  logic [1:0]                    irq_priv_i,
-  input  logic                          irq_kill_req_i,
-  output logic                          irq_kill_ack_o
+  input  logic [31:0]                   boot_addr_i
 );
 
   // ===========================================================================
@@ -108,9 +95,5 @@ module riscv_core_stub #(
   assign axi_ar_prot_o  = '0;
   assign axi_ar_valid_o = 1'b0;
   assign axi_r_ready_o  = 1'b0;
-
-  // Interrupt: not acknowledging
-  assign irq_ready_o    = 1'b0;
-  assign irq_kill_ack_o = 1'b0;
 
 endmodule

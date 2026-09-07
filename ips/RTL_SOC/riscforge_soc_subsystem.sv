@@ -3,50 +3,223 @@
 // =============================================================================
 //
 // Architecture:
-//   RISC-V Core (stub):
-//     - Instruction fetch port → sram_mux[ISRAM] port 0 → ISRAM (4 KB)
-//     - Data memory port      → sram_mux[DSRAM] port 0 → DSRAM (4 KB)
-//     - AXI-Lite master       → axi_lite_xbar SLV[0]
+//   RISC-V Core (real RV32IM, 5-stage — ips/riscv_core/rtl/top.v):
+//     - Instruction fetch port → instr_fetch_demux
+//         ├─ BootROM range (0x0000_0000) → boot_rom (reset vector; sets sp,
+//         │                                 jumps to ISRAM base)
+//         └─ ISRAM range   (0x0001_0000) → sram_mux[ISRAM] port 0 → ISRAM (32 KB)
+//     - Load/store port       → hybrid_mem_interface, which splits:
+//         ├─ DSRAM range  → sram_mux[DSRAM] port 0 → DSRAM (32 KB), direct
+//         └─ MMIO range   → AXI-Lite master → axi_lite_xbar SLV[0]
+//     Both SRAM paths are direct; only MMIO crosses the AXI fabric.
 //
 //   Bootloader (real):
-//     - AXI-Lite master       → axi_lite_xbar SLV[1]   (SRAM writes only)
+//     - AXI-Lite master       → axi_lite_xbar SLV[1]   (SRAM writes only,
+//                                awprot[0]=1 privileged — passes ISRAM gate)
 //     - APB slave  ← APB bridge slot 4 (SPI address space)
 //     - APB master → apb_spi_master  (boot: FSM drives; runtime: passthrough)
 //     - Outputs: core_rst_ni, periph_rst_ni (clean-slate reset after load)
 //
 //   axi_lite_xbar (2 SLV → 3 MST):
-//     MST[0] → axi_lite_sram_if → sram_mux[ISRAM] port 1 → ISRAM
+//     MST[0] → axi_lite_sram_if (PRIV_WRITE_ONLY=1)
+//                → sram_mux[ISRAM] port 1 → ISRAM
 //     MST[1] → axi_lite_sram_if → sram_mux[DSRAM] port 1 → DSRAM
 //     MST[2] → axi_lite_to_apb (1 AXI → 6 APB)
 //               ├─ APB[0] → I2C
-//               ├─ APB[1] → Timer
+//               ├─ APB[1] → Timer 0
 //               ├─ APB[2] → UART
 //               ├─ APB[3] → GPIO
 //               ├─ APB[4] → Bootloader APB slave (→ apb_spi_master)
-//               └─ APB[5] → CLIC
+//               └─ APB[5] → Timer 1
 //
-//   CLIC ↔ Core interrupt handshake is an internal closed loop.
+//   BootROM is directly connected to the core fetch demux (NOT on crossbar).
+//   ISRAM writes via AXI are privilege-gated: only awprot[0]=1 (privileged)
+//   transactions are accepted; unprivileged writes return SLVERR.
 //
+// ─────────────────────────────────────────────────────────────────────────────
 // Address Map (Crossbar):
-//   ISRAM:  0x0000_0000 – 0x0000_1000  (4 KB)
-//   DSRAM:  0x0001_0000 – 0x0001_1000  (4 KB)
-//   APB:    0x4000_0000 – 0x5000_0000  (256 MB peripheral space)
+//   ISRAM:    0x0001_0000 – 0x0001_8000  (32 KB, privilege-gated writes)
+//   DSRAM:    0x0002_0000 – 0x0002_8000  (32 KB)
+//   APB:      0x4000_0000 – 0x5000_0000  (256 MB peripheral space)
+//
+// Address Map (Core-only, NOT on crossbar):
+//   BootROM:  0x0000_0000 – 0x0000_0040  (64 B, 16 × 32-bit, read-only stub)
 //
 // Address Map (APB Bridge, within peripheral space):
-//   I2C:    0x4000_0000 – 0x4000_1000  (4 KB)
-//   Timer:  0x4000_1000 – 0x4000_2000  (4 KB)
-//   UART:   0x4000_2000 – 0x4000_3000  (4 KB)
-//   GPIO:   0x4000_3000 – 0x4000_4000  (4 KB)
-//   SPI:    0x4000_4000 – 0x4000_5000  (4 KB)
-//   CLIC:   0x4000_5000 – 0x4000_6000  (4 KB)
+//   I2C:      0x4000_0000 – 0x4000_1000  (4 KB)
+//   Timer 0:  0x4000_1000 – 0x4000_2000  (4 KB)
+//   UART:     0x4000_2000 – 0x4000_3000  (4 KB)
+//   GPIO:     0x4000_3000 – 0x4000_4000  (4 KB)
+//   SPI:      0x4000_4000 – 0x4000_5000  (4 KB)
+//   Timer 1:  0x4000_5000 – 0x4000_6000  (4 KB)
 //
+// ═══════════════════════════════════════════════════════════════════════════════
+// MEMORY-MAPPED I/O REGISTER MAP
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// BootROM: 0x0000_0000 – 0x0000_003F  (64 B, 16 × 32-bit, read-only stub)
+//   Core-only access via instruction fetch demux. Not on AXI crossbar.
+// ───────────────────────────────────────────────────────────────────────────────
+//   0x0000_0000 – 0x0000_003C   ROM data (16 × 32-bit words, NOP-filled stub)
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// ISRAM: 0x0001_0000 – 0x0001_7FFF  (32 KB, privilege-gated writes)
+//   AXI writes require awprot[0]=1 (privileged). Unprivileged writes
+//   return SLVERR. Core fetches via direct port (read-only, no AXI).
+// ───────────────────────────────────────────────────────────────────────────────
+//   0x0001_0000 – 0x0001_7FFC   Instruction SRAM (8192 × 32-bit words)
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// DSRAM: 0x0002_0000 – 0x0002_7FFF  (32 KB)
+// ───────────────────────────────────────────────────────────────────────────────
+//   0x0002_0000 – 0x0002_7FFC   Data SRAM (8192 × 32-bit words)
+//
+// ═══════════════════════════════════════════════════════════════════════════════
+// APB PERIPHERAL SPACE: 0x4000_0000 – 0x4FFF_FFFF
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// I2C Master — APB[0]: 0x4000_0000 – 0x4000_0FFF  (4 KB)
+// ───────────────────────────────────────────────────────────────────────────────
+//   Offset  Name   Width   Access  Description
+//   0x00    PRE    16-bit  R/W     Clock prescaler (SCL = PCLK/(5×(PRE+1)))
+//   0x04    CTR    8-bit   R/W     Control register
+//             [7]   EN       R/W     Core enable
+//             [6]   IEN      R/W     Interrupt enable
+//             [5:0] —        —       Reserved
+//   0x08    RXR    8-bit   R       Received byte
+//   0x0C    SR     8-bit   R       Status register
+//             [7]   RxACK    R       Received ACK from slave (0=ACK)
+//             [6]   Busy     R       I2C bus busy
+//             [5]   AL       R       Arbitration lost
+//             [1]   TIP      R       Transfer in progress
+//             [0]   IF       R       Interrupt flag
+//   0x10    TXR    8-bit   W       Transmit byte / slave address
+//   0x14    CR     8-bit   W       Command register
+//             [7]   STA      W       Generate START condition
+//             [6]   STO      W       Generate STOP condition
+//             [5]   RD       W       Read from slave
+//             [4]   WR       W       Write to slave
+//             [3]   ACK      W       ACK value to send (0=ACK, 1=NACK)
+//             [0]   IACK     W       Interrupt acknowledge
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// Timer 0 — APB[1]: 0x4000_1000 – 0x4000_1FFF  (4 KB, TIMER_CNT=2)
+// ───────────────────────────────────────────────────────────────────────────────
+//   Per-timer registers (Timer_N at offset N × 0x10):
+//
+//   Timer_0 (N=0):
+//   Offset  Name         Width   Access  Description
+//   0x00    TIMER_VAL    32-bit  R/W     Current timer value
+//   0x04    TIMER_CTRL   32-bit  R/W     Timer control
+//             [0]   EN        R/W     Timer enable
+//             [5:3] PRESCALER R/W     Prescaler divider (0=bypass)
+//   0x08    TIMER_CMP    32-bit  R/W     Compare value (resets timer on match)
+//
+//   Timer_1 (N=1):
+//   0x10    TIMER_VAL    32-bit  R/W     Current timer value
+//   0x14    TIMER_CTRL   32-bit  R/W     Timer control
+//   0x18    TIMER_CMP    32-bit  R/W     Compare value
+//
+//   IRQ outputs: [2*N] = overflow,  [2*N+1] = compare match
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// UART — APB[2]: 0x4000_2000 – 0x4000_2FFF  (4 KB, 16550-compatible)
+//   Note: apb_uart takes a 3-bit word address PADDR[4:2] (8 registers).
+// ───────────────────────────────────────────────────────────────────────────────
+//   Offset  Name          Width   Access  Description
+//   0x00    RBR/THR/DLL   8-bit   R/W     Receive buffer (R) / Transmit hold (W)
+//                                          / Divisor latch LSB (when DLAB=1)
+//   0x04    IER/DLM       8-bit   R/W     Interrupt enable (DLAB=0)
+//                                          / Divisor latch MSB (DLAB=1)
+//             [0]   ERBFI    R/W     Enable received data available IRQ
+//             [1]   ETBEI    R/W     Enable TX hold empty IRQ
+//             [2]   ELSI     R/W     Enable receiver line status IRQ
+//             [3]   EDSSI    R/W     Enable modem status IRQ
+//   0x08    IIR/FCR       8-bit   R/W     Interrupt identification (R)
+//                                          / FIFO control (W)
+//   0x0C    LCR           8-bit   R/W     Line control register
+//             [7]   DLAB     R/W     Divisor latch access bit
+//             [5:3] —        R/W     Parity config
+//             [2]   STOP     R/W     Stop bits (0=1bit, 1=2bits)
+//             [1:0] WLS      R/W     Word length (00=5, 11=8 bits)
+//   0x10    MCR           8-bit   R/W     Modem control register
+//   0x14    LSR           8-bit   R       Line status register
+//             [0]   DR       R       Data ready
+//             [5]   THRE     R       TX holding register empty
+//             [6]   TEMT     R       Transmitter empty
+//   0x18    MSR           8-bit   R       Modem status register
+//   0x1C    SCR           8-bit   R/W     Scratch register
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// GPIO — APB[3]: 0x4000_3000 – 0x4000_37FF  (2 KB, 32 pins)
+//   lowRISC reggen-generated register map (BlockAw=11).
+// ───────────────────────────────────────────────────────────────────────────────
+//   Offset  Name                Width   Access  Description
+//   0x000   INFO                32-bit  R       [9:0] GPIO count, [19:10] version
+//   0x004   CFG                 32-bit  R/W     [0] global_intrpt_mode
+//                                                [1] pin_lvl_intrpt_mode
+//   0x008   GPIO_MODE_0         32-bit  R/W     2-bit mode per GPIO[0..15]
+//   0x00C   GPIO_MODE_1         32-bit  R/W     2-bit mode per GPIO[16..31]
+//   0x010   GPIO_EN             32-bit  R/W     Output enable per pin
+//   0x014   GPIO_IN             32-bit  R       Sampled input value
+//   0x018   GPIO_OUT            32-bit  R/W     Output data value
+//   0x01C   GPIO_SET            32-bit  W       Set output pins (write-1-to-set)
+//   0x020   GPIO_CLEAR          32-bit  W       Clear output pins (write-1-to-clear)
+//   0x024   GPIO_TOGGLE         32-bit  W       Toggle output pins
+//   0x028   INTRPT_RISE_EN      32-bit  R/W     Rising-edge interrupt enable
+//   0x02C   INTRPT_FALL_EN      32-bit  R/W     Falling-edge interrupt enable
+//   0x030   INTRPT_LVL_HIGH_EN  32-bit  R/W     Level-high interrupt enable
+//   0x034   INTRPT_LVL_LOW_EN   32-bit  R/W     Level-low interrupt enable
+//   0x038   INTRPT_STATUS       32-bit  R/W1C   Interrupt status
+//   0x03C   INTRPT_RISE_STATUS  32-bit  R/W1C   Rising-edge interrupt status
+//   0x040   INTRPT_FALL_STATUS  32-bit  R/W1C   Falling-edge interrupt status
+//   0x044   INTRPT_LVL_HIGH_STS 32-bit  R       Level-high interrupt status
+//   0x048   INTRPT_LVL_LOW_STS  32-bit  R       Level-low interrupt status
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// SPI Master — APB[4]: 0x4000_4000 – 0x4000_4FFF  (4 KB)
+//   Accessible via bootloader APB mux; during boot: FSM-driven.
+// ───────────────────────────────────────────────────────────────────────────────
+//   Offset  Name     Width   Access  Description
+//   0x00    STATUS   32-bit  R       SPI status (TX/RX FIFO flags)
+//             [0]   TX_FULL   R       TX FIFO full
+//             [1]   TX_EMPTY  R       TX FIFO empty
+//             [4]   RX_FULL   R       RX FIFO full
+//             [5]   RX_EMPTY  R       RX FIFO empty
+//             [8]   CS        R       Active chip select
+//   0x04    CLKDIV   8-bit   R/W     SPI clock divider (f_SPI = f_CLK/(2×(CLKDIV+1)))
+//   0x08    SPICMD   32-bit  R/W     SPI command value (MSB-aligned)
+//   0x0C    SPIADR   32-bit  R/W     SPI address value (MSB-aligned)
+//   0x10    SPILEN   32-bit  R/W     Transfer lengths
+//             [5:0]   CMDLEN    R/W   Command length (bits)
+//             [13:8]  ADRLEN    R/W   Address length (bits)
+//             [31:16] DATALEN   R/W   Data length (bits)
+//   0x14    SPIDUM   32-bit  R/W     Dummy cycle config
+//             [15:0]  DUMMYRD   R/W   Dummy cycles for reads
+//             [31:16] DUMMYWR   R/W   Dummy cycles for writes
+//   0x18    TXFIFO   32-bit  W       TX FIFO data (push)
+//   0x20    RXFIFO   32-bit  R       RX FIFO data (pop)
+//   0x24    INTCFG   32-bit  R/W     Interrupt configuration
+//   0x28    INTSTA   32-bit  R       Interrupt status
+//
+// ───────────────────────────────────────────────────────────────────────────────
+// Timer 1 — APB[5]: 0x4000_5000 – 0x4000_5FFF  (4 KB, TIMER_CNT=2)
+//   Same register layout as Timer 0.
+// ───────────────────────────────────────────────────────────────────────────────
+//   Timer_0 (N=0): 0x00 TIMER_VAL, 0x04 TIMER_CTRL, 0x08 TIMER_CMP
+//   Timer_1 (N=1): 0x10 TIMER_VAL, 0x14 TIMER_CTRL, 0x18 TIMER_CMP
+//   IRQ outputs: [2*N] = overflow,  [2*N+1] = compare match
+//
+// ─────────────────────────────────────────────────────────────────────────────
 // Reset Topology:
 //   hard_rst_ni  → cold boot, resets everything including bootloader
 //   soft_rst_ni  → warm boot, SRAM preserved, bootloader runs clean-slate only
 //   sys_rst_n    = hard_rst_ni & soft_rst_ni → crossbar, bridges, muxes
 //   core_rst_n   ← bootloader output → RISC-V core
-//   periph_rst_n ← bootloader output → non-boot peripherals (I2C, Timer, UART,
-//                                       GPIO, CLIC)
+//   periph_rst_n ← bootloader output → non-boot peripherals (I2C, Timer 0,
+//                                       Timer 1, UART, GPIO)
 //   spi_rst_n    ← bootloader output → SPI master (independent timing: HIGH
 //                                       during boot, pulsed LOW for clean-slate,
 //                                       HIGH for runtime)
@@ -58,10 +231,10 @@ module riscforge_soc_subsystem
 #(
   parameter int unsigned AXI_ADDR_WIDTH    = 32,
   parameter int unsigned AXI_DATA_WIDTH    = 32,
-  parameter int unsigned CLIC_N_SOURCE     = 256,
-  parameter int unsigned CLIC_INTCTLBITS   = 8,
-  parameter int unsigned TIMER_CNT         = 2,
+  parameter int unsigned TIMER0_CNT        = 2,
+  parameter int unsigned TIMER1_CNT        = 2,
   parameter int unsigned SPI_BUFFER_DEPTH  = 10,
+  parameter int unsigned BOOTROM_NUM_WORDS = 16,
   // Bootloader firmware image parameters (passed to bootloader)
   parameter int unsigned NUM_INSTR_WORDS   = 64,
   parameter int unsigned NUM_DATA_WORDS    = 0,
@@ -69,7 +242,7 @@ module riscforge_soc_subsystem
   // Derived — do not override
   localparam int unsigned AXI_STRB_WIDTH   = AXI_DATA_WIDTH / 8,
   localparam int unsigned NR_GPIOS         = GPIOCount,
-  localparam int unsigned CLIC_SRC_W       = $clog2(CLIC_N_SOURCE)
+  localparam int unsigned BOOTROM_ADDR_WIDTH = $clog2(BOOTROM_NUM_WORDS)
 )(
   // =========================================================================
   // Global
@@ -102,9 +275,14 @@ module riscforge_soc_subsystem
   output logic                          i2c_interrupt_o,
 
   // =========================================================================
-  // Timer IRQ
+  // Timer 0 IRQ
   // =========================================================================
-  output logic [(TIMER_CNT*2)-1:0]      timer_irq_o,
+  output logic [(TIMER0_CNT*2)-1:0]     timer0_irq_o,
+
+  // =========================================================================
+  // Timer 1 IRQ
+  // =========================================================================
+  output logic [(TIMER1_CNT*2)-1:0]     timer1_irq_o,
 
   // =========================================================================
   // UART External Interface
@@ -148,18 +326,7 @@ module riscforge_soc_subsystem
   input  logic                          spi_sdi1_i,
   input  logic                          spi_sdi2_i,
   input  logic                          spi_sdi3_i,
-  output logic [1:0]                    spi_events_o,
-
-  // =========================================================================
-  // CLIC External Interface (observability outputs only)
-  // =========================================================================
-  input  logic [CLIC_N_SOURCE-1:0]      clic_intr_src_i,
-  output logic                          clic_irq_valid_o,
-  output logic [CLIC_SRC_W-1:0]         clic_irq_id_o,
-  output logic [7:0]                    clic_irq_level_o,
-  output logic                          clic_irq_shv_o,
-  output logic [1:0]                    clic_irq_priv_o,
-  output logic                          clic_irq_kill_req_o
+  output logic [1:0]                    spi_events_o
 );
 
   // ===========================================================================
@@ -281,12 +448,12 @@ module riscforge_soc_subsystem
   localparam int unsigned NUM_APB_RULES  = 6;
 
   // ===========================================================================
-  //  Section 5 — SRAM Configuration
+  //  Section 5 — SRAM & BootROM Configuration
   // ===========================================================================
 
-  localparam int unsigned ISRAM_NUM_WORDS  = 1024;  // 4 KB (1024 × 32-bit)
-  localparam int unsigned DSRAM_NUM_WORDS  = 1024;  // 4 KB (1024 × 32-bit)
-  localparam int unsigned SRAM_ADDR_WIDTH  = $clog2(ISRAM_NUM_WORDS);  // 10
+  localparam int unsigned ISRAM_NUM_WORDS  = 8192;  // 32 KB (8192 × 32-bit)
+  localparam int unsigned DSRAM_NUM_WORDS  = 8192;  // 32 KB (8192 × 32-bit)
+  localparam int unsigned SRAM_ADDR_WIDTH  = $clog2(ISRAM_NUM_WORDS);  // 13
   localparam int unsigned BYTE_OFFSET      = $clog2(AXI_DATA_WIDTH/8); // 2
 
   // ===========================================================================
@@ -321,47 +488,57 @@ module riscforge_soc_subsystem
   // APB address map
   rule_t [NUM_APB_RULES-1:0] apb_addr_map;
 
-  // --- RISC-V Core AXI-Lite flat signals (core → crossbar SLV[0]) ---
-  logic [AXI_ADDR_WIDTH-1:0] riscv_aw_addr;
-  logic [2:0]                riscv_aw_prot;
-  logic                      riscv_aw_valid;
-  logic                      riscv_aw_ready;
-  logic [AXI_DATA_WIDTH-1:0] riscv_w_data;
-  logic [AXI_STRB_WIDTH-1:0] riscv_w_strb;
-  logic                      riscv_w_valid;
-  logic                      riscv_w_ready;
-  logic [1:0]                riscv_b_resp;
-  logic                      riscv_b_valid;
-  logic                      riscv_b_ready;
-  logic [AXI_ADDR_WIDTH-1:0] riscv_ar_addr;
-  logic [2:0]                riscv_ar_prot;
-  logic                      riscv_ar_valid;
-  logic                      riscv_ar_ready;
-  logic [AXI_DATA_WIDTH-1:0] riscv_r_data;
-  logic [1:0]                riscv_r_resp;
-  logic                      riscv_r_valid;
-  logic                      riscv_r_ready;
-
-  // --- Core instruction fetch port (core → ISRAM mux port 0) ---
+  // --- Core instruction fetch port (core → fetch demux) ---
+  // The core drives a raw SRAM-style fetch interface (enable + 30-bit word
+  // address, 1-cycle read latency) with no req/gnt handshake. core_instr_gnt
+  // and core_instr_rvalid are therefore left unread: the fetch port owns
+  // sram_mux port 0, which has unconditional priority, and the ISRAM AXI
+  // bridge is locked out at runtime — so a fetch is never denied.
   logic        core_instr_req;
-  logic        core_instr_gnt;
+  logic        core_instr_gnt;     // unused (see above)
   logic [31:0] core_instr_addr;
   logic [31:0] core_instr_rdata;
-  logic        core_instr_rvalid;
+  logic        core_instr_rvalid;  // unused (see above)
 
-  // --- Core data memory port (core → DSRAM mux port 0) ---
+  // --- Core fetch signals as driven by top.v ---
+  logic        core_imem_en;
+  logic [29:0] core_imem_addr_word;
+
+  // --- Fetch demux → BootROM ---
+  logic                           bootrom_cs;
+  logic [BOOTROM_ADDR_WIDTH-1:0]  bootrom_addr;
+  logic [31:0]                    bootrom_rdata;
+
+  // --- Fetch demux → ISRAM mux port 0 ---
+  logic        demux_isram_req;
+  logic        demux_isram_gnt;
+  logic [31:0] demux_isram_addr;
+  logic [31:0] demux_isram_rdata;
+  logic        demux_isram_rvalid;
+
+  // --- Core LSU bus (top.v ↔ hybrid_mem_interface) ---
+  logic        core_lsu_req;
+  logic        core_lsu_we;
+  logic [31:0] core_lsu_addr;
+  logic [31:0] core_lsu_wdata;
+  logic [3:0]  core_lsu_be;
+  logic [31:0] core_lsu_rdata;
+  logic        core_lsu_stall;
+  logic        core_lsu_err;
+
+  // --- Core data memory port (hybrid_mem_interface → DSRAM mux port 0) ---
+  // As with the fetch port, core_data_gnt / core_data_rvalid are unread:
+  // hybrid_mem_interface has no grant input and owns the read timing via its
+  // own 1-cycle stall FSM. Port 0 has unconditional priority so it is never
+  // denied. core_data_addr is a 30-bit ABSOLUTE word address (mem_addr[31:2]).
   logic        core_data_req;
-  logic        core_data_gnt;
+  logic        core_data_gnt;      // unused (see above)
   logic        core_data_we;
   logic [3:0]  core_data_be;
-  logic [31:0] core_data_addr;
+  logic [29:0] core_data_addr;
   logic [31:0] core_data_wdata;
   logic [31:0] core_data_rdata;
-  logic        core_data_rvalid;
-
-  // --- CLIC ↔ Core interrupt handshake (internal closed loop) ---
-  logic core_irq_ready;
-  logic core_irq_kill_ack;
+  logic        core_data_rvalid;   // unused (see above)
 
   // --- ISRAM: AXI bridge ↔ mux port 1 ---
   logic                        isram_axi_req;
@@ -400,9 +577,14 @@ module riscforge_soc_subsystem
   logic [AXI_DATA_WIDTH-1:0]   dsram_rdata;
 
   // Peripheral intermediate signals for APB response construction
-  logic [31:0] i2c_prdata,   timer_prdata,   uart_prdata;
-  logic        i2c_pready,   timer_pready,   uart_pready;
-  logic        i2c_pslverr,  timer_pslverr,  uart_pslverr;
+  logic [31:0] i2c_prdata,   timer0_prdata,  uart_prdata;
+  logic        i2c_pready,   timer0_pready,  uart_pready;
+  logic        i2c_pslverr,  timer0_pslverr, uart_pslverr;
+
+  // Timer 1 intermediate signals
+  logic [31:0] timer1_prdata;
+  logic        timer1_pready;
+  logic        timer1_pslverr;
 
   // SPI Master APB signals (from/to bootloader APB master port)
   apb_req_t  spi_apb_req;
@@ -410,11 +592,6 @@ module riscforge_soc_subsystem
   logic [31:0] spi_prdata;
   logic        spi_pready;
   logic        spi_pslverr;
-
-  // CLIC intermediate signals
-  logic [31:0] clic_prdata;
-  logic        clic_pready;
-  logic        clic_pslverr;
 
   // Default master port controls (disabled)
   localparam int unsigned MST_IDX_W = (NUM_MST_PORTS > 1) ? $clog2(NUM_MST_PORTS) : 1;
@@ -428,59 +605,107 @@ module riscforge_soc_subsystem
   //  Section 8 — Address Maps
   // ===========================================================================
 
-  // Crossbar address map
-  assign xbar_addr_map[0] = '{idx: 32'd0, start_addr: 32'h0000_0000, end_addr: 32'h0000_1000}; // ISRAM (4 KB)
-  assign xbar_addr_map[1] = '{idx: 32'd1, start_addr: 32'h0001_0000, end_addr: 32'h0001_1000}; // DSRAM (4 KB)
+  // Crossbar address map (BootROM is NOT on crossbar — core-only access)
+  assign xbar_addr_map[0] = '{idx: 32'd0, start_addr: 32'h0001_0000, end_addr: 32'h0001_8000}; // ISRAM (32 KB)
+  assign xbar_addr_map[1] = '{idx: 32'd1, start_addr: 32'h0002_0000, end_addr: 32'h0002_8000}; // DSRAM (32 KB)
   assign xbar_addr_map[2] = '{idx: 32'd2, start_addr: 32'h4000_0000, end_addr: 32'h5000_0000}; // APB
 
   // APB bridge address map
   assign apb_addr_map[0] = '{idx: 32'd0, start_addr: 32'h4000_0000, end_addr: 32'h4000_1000}; // I2C
-  assign apb_addr_map[1] = '{idx: 32'd1, start_addr: 32'h4000_1000, end_addr: 32'h4000_2000}; // Timer
+  assign apb_addr_map[1] = '{idx: 32'd1, start_addr: 32'h4000_1000, end_addr: 32'h4000_2000}; // Timer 0
   assign apb_addr_map[2] = '{idx: 32'd2, start_addr: 32'h4000_2000, end_addr: 32'h4000_3000}; // UART
   assign apb_addr_map[3] = '{idx: 32'd3, start_addr: 32'h4000_3000, end_addr: 32'h4000_4000}; // GPIO
   assign apb_addr_map[4] = '{idx: 32'd4, start_addr: 32'h4000_4000, end_addr: 32'h4000_5000}; // SPI Master (via bootloader)
-  assign apb_addr_map[5] = '{idx: 32'd5, start_addr: 32'h4000_5000, end_addr: 32'h4000_6000}; // CLIC
+  assign apb_addr_map[5] = '{idx: 32'd5, start_addr: 32'h4000_5000, end_addr: 32'h4000_6000}; // Timer 1
 
   // ===========================================================================
-  //  Section 9 — Flat ↔ Struct Packing (RISC-V Core Stub → Crossbar SLV[0])
+  //  Section 9 — (removed)
   // ===========================================================================
-
-  assign xbar_slv_req[0] = '{
-    aw:       '{addr: riscv_aw_addr, prot: axi_pkg::prot_t'(riscv_aw_prot)},
-    aw_valid: riscv_aw_valid,
-    w:        '{data: riscv_w_data, strb: riscv_w_strb},
-    w_valid:  riscv_w_valid,
-    b_ready:  riscv_b_ready,
-    ar:       '{addr: riscv_ar_addr, prot: axi_pkg::prot_t'(riscv_ar_prot)},
-    ar_valid: riscv_ar_valid,
-    r_ready:  riscv_r_ready
-  };
-
-  assign riscv_aw_ready = xbar_slv_resp[0].aw_ready;
-  assign riscv_w_ready  = xbar_slv_resp[0].w_ready;
-  assign riscv_b_resp   = xbar_slv_resp[0].b.resp;
-  assign riscv_b_valid  = xbar_slv_resp[0].b_valid;
-  assign riscv_ar_ready = xbar_slv_resp[0].ar_ready;
-  assign riscv_r_data   = xbar_slv_resp[0].r.data;
-  assign riscv_r_resp   = xbar_slv_resp[0].r.resp;
-  assign riscv_r_valid  = xbar_slv_resp[0].r_valid;
+  // The RISC-V core's AXI-Lite master is hybrid_mem_interface, whose struct
+  // ports connect directly to xbar_slv_req[0] / xbar_slv_resp[0] in Section 21.
+  // The flat signal set and its pack/unpack that the stub required are gone.
 
   // ===========================================================================
-  //  Section 10 — Instruction SRAM Subsystem
-  //  (Crossbar MST[0] → AXI bridge → mux port 1; Core fetch → mux port 0)
+  //  Section 10 — BootROM + Instruction Fetch Demux
+  //  Core fetch → instr_fetch_demux → BootROM (direct)
+  //                                 → sram_mux[ISRAM] port 0 (arbitrated)
   // ===========================================================================
 
-  // AXI-Lite to SRAM bridge (crossbar MST[0] → mux port 1)
+  // BootROM (16-word stub, core-only access, NOT on crossbar)
+  boot_rom #(
+    .NUM_WORDS  ( BOOTROM_NUM_WORDS ),
+    .DATA_WIDTH ( AXI_DATA_WIDTH    )
+  ) i_boot_rom (
+    .clk_i   ( clk_i        ),
+    .rst_ni  ( core_rst_n    ),  // primes rdata_o with mem[0] for the first fetch
+    .cs_i    ( bootrom_cs    ),
+    .addr_i  ( bootrom_addr  ),
+    .rdata_o ( bootrom_rdata )
+  );
+
+  // Instruction fetch address demux (routes core fetch to BootROM or ISRAM)
+  instr_fetch_demux #(
+    .BOOTROM_NUM_WORDS ( BOOTROM_NUM_WORDS ),
+    .ISRAM_NUM_WORDS   ( ISRAM_NUM_WORDS   ),
+    .BOOTROM_BASE      ( 32'h0000_0000     ),
+    .ISRAM_BASE        ( 32'h0001_0000     ),
+    // MUST match i_riscv_core's RESET_PC (Section 21). Selects the reset state
+    // of the demux read-data mux so the reset-vector fetch is routed to the
+    // right memory; a mismatch silently drops the instruction at RESET_PC.
+    .RESET_PC          ( 32'h0000_0000     )
+  ) i_instr_fetch_demux (
+    .clk_i          ( clk_i              ),
+    // core_rst_n, NOT sys_rst_n. The demux's only state is rom_accessed_q,
+    // which selects the read-data source for the core's NEXT fetch. Its reset
+    // value must still be intact when the core issues its FIRST fetch.
+    // sys_rst_n releases ~121k cycles before core_rst_n (the whole boot), so in
+    // that domain rom_accessed_q was clocked to 0 immediately and the reset
+    // vector's fetch was routed to ISRAM instead of the BootROM — dropping the
+    // instruction at RESET_PC. Sharing the core's reset holds it until the core
+    // actually starts fetching. Safe: isram_req_o is combinational and already
+    // gated by core_req_i, which is low while the core is in reset.
+    .rst_ni         ( core_rst_n         ),
+    // Core fetch port (upstream)
+    .core_req_i     ( core_instr_req     ),
+    .core_gnt_o     ( core_instr_gnt     ),
+    .core_addr_i    ( core_instr_addr    ),
+    .core_rdata_o   ( core_instr_rdata   ),
+    .core_rvalid_o  ( core_instr_rvalid  ),
+    // BootROM port (downstream)
+    .rom_cs_o       ( bootrom_cs         ),
+    .rom_addr_o     ( bootrom_addr       ),
+    .rom_rdata_i    ( bootrom_rdata      ),
+    // ISRAM mux port 0 (downstream)
+    .isram_req_o    ( demux_isram_req    ),
+    .isram_gnt_i    ( demux_isram_gnt    ),
+    .isram_addr_o   ( demux_isram_addr   ),
+    .isram_rdata_i  ( demux_isram_rdata  ),
+    .isram_rvalid_i ( demux_isram_rvalid )
+  );
+
+  // ===========================================================================
+  //  Section 11 — Instruction SRAM Subsystem
+  //  (Crossbar MST[0] → AXI bridge → mux port 1; Demux → mux port 0)
+  //  AXI bridge has PRIV_WRITE_ONLY=1: only privileged writes (bootloader)
+  //  can modify ISRAM via AXI. Unprivileged writes return SLVERR.
+  // ===========================================================================
+
+  // AXI-Lite to SRAM bridge (crossbar MST[0] → mux port 1, privilege-gated)
   axi_lite_sram_if #(
-    .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
-    .AXI_DATA_WIDTH ( AXI_DATA_WIDTH ),
-    .SRAM_NUM_WORDS ( ISRAM_NUM_WORDS ),
-    .axi_req_t      ( axi_req_t      ),
-    .axi_resp_t     ( axi_resp_t     )
+    .AXI_ADDR_WIDTH  ( AXI_ADDR_WIDTH ),
+    .AXI_DATA_WIDTH  ( AXI_DATA_WIDTH ),
+    .SRAM_NUM_WORDS  ( ISRAM_NUM_WORDS ),
+    .PRIV_WRITE_ONLY ( 1'b1            ),  // Only privileged writes accepted
+    .axi_req_t       ( axi_req_t       ),
+    .axi_resp_t      ( axi_resp_t      )
   ) i_isram_axi_if (
     .clk_i      ( clk_i              ),
     .rst_ni     ( sys_rst_n          ),
     .soft_rst_ni( soft_rst_ni        ),
+    // Runtime lockout: once boot completes, ISRAM belongs to the core's fetch
+    // port alone. AXI traffic is answered with SLVERR instead of contending
+    // with (and being starved by) the every-cycle instruction fetch.
+    .reject_i   ( boot_done_o        ),
     .axi_req_i  ( xbar_mst_req[0]    ),
     .axi_resp_o ( xbar_mst_resp[0]   ),
     .sram_req_o    ( isram_axi_req    ),
@@ -493,23 +718,28 @@ module riscforge_soc_subsystem
     .sram_rvalid_i ( isram_axi_rvalid )
   );
 
-  // 2:1 Priority Mux (port 0 = core fetch, port 1 = AXI bridge)
+  // 2:1 Priority Mux (port 0 = fetch demux, port 1 = AXI bridge)
+  //
+  // The two ports are never active simultaneously: during boot the core is held
+  // in reset (port 0 idle) so the bootloader owns the SRAM, and after boot the
+  // ISRAM AXI bridge rejects transactions (port 1 idle, see i_isram_axi_if's
+  // reject_i). Plain port-0 priority is therefore sufficient.
   sram_mux #(
     .ADDR_WIDTH ( SRAM_ADDR_WIDTH ),
     .DATA_WIDTH ( AXI_DATA_WIDTH  )
   ) i_isram_mux (
     .clk_i          ( clk_i       ),
     .rst_ni         ( sys_rst_n   ),
-    // Port 0 — Core instruction fetch (read-only)
-    .port0_req_i    ( core_instr_req   ),
-    .port0_gnt_o    ( core_instr_gnt   ),
-    .port0_we_i     ( 1'b0             ),  // instruction fetch is read-only
-    .port0_addr_i   ( core_instr_addr[BYTE_OFFSET +: SRAM_ADDR_WIDTH] ),
-    .port0_wdata_i  ( '0               ),
-    .port0_be_i     ( '0               ),
-    .port0_rdata_o  ( core_instr_rdata ),
-    .port0_rvalid_o ( core_instr_rvalid),
-    // Port 1 — AXI bridge (bootloader / runtime AXI access)
+    // Port 0 — Fetch demux (read-only, from core via demux)
+    .port0_req_i    ( demux_isram_req   ),
+    .port0_gnt_o    ( demux_isram_gnt   ),
+    .port0_we_i     ( 1'b0              ),  // instruction fetch is read-only
+    .port0_addr_i   ( demux_isram_addr[BYTE_OFFSET +: SRAM_ADDR_WIDTH] ),
+    .port0_wdata_i  ( '0                ),
+    .port0_be_i     ( '0                ),
+    .port0_rdata_o  ( demux_isram_rdata ),
+    .port0_rvalid_o ( demux_isram_rvalid),
+    // Port 1 — AXI bridge (bootloader / runtime AXI access, privilege-gated)
     .port1_req_i    ( isram_axi_req    ),
     .port1_gnt_o    ( isram_axi_gnt    ),
     .port1_we_i     ( isram_axi_we     ),
@@ -531,7 +761,7 @@ module riscforge_soc_subsystem
   imem_sram_wrapper #(
     .NUM_WORDS      ( ISRAM_NUM_WORDS ),
     .DATA_WIDTH     ( AXI_DATA_WIDTH  ),
-    .IMEM_BASE_BYTE ( 32'h0000_0000  )   // Match crossbar ISRAM address map
+    .IMEM_BASE_BYTE ( 32'h0001_0000  )   // Match crossbar ISRAM address map
   ) i_isram (
     .clk_i   ( clk_i       ),
     .rst_ni  ( sys_rst_n   ),
@@ -544,7 +774,7 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 11 — Data SRAM Subsystem
+  //  Section 12 — Data SRAM Subsystem
   //  (Crossbar MST[1] → AXI bridge → mux port 1; Core data → mux port 0)
   // ===========================================================================
 
@@ -559,6 +789,7 @@ module riscforge_soc_subsystem
     .clk_i      ( clk_i              ),
     .rst_ni     ( sys_rst_n          ),
     .soft_rst_ni( soft_rst_ni        ),
+    .reject_i   ( 1'b0               ),  // DSRAM stays AXI-accessible at runtime
     .axi_req_i  ( xbar_mst_req[1]    ),
     .axi_resp_o ( xbar_mst_resp[1]   ),
     .sram_req_o    ( dsram_axi_req    ),
@@ -572,6 +803,9 @@ module riscforge_soc_subsystem
   );
 
   // 2:1 Priority Mux (port 0 = core data, port 1 = AXI bridge)
+  //
+  // Core data requests are intermittent (only load/store instructions assert
+  // them), so port 1 gets cycles naturally under plain port-0 priority.
   sram_mux #(
     .ADDR_WIDTH ( SRAM_ADDR_WIDTH ),
     .DATA_WIDTH ( AXI_DATA_WIDTH  )
@@ -579,10 +813,13 @@ module riscforge_soc_subsystem
     .clk_i          ( clk_i       ),
     .rst_ni         ( sys_rst_n   ),
     // Port 0 — Core data port (read/write)
+    // core_data_addr is already a word address, so no byte-offset shift here;
+    // the low SRAM_ADDR_WIDTH bits are the offset into DSRAM because its base
+    // (0x0002_0000 = word 0x8000) is DSRAM_NUM_WORDS-aligned.
     .port0_req_i    ( core_data_req    ),
     .port0_gnt_o    ( core_data_gnt    ),
     .port0_we_i     ( core_data_we     ),
-    .port0_addr_i   ( core_data_addr[BYTE_OFFSET +: SRAM_ADDR_WIDTH] ),
+    .port0_addr_i   ( core_data_addr[SRAM_ADDR_WIDTH-1:0] ),
     .port0_wdata_i  ( core_data_wdata  ),
     .port0_be_i     ( core_data_be     ),
     .port0_rdata_o  ( core_data_rdata  ),
@@ -605,7 +842,7 @@ module riscforge_soc_subsystem
     .sram_rdata_i   ( dsram_rdata      )
   );
 
-  // Data SRAM (4 KB)
+  // Data SRAM (32 KB)
   sram_sp #(
     .NUM_WORDS  ( DSRAM_NUM_WORDS ),
     .DATA_WIDTH ( AXI_DATA_WIDTH  )
@@ -620,7 +857,7 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 12 — AXI-Lite Crossbar
+  //  Section 13 — AXI-Lite Crossbar
   // ===========================================================================
 
   axi_lite_xbar #(
@@ -647,7 +884,7 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 13 — AXI-Lite → APB Bridge (Crossbar MST[2] → 6 APB Slaves)
+  //  Section 14 — AXI-Lite → APB Bridge (Crossbar MST[2] → 6 APB Slaves)
   // ===========================================================================
 
   axi_lite_to_apb #(
@@ -673,7 +910,7 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 14 — APB[0]: I2C Master
+  //  Section 15 — APB[0]: I2C Master
   // ===========================================================================
 
   apb_i2c #(
@@ -701,13 +938,13 @@ module riscforge_soc_subsystem
   assign apb_resp[0] = '{pready: i2c_pready, prdata: i2c_prdata, pslverr: i2c_pslverr};
 
   // ===========================================================================
-  //  Section 15 — APB[1]: Timer
+  //  Section 16 — APB[1]: Timer 0
   // ===========================================================================
 
   apb_timer #(
-    .APB_ADDR_WIDTH ( 12        ),
-    .TIMER_CNT      ( TIMER_CNT )
-  ) i_apb_timer (
+    .APB_ADDR_WIDTH ( 12         ),
+    .TIMER_CNT      ( TIMER0_CNT )
+  ) i_apb_timer0 (
     .HCLK    ( clk_i                    ),
     .HRESETn ( periph_rst_n             ),
     .PADDR   ( apb_req[1].paddr[11:0]   ),
@@ -715,16 +952,16 @@ module riscforge_soc_subsystem
     .PWRITE  ( apb_req[1].pwrite        ),
     .PSEL    ( apb_req[1].psel          ),
     .PENABLE ( apb_req[1].penable       ),
-    .PRDATA  ( timer_prdata             ),
-    .PREADY  ( timer_pready             ),
-    .PSLVERR ( timer_pslverr            ),
-    .irq_o   ( timer_irq_o             )
+    .PRDATA  ( timer0_prdata            ),
+    .PREADY  ( timer0_pready            ),
+    .PSLVERR ( timer0_pslverr           ),
+    .irq_o   ( timer0_irq_o             )
   );
 
-  assign apb_resp[1] = '{pready: timer_pready, prdata: timer_prdata, pslverr: timer_pslverr};
+  assign apb_resp[1] = '{pready: timer0_pready, prdata: timer0_prdata, pslverr: timer0_pslverr};
 
   // ===========================================================================
-  //  Section 16 — APB[2]: UART
+  //  Section 17 — APB[2]: UART
   //  Note: apb_uart takes a 3-bit word address PADDR[2:0].
   //        The bridge outputs full byte address; extract bits [4:2].
   // ===========================================================================
@@ -756,7 +993,7 @@ module riscforge_soc_subsystem
   assign apb_resp[2] = '{pready: uart_pready, prdata: uart_prdata, pslverr: uart_pslverr};
 
   // ===========================================================================
-  //  Section 17 — APB[3]: GPIO
+  //  Section 18 — APB[3]: GPIO
   //  Note: gpio_apb_wrap accepts parameterized APB struct types directly.
   // ===========================================================================
 
@@ -779,7 +1016,7 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
-  //  Section 18 — APB[4]: SPI Master (via Bootloader APB mux)
+  //  Section 19 — APB[4]: SPI Master (via Bootloader APB mux)
   //  The bootloader sits between the APB bridge and the SPI master.
   //  During boot: bootloader drives SPI master directly
   //  At runtime: APB bridge slot 4 passes through bootloader to SPI master
@@ -819,105 +1056,134 @@ module riscforge_soc_subsystem
   assign spi_apb_resp = '{pready: spi_pready, prdata: spi_prdata, pslverr: spi_pslverr};
 
   // ===========================================================================
-  //  Section 19 — APB[5]: CLIC (Core-Local Interrupt Controller)
-  //  Note: clic_apb uses flat APB signals, not struct. Decompose manually.
-  //  FIX: irq_ready / irq_kill_ack now come from core (closed internal loop).
+  //  Section 20 — APB[5]: Timer 1
+  //  Second timer instance (replaces CLIC at this APB slot).
   // ===========================================================================
 
-  clic_apb #(
-    .N_SOURCE           ( CLIC_N_SOURCE   ),
-    .INTCTLBITS         ( CLIC_INTCTLBITS ),
-    .REG_BUS_ADDR_WIDTH ( AXI_ADDR_WIDTH  ),
-    .REG_BUS_DATA_WIDTH ( AXI_DATA_WIDTH  )
-  ) i_clic_apb (
-    .clk_i       ( clk_i                     ),
-    .rst_ni      ( periph_rst_n              ),
-    .penable_i   ( apb_req[5].penable        ),
-    .pwrite_i    ( apb_req[5].pwrite         ),
-    .paddr_i     ( apb_req[5].paddr          ),
-    .psel_i      ( apb_req[5].psel           ),
-    .pwdata_i    ( apb_req[5].pwdata         ),
-    .prdata_o    ( clic_prdata               ),
-    .pready_o    ( clic_pready               ),
-    .pslverr_o   ( clic_pslverr              ),
-    // Interrupt sources
-    .intr_src_i  ( clic_intr_src_i           ),
-    // Interrupt notification — closed loop with core
-    .irq_valid_o    ( clic_irq_valid_o       ),
-    .irq_ready_i    ( core_irq_ready         ),  // from core (was: top-level input)
-    .irq_id_o       ( clic_irq_id_o          ),
-    .irq_level_o    ( clic_irq_level_o       ),
-    .irq_shv_o      ( clic_irq_shv_o        ),
-    .irq_priv_o     ( clic_irq_priv_o        ),
-    .irq_kill_req_o ( clic_irq_kill_req_o    ),
-    .irq_kill_ack_i ( core_irq_kill_ack      )   // from core (was: top-level input)
+  apb_timer #(
+    .APB_ADDR_WIDTH ( 12         ),
+    .TIMER_CNT      ( TIMER1_CNT )
+  ) i_apb_timer1 (
+    .HCLK    ( clk_i                    ),
+    .HRESETn ( periph_rst_n             ),
+    .PADDR   ( apb_req[5].paddr[11:0]   ),
+    .PWDATA  ( apb_req[5].pwdata        ),
+    .PWRITE  ( apb_req[5].pwrite        ),
+    .PSEL    ( apb_req[5].psel          ),
+    .PENABLE ( apb_req[5].penable       ),
+    .PRDATA  ( timer1_prdata            ),
+    .PREADY  ( timer1_pready            ),
+    .PSLVERR ( timer1_pslverr           ),
+    .irq_o   ( timer1_irq_o             )
   );
 
-  assign apb_resp[5] = '{pready: clic_pready, prdata: clic_prdata, pslverr: clic_pslverr};
+  assign apb_resp[5] = '{pready: timer1_pready, prdata: timer1_prdata, pslverr: timer1_pslverr};
 
   // ===========================================================================
-  //  Section 20 — RISC-V Core Stub
+  //  Section 21 — RISC-V Core (RV32IM, 5-stage) + Data Memory Router
+  // ===========================================================================
+  // The core exposes two native buses and no AXI master of its own:
+  //
+  //   imem_sram_*  raw fetch interface — enable + 30-bit word address, 1-cycle
+  //                read latency, no handshake. Feeds instr_fetch_demux, which
+  //                routes to BootROM or ISRAM.
+  //   lsu_mem_*    load/store bus. hybrid_mem_interface decodes it into either
+  //                a direct DSRAM access (combinational, port 0 of the DSRAM
+  //                mux) or an AXI-Lite transaction to the crossbar for MMIO.
+  //
+  // Only MMIO traffic crosses the AXI fabric; both SRAM paths are direct.
+  //
+  // fetch_enable_i / boot_addr_i are legacy top-level ports from the stub. The
+  // reset vector is a parameter here (RESET_PC), since it is a register reset
+  // value inside PC.v rather than a runtime input.
   // ===========================================================================
 
-  riscv_core_stub #(
-    .AXI_ADDR_WIDTH ( AXI_ADDR_WIDTH ),
-    .AXI_DATA_WIDTH ( AXI_DATA_WIDTH )
+  top #(
+    .RESET_PC ( 32'h0000_0000 )   // BootROM base — see boot_rom.sv for the image
   ) i_riscv_core (
-    .clk_i          ( clk_i             ),
-    .rst_ni         ( core_rst_n        ),
-    // Instruction fetch port (direct to ISRAM mux)
-    .instr_req_o    ( core_instr_req    ),
-    .instr_gnt_i    ( core_instr_gnt    ),
-    .instr_addr_o   ( core_instr_addr   ),
-    .instr_rdata_i  ( core_instr_rdata  ),
-    .instr_rvalid_i ( core_instr_rvalid ),
-    // Data memory port (direct to DSRAM mux)
-    .data_req_o     ( core_data_req     ),
-    .data_gnt_i     ( core_data_gnt     ),
-    .data_we_o      ( core_data_we      ),
-    .data_be_o      ( core_data_be      ),
-    .data_addr_o    ( core_data_addr    ),
-    .data_wdata_o   ( core_data_wdata   ),
-    .data_rdata_i   ( core_data_rdata   ),
-    .data_rvalid_i  ( core_data_rvalid  ),
-    // AXI-Lite master (to crossbar for peripheral access)
-    .axi_aw_addr_o  ( riscv_aw_addr     ),
-    .axi_aw_prot_o  ( riscv_aw_prot     ),
-    .axi_aw_valid_o ( riscv_aw_valid    ),
-    .axi_aw_ready_i ( riscv_aw_ready    ),
-    .axi_w_data_o   ( riscv_w_data      ),
-    .axi_w_strb_o   ( riscv_w_strb      ),
-    .axi_w_valid_o  ( riscv_w_valid     ),
-    .axi_w_ready_i  ( riscv_w_ready     ),
-    .axi_b_resp_i   ( riscv_b_resp      ),
-    .axi_b_valid_i  ( riscv_b_valid     ),
-    .axi_b_ready_o  ( riscv_b_ready     ),
-    .axi_ar_addr_o  ( riscv_ar_addr     ),
-    .axi_ar_prot_o  ( riscv_ar_prot     ),
-    .axi_ar_valid_o ( riscv_ar_valid    ),
-    .axi_ar_ready_i ( riscv_ar_ready    ),
-    .axi_r_data_i   ( riscv_r_data      ),
-    .axi_r_resp_i   ( riscv_r_resp      ),
-    .axi_r_valid_i  ( riscv_r_valid     ),
-    .axi_r_ready_o  ( riscv_r_ready     ),
-    // Control
-    .fetch_enable_i ( fetch_enable_i    ),
-    .boot_addr_i    ( boot_addr_i       ),
-    // CLIC interrupt — closed internal loop
-    .irq_valid_i    ( clic_irq_valid_o  ),
-    .irq_ready_o    ( core_irq_ready    ),   // → clic_apb.irq_ready_i
-    .irq_id_i       ( clic_irq_id_o     ),
-    .irq_level_i    ( clic_irq_level_o   ),
-    .irq_shv_i      ( clic_irq_shv_o     ),
-    .irq_priv_i     ( clic_irq_priv_o    ),
-    .irq_kill_req_i ( clic_irq_kill_req_o),
-    .irq_kill_ack_o ( core_irq_kill_ack  )   // → clic_apb.irq_kill_ack_i
+    .clk            ( clk_i               ),
+    .rst            ( core_rst_n          ),  // active-low
+    .PCSrcE1        (                     ),  // debug only
+
+    // ---- Instruction fetch (→ instr_fetch_demux) ----
+    .imem_sram_en   ( core_imem_en        ),
+    .imem_sram_we   (                     ),  // fetch path is read-only
+    .imem_sram_wmask(                     ),
+    .imem_sram_addr ( core_imem_addr_word ),
+    .imem_sram_wdata(                     ),
+    .imem_sram_rdata( core_instr_rdata    ),
+
+    // ---- Load/store bus (→ hybrid_mem_interface) ----
+    .lsu_mem_req    ( core_lsu_req        ),
+    .lsu_mem_we     ( core_lsu_we         ),
+    .lsu_mem_addr   ( core_lsu_addr       ),
+    .lsu_mem_wdata  ( core_lsu_wdata      ),
+    .lsu_mem_be     ( core_lsu_be         ),
+    .lsu_mem_rdata  ( core_lsu_rdata      ),
+    .lsu_mem_stall  ( core_lsu_stall      ),
+    .lsu_mem_err    ( core_lsu_err        ),
+
+    // ---- Interrupts ----
+    // Fast local interrupts map to mip[19:16]; see the priority table in top.v
+    // (UART=3, SPI=2, I2C=1, GPIO=0). There is no CLINT in this subsystem, so
+    // MTIP is driven from Timer 0's compare-match and MEIP/MSIP are tied off.
+    .fast_irq_i     ( { 12'b0,
+                        uart_int_o,               // FLI[3] → mip[19]
+                        spi_events_o[0],          // FLI[2] → mip[18]
+                        i2c_interrupt_o,          // FLI[1] → mip[17]
+                        gpio_global_interrupt_o } ), // FLI[0] → mip[16]
+    .timer_irq_i    ( timer0_irq_o[1]     ),  // MTIP — Timer 0 compare match
+    .ext_irq_i      ( 1'b0                ),  // MEIP — no platform PLIC
+    .sw_irq_i       ( 1'b0                )   // MSIP — no CLINT
+  );
+
+  // Fetch port adaptation: the demux takes a byte address, the core emits a
+  // word address. No handshake to translate — port 0 is never denied.
+  assign core_instr_req  = core_imem_en;
+  assign core_instr_addr = { core_imem_addr_word, 2'b00 };
+
+  // ---------------------------------------------------------------------------
+  // Data memory router: DSRAM direct, MMIO over AXI-Lite to crossbar SLV[0]
+  // ---------------------------------------------------------------------------
+  hybrid_mem_interface #(
+    .MEM_DEPTH      ( DSRAM_NUM_WORDS ),
+    .DMEM_BASE_BYTE ( 32'h0002_0000   ),  // must match xbar_addr_map[1]
+    .MMIO_BASE      ( 32'h4000_0000   ),  // must match xbar_addr_map[2]
+    .MMIO_LIMIT     ( 32'h4FFF_FFFF   ),
+    .axi_req_t      ( axi_req_t       ),
+    .axi_resp_t     ( axi_resp_t      )
+  ) i_core_data_if (
+    .clk         ( clk_i            ),
+    .rst_n       ( core_rst_n       ),
+
+    // ---- From the core's LSU ----
+    .mem_req     ( core_lsu_req     ),
+    .mem_we      ( core_lsu_we      ),
+    .mem_addr    ( core_lsu_addr    ),
+    .mem_wdata   ( core_lsu_wdata   ),
+    .mem_be      ( core_lsu_be      ),
+    .mem_rdata   ( core_lsu_rdata   ),
+    .mem_stall   ( core_lsu_stall   ),
+    .mem_err     ( core_lsu_err     ),
+
+    // ---- Direct DSRAM path (→ sram_mux port 0) ----
+    .sram_en     ( core_data_req    ),
+    .sram_we     ( core_data_we     ),
+    .sram_wmask  ( core_data_be     ),
+    .sram_addr   ( core_data_addr   ),
+    .sram_wdata  ( core_data_wdata  ),
+    .sram_rdata  ( core_data_rdata  ),
+
+    // ---- MMIO path (→ crossbar SLV[0]) ----
+    .m_axi_req_o ( xbar_slv_req[0]  ),
+    .m_axi_resp_i( xbar_slv_resp[0] )
   );
 
   // ===========================================================================
-  //  Section 21 — Bootloader (Real Implementation)
+  //  Section 22 — Bootloader (Real Implementation)
   //  Connects directly via struct-based AXI-Lite to crossbar SLV[1].
   //  APB mux: during boot, FSM drives SPI master; at runtime, passthrough.
+  //  AXI writes use awprot[0]=1 (privileged) to pass ISRAM privilege gate.
   // ===========================================================================
 
   bootloader #(
@@ -927,8 +1193,8 @@ module riscforge_soc_subsystem
     .apb_resp_t          ( apb_resp_t          ),
     .AXI_ADDR_WIDTH      ( AXI_ADDR_WIDTH      ),
     .AXI_DATA_WIDTH      ( AXI_DATA_WIDTH      ),
-    .ISRAM_BASE_ADDR     ( 32'h0000_0000       ),
-    .DSRAM_BASE_ADDR     ( 32'h0001_0000       ),
+    .ISRAM_BASE_ADDR     ( 32'h0001_0000       ),
+    .DSRAM_BASE_ADDR     ( 32'h0002_0000       ),
     .ISRAM_NUM_WORDS     ( ISRAM_NUM_WORDS     ),
     .DSRAM_NUM_WORDS     ( DSRAM_NUM_WORDS     ),
     .NUM_INSTR_WORDS     ( NUM_INSTR_WORDS     ),

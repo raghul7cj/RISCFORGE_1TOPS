@@ -426,7 +426,7 @@ module bootloader #(
 
     // -- Write Address channel --
     axi_req_o.aw.addr  = axi_wr_addr;
-    axi_req_o.aw.prot  = axi_pkg::prot_t'('0);
+    axi_req_o.aw.prot  = axi_pkg::prot_t'(3'b001);  // privileged access (bit[0]=1)
     axi_req_o.aw_valid = is_axi_write_state(state_q) && !aw_done_q;
 
     // -- Write Data channel --

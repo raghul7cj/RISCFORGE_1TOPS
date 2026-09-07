@@ -15,7 +15,8 @@
 // Coverage matrix (30 test-cases, ~70 individual checks):
 //   TC1  Reset — output ports and registers in safe idle state
 //   TC2  PSLVERR / PREADY always sane (protocol compliance)
-//   TC3  Scratch register (SCR) full-pattern round-trip
+//   TC3  Scratch register (SCR) full-pattern round-trip [INFORMATIONAL ONLY —
+//        SPR is not implemented by this IP; see note at the test]
 //   TC4  LCR bit-field round-trip (WLS, STB, PEN, EPS, SP, BC, DLAB)
 //   TC5  DLAB isolation — DLL/DLM only visible when DLAB=1
 //   TC6  IER register write-read (each bit independently)
@@ -160,41 +161,65 @@ module tb_apb_uart_thorough;
   endtask
 
   // ---------------------------------------------------------------------------
-  // APB BFM — sample PRDATA at posedge before any # delay
-  // (avoids the SPI-master RXFIFO pointer-advance race noted in the verif doc)
+  // APB BFM
+  //
+  // Protocol note (AMBA APB): PRDATA is valid in the same cycle PREADY is high;
+  // the transfer completes at the following rising edge.
+  //
+  // Two problems with the previous version:
+  //  1. It sampled PRDATA one cycle AFTER the PREADY window. That only worked by
+  //     accident: obi_uart_register drives rsp_data combinationally while
+  //     req_q is set, and req_q was still high because PSEL had not yet dropped.
+  //     Any change to the slave's response timing would have broken it silently.
+  //  2. The wait loop tested PREADY in the active region immediately after
+  //     @(posedge CLK), racing the DUT's own edge-aligned update of that signal.
+  //
+  // Both are fixed by settling #1 past each edge before sampling, and by taking
+  // PRDATA inside the PREADY window. Drive and sample both happen at
+  // (posedge + 1ns), so neither races the DUT.
+  //
+  // Note PREADY is 0 once the access completes and PSEL drops — that is correct
+  // APB behaviour, and it is what TC2/TC27 were unintentionally measuring.
   // ---------------------------------------------------------------------------
-  task automatic apb_write(input logic [2:0] addr, input logic [31:0] data);
+
+  // Total slave wait-states observed, so tests can measure real stalls.
+  int apb_wait_cycles = 0;
+
+  task automatic apb_await_ready(input string op, input logic [2:0] addr);
     int t;
-    @(posedge CLK); #1;
+    t = 0;
+    forever begin
+      @(posedge CLK); #1;
+      if (PREADY) break;
+      t++;
+      apb_wait_cycles++;
+      if (t >= TIMEOUT_CYC) begin
+        $error("APB %s timeout @ addr=0x%0h", op, addr);
+        break;
+      end
+    end
+  endtask
+
+  task automatic apb_write(input logic [2:0] addr, input logic [31:0] data);
+    @(posedge CLK); #1;                       // SETUP phase
     PSEL    = 1'b1; PWRITE = 1'b1; PADDR = addr;
     PWDATA  = data; PENABLE = 1'b0;
-    @(posedge CLK); #1;
+    @(posedge CLK); #1;                       // ACCESS phase
     PENABLE = 1'b1;
-    // wait PREADY
-    t = 0;
-    while (!PREADY && t < TIMEOUT_CYC) begin
-      @(posedge CLK); t++;
-    end
-    if (t >= TIMEOUT_CYC) $error("APB write timeout @ addr=0x%0h", addr);
-    @(posedge CLK); #1;
+    apb_await_ready("write", addr);
+    @(posedge CLK); #1;                       // this edge completes the transfer
     PSEL = 1'b0; PENABLE = 1'b0; PWRITE = 1'b0;
   endtask
 
   task automatic apb_read(input logic [2:0] addr, output logic [31:0] data);
-    int t;
-    @(posedge CLK); #1;
+    @(posedge CLK); #1;                       // SETUP phase
     PSEL    = 1'b1; PWRITE = 1'b0; PADDR = addr;
     PWDATA  = '0;   PENABLE = 1'b0;
-    @(posedge CLK); #1;
+    @(posedge CLK); #1;                       // ACCESS phase
     PENABLE = 1'b1;
-    t = 0;
-    while (!PREADY && t < TIMEOUT_CYC) begin
-      @(posedge CLK); t++;
-    end
-    if (t >= TIMEOUT_CYC) $error("APB read timeout @ addr=0x%0h", addr);
-    @(posedge CLK);            // Active region sample
-    data = PRDATA;             //  BEFORE any # delay
-    #1;
+    apb_await_ready("read", addr);
+    data = PRDATA;                            // valid in the same cycle as PREADY
+    @(posedge CLK); #1;                       // this edge completes the transfer
     PSEL = 1'b0; PENABLE = 1'b0;
   endtask
 
@@ -376,19 +401,28 @@ module tb_apb_uart_thorough;
     $display("\n========== TC2: APB protocol sanity ==========");
     apb_read(ADDR_LSR, rdata);
     check("PSLVERR still 0 after read",  PSLVERR, 1'b0);
-    check("PREADY high at end of access", PREADY, 1'b1);
+    // NOTE: PREADY is only meaningful DURING the access phase. Once the transfer
+    // completes and PSEL drops it returns to 0, so checking it here would always
+    // fail. Completion is already enforced by apb_await_ready() (it $errors on
+    // timeout) and by the apb_no_stall SVA below.
 
     // ===============================================================
     // TC3 – Scratch register full pattern
     // ===============================================================
-    $display("\n========== TC3: SCR round-trip ==========");
+    // The scratch-pad register is deliberately NOT implemented by this IP:
+    // obi_uart_register.sv ignores SPR writes ("no error but ignored") and
+    // returns '0 on SPR reads. That is a documented feature gap, not a defect,
+    // so this is reported for information only and is not a pass/fail check.
+    // (Worth revisiting if this SoC ever runs Linux — the 8250 driver probes
+    //  SCR for UART autodetection.)
+    $display("\n========== TC3: SCR round-trip (informational) ==========");
     begin
       automatic logic [7:0] pats [6] = '{8'hA5, 8'h5A, 8'hFF, 8'h00, 8'h55, 8'hAA};
       foreach (pats[i]) begin
         apb_write(ADDR_SCR, {24'h0, pats[i]});
         apb_read (ADDR_SCR, rdata);
-        check_val($sformatf("SCR pattern 0x%02X", pats[i]),
-                  rdata, {24'h0, pats[i]}, 32'hFF);
+        $display("  [INFO] SCR pattern 0x%02X -> read 0x%02X (SPR unimplemented, expect 0x00)",
+                 pats[i], rdata[7:0]);
       end
     end
 
@@ -574,8 +608,11 @@ module tb_apb_uart_thorough;
     uart_send_byte(8'hBE);
     wait_int_flag;
     check("INT asserted on RDA", int_flag, 1'b1);
+    // Mask 0x0F (not 0x0E) so bit0 is checked too: bit0=0 means "interrupt
+    // pending". With mask 0x0E a self-cancelled interrupt reads as a pass
+    // because bits[3:1] happen to be 000.
     apb_read(ADDR_IIR_FCR, rdata);
-    check_val("IIR shows RDA (0b0100)", rdata, 32'h04, 32'h0E);
+    check_val("IIR pending + shows RDA (0b0100)", rdata, 32'h04, 32'h0F);
     apb_read(ADDR_THR_RBR, rdata);
     check_val("RBR = 0xBE", rdata, 32'hBE, 32'hFF);
     repeat (8) @(posedge CLK);
@@ -608,6 +645,14 @@ module tb_apb_uart_thorough;
     apb_write(ADDR_MCR, 32'h12);          // loopback, RTS=1 -> CTS delta
     repeat (16) @(posedge CLK);
     check("INT asserted on MSR delta", int_flag, 1'b1);
+    // KNOWN-WEAK CHECK: mask is 0x0E, so bit0 ("interrupt pending") is ignored
+    // and modem-status ID 0b000 is indistinguishable from "nothing pending".
+    // Not tightened to 0x0F yet because the modem-status interrupt has the same
+    // self-cancelling shape as the RDA bug fixed in obi_uart_rx.sv: the
+    // interrupt module keys off the raw one-cycle delta pulses
+    // (reg_write_i.modem.d_cts/d_dsr/te_ri/d_cd) while MSR's own delta bits are
+    // sticky until read (obi_uart_register.sv:127,261). Fix that inconsistency,
+    // then change this mask to 0x0F.
     apb_read(ADDR_IIR_FCR, rdata);
     check_val("IIR shows MSR (0b0000)", rdata, 32'h00, 32'h0E);
     apb_read(ADDR_MSR, rdata);            // clears delta bits
@@ -730,15 +775,21 @@ module tb_apb_uart_thorough;
     // ===============================================================
     // TC27 – Back-to-back APB reads (bus doesn't stall)
     // ===============================================================
+    // The old version sampled PREADY AFTER apb_read returned, i.e. after the
+    // transfer had completed and PSEL dropped — where PREADY is always 0. It
+    // therefore reported 8 "stalls" for 8 reads regardless of DUT behaviour.
+    // apb_wait_cycles counts real wait-states seen inside the access phase.
+    // apb_to_obi is a two-state FSM (ADDR -> RESP), so one wait cycle per
+    // access is architectural; allow a small budget rather than demanding zero.
     $display("\n========== TC27: back-to-back APB reads ==========");
     begin
-      automatic int stall_cnt = 0;
-      for (int k = 0; k < 8; k++) begin
-        apb_read(ADDR_LSR, rdata);
-        if (!PREADY) stall_cnt++;  // shouldn't stall
-      end
-      check_val("no PREADY stalls in 8 back-to-back reads",
-                stall_cnt, 32'h0, 32'hFFFFFFFF);
+      automatic int wait_before, wait_taken;
+      wait_before = apb_wait_cycles;
+      for (int k = 0; k < 8; k++) apb_read(ADDR_LSR, rdata);
+      wait_taken = apb_wait_cycles - wait_before;
+      $display("  [INFO] 8 back-to-back reads took %0d wait-state cycles", wait_taken);
+      check_val("APB wait-states within budget for 8 reads",
+                (wait_taken <= 8*4), 32'h1, 32'h1);
     end
 
     // ===============================================================
@@ -782,25 +833,34 @@ module tb_apb_uart_thorough;
     //       if the design ignores bit 5.
     // ===============================================================
     $display("\n========== TC30: MCR.AFE (informational if unsupported) ==========");
+    // AFE (MCR bit 5) does not exist in this IP — obi_uart_pkg::mcr_bits_t has
+    // "unused5" in that position — so TX is never gated and the byte starts
+    // shifting immediately after the THR write.
+    //
+    // The old version waited bit_period()*2 and only THEN called
+    // uart_recv_byte(), whose @(negedge SOUT) then latched onto a data-bit edge
+    // mid-frame instead of the start bit, decoding 0x77 as 0xF7. The receiver is
+    // now forked BEFORE the THR write so it always catches the real start bit.
     drain_rx;
-    apb_write(ADDR_MCR, 32'h22);          // AFE=1, RTS=1
-    CTSN = 1'b1;                          // deasserted → gate TX
-    apb_write(ADDR_THR_RBR, 32'h77);      // queue a byte
-    // If AFE is honoured, SOUT stays high; if not, SOUT begins to shift.
-    begin
-      automatic int fell = 0;
-      repeat (bit_period() * 2) begin
-        @(posedge CLK);
-        if (SOUT === 1'b0) fell = 1;
-      end
-      if (fell) $display("  [INFO] MCR.AFE not honoured by this 16550 variant — TX went out with CTSN=1");
-      else      $display("  [INFO] MCR.AFE honoured — TX held while CTSN=1");
-    end
-    CTSN = 1'b0;                          // release
-    // now the byte should get out
+    apb_write(ADDR_MCR, 32'h22);          // AFE=1 (if supported), RTS=1
+    CTSN = 1'b1;                          // deasserted → would gate TX if AFE existed
     begin
       automatic logic [7:0] rx;
-      uart_recv_byte(rx);
+      automatic int fell = 0;
+      fork
+        // Receiver armed up-front: catches the start bit whether TX is gated or not.
+        uart_recv_byte(rx);
+        begin
+          apb_write(ADDR_THR_RBR, 32'h77);  // queue a byte
+          repeat (bit_period() * 2) begin
+            @(posedge CLK);
+            if (SOUT === 1'b0) fell = 1;
+          end
+          if (fell) $display("  [INFO] MCR.AFE not honoured by this 16550 variant — TX went out with CTSN=1");
+          else      $display("  [INFO] MCR.AFE honoured — TX held while CTSN=1");
+          CTSN = 1'b0;                      // release so a gated byte can drain
+        end
+      join
       check_val("Byte transmitted once CTS asserted", {24'h0, rx}, 32'h77, 32'hFF);
     end
     apb_write(ADDR_MCR, 32'h00);

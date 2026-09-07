@@ -55,6 +55,9 @@ module obi_uart_rx import obi_uart_pkg::*; #()
   logic [3:0] fifo_error_index_q, fifo_error_index_d;
   // FIFO trigger
   logic [3:0] tl_characters;
+  // Unread characters = FIFO occupancy + the byte already promoted into RHR.
+  // 5 bits so a full FIFO (15) plus RHR cannot wrap.
+  logic [4:0] unread_chars;
   // FIFO timeout
   // longest character: 1 start, 8 data, 1 parity, 2 stop -> 12bit
   // timeout occurs after 4 characters -> 48bit -> $clog2(48) = 6
@@ -215,6 +218,7 @@ module obi_uart_rx import obi_uart_pkg::*; #()
 
     trigger_o       = 1'b0;    // trigger_o
     tl_characters = 4'b0001; // trigger_o
+    unread_chars  = 5'b00000; // trigger_o
 
     fifo_push     = 1'b0; // Write
     fifo_data_i   = '0;   // Write
@@ -396,7 +400,9 @@ module obi_uart_rx import obi_uart_pkg::*; #()
 
       RXSTOP: begin
         if (stop_finish) begin
-          if (framing_err_q) begin
+          // BUGFIX: framing_err_d — stop_finish and framing_err_d are produced in
+          // the same comb cycle, so _q here would resync on the PREVIOUS character.
+          if (framing_err_d) begin
             state_d = RXRESYNCHRONIZE;
           end else begin
             state_d = RXIDLE;
@@ -464,7 +470,8 @@ module obi_uart_rx import obi_uart_pkg::*; #()
         reg_write_o.data_ready   = 1'b1; // Set Data Ready Bit
         reg_write_o.dr_valid     = 1'b1;
         reg_write_o.par_err      = parity_err_q;
-        reg_write_o.frame_err    = framing_err_q;
+        // BUGFIX: framing_err_d (see FIFO push) — _q is one cycle stale at write_init.
+        reg_write_o.frame_err    = framing_err_d;
         reg_write_o.break_ind    = break_interrupt;
         reg_write_o.break_ind    = 1'b1;
         reg_write_o.break_valid  = 1'b1;
@@ -500,7 +507,12 @@ module obi_uart_rx import obi_uart_pkg::*; #()
         default: tl_characters = 4'b0001;
       endcase
 
-      if (tl_characters <= fifo_usage) begin
+      // BUGFIX: the head byte is auto-promoted from the FIFO into RHR as soon as
+      // RHR is free, so fifo_usage alone drops back to 0 and the RDA interrupt
+      // cancelled itself before software could read ISR. Count the byte held in
+      // RHR as unread — this also stops trigger levels 4/8/14 firing one late.
+      unread_chars = {1'b0, fifo_usage} + {4'b0, rhr_full_q};
+      if ({1'b0, tl_characters} <= unread_chars) begin
         trigger_o = 1'b1;
       end
       //------------------------------------------------------------------------------------------
@@ -512,9 +524,12 @@ module obi_uart_rx import obi_uart_pkg::*; #()
           reg_write_o.overrun_valid = 1'b1;
         end else begin
           fifo_push       = 1'b1;
-          fifo_data_i     = {parity_err_q, framing_err_q, break_interrupt, rsr_q}; // 11 Bits
+          // BUGFIX: use framing_err_d, not _q. The stop-bit check above computes
+          // framing_err_d and raises write_init in the SAME comb cycle, so
+          // framing_err_q still holds the previous character's value here.
+          fifo_data_i     = {parity_err_q, framing_err_d, break_interrupt, rsr_q}; // 11 Bits
 
-          if (parity_err_q | framing_err_q | break_interrupt) begin
+          if (parity_err_q | framing_err_d | break_interrupt) begin
             fifo_error_index_d         = fifo_usage;
             reg_write_o.fifo_err       = 1'b1;
             reg_write_o.fifo_err_valid = 1'b1;

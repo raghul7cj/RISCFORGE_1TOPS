@@ -12,6 +12,13 @@
 //   SRAM rdata is broadcast to both ports, but rvalid is asserted only
 //   to the port that was granted in the previous cycle (matching the
 //   SRAM's 1-cycle read latency).
+//
+// Contention note:
+//   Port 1 (AXI bridge) is only ever active while port 0 is idle. The ISRAM
+//   instance relies on the core being held in reset during boot, and on the
+//   ISRAM AXI bridge rejecting transactions once boot completes; the DSRAM
+//   instance relies on core data requests being intermittent. Neither port
+//   therefore needs anti-starvation logic.
 // =============================================================================
 
 module sram_mux #(
