@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RISCFORGE 1TOPS — I2C Master Datapath Verification Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #eff6ff;
+      --accent: #0284c7;
+      --accent-light: #e0f2fe;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-size: 13.5px;
+      line-height: 1.6;
+      padding: 36px 16px;
+    }
+
+    .document-container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      padding: 48px 56px;
+    }
+
+    .doc-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .doc-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .doc-header .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .meta-badge-group {
+      text-align: right;
+    }
+
+    .status-badge {
+      display: inline-block;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .meta-date {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-left: 3px solid var(--accent);
+      padding-left: 10px;
+      margin: 32px 0 14px;
+    }
+
+    h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 18px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0 20px;
+    }
+
+    .highlight-card {
+      background: var(--primary-light);
+      border: 1px solid #dbeafe;
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+
+    .highlight-card h4 {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .highlight-card ul {
+      list-style-type: none;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .highlight-card li {
+      margin-bottom: 4px;
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .highlight-card li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .diagram-wrapper {
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 22px;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    .badge-pass {
+      background: var(--success-bg);
+      color: var(--success);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      border: 1px solid var(--success-border);
+      display: inline-block;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 14px 0 20px;
+    }
+
+    .code-term {
+      color: #38bdf8;
+    }
+
+    .code-success {
+      color: #4ade80;
+      font-weight: bold;
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      margin-top: 36px;
+      padding-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    @media print {
+      body { background: #ffffff; padding: 0; }
+      .document-container { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+      pre { white-space: pre-wrap; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="document-container">
+  <!-- Header -->
+  <div class="doc-header">
+    <div>
+      <h1>RISCFORGE 1TOPS — SoC Verification Report</h1>
+      <div class="subtitle">Subsystem Datapath: RV32IM Core &rarr; AXI Crossbar &rarr; APB I2C Master IP &rarr; AT24C02 EEPROM</div>
+    </div>
+    <div class="meta-badge-group">
+      <div class="status-badge">Sign-Off: PASSED</div>
+      <div class="meta-date">Date: September 2026</div>
+    </div>
+  </div>
+
+  <!-- Executive Summary -->
+  <h2>1. Executive Summary</h2>
+  <p>
+    This report documents the end-to-end datapath verification of the <strong>APB I2C Master IP (<code>apb_i2c</code> @ <code>0x4000_0000</code>)</strong> within the <strong>RISCFORGE 1TOPS SoC Subsystem</strong> (<code>riscforge_soc_subsystem.sv</code>). The I2C Master controller interacts with the open-source <strong>AT24C02 2Kb I2C Serial EEPROM Slave Model</strong> over an open-drain two-wire bus, driven by bare-metal C firmware running natively on the RV32IM 5-stage RISC-V processor core with real-time UART0 telemetry logging.
+  </p>
+
+  <div class="highlight-grid">
+    <div class="highlight-card">
+      <h4>Verification Scope</h4>
+      <ul>
+        <li><strong>SoC Top Module</strong>: <code>riscforge_soc_subsystem</code></li>
+        <li><strong>Processor Core</strong>: 5-Stage RV32IM (Booth Mul / Non-Restoring Div)</li>
+        <li><strong>Peripheral Under Test</strong>: APB I2C Master (Base: <code>0x4000_0000</code>)</li>
+        <li><strong>Target EEPROM Model</strong>: AT24C02 (7-bit I2C Addr: <code>0x50</code>)</li>
+      </ul>
+    </div>
+    <div class="highlight-card">
+      <h4>EDA & Sign-Off Metrics</h4>
+      <ul>
+        <li><strong>EDA Simulator</strong>: Synopsys VCS <code>U-2023.03</code> (64-bit)</li>
+        <li><strong>Simulation Runtime</strong>: 3,287,465,000 ps (~3.29 ms)</li>
+        <li><strong>Test Pass Rate</strong>: 3 / 3 Test Scenarios (100%)</li>
+        <li><strong>Sign-Off Result</strong>: <strong>PASSED (Clean Hardware Execution)</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SoC Architecture -->
+  <h2>2. SoC Architecture & System Interconnect</h2>
+  <p>
+    The RISCFORGE 1TOPS SoC integrates a high-performance memory and bus interconnect architecture. The RV32IM core accesses Instruction SRAM directly via a fetch demux and routes load/store accesses through <code>hybrid_mem_interface</code>: direct accesses map to DSRAM, while MMIO ranges (<code>0x4000_0000 - 0x4FFF_FFFF</code>) cross the 2x3 AXI4-Lite crossbar to the APB bridge.
+  </p>
+
+  <div class="diagram-wrapper">
+    <svg width="740" height="260" viewBox="0 0 740 260" xmlns="http://www.w3.org/2000/svg" style="max-width: 100%; height: auto;">
+      <!-- SoC Outer Box -->
+      <rect x="10" y="10" width="720" height="240" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+      <text x="25" y="30" font-family="Inter" font-size="12" font-weight="700" fill="#1e3a8a">RISCFORGE 1TOPS SoC Subsystem (riscforge_soc_subsystem.sv)</text>
+
+      <!-- Core Box -->
+      <rect x="30" y="50" width="220" height="60" rx="4" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2" />
+      <text x="40" y="74" font-family="Inter" font-size="11" font-weight="700" fill="#1e3a8a">RV32IM 5-Stage RISC-V Core</text>
+      <text x="40" y="92" font-family="Inter" font-size="9.5" fill="#475569">Fetch &rarr; Decode &rarr; EX &rarr; MEM &rarr; WB</text>
+
+      <!-- Hybrid Mem / LSU -->
+      <rect x="290" y="50" width="160" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <text x="300" y="74" font-family="Inter" font-size="10.5" font-weight="700" fill="#0f172a">hybrid_mem_interface</text>
+      <text x="300" y="92" font-family="Inter" font-size="9.5" fill="#475569">MMIO &harr; AXI Master</text>
+
+      <!-- AXI Crossbar -->
+      <rect x="490" y="50" width="140" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <text x="502" y="74" font-family="Inter" font-size="10.5" font-weight="700" fill="#0f172a">AXI-Lite Crossbar</text>
+      <text x="502" y="92" font-family="Inter" font-size="9.5" fill="#475569">2 Slaves &times; 3 Masters</text>
+
+      <!-- APB Bridge -->
+      <rect x="490" y="145" width="140" height="45" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <text x="506" y="172" font-family="Inter" font-size="10.5" font-weight="700" fill="#0f172a">AXI-to-APB Bridge</text>
+
+      <!-- I2C Master IP Box -->
+      <rect x="290" y="140" width="160" height="55" rx="4" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" />
+      <text x="302" y="164" font-family="Inter" font-size="11" font-weight="700" fill="#0369a1">APB I2C Master IP</text>
+      <text x="302" y="180" font-family="Inter" font-size="9.5" fill="#0284c7">Base: 0x4000_0000 (Slot 0)</text>
+
+      <!-- UART0 Box -->
+      <rect x="70" y="145" width="150" height="45" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <text x="82" y="172" font-family="Inter" font-size="10.5" font-weight="700" fill="#0f172a">16550 UART0 (0x4000_2000)</text>
+
+      <!-- EEPROM Target Model (External) -->
+      <rect x="290" y="215" width="160" height="30" rx="4" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.2" />
+      <text x="304" y="234" font-family="Inter" font-size="10" font-weight="700" fill="#15803d">AT24C02 EEPROM (0x50)</text>
+
+      <!-- Signal Arrows -->
+      <line x1="250" y1="80" x2="290" y2="80" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow)" />
+      <line x1="450" y1="80" x2="490" y2="80" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow)" />
+      <line x1="560" y1="110" x2="560" y2="145" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow)" />
+      <line x1="490" y1="168" x2="450" y2="168" stroke="#0284c7" stroke-width="1.5" marker-end="url(#arrow)" />
+      <line x1="370" y1="195" x2="370" y2="215" stroke="#15803d" stroke-width="1.5" stroke-dasharray="3,3" />
+
+      <!-- Arrow Marker Definition -->
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 8 5 L 0 9 z" fill="#0284c7" />
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- Memory Map Table -->
+  <h2>3. Complete Subsystem Memory Map</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Address Range</th>
+        <th>Size</th>
+        <th>Target Device / Memory</th>
+        <th>Interconnect Route</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>0x0000_0000 – 0x0000_003F</code></td>
+        <td>64 B</td>
+        <td><strong>BootROM</strong></td>
+        <td>Direct Core Fetch Demux</td>
+        <td>Reset vector trampoline (<code>0x0000_0000</code> &rarr; <code>0x0001_0000</code>)</td>
+      </tr>
+      <tr>
+        <td><code>0x0001_0000 – 0x0001_7FFF</code></td>
+        <td>32 KB</td>
+        <td><strong>ISRAM (Instruction)</strong></td>
+        <td>Core Fetch Mux / AXI Write-Only</td>
+        <td>Direct zero-wait executable memory image</td>
+      </tr>
+      <tr>
+        <td><code>0x0002_0000 – 0x0002_7FFF</code></td>
+        <td>32 KB</td>
+        <td><strong>DSRAM (Data)</strong></td>
+        <td>Direct Core LSU / AXI Bridge</td>
+        <td>Stack (top: <code>0x28000</code>), <code>.data</code>, <code>.bss</code>, <code>.rodata</code></td>
+      </tr>
+      <tr>
+        <td><code>0x4000_0000 – 0x4000_0FFF</code></td>
+        <td>4 KB</td>
+        <td><strong>APB I2C Master</strong></td>
+        <td>AXI Crossbar &rarr; APB Slot 0</td>
+        <td>Two-wire I2C Master IP Controller</td>
+      </tr>
+      <tr>
+        <td><code>0x4000_1000 – 0x4000_1FFF</code></td>
+        <td>4 KB</td>
+        <td><strong>APB Timer 0 / 1</strong></td>
+        <td>AXI Crossbar &rarr; APB Slot 1</td>
+        <td>Prescaled timers & system tick compare</td>
+      </tr>
+      <tr>
+        <td><code>0x4000_2000 – 0x4000_2FFF</code></td>
+        <td>4 KB</td>
+        <td><strong>16550 UART0</strong></td>
+        <td>AXI Crossbar &rarr; APB Slot 2</td>
+        <td>Live serial telemetry console output</td>
+      </tr>
+      <tr>
+        <td><code>0x4000_3000 – 0x4000_3FFF</code></td>
+        <td>4 KB</td>
+        <td><strong>GPIO Controller</strong></td>
+        <td>AXI Crossbar &rarr; APB Slot 3</td>
+        <td>32-bit digital I/O register interface</td>
+      </tr>
+      <tr>
+        <td><code>0x4000_4000 – 0x4000_4FFF</code></td>
+        <td>4 KB</td>
+        <td><strong>APB SPI Master</strong></td>
+        <td>AXI Crossbar &rarr; APB Slot 4</td>
+        <td>SPI/QSPI Flash Master Controller</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Software Toolchain -->
+  <h2>4. Software Toolchain Dataflow</h2>
+  <p>
+    The verification binary is built with the GNU RISC-V Toolchain (<code>riscv64-unknown-elf-gcc</code>) targeting <code>rv32im_zicsr</code>. The custom Python linker post-processor (<code>elf_to_hex.py</code>) parses section headers and partitions the ELF into separate word-addressed hex images for ISRAM (<code>0x0001_0000</code>) and DSRAM (<code>0x0002_0000</code>).
+  </p>
+
+  <div class="diagram-wrapper" style="padding: 12px;">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1e3a8a;">
+      [crt0.S + i2c_smoke_test.c + link.ld] &rarr; (GCC -O2) &rarr; app.elf &rarr; (elf_to_hex.py) &rarr; [imem.hex (432 words) + dmem.hex (2308 words)]
+    </div>
+  </div>
+
+  <!-- Test Results Breakdown -->
+  <h2>5. Detailed Test Execution & Results</h2>
+  
+  <h3>Test 1: Single-Byte EEPROM Write (Address 0x10 &larr; 0xA5)</h3>
+  <p>
+    The RV32IM core programs the I2C Master registers to issue a START condition, sends the 7-bit slave device address <code>0x50</code> with Write bit (<code>0xA0</code>), transmits the memory word offset <code>0x10</code>, writes byte <code>0xA5</code>, and terminates with a STOP condition. The AT24C02 slave asserts ACK across all phases.
+  </p>
+
+  <h3>Test 2: EEPROM Random Read & Data Integrity Check (Address 0x10 &rarr; 0xA5)</h3>
+  <p>
+    The core executes a combined-format random read: dummy write phase to set the internal memory word address pointer to <code>0x10</code>, followed by a Repeated START with Read bit (<code>0xA1</code>). The slave outputs the byte stored at <code>0x10</code>. The master responds with NACK and STOP, and compares the received value against <code>0xA5</code>.
+  </p>
+
+  <h3>Test 3: Multi-Location Non-Contiguous Verification</h3>
+  <p>
+    Validates multiple memory address offsets (<code>0x20</code> &larr; <code>0x5A</code>, <code>0x30</code> &larr; <code>0x3C</code>). After allowing the internal write cycle to commit, the core executes random reads from both locations and verifies that the retrieved data exactly matches expectations.
+  </p>
+
+  <!-- Sign-off Table -->
+  <h2>6. Verification Sign-Off Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Test Identifier</th>
+        <th>Test Description</th>
+        <th>Target Hardware</th>
+        <th>Expected Output</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>TC_I2C_01</code></td>
+        <td>EEPROM Byte Write</td>
+        <td><code>apb_i2c</code> (0x4000_0000)</td>
+        <td>Slave ACK on DevAddr, Offset, and Data</td>
+        <td><span class="badge-pass">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>TC_I2C_02</code></td>
+        <td>EEPROM Random Read & Compare</td>
+        <td><code>apb_i2c</code> (0x4000_0000)</td>
+        <td>Read Byte == 0xA5 (Exact Match)</td>
+        <td><span class="badge-pass">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>TC_I2C_03</code></td>
+        <td>Multi-Location Write & Read</td>
+        <td><code>apb_i2c</code> (0x4000_0000)</td>
+        <td>Addr 0x20 == 0x5A, Addr 0x30 == 0x3C</td>
+        <td><span class="badge-pass">PASSED</span></td>
+      </tr>
+      <tr>
+        <td><code>TC_UART_01</code></td>
+        <td>Live Telemetry Logging</td>
+        <td><code>apb_uart</code> (0x4000_2000)</td>
+        <td>ASCII Stream: "TEST RESULT: [ PASSED ]"</td>
+        <td><span class="badge-pass">PASSED</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Simulation Transcript -->
+  <h2>7. Raw EDA Simulator Transcript (Synopsys VCS)</h2>
+  <pre>
+<span class="code-term">===============================================================</span>
+<span class="code-term">    RISCFORGE 1TOPS — I2C MASTER & AT24C02 SIMULATION         </span>
+<span class="code-term">===============================================================</span>
+[TB-DIAG] @0 Bootloader State -> S_RESET
+[TB] Loading ISRAM from '../datapath_verification/i2c0/imem.hex'...
+[TB] Loading DSRAM from '../datapath_verification/i2c0/dmem.hex'...
+[TB] Warm reset de-asserted at t = 195000 ns
+
+[TB-DIAG] @205000 Bootloader State -> S_CLEAN_ASSERT
+[TB-DIAG] @215000 Bootloader State -> S_CLEAN_HOLD
+[TB-DIAG] @255000 Bootloader State -> S_CLEAN_RELEASE
+[TB-DIAG] @255000 Core Reset Released! boot_done=0, PC=0x00000000
+[TB-DIAG] @265000 Bootloader State -> S_DONE
+
+=======================================================
+   RISCFORGE 1TOPS - I2C Master & AT24C02 Smoke Test   
+=======================================================
+[INFO] Initializing I2C Master Controller (Prescaler=20)...
+[INFO] I2C Master Initialized.
+
+[TEST 1] EEPROM Byte Write...
+  Slave Addr : 0x50
+  Mem Offset : 0x00000010
+  Write Data : 0x000000A5
+  --> [TEST 1 PASSED: Byte Write ACKed by Slave]
+
+[TEST 2] EEPROM Byte Read & Compare...
+  Read Data  : 0x000000A5
+  --> [TEST 2 PASSED: Read data matches written data 0xA5]
+
+[TEST 3] Multi-Location Write & Read Verification...
+  Addr 0x20 -> Exp: 0x5A, Got: 0x0000005A
+  Addr 0x30 -> Exp: 0x3C, Got: 0x0000003C
+  --> [TEST 3 PASSED: Both locations verified successfully]
+
+=======================================================
+>>> TEST RESULT: [ PASSED ] <<<
+=======================================================
+
+<span class="code-success">===============================================================</span>
+<span class="code-success"> [SIMULATION SUCCESS] All I2C Master tests verified successfully!</span>
+<span class="code-success">===============================================================</span>
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 3287465000 ps
+CPU time: 1.946 seconds to compile + .277 seconds to elab + .144 seconds to link
+  </pre>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>RISCFORGE 1TOPS SoC Subsystem Verification Environment</div>
+    <div>Sign-Off Confirmed by Antigravity AI Engine</div>
+  </div>
+</div>
+
+</body>
+</html>
