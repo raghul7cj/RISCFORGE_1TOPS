@@ -34,3 +34,4 @@ hex: $(TARGET)
 clean:
 	rm -f $(TARGET) $(DISASM) $(IMEM_HEX) $(DMEM_HEX) xrun.log xrun.history *.vcd
 	rm -rf xcelium.d simv simv.daidir
+

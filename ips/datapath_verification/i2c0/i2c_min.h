@@ -185,3 +185,4 @@ static inline int i2c_eeprom_read_byte(uint8_t dev_addr, uint8_t mem_addr, uint8
 }
 
 #endif /* I2C_MIN_H */
+

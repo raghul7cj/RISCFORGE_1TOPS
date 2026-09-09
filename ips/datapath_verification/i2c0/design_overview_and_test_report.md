@@ -169,3 +169,4 @@ The **APB I2C Master IP (`apb_i2c` @ `0x4000_0000`)** has been verified end-to-e
            V C S   S i m u l a t i o n   R e p o r t 
 Time: 3287465000 ps
 ```
+

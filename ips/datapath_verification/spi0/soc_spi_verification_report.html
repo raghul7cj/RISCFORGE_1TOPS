@@ -400,8 +400,212 @@
     </tbody>
   </table>
 
-  <!-- Section 3: Toolchain Flow -->
-  <h2>3. Software Toolchain & Image Generation Flow</h2>
+  <!-- Section 3: Peripheral Register Maps -->
+  <h2>3. Peripheral Register Maps (SPI & I2C Master)</h2>
+  
+  <h3>3.1 APB SPI Master IP Register Map (Base: <code>0x4000_4000</code>, APB Slot 4)</h3>
+  <p>
+    The APB SPI Master peripheral controls SPI / QSPI NOR Flash memories with configurable clock divider, left-justified command/address shift registers, and hardware dummy cycle insertion.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Offset</th>
+        <th>Register Name</th>
+        <th>Width</th>
+        <th>Access</th>
+        <th>Reset</th>
+        <th>Description & Key Bitfields</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>0x00</code></td>
+        <td><strong>REG_STATUS</strong></td>
+        <td>32-bit</td>
+        <td>R</td>
+        <td><code>0x0002</code></td>
+        <td>
+          FIFO & Interface Status:<br>
+          • <code>[0] TX_FULL</code>: Transmit FIFO full (1 = Full, 0 = Space available)<br>
+          • <code>[1] TX_EMPTY</code>: Transmit FIFO empty (1 = Empty, 0 = Pending data)<br>
+          • <code>[4] RX_FULL</code>: Receive FIFO full (1 = Full)<br>
+          • <code>[5] RX_EMPTY</code>: Receive FIFO empty (1 = Empty, 0 = Unread data ready)<br>
+          • <code>[8] CS</code>: Active Chip Select indicator
+        </td>
+      </tr>
+      <tr>
+        <td><code>0x04</code></td>
+        <td><strong>REG_CLKDIV</strong></td>
+        <td>8-bit</td>
+        <td>R/W</td>
+        <td><code>0x00</code></td>
+        <td>Clock prescaler divider: <code>f_SPI = f_PCLK / (2 &times; (CLKDIV + 1))</code>. For 100 MHz PCLK: CLKDIV=1 gives 25 MHz SPI SCK.</td>
+      </tr>
+      <tr>
+        <td><code>0x08</code></td>
+        <td><strong>REG_SPICMD</strong></td>
+        <td>32-bit</td>
+        <td>R/W</td>
+        <td><code>0x00000000</code></td>
+        <td>SPI Command Register: Left-justified / MSB-aligned command opcode (e.g. <code>0x9F00_0000</code> for JEDEC ID opcode <code>0x9F</code>).</td>
+      </tr>
+      <tr>
+        <td><code>0x0C</code></td>
+        <td><strong>REG_SPIADR</strong></td>
+        <td>32-bit</td>
+        <td>R/W</td>
+        <td><code>0x00000000</code></td>
+        <td>SPI Target Address: Left-justified / MSB-aligned byte address (e.g. <code>0x0010_0000</code> for 24-bit address <code>0x001000</code>).</td>
+      </tr>
+      <tr>
+        <td><code>0x10</code></td>
+        <td><strong>REG_SPILEN</strong></td>
+        <td>32-bit</td>
+        <td>R/W</td>
+        <td><code>0x00000000</code></td>
+        <td>
+          Transfer Phase Lengths (in bits):<br>
+          • <code>[5:0] CMDLEN</code>: Command bit length (e.g. 8 bits)<br>
+          • <code>[13:8] ADRLEN</code>: Address bit length (e.g. 24 or 32 bits)<br>
+          • <code>[31:16] DATALEN</code>: Data payload length (e.g. 24 bits for ID, 32 bits for word)
+        </td>
+      </tr>
+      <tr>
+        <td><code>0x14</code></td>
+        <td><strong>REG_SPIDUM</strong></td>
+        <td>32-bit</td>
+        <td>R/W</td>
+        <td><code>0x00000000</code></td>
+        <td>
+          Dummy Cycle Configuration:<br>
+          • <code>[15:0] DUMMYRD</code>: Number of dummy clock cycles before Read phase (e.g. 8 for Fast Read <code>0x0B</code>)<br>
+          • <code>[31:16] DUMMYWR</code>: Dummy cycles before Write phase
+        </td>
+      </tr>
+      <tr>
+        <td><code>0x18</code></td>
+        <td><strong>REG_TXFIFO</strong></td>
+        <td>32-bit</td>
+        <td>W</td>
+        <td>—</td>
+        <td>Transmit FIFO Write Port: Pushes 32-bit word into outgoing TX FIFO buffer.</td>
+      </tr>
+      <tr>
+        <td><code>0x20</code></td>
+        <td><strong>REG_RXFIFO</strong></td>
+        <td>32-bit</td>
+        <td>R</td>
+        <td>—</td>
+        <td>Receive FIFO Read Port: Pops 32-bit word from incoming RX FIFO buffer.</td>
+      </tr>
+      <tr>
+        <td><code>0x24</code></td>
+        <td><strong>REG_INTCFG</strong></td>
+        <td>32-bit</td>
+        <td>R/W</td>
+        <td><code>0x00000000</code></td>
+        <td>Interrupt Configuration: Watermark threshold and transfer completion interrupt enables.</td>
+      </tr>
+      <tr>
+        <td><code>0x28</code></td>
+        <td><strong>REG_INTSTA</strong></td>
+        <td>32-bit</td>
+        <td>R/W1C</td>
+        <td><code>0x00000000</code></td>
+        <td>Interrupt Status: Latched interrupt flags (write 1 to clear).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3.2 APB I2C Master IP Register Map (Base: <code>0x4000_0000</code>, APB Slot 0)</h3>
+  <p>
+    The APB I2C Master peripheral is mapped to a 4 KB APB aperture. It supports standard-mode (100 kHz) and fast-mode (400 kHz / 1 MHz) I2C bus transactions via an internal 16-bit prescaler divider: <code>f_SCL = f_PCLK / (5 &times; (PRE + 1))</code>.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Offset</th>
+        <th>Register Name</th>
+        <th>Width</th>
+        <th>Access</th>
+        <th>Reset</th>
+        <th>Description & Key Bitfields</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>0x00</code></td>
+        <td><strong>REG_CLK_PRESCALER</strong> (<code>PRE</code>)</td>
+        <td>16-bit</td>
+        <td>R/W</td>
+        <td><code>0x0000</code></td>
+        <td>Clock prescaler divider: SCL frequency = PCLK / (5 &times; (PRE + 1)). For 100 MHz PCLK: PRE=20 gives ~952 kHz fast simulation clock.</td>
+      </tr>
+      <tr>
+        <td><code>0x04</code></td>
+        <td><strong>REG_CTRL</strong> (<code>CTR</code>)</td>
+        <td>8-bit</td>
+        <td>R/W</td>
+        <td><code>0x00</code></td>
+        <td>
+          Control Register:<br>
+          • <code>[7] EN</code>: Core Enable (1 = Enable I2C core, 0 = Disable/Reset)<br>
+          • <code>[6] IEN</code>: Interrupt Enable (1 = Assert interrupt on transfer done / IF)
+        </td>
+      </tr>
+      <tr>
+        <td><code>0x08</code></td>
+        <td><strong>REG_RX</strong> (<code>RXR</code>)</td>
+        <td>8-bit</td>
+        <td>R</td>
+        <td><code>0x00</code></td>
+        <td>Receive Data Register: Contains the latest 8-bit byte received from the I2C slave.</td>
+      </tr>
+      <tr>
+        <td><code>0x0C</code></td>
+        <td><strong>REG_STATUS</strong> (<code>SR</code>)</td>
+        <td>8-bit</td>
+        <td>R</td>
+        <td><code>0x00</code></td>
+        <td>
+          Status Register:<br>
+          • <code>[7] RxACK</code>: Acknowledge status from slave (0 = Slave ACKed, 1 = Slave NACKed)<br>
+          • <code>[6] BUSY</code>: I2C bus busy flag (1 = Active transfer after START, 0 = Idle after STOP)<br>
+          • <code>[5] AL</code>: Arbitration Lost flag (1 = Master lost arbitration)<br>
+          • <code>[1] TIP</code>: Transfer In Progress (1 = Active byte transfer in flight, 0 = Idle)<br>
+          • <code>[0] IF</code>: Interrupt Flag (1 = Transfer completed or error; cleared by writing IACK)
+        </td>
+      </tr>
+      <tr>
+        <td><code>0x10</code></td>
+        <td><strong>REG_TX</strong> (<code>TXR</code>)</td>
+        <td>8-bit</td>
+        <td>W</td>
+        <td><code>0x00</code></td>
+        <td>Transmit Data Register: Outgoing 8-bit data payload or 7-bit slave address with R/W bit (<code>{dev_addr[6:0], rw}</code>).</td>
+      </tr>
+      <tr>
+        <td><code>0x14</code></td>
+        <td><strong>REG_CMD</strong> (<code>CR</code>)</td>
+        <td>8-bit</td>
+        <td>W</td>
+        <td><code>0x00</code></td>
+        <td>
+          Command Register:<br>
+          • <code>[7] STA</code>: Generate (Repeated) START condition (<code>0x80</code>)<br>
+          • <code>[6] STO</code>: Generate STOP condition (<code>0x40</code>)<br>
+          • <code>[5] RD</code>: Read 1 byte from slave (<code>0x20</code>)<br>
+          • <code>[4] WR</code>: Write 1 byte to slave (<code>0x10</code>)<br>
+          • <code>[3] ACK</code>: ACK value to send during Read (0 = ACK, 1 = NACK)<br>
+          • <code>[0] IACK</code>: Clear Interrupt Flag (<code>IF</code>)
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 4: Toolchain Flow -->
+  <h2>4. Software Toolchain & Image Generation Flow</h2>
   <p>
     Bare-metal C code is cross-compiled using the GNU RISC-V toolchain, linked with a customized linker script, and translated by a standalone Python converter into word-addressed memory hex images.
   </p>
@@ -434,8 +638,8 @@
     </svg>
   </div>
 
-  <!-- Section 4: Verification Suite & Results -->
-  <h2>4. Datapath Verification Suite & Results</h2>
+  <!-- Section 5: Verification Suite & Results -->
+  <h2>5. Datapath Verification Suite & Results</h2>
   <table>
     <thead>
       <tr>
@@ -485,8 +689,8 @@
     </tbody>
   </table>
 
-  <!-- Section 5: Simulation Logs -->
-  <h2>5. EDA Simulation Transcript (Synopsys VCS)</h2>
+  <!-- Section 6: Simulation Logs -->
+  <h2>6. EDA Simulation Transcript (Synopsys VCS)</h2>
   <pre>
 <span class="code-term">===============================================================</span>
 <span class="code-term">    RISCFORGE 1TOPS — SPI MASTER & DATAPATH SIMULATION        </span>
