@@ -29,3 +29,4 @@ $cmd = "cd $RemoteDir/RTL_SOC && export SNPSLMD_LICENSE_FILE=27020@14.139.1.126 
 & "C:\Program Files\PuTTY\plink.exe" -ssh -batch -hostkey $HostKey -pw $ServerPass ${ServerUser}@${ServerHost} $cmd
 
 Write-Host "[4/4] Simulation finished."
+

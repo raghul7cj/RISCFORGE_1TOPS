@@ -85,3 +85,4 @@ if __name__ == '__main__':
         sys.exit(1)
     secs = parse_elf(sys.argv[1])
     generate_hex(secs, sys.argv[2], sys.argv[3])
+

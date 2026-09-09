@@ -101,3 +101,4 @@ I2C physical signaling relies on open-drain lines with external resistive pull-u
 | `TEST_3` | Multi-Address Write & Read | Write `0x5A` @ `0x20`, `0x3C` @ `0x30` & sequential Random Reads | Read data == `0x5A`, `0x3C` | **PASSED** |
 
 **Conclusion**: The APB I2C Master IP datapath is fully verified and functional in the RISCFORGE 1TOPS SoC Subsystem.
+
