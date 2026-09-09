@@ -1,0 +1,735 @@
+
+app.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010000 <_start>:
+  .global _start
+  .type _start, @function
+
+_start:
+  /* 1. Disable interrupts globally during boot */
+  csrci mstatus, 0x8
+   10000:	30047073          	csrci	mstatus,8
+
+  /* 2. Initialize Stack Pointer (sp) and Global Pointer (gp) */
+  .option push
+  .option norelax
+  la gp, __global_pointer$
+   10004:	00011197          	auipc	gp,0x11
+   10008:	cdc18193          	addi	gp,gp,-804 # 20ce0 <__global_pointer$>
+  .option pop
+  la sp, _stack_top
+   1000c:	00018117          	auipc	sp,0x18
+   10010:	ff410113          	addi	sp,sp,-12 # 28000 <_stack_top>
+
+  /* 3. Zero General-Purpose Registers */
+  li x1,  0
+   10014:	00000093          	li	ra,0
+  li x4,  0
+   10018:	00000213          	li	tp,0
+  li x5,  0
+   1001c:	00000293          	li	t0,0
+  li x6,  0
+   10020:	00000313          	li	t1,0
+  li x7,  0
+   10024:	00000393          	li	t2,0
+  li x8,  0
+   10028:	00000413          	li	s0,0
+  li x9,  0
+   1002c:	00000493          	li	s1,0
+  li x10, 0
+   10030:	00000513          	li	a0,0
+  li x11, 0
+   10034:	00000593          	li	a1,0
+  li x12, 0
+   10038:	00000613          	li	a2,0
+  li x13, 0
+   1003c:	00000693          	li	a3,0
+  li x14, 0
+   10040:	00000713          	li	a4,0
+  li x15, 0
+   10044:	00000793          	li	a5,0
+  li x16, 0
+   10048:	00000813          	li	a6,0
+  li x17, 0
+   1004c:	00000893          	li	a7,0
+  li x18, 0
+   10050:	00000913          	li	s2,0
+  li x19, 0
+   10054:	00000993          	li	s3,0
+  li x20, 0
+   10058:	00000a13          	li	s4,0
+  li x21, 0
+   1005c:	00000a93          	li	s5,0
+  li x22, 0
+   10060:	00000b13          	li	s6,0
+  li x23, 0
+   10064:	00000b93          	li	s7,0
+  li x24, 0
+   10068:	00000c13          	li	s8,0
+  li x25, 0
+   1006c:	00000c93          	li	s9,0
+  li x26, 0
+   10070:	00000d13          	li	s10,0
+  li x27, 0
+   10074:	00000d93          	li	s11,0
+  li x28, 0
+   10078:	00000e13          	li	t3,0
+  li x29, 0
+   1007c:	00000e93          	li	t4,0
+  li x30, 0
+   10080:	00000f13          	li	t5,0
+  li x31, 0
+   10084:	00000f93          	li	t6,0
+
+  /* 4. Zero .bss section in DSRAM */
+  la a0, _sbss
+   10088:	00010517          	auipc	a0,0x10
+   1008c:	45850513          	addi	a0,a0,1112 # 204e0 <_ebss>
+  la a1, _ebss
+   10090:	00010597          	auipc	a1,0x10
+   10094:	45058593          	addi	a1,a1,1104 # 204e0 <_ebss>
+  bge a0, a1, .Lzero_bss_done
+   10098:	00b55863          	bge	a0,a1,100a8 <_start+0xa8>
+.Lzero_bss_loop:
+  sw zero, 0(a0)
+   1009c:	00052023          	sw	zero,0(a0)
+  addi a0, a0, 4
+   100a0:	00450513          	addi	a0,a0,4
+  blt a0, a1, .Lzero_bss_loop
+   100a4:	feb54ce3          	blt	a0,a1,1009c <_start+0x9c>
+.Lzero_bss_done:
+
+  /* 5. Initialize mintprio CSR (0x7C0) to 0 */
+  csrw 0x7C0, zero
+   100a8:	7c001073          	csrw	0x7c0,zero
+
+  /* 6. Jump to main */
+  call main
+   100ac:	13c000ef          	jal	101e8 <main>
+
+000100b0 <_exit>:
+
+  /* 7. Halt loop */
+_exit:
+  j _exit
+   100b0:	0000006f          	j	100b0 <_exit>
+
+000100b4 <uart_puts>:
+   100b4:	00054783          	lbu	a5,0(a0)
+
+    // -------------------------------------------------------------------------
+    // TEST 2: Write Enable (0x06) & Read Status Register 1 (0x05)
+    // -------------------------------------------------------------------------
+    uart_puts("[TEST 2] Testing Write Enable (0x06) & Read Status (0x05)...\n");
+    spi_flash_write_enable();
+   100b8:	02078e63          	beqz	a5,100f4 <uart_puts+0x40>
+
+   100bc:	40002737          	lui	a4,0x40002
+    uint8_t status = spi_flash_read_status();
+   100c0:	00a00593          	li	a1,10
+
+   100c4:	40002637          	lui	a2,0x40002
+   100c8:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+    // -------------------------------------------------------------------------
+   100cc:	00d00813          	li	a6,13
+    uint8_t status = spi_flash_read_status();
+   100d0:	02b78463          	beq	a5,a1,100f8 <uart_puts+0x44>
+    uart_puts("  Status Register : ");
+   100d4:	00054683          	lbu	a3,0(a0)
+   100d8:	00150513          	addi	a0,a0,1
+
+   100dc:	00072783          	lw	a5,0(a4)
+   100e0:	0207f793          	andi	a5,a5,32
+   100e4:	fe078ce3          	beqz	a5,100dc <uart_puts+0x28>
+    // -------------------------------------------------------------------------
+   100e8:	00d62023          	sw	a3,0(a2) # 40002000 <_stack_top+0x3ffda000>
+    spi_flash_write_enable();
+   100ec:	00054783          	lbu	a5,0(a0)
+   100f0:	fe0790e3          	bnez	a5,100d0 <uart_puts+0x1c>
+    uart_puthex(status);
+    uart_puts(" (WEL bit should be 1)\n");
+   100f4:	00008067          	ret
+
+   100f8:	00072783          	lw	a5,0(a4)
+   100fc:	0207f793          	andi	a5,a5,32
+   10100:	fe078ce3          	beqz	a5,100f8 <uart_puts+0x44>
+    // -------------------------------------------------------------------------
+   10104:	01062023          	sw	a6,0(a2)
+    // TEST 2: Write Enable (0x06) & Read Status Register 1 (0x05)
+   10108:	fcdff06f          	j	100d4 <uart_puts+0x20>
+
+0001010c <uart_puthex>:
+
+   1010c:	40002737          	lui	a4,0x40002
+   10110:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+   10114:	00072783          	lw	a5,0(a4)
+   10118:	0207f793          	andi	a5,a5,32
+   1011c:	fe078ce3          	beqz	a5,10114 <uart_puthex+0x8>
+   10120:	40002737          	lui	a4,0x40002
+    // -------------------------------------------------------------------------
+   10124:	400027b7          	lui	a5,0x40002
+   10128:	03000693          	li	a3,48
+   1012c:	00d7a023          	sw	a3,0(a5) # 40002000 <_stack_top+0x3ffda000>
+
+   10130:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+   10134:	00072783          	lw	a5,0(a4)
+   10138:	0207f793          	andi	a5,a5,32
+   1013c:	fe078ce3          	beqz	a5,10134 <uart_puthex+0x28>
+    // -------------------------------------------------------------------------
+   10140:	07800693          	li	a3,120
+
+   10144:	40002737          	lui	a4,0x40002
+    // -------------------------------------------------------------------------
+   10148:	400027b7          	lui	a5,0x40002
+   1014c:	00d7a023          	sw	a3,0(a5) # 40002000 <_stack_top+0x3ffda000>
+    if (status & 0x02) {
+        uart_puts("  --> [TEST 2 PASSED: WEL bit set]\n\n");
+    } else {
+        uart_puts("  --> [TEST 2 FAILED: WEL bit not set]\n\n");
+        test_fail++;
+    }
+   10150:	00900893          	li	a7,9
+    // -------------------------------------------------------------------------
+   10154:	01c00693          	li	a3,28
+
+   10158:	40002837          	lui	a6,0x40002
+   1015c:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+        uart_puts("  --> [TEST 2 FAILED: WEL bit not set]\n\n");
+   10160:	ffc00593          	li	a1,-4
+        test_fail++;
+   10164:	00d557b3          	srl	a5,a0,a3
+   10168:	00f7f793          	andi	a5,a5,15
+    }
+   1016c:	03778613          	addi	a2,a5,55
+   10170:	00f8e463          	bltu	a7,a5,10178 <uart_puthex+0x6c>
+   10174:	03078613          	addi	a2,a5,48
+
+   10178:	00072783          	lw	a5,0(a4)
+   1017c:	0207f793          	andi	a5,a5,32
+   10180:	fe078ce3          	beqz	a5,10178 <uart_puthex+0x6c>
+    // -------------------------------------------------------------------------
+   10184:	00c82023          	sw	a2,0(a6) # 40002000 <_stack_top+0x3ffda000>
+        uart_puts("  --> [TEST 2 FAILED: WEL bit not set]\n\n");
+   10188:	ffc68693          	addi	a3,a3,-4
+   1018c:	fcb69ce3          	bne	a3,a1,10164 <uart_puthex+0x58>
+
+    // -------------------------------------------------------------------------
+    // TEST 3 & 4: Page Program (0x02) & Standard Read Data (0x03)
+   10190:	00008067          	ret
+
+00010194 <spi_flash_write_enable>:
+        uart_puts("  --> [TEST 5 FAILED: Fast read data mismatch]\n\n");
+        test_fail++;
+    }
+
+    // -------------------------------------------------------------------------
+    // Final Test Summary
+   10194:	40004737          	lui	a4,0x40004
+   10198:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   1019c:	0017f793          	andi	a5,a5,1
+   101a0:	fe078ce3          	beqz	a5,10198 <spi_flash_write_enable+0x4>
+   101a4:	400047b7          	lui	a5,0x40004
+   101a8:	06000637          	lui	a2,0x6000
+   101ac:	00c7a423          	sw	a2,8(a5) # 40004008 <_stack_top+0x3ffdc008>
+   101b0:	400046b7          	lui	a3,0x40004
+   101b4:	0006a623          	sw	zero,12(a3) # 4000400c <_stack_top+0x3ffdc00c>
+   101b8:	40004637          	lui	a2,0x40004
+   101bc:	00800593          	li	a1,8
+   101c0:	400047b7          	lui	a5,0x40004
+   101c4:	00b62823          	sw	a1,16(a2) # 40004010 <_stack_top+0x3ffdc010>
+   101c8:	0007aa23          	sw	zero,20(a5) # 40004014 <_stack_top+0x3ffdc014>
+   101cc:	10200793          	li	a5,258
+   101d0:	00f72023          	sw	a5,0(a4)
+    // Final Test Summary
+   101d4:	40004737          	lui	a4,0x40004
+   101d8:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   101dc:	0017f793          	andi	a5,a5,1
+   101e0:	fe078ce3          	beqz	a5,101d8 <spi_flash_write_enable+0x44>
+   101e4:	00008067          	ret
+
+000101e8 <main>:
+int main(void) {
+   101e8:	fe010113          	addi	sp,sp,-32
+   101ec:	00112e23          	sw	ra,28(sp)
+   101f0:	01212823          	sw	s2,16(sp)
+   101f4:	00812c23          	sw	s0,24(sp)
+   101f8:	00912a23          	sw	s1,20(sp)
+   101fc:	01312623          	sw	s3,12(sp)
+#define UART_LSR_TEMT     (1 << 6)
+#define UART_LCR_8BIT     (3 << 0)
+#define UART_LCR_DLAB     (1 << 7)
+
+static inline void uart_init(void) {
+    UART_LCR = UART_LCR_DLAB | UART_LCR_8BIT;
+   10200:	40002737          	lui	a4,0x40002
+   10204:	08300793          	li	a5,131
+   10208:	00f72623          	sw	a5,12(a4) # 4000200c <_stack_top+0x3ffda00c>
+    UART_DLL = 0x02;  // Divisor 2 (32 clocks/bit)
+   1020c:	00200613          	li	a2,2
+   10210:	400026b7          	lui	a3,0x40002
+   10214:	00c6a023          	sw	a2,0(a3) # 40002000 <_stack_top+0x3ffda000>
+    UART_DLM = 0x00;
+   10218:	400027b7          	lui	a5,0x40002
+   1021c:	0007a223          	sw	zero,4(a5) # 40002004 <_stack_top+0x3ffda004>
+    UART_LCR = UART_LCR_8BIT;
+   10220:	00300693          	li	a3,3
+   10224:	00d72623          	sw	a3,12(a4)
+    UART_IER = 0x00;
+   10228:	0007a223          	sw	zero,4(a5)
+    UART_FCR = 0x07;
+   1022c:	40002737          	lui	a4,0x40002
+   10230:	00700693          	li	a3,7
+    uart_puts("\n=======================================================\n");
+   10234:	00020537          	lui	a0,0x20
+   10238:	00d72423          	sw	a3,8(a4) # 40002008 <_stack_top+0x3ffda008>
+   1023c:	00050513          	mv	a0,a0
+   10240:	e75ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("   RISCFORGE 1TOPS — SPI Master & Flash Smoke Test     \n");
+   10244:	00020537          	lui	a0,0x20
+   10248:	03c50513          	addi	a0,a0,60 # 2003c <_srodata+0x3c>
+   1024c:	e69ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("=======================================================\n");
+   10250:	00020937          	lui	s2,0x20
+   10254:	07890513          	addi	a0,s2,120 # 20078 <_srodata+0x78>
+   10258:	e5dff0ef          	jal	100b4 <uart_puts>
+    uart_puts("[INFO] Initializing SPI Master Controller...\n");
+   1025c:	00020537          	lui	a0,0x20
+   10260:	0b450513          	addi	a0,a0,180 # 200b4 <_srodata+0xb4>
+   10264:	e51ff0ef          	jal	100b4 <uart_puts>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+}
+
+// Initialize SPI Master
+static inline void spi_init(uint8_t clk_div) {
+    SPI_CLKDIV = (uint32_t)clk_div;
+   10268:	400047b7          	lui	a5,0x40004
+   1026c:	00100713          	li	a4,1
+   10270:	00e7a223          	sw	a4,4(a5) # 40004004 <_stack_top+0x3ffdc004>
+    SPI_STATUS = SPI_CMD_SWRST;  // clear FIFOs and reset FSM
+   10274:	01000713          	li	a4,16
+   10278:	400047b7          	lui	a5,0x40004
+   1027c:	00e7a023          	sw	a4,0(a5) # 40004000 <_stack_top+0x3ffdc000>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   10280:	40004737          	lui	a4,0x40004
+   10284:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   10288:	0017f793          	andi	a5,a5,1
+   1028c:	fe078ce3          	beqz	a5,10284 <main+0x9c>
+    uart_puts("[INFO] SPI Master Initialized.\n\n");
+   10290:	00020537          	lui	a0,0x20
+   10294:	0e450513          	addi	a0,a0,228 # 200e4 <_srodata+0xe4>
+   10298:	e1dff0ef          	jal	100b4 <uart_puts>
+    uart_puts("[TEST 1] Querying SPI Flash JEDEC ID (Opcode 0x9F)...\n");
+   1029c:	00020537          	lui	a0,0x20
+   102a0:	10850513          	addi	a0,a0,264 # 20108 <_srodata+0x108>
+   102a4:	e11ff0ef          	jal	100b4 <uart_puts>
+   102a8:	40004737          	lui	a4,0x40004
+   102ac:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   102b0:	0017f793          	andi	a5,a5,1
+   102b4:	fe078ce3          	beqz	a5,102ac <main+0xc4>
+// Read 24-bit JEDEC ID (Opcode 0x9F) -> Returns 24-bit ID
+static inline uint32_t spi_flash_read_id(void) {
+    spi_wait_idle();
+    
+    // Command = 0x9F (8 bits, left aligned)
+    SPI_SPICMD = ((uint32_t)CMD_READ_ID) << 24;
+   102b8:	400047b7          	lui	a5,0x40004
+   102bc:	9f0006b7          	lui	a3,0x9f000
+   102c0:	00d7a423          	sw	a3,8(a5) # 40004008 <_stack_top+0x3ffdc008>
+    SPI_SPIADR = 0;
+   102c4:	40004637          	lui	a2,0x40004
+    // SPILEN: cmd_len=8, addr_len=0, data_len=24 (3 bytes)
+    SPI_SPILEN = (24 << 16) | (0 << 8) | (8);
+   102c8:	001805b7          	lui	a1,0x180
+    SPI_SPIADR = 0;
+   102cc:	00062623          	sw	zero,12(a2) # 4000400c <_stack_top+0x3ffdc00c>
+    SPI_SPILEN = (24 << 16) | (0 << 8) | (8);
+   102d0:	400047b7          	lui	a5,0x40004
+   102d4:	00858593          	addi	a1,a1,8 # 180008 <_stack_top+0x158008>
+   102d8:	00b7a823          	sw	a1,16(a5) # 40004010 <_stack_top+0x3ffdc010>
+    SPI_SPIDUM = 0;
+   102dc:	400046b7          	lui	a3,0x40004
+   102e0:	0006aa23          	sw	zero,20(a3) # 40004014 <_stack_top+0x3ffdc014>
+    
+    // Start Read with CSN0 asserted
+    SPI_STATUS = SPI_CS_0 | SPI_CMD_RD;
+   102e4:	10100593          	li	a1,257
+   102e8:	00b72023          	sw	a1,0(a4)
+    
+    // Read RX FIFO (hardware stalls until word is ready)
+    uint32_t id = SPI_RXFIFO;
+   102ec:	400047b7          	lui	a5,0x40004
+   102f0:	0207a403          	lw	s0,32(a5) # 40004020 <_stack_top+0x3ffdc020>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   102f4:	40004737          	lui	a4,0x40004
+   102f8:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   102fc:	0017f793          	andi	a5,a5,1
+   10300:	fe078ce3          	beqz	a5,102f8 <main+0x110>
+    uart_puts("  Expected ID : 0x00EF4018 / 0x00010219\n");
+   10304:	00020537          	lui	a0,0x20
+   10308:	14050513          	addi	a0,a0,320 # 20140 <_srodata+0x140>
+   1030c:	da9ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("  Received ID : ");
+   10310:	00020537          	lui	a0,0x20
+   10314:	16c50513          	addi	a0,a0,364 # 2016c <_srodata+0x16c>
+   10318:	d9dff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(jedec_id);
+   1031c:	00040513          	mv	a0,s0
+   10320:	dedff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n");
+   10324:	000204b7          	lui	s1,0x20
+   10328:	18048513          	addi	a0,s1,384 # 20180 <_srodata+0x180>
+   1032c:	d89ff0ef          	jal	100b4 <uart_puts>
+    if ((jedec_id & 0x00FFFFFF) == 0x00EF4018 || (jedec_id & 0x00FFFFFF) == 0x00010219) {
+   10330:	00841413          	slli	s0,s0,0x8
+   10334:	00ef47b7          	lui	a5,0xef4
+   10338:	00845413          	srli	s0,s0,0x8
+   1033c:	01878793          	addi	a5,a5,24 # ef4018 <_stack_top+0xecc018>
+   10340:	00f40863          	beq	s0,a5,10350 <main+0x168>
+   10344:	000107b7          	lui	a5,0x10
+   10348:	21978793          	addi	a5,a5,537 # 10219 <main+0x31>
+   1034c:	30f41e63          	bne	s0,a5,10668 <main+0x480>
+        uart_puts("  --> [TEST 1 PASSED]\n\n");
+   10350:	00020537          	lui	a0,0x20
+   10354:	18450513          	addi	a0,a0,388 # 20184 <_srodata+0x184>
+   10358:	d5dff0ef          	jal	100b4 <uart_puts>
+    int test_fail = 0;
+   1035c:	00000413          	li	s0,0
+    uart_puts("[TEST 2] Testing Write Enable (0x06) & Read Status (0x05)...\n");
+   10360:	00020537          	lui	a0,0x20
+   10364:	1cc50513          	addi	a0,a0,460 # 201cc <_srodata+0x1cc>
+   10368:	d4dff0ef          	jal	100b4 <uart_puts>
+    spi_flash_write_enable();
+   1036c:	e29ff0ef          	jal	10194 <spi_flash_write_enable>
+   10370:	40004737          	lui	a4,0x40004
+   10374:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   10378:	0017f793          	andi	a5,a5,1
+   1037c:	fe078ce3          	beqz	a5,10374 <main+0x18c>
+}
+
+// Read Flash Status Register 1 (0x05) -> Returns status byte
+static inline uint8_t spi_flash_read_status(void) {
+    spi_wait_idle();
+    SPI_SPICMD = ((uint32_t)CMD_READ_STATUS) << 24;
+   10380:	400047b7          	lui	a5,0x40004
+   10384:	050006b7          	lui	a3,0x5000
+   10388:	00d7a423          	sw	a3,8(a5) # 40004008 <_stack_top+0x3ffdc008>
+    SPI_SPIADR = 0;
+   1038c:	40004637          	lui	a2,0x40004
+    // SPILEN: cmd_len=8, addr_len=0, data_len=8 (1 byte)
+    SPI_SPILEN = (8 << 16) | (0 << 8) | (8);
+   10390:	000805b7          	lui	a1,0x80
+    SPI_SPIADR = 0;
+   10394:	00062623          	sw	zero,12(a2) # 4000400c <_stack_top+0x3ffdc00c>
+    SPI_SPILEN = (8 << 16) | (0 << 8) | (8);
+   10398:	400047b7          	lui	a5,0x40004
+   1039c:	00858593          	addi	a1,a1,8 # 80008 <_stack_top+0x58008>
+   103a0:	00b7a823          	sw	a1,16(a5) # 40004010 <_stack_top+0x3ffdc010>
+    SPI_SPIDUM = 0;
+   103a4:	400046b7          	lui	a3,0x40004
+   103a8:	0006aa23          	sw	zero,20(a3) # 40004014 <_stack_top+0x3ffdc014>
+    
+    SPI_STATUS = SPI_CS_0 | SPI_CMD_RD;
+   103ac:	10100593          	li	a1,257
+   103b0:	00b72023          	sw	a1,0(a4)
+    uint32_t status = SPI_RXFIFO;
+   103b4:	400047b7          	lui	a5,0x40004
+   103b8:	0207a983          	lw	s3,32(a5) # 40004020 <_stack_top+0x3ffdc020>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   103bc:	40004737          	lui	a4,0x40004
+   103c0:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   103c4:	0017f793          	andi	a5,a5,1
+   103c8:	fe078ce3          	beqz	a5,103c0 <main+0x1d8>
+    uart_puts("  Status Register : ");
+   103cc:	00020537          	lui	a0,0x20
+   103d0:	20c50513          	addi	a0,a0,524 # 2020c <_srodata+0x20c>
+   103d4:	ce1ff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(status);
+   103d8:	0ff9f513          	zext.b	a0,s3
+   103dc:	d31ff0ef          	jal	1010c <uart_puthex>
+    uart_puts(" (WEL bit should be 1)\n");
+   103e0:	00020537          	lui	a0,0x20
+   103e4:	22450513          	addi	a0,a0,548 # 20224 <_srodata+0x224>
+    if (status & 0x02) {
+   103e8:	0029f993          	andi	s3,s3,2
+    uart_puts(" (WEL bit should be 1)\n");
+   103ec:	cc9ff0ef          	jal	100b4 <uart_puts>
+    if (status & 0x02) {
+   103f0:	26098263          	beqz	s3,10654 <main+0x46c>
+        uart_puts("  --> [TEST 2 PASSED: WEL bit set]\n\n");
+   103f4:	00020537          	lui	a0,0x20
+   103f8:	23c50513          	addi	a0,a0,572 # 2023c <_srodata+0x23c>
+   103fc:	cb9ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("[TEST 3] Page Program (Opcode 0x02)...\n");
+   10400:	00020537          	lui	a0,0x20
+   10404:	29050513          	addi	a0,a0,656 # 20290 <_srodata+0x290>
+   10408:	cadff0ef          	jal	100b4 <uart_puts>
+    uart_puts("  Target Addr : ");
+   1040c:	00020537          	lui	a0,0x20
+   10410:	2b850513          	addi	a0,a0,696 # 202b8 <_srodata+0x2b8>
+   10414:	ca1ff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(test_addr);
+   10418:	00001537          	lui	a0,0x1
+   1041c:	cf1ff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n  Write Data  : ");
+   10420:	00020537          	lui	a0,0x20
+   10424:	2cc50513          	addi	a0,a0,716 # 202cc <_srodata+0x2cc>
+   10428:	c8dff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(test_data);
+   1042c:	55aa1537          	lui	a0,0x55aa1
+   10430:	23450513          	addi	a0,a0,564 # 55aa1234 <_stack_top+0x55a79234>
+   10434:	cd9ff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n");
+   10438:	18048513          	addi	a0,s1,384
+   1043c:	c79ff0ef          	jal	100b4 <uart_puts>
+   10440:	40004737          	lui	a4,0x40004
+   10444:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   10448:	0017f793          	andi	a5,a5,1
+   1044c:	fe078ce3          	beqz	a5,10444 <main+0x25c>
+
+// Page Program (0x02) - Write 32-bit word to 24-bit address
+static inline void spi_flash_page_program(uint32_t addr, uint32_t data) {
+    spi_wait_idle();
+    // Enable writes first
+    spi_flash_write_enable();
+   10450:	d45ff0ef          	jal	10194 <spi_flash_write_enable>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   10454:	40004737          	lui	a4,0x40004
+   10458:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   1045c:	0017f793          	andi	a5,a5,1
+   10460:	fe078ce3          	beqz	a5,10458 <main+0x270>
+    
+    spi_wait_idle();
+    SPI_SPICMD = ((uint32_t)CMD_PAGE_PROGRAM) << 24;
+   10464:	400046b7          	lui	a3,0x40004
+   10468:	02000637          	lui	a2,0x2000
+   1046c:	00c6a423          	sw	a2,8(a3) # 40004008 <_stack_top+0x3ffdc008>
+    // 24-bit address left aligned into 32-bit register
+    SPI_SPIADR = (addr & 0x00FFFFFF) << 8;
+   10470:	400047b7          	lui	a5,0x40004
+    // SPILEN: cmd_len=8, addr_len=24, data_len=32
+    SPI_SPILEN = (32 << 16) | (24 << 8) | (8);
+   10474:	00202637          	lui	a2,0x202
+    SPI_SPIADR = (addr & 0x00FFFFFF) << 8;
+   10478:	001005b7          	lui	a1,0x100
+   1047c:	00b7a623          	sw	a1,12(a5) # 4000400c <_stack_top+0x3ffdc00c>
+    SPI_SPILEN = (32 << 16) | (24 << 8) | (8);
+   10480:	400046b7          	lui	a3,0x40004
+   10484:	80860613          	addi	a2,a2,-2040 # 201808 <_stack_top+0x1d9808>
+   10488:	00c6a823          	sw	a2,16(a3) # 40004010 <_stack_top+0x3ffdc010>
+    SPI_SPIDUM = 0;
+   1048c:	400047b7          	lui	a5,0x40004
+    
+    // Push data into TX FIFO
+    SPI_TXFIFO = data;
+   10490:	55aa1637          	lui	a2,0x55aa1
+    SPI_SPIDUM = 0;
+   10494:	0007aa23          	sw	zero,20(a5) # 40004014 <_stack_top+0x3ffdc014>
+    SPI_TXFIFO = data;
+   10498:	400046b7          	lui	a3,0x40004
+   1049c:	23460613          	addi	a2,a2,564 # 55aa1234 <_stack_top+0x55a79234>
+   104a0:	00c6ac23          	sw	a2,24(a3) # 40004018 <_stack_top+0x3ffdc018>
+    
+    // Start Write with CSN0
+    SPI_STATUS = SPI_CS_0 | SPI_CMD_WR;
+   104a4:	10200793          	li	a5,258
+   104a8:	00f72023          	sw	a5,0(a4)
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   104ac:	40004737          	lui	a4,0x40004
+   104b0:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   104b4:	0017f793          	andi	a5,a5,1
+   104b8:	fe078ce3          	beqz	a5,104b0 <main+0x2c8>
+    uart_puts("  Page program command issued.\n\n");
+   104bc:	00020537          	lui	a0,0x20
+   104c0:	2e050513          	addi	a0,a0,736 # 202e0 <_srodata+0x2e0>
+   104c4:	bf1ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("[TEST 4] Standard Read Data (Opcode 0x03)...\n");
+   104c8:	00020537          	lui	a0,0x20
+   104cc:	30450513          	addi	a0,a0,772 # 20304 <_srodata+0x304>
+   104d0:	be5ff0ef          	jal	100b4 <uart_puts>
+   104d4:	40004737          	lui	a4,0x40004
+   104d8:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   104dc:	0017f793          	andi	a5,a5,1
+   104e0:	fe078ce3          	beqz	a5,104d8 <main+0x2f0>
+}
+
+// Read Data (0x03) - Read 32-bit word from 24-bit address
+static inline uint32_t spi_flash_read_data(uint32_t addr) {
+    spi_wait_idle();
+    SPI_SPICMD = ((uint32_t)CMD_READ_DATA) << 24;
+   104e4:	400047b7          	lui	a5,0x40004
+   104e8:	03000637          	lui	a2,0x3000
+   104ec:	00c7a423          	sw	a2,8(a5) # 40004008 <_stack_top+0x3ffdc008>
+    SPI_SPIADR = (addr & 0x00FFFFFF) << 8;
+   104f0:	400046b7          	lui	a3,0x40004
+    // SPILEN: cmd_len=8, addr_len=24, data_len=32
+    SPI_SPILEN = (32 << 16) | (24 << 8) | (8);
+   104f4:	00202637          	lui	a2,0x202
+    SPI_SPIADR = (addr & 0x00FFFFFF) << 8;
+   104f8:	001005b7          	lui	a1,0x100
+   104fc:	00b6a623          	sw	a1,12(a3) # 4000400c <_stack_top+0x3ffdc00c>
+    SPI_SPILEN = (32 << 16) | (24 << 8) | (8);
+   10500:	400047b7          	lui	a5,0x40004
+   10504:	80860613          	addi	a2,a2,-2040 # 201808 <_stack_top+0x1d9808>
+   10508:	00c7a823          	sw	a2,16(a5) # 40004010 <_stack_top+0x3ffdc010>
+    SPI_SPIDUM = 0;
+   1050c:	400046b7          	lui	a3,0x40004
+   10510:	0006aa23          	sw	zero,20(a3) # 40004014 <_stack_top+0x3ffdc014>
+    
+    // Start Read with CSN0
+    SPI_STATUS = SPI_CS_0 | SPI_CMD_RD;
+   10514:	10100613          	li	a2,257
+   10518:	00c72023          	sw	a2,0(a4)
+    
+    uint32_t rdata = SPI_RXFIFO;
+   1051c:	400047b7          	lui	a5,0x40004
+   10520:	0207a983          	lw	s3,32(a5) # 40004020 <_stack_top+0x3ffdc020>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   10524:	40004737          	lui	a4,0x40004
+   10528:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   1052c:	0017f793          	andi	a5,a5,1
+   10530:	fe078ce3          	beqz	a5,10528 <main+0x340>
+    uart_puts("  Read Data   : ");
+   10534:	00020537          	lui	a0,0x20
+   10538:	33450513          	addi	a0,a0,820 # 20334 <_srodata+0x334>
+   1053c:	b79ff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(read_data);
+   10540:	00098513          	mv	a0,s3
+   10544:	bc9ff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n");
+   10548:	18048513          	addi	a0,s1,384
+   1054c:	b69ff0ef          	jal	100b4 <uart_puts>
+    if (read_data == test_data) {
+   10550:	55aa17b7          	lui	a5,0x55aa1
+   10554:	23478793          	addi	a5,a5,564 # 55aa1234 <_stack_top+0x55a79234>
+   10558:	14f98663          	beq	s3,a5,106a4 <main+0x4bc>
+        uart_puts("  --> [TEST 4 FAILED: Data mismatch]\n\n");
+   1055c:	00020537          	lui	a0,0x20
+   10560:	38050513          	addi	a0,a0,896 # 20380 <_srodata+0x380>
+   10564:	b51ff0ef          	jal	100b4 <uart_puts>
+        test_fail++;
+   10568:	00140413          	addi	s0,s0,1
+    uart_puts("[TEST 5] Fast Read Data (Opcode 0x0B, 8 Dummy Cycles)...\n");
+   1056c:	00020537          	lui	a0,0x20
+   10570:	3a850513          	addi	a0,a0,936 # 203a8 <_srodata+0x3a8>
+   10574:	b41ff0ef          	jal	100b4 <uart_puts>
+   10578:	40004737          	lui	a4,0x40004
+   1057c:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   10580:	0017f793          	andi	a5,a5,1
+   10584:	fe078ce3          	beqz	a5,1057c <main+0x394>
+}
+
+// Fast Read (0x0B) - Read 32-bit word with dummy cycles
+static inline uint32_t spi_flash_fast_read(uint32_t addr, uint8_t dummy_cycles) {
+    spi_wait_idle();
+    SPI_SPICMD = ((uint32_t)CMD_FAST_READ) << 24;
+   10588:	400046b7          	lui	a3,0x40004
+   1058c:	0b000637          	lui	a2,0xb000
+   10590:	00c6a423          	sw	a2,8(a3) # 40004008 <_stack_top+0x3ffdc008>
+    SPI_SPIADR = (addr & 0x00FFFFFF) << 8;
+   10594:	400047b7          	lui	a5,0x40004
+    // SPILEN: cmd_len=8, addr_len=24, data_len=32
+    SPI_SPILEN = (32 << 16) | (24 << 8) | (8);
+   10598:	00202637          	lui	a2,0x202
+    SPI_SPIADR = (addr & 0x00FFFFFF) << 8;
+   1059c:	001005b7          	lui	a1,0x100
+   105a0:	00b7a623          	sw	a1,12(a5) # 4000400c <_stack_top+0x3ffdc00c>
+    SPI_SPILEN = (32 << 16) | (24 << 8) | (8);
+   105a4:	400046b7          	lui	a3,0x40004
+   105a8:	80860613          	addi	a2,a2,-2040 # 201808 <_stack_top+0x1d9808>
+   105ac:	00c6a823          	sw	a2,16(a3) # 40004010 <_stack_top+0x3ffdc010>
+    // SPIDUM: dummy_rd = dummy_cycles
+    SPI_SPIDUM = (uint32_t)dummy_cycles;
+   105b0:	400047b7          	lui	a5,0x40004
+   105b4:	00800693          	li	a3,8
+   105b8:	00d7aa23          	sw	a3,20(a5) # 40004014 <_stack_top+0x3ffdc014>
+    
+    // Start Read with CSN0
+    SPI_STATUS = SPI_CS_0 | SPI_CMD_RD;
+   105bc:	10100693          	li	a3,257
+   105c0:	00d72023          	sw	a3,0(a4)
+    
+    uint32_t rdata = SPI_RXFIFO;
+   105c4:	400047b7          	lui	a5,0x40004
+   105c8:	0207a983          	lw	s3,32(a5) # 40004020 <_stack_top+0x3ffdc020>
+    while (!(SPI_STATUS & SPI_STATUS_IDLE));
+   105cc:	40004737          	lui	a4,0x40004
+   105d0:	00072783          	lw	a5,0(a4) # 40004000 <_stack_top+0x3ffdc000>
+   105d4:	0017f793          	andi	a5,a5,1
+   105d8:	fe078ce3          	beqz	a5,105d0 <main+0x3e8>
+    uart_puts("  Fast Read   : ");
+   105dc:	00020537          	lui	a0,0x20
+   105e0:	3e450513          	addi	a0,a0,996 # 203e4 <_srodata+0x3e4>
+   105e4:	ad1ff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(fast_data);
+   105e8:	00098513          	mv	a0,s3
+   105ec:	b21ff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n");
+   105f0:	18048513          	addi	a0,s1,384
+   105f4:	ac1ff0ef          	jal	100b4 <uart_puts>
+    if (fast_data == test_data) {
+   105f8:	55aa17b7          	lui	a5,0x55aa1
+   105fc:	23478793          	addi	a5,a5,564 # 55aa1234 <_stack_top+0x55a79234>
+   10600:	06f98e63          	beq	s3,a5,1067c <main+0x494>
+        uart_puts("  --> [TEST 5 FAILED: Fast read data mismatch]\n\n");
+   10604:	00020537          	lui	a0,0x20
+   10608:	42850513          	addi	a0,a0,1064 # 20428 <_srodata+0x428>
+   1060c:	aa9ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("=======================================================\n");
+   10610:	07890513          	addi	a0,s2,120
+        test_fail++;
+   10614:	00140413          	addi	s0,s0,1
+    uart_puts("=======================================================\n");
+   10618:	a9dff0ef          	jal	100b4 <uart_puts>
+        uart_puts(">>> TEST RESULT: [ FAILED ] <<<\n");
+   1061c:	00020537          	lui	a0,0x20
+   10620:	48050513          	addi	a0,a0,1152 # 20480 <_srodata+0x480>
+   10624:	a91ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("=======================================================\n\n");
+   10628:	00020537          	lui	a0,0x20
+   1062c:	4a450513          	addi	a0,a0,1188 # 204a4 <_srodata+0x4a4>
+   10630:	a85ff0ef          	jal	100b4 <uart_puts>
+}
+   10634:	01c12083          	lw	ra,28(sp)
+   10638:	00040513          	mv	a0,s0
+   1063c:	01812403          	lw	s0,24(sp)
+   10640:	01412483          	lw	s1,20(sp)
+   10644:	01012903          	lw	s2,16(sp)
+   10648:	00c12983          	lw	s3,12(sp)
+   1064c:	02010113          	addi	sp,sp,32
+   10650:	00008067          	ret
+        uart_puts("  --> [TEST 2 FAILED: WEL bit not set]\n\n");
+   10654:	00020537          	lui	a0,0x20
+   10658:	26450513          	addi	a0,a0,612 # 20264 <_srodata+0x264>
+   1065c:	a59ff0ef          	jal	100b4 <uart_puts>
+        test_fail++;
+   10660:	00140413          	addi	s0,s0,1
+   10664:	d9dff06f          	j	10400 <main+0x218>
+        uart_puts("  --> [TEST 1 FAILED: Unexpected Flash ID]\n\n");
+   10668:	00020537          	lui	a0,0x20
+   1066c:	19c50513          	addi	a0,a0,412 # 2019c <_srodata+0x19c>
+   10670:	a45ff0ef          	jal	100b4 <uart_puts>
+        test_fail++;
+   10674:	00100413          	li	s0,1
+   10678:	ce9ff06f          	j	10360 <main+0x178>
+        uart_puts("  --> [TEST 5 PASSED: Fast read data matches]\n\n");
+   1067c:	00020537          	lui	a0,0x20
+   10680:	3f850513          	addi	a0,a0,1016 # 203f8 <_srodata+0x3f8>
+   10684:	a31ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("=======================================================\n");
+   10688:	07890513          	addi	a0,s2,120
+   1068c:	a29ff0ef          	jal	100b4 <uart_puts>
+    if (test_fail == 0) {
+   10690:	f80416e3          	bnez	s0,1061c <main+0x434>
+        uart_puts(">>> TEST RESULT: [ PASSED ] <<<\n");
+   10694:	00020537          	lui	a0,0x20
+   10698:	45c50513          	addi	a0,a0,1116 # 2045c <_srodata+0x45c>
+   1069c:	a19ff0ef          	jal	100b4 <uart_puts>
+   106a0:	f89ff06f          	j	10628 <main+0x440>
+        uart_puts("  --> [TEST 4 PASSED: Read data matches written data]\n\n");
+   106a4:	00020537          	lui	a0,0x20
+   106a8:	34850513          	addi	a0,a0,840 # 20348 <_srodata+0x348>
+   106ac:	a09ff0ef          	jal	100b4 <uart_puts>
+   106b0:	ebdff06f          	j	1056c <main+0x384>
