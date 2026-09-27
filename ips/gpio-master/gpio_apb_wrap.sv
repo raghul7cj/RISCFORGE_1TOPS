@@ -48,19 +48,49 @@ module gpio_apb_wrap # (
   output                     apb_rsp_t apb_rsp_o
 );
 
+  // Sub-word write guard.
+  //
+  // apb_to_reg has no strobe port and hardcodes reg_o.wstrb = '1, so the APB
+  // byte enables never reach gpio_reg_top. gpio_reg_top writes all 32 bits of
+  // reg_wdata irrespective of reg_be (it uses reg_be only to raise wr_err
+  // against GPIO_PERMIT), so a byte or half-word store used to drive the
+  // addressed byte and zero the remaining 24 bits of the register.
+  //
+  // Writes that do not assert every byte enable are therefore blocked here:
+  // psel/penable are withheld from the bridge so the register block never sees
+  // the access, and the wrapper answers with PSLVERR itself. Full-word writes
+  // (pstrb = '1) and all reads are passed through unchanged.
+  //
+  // Software consequence: the GPIO must be accessed with 32-bit, word-aligned
+  // loads and stores. A sub-word store now faults instead of corrupting.
+  logic                  s_sub_word_wr;
+  logic [DATA_WIDTH-1:0] s_bridge_prdata;
+  logic                  s_bridge_pready;
+  logic                  s_bridge_pslverr;
+
+  // Qualified with penable so PSLVERR/PREADY are only forced in the ACCESS
+  // phase, never during SETUP. Gating penable alone is enough to block the
+  // write: the bridge only raises reg valid on psel & penable.
+  assign s_sub_word_wr = apb_req_i.psel & apb_req_i.penable & apb_req_i.pwrite &
+                         ~(&apb_req_i.pstrb);
+
+  assign apb_rsp_o.prdata  = s_bridge_prdata;
+  assign apb_rsp_o.pready  = s_sub_word_wr ? 1'b1 : s_bridge_pready;
+  assign apb_rsp_o.pslverr = s_sub_word_wr ? 1'b1 : s_bridge_pslverr;
+
   // Convert APB to reg_bus
   REG_BUS #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH)) s_reg_bus(.clk_i);
   apb_to_reg i_abp_to_reg (
     .clk_i,
     .rst_ni,
-    .penable_i ( apb_req_i.penable ),
+    .penable_i ( apb_req_i.penable & ~s_sub_word_wr ),
     .pwrite_i  ( apb_req_i.pwrite  ),
     .paddr_i   ( apb_req_i.paddr   ),
-    .psel_i    ( apb_req_i.psel    ),
+    .psel_i    ( apb_req_i.psel    & ~s_sub_word_wr ),
     .pwdata_i  ( apb_req_i.pwdata  ),
-    .prdata_o  ( apb_rsp_o.prdata  ),
-    .pready_o  ( apb_rsp_o.pready  ),
-    .pslverr_o ( apb_rsp_o.pslverr ),
+    .prdata_o  ( s_bridge_prdata   ),
+    .pready_o  ( s_bridge_pready   ),
+    .pslverr_o ( s_bridge_pslverr  ),
     .reg_o     ( s_reg_bus         )
   );
 

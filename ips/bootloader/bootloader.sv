@@ -52,6 +52,19 @@
 //   is ever accessed. There are >5000 idle cycles in S_CLEAR_SRAM before
 //   SPI is needed, so this costs nothing timing-wise.
 //
+//   *** FIX (reset synchronizer revision) ***
+//   The original always_ff block had `@(posedge clk_i or negedge hard_rst_ni
+//   or negedge soft_rst_ni)` — two async resets. warm_boot_q was assigned
+//   differently in each async branch (0 vs 1) and never in the clocked branch,
+//   creating an inferred SR latch (InferLatch / SYNTH_12608). Both resets
+//   asserted simultaneously produced a live sim/synthesis mismatch.
+//
+//   Fix: soft_rst_ni is now synchronized through a 2-FF chain
+//   (soft_rst_sync_q) and handled in the synchronous clocked branch. The
+//   sensitivity list is reduced to `@(posedge clk_i or negedge hard_rst_ni)`
+//   — a single async reset. warm_boot_q maps to a standard async-reset DFF.
+//   Soft reset detection has 2-3 cycles of latency, which is acceptable.
+//
 // BOOT FLOW:
 //   Cold Boot (hard_rst_ni LOW→HIGH):
 //     S_RESET → S_CLEAR_SRAM → one-time SPI config → chunked fetch →
@@ -346,6 +359,24 @@ module bootloader #(
   // Warm boot flag (set by soft reset, cleared by hard reset)
   logic warm_boot_q;
 
+  // --- Soft-reset synchronizer (async assert, sync deassert into clk_i) ---
+  // Used only for warm_boot_q detection and synchronous soft-reset handling.
+  // The main always_ff block uses only hard_rst_ni for its async reset,
+  // eliminating the dual-async-reset SR latch on warm_boot_q.
+  logic [1:0] soft_rst_sync_q;  // 2-FF synchronizer chain
+  logic       soft_rst_sync_n;  // synchronized soft_rst_ni (active-low)
+
+  always_ff @(posedge clk_i or negedge hard_rst_ni) begin
+    if (!hard_rst_ni) begin
+      soft_rst_sync_q <= 2'b11;      // de-asserted value: 2'b00 would read as a
+                                     // soft reset for 2 cycles after every cold
+                                     // boot and set warm_boot_q, skipping the fetch
+    end else begin
+      soft_rst_sync_q <= {soft_rst_sync_q[0], soft_rst_ni};
+    end
+  end
+  assign soft_rst_sync_n = soft_rst_sync_q[1];
+
   // Reset output registers
   logic core_rst_q;       // 0 = core in reset
   logic periph_rst_q;     // 0 = peripherals in reset
@@ -532,7 +563,7 @@ module bootloader #(
   // ===========================================================================
   //  Sequential Logic
   // ===========================================================================
-  always_ff @(posedge clk_i or negedge hard_rst_ni or negedge soft_rst_ni) begin
+  always_ff @(posedge clk_i or negedge hard_rst_ni) begin
     if (!hard_rst_ni) begin
       // ===== Cold Boot Reset =====
       state_q        <= S_RESET;
@@ -559,144 +590,155 @@ module bootloader #(
       periph_rst_q   <= 1'b0;
       spi_rst_q      <= 1'b0;    // CHANGED: was 1'b1
 
-    end else if (!soft_rst_ni) begin
-      // ===== Warm Boot Reset =====
-      state_q        <= S_RESET;
-      warm_boot_q    <= 1'b1;    // Flag: skip SPI fetch
-      flash_addr_q   <= FLASH_START_ADDR;
-      dest_addr_q    <= DEST_ADDR_INIT;
-      word_cnt_q     <= '0;
-      chunk_left_q   <= '0;
-      rxfifo_data_q  <= '0;
-      clear_addr_q   <= CLEAR_ADDR_INIT;
-      clear_cnt_q    <= '0;
-      flash_wait_cnt_q <= '0;
-      aw_done_q      <= 1'b0;
-      w_done_q       <= 1'b0;
-      apb_phase_q    <= 1'b0;
-      rst_hold_cnt_q <= '0;
-      // Reset outputs: everything held LOW (SPI not needed for warm boot)
-      core_rst_q     <= 1'b0;
-      periph_rst_q   <= 1'b0;
-      spi_rst_q      <= 1'b0;
-
     end else begin
       // ===== Normal Clocked Operation =====
-      state_q <= state_d;
 
       // -----------------------------------------------------------------
-      // AXI-Lite write handshake tracking
+      // Synchronous soft-reset detection
       // -----------------------------------------------------------------
-      if (is_axi_write_state(state_q)) begin
-        if (axi_req_o.aw_valid && axi_resp_i.aw_ready) aw_done_q <= 1'b1;
-        if (axi_req_o.w_valid  && axi_resp_i.w_ready)  w_done_q  <= 1'b1;
-        if (axi_resp_i.b_valid) begin
-          aw_done_q <= 1'b0;
-          w_done_q  <= 1'b0;
-        end
-      end
-
-      // -----------------------------------------------------------------
-      // APB phase tracking: 0=setup → 1=access → 0 (on PREADY)
-      // -----------------------------------------------------------------
-      if (is_apb_state(state_q)) begin
-        if (!apb_phase_q)
-          apb_phase_q <= 1'b1;              // Setup → Access
-        else if (apb_mst_resp_i.pready)
-          apb_phase_q <= 1'b0;              // Access complete → reset
-      end else begin
-        apb_phase_q <= 1'b0;                // Reset between APB states
-      end
-
-      // -----------------------------------------------------------------
-      // Capture RX FIFO data on APB read completion
-      // -----------------------------------------------------------------
-      if (state_q == S_READ_FIFO && apb_phase_q && apb_mst_resp_i.pready)
-        rxfifo_data_q <= {apb_mst_resp_i.prdata[7:0],
-                          apb_mst_resp_i.prdata[15:8],
-                          apb_mst_resp_i.prdata[23:16],
-                          apb_mst_resp_i.prdata[31:24]};
-
-      // -----------------------------------------------------------------
-      // SRAM clear counter / address management
-      // -----------------------------------------------------------------
-      if (state_q == S_CLEAR_SRAM && axi_resp_i.b_valid) begin
-        clear_cnt_q <= clear_cnt_q + 1'b1;
-        if (clear_cnt_q + 1 == ISRAM_NUM_WORDS[CLEAR_CNT_W-1:0])
-          clear_addr_q <= DSRAM_BASE_ADDR;        // Cross from ISRAM to DSRAM
-        else
-          clear_addr_q <= clear_addr_q + AXI_ADDR_WIDTH'(4);
-      end
-
-      // -----------------------------------------------------------------
-      // Firmware word counter / address management
-      // -----------------------------------------------------------------
-      if (state_q == S_CHECK_DONE) begin
-        // flash_addr_q advances per word even though the flash auto-increments
-        // within a burst: that keeps it pointing at the correct byte address to
-        // program into SPIADR at the head of the NEXT chunk.
-        flash_addr_q <= flash_addr_q + 24'd4;
-        word_cnt_q   <= word_cnt_q + 1'b1;
-        if (chunk_left_q != '0)
-          chunk_left_q <= chunk_left_q - 1'b1;    // one word consumed from burst
-        if (word_cnt_q + 1 == NUM_INSTR_WORDS[WORD_CNT_W-1:0])
-          dest_addr_q <= DSRAM_BASE_ADDR;         // Cross from ISRAM to DSRAM
-        else
-          dest_addr_q <= dest_addr_q + AXI_ADDR_WIDTH'(4);
-      end
-
-      // -----------------------------------------------------------------
-      // Chunk word counter: armed when the burst length is programmed
-      // -----------------------------------------------------------------
-      if (state_q == S_INIT_SPILEN && apb_phase_q && apb_mst_resp_i.pready)
-        chunk_left_q <= chunk_size;
-
-      // -----------------------------------------------------------------
-      // Flash power-up wait counter
-      // -----------------------------------------------------------------
-      if (state_q == S_FLASH_WAIT)
-        flash_wait_cnt_q <= flash_wait_cnt_q + 1'b1;
-      else
+      // soft_rst_sync_n is the 2-FF synchronized version of soft_rst_ni.
+      // While it is asserted (LOW), we re-initialize all state to warm-boot
+      // reset values. This replaces the old async `else if (!soft_rst_ni)`
+      // branch and eliminates the dual-async-reset SR latch on warm_boot_q.
+      if (!soft_rst_sync_n) begin
+        // ===== Warm Boot Reset (synchronous) =====
+        state_q          <= S_RESET;
+        warm_boot_q      <= 1'b1;    // Flag: skip SPI fetch on warm boot
+        flash_addr_q     <= FLASH_START_ADDR;
+        dest_addr_q      <= DEST_ADDR_INIT;
+        word_cnt_q       <= '0;
+        chunk_left_q     <= '0;
+        rxfifo_data_q    <= '0;
+        clear_addr_q     <= CLEAR_ADDR_INIT;
+        clear_cnt_q      <= '0;
         flash_wait_cnt_q <= '0;
+        aw_done_q        <= 1'b0;
+        w_done_q         <= 1'b0;
+        apb_phase_q      <= 1'b0;
+        rst_hold_cnt_q   <= '0;
+        // Reset outputs: everything held LOW (SPI not needed for warm boot)
+        core_rst_q       <= 1'b0;
+        periph_rst_q     <= 1'b0;
+        spi_rst_q        <= 1'b0;
 
-      // -----------------------------------------------------------------
-      // Clean-slate reset hold counter
-      // -----------------------------------------------------------------
-      if (state_q == S_CLEAN_HOLD)
-        rst_hold_cnt_q <= rst_hold_cnt_q + 1'b1;
-      else
-        rst_hold_cnt_q <= '0;
+      end else begin
+        // ===== Normal clocked operation =====
+        state_q <= state_d;
 
-      // -----------------------------------------------------------------
-      // Reset output register management
-      // -----------------------------------------------------------------
-      // FIX: added S_RESET/S_CLEAR_SRAM/S_INIT_CLKDIV branch below to
-      // explicitly RELEASE spi_rst_q (0 -> 1) as soon as the FSM leaves
-      // S_RESET. This produces the genuine negedge->posedge pulse on
-      // spi_rst_ni_o that apb_spi_master's internal flops need to
-      // actually initialize, since spi_rst_q now starts at 0 (not X->1)
-      // on cold-boot entry above.
-      unique case (state_d)
-        S_CLEAR_SRAM, S_FLASH_WAIT, S_INIT_CLKDIV: begin
-          // First real states after S_RESET: release SPI IP from reset early,
-          // long before any APB access is made. Keep core/periph in reset
-          // until the clean-slate phase.
-          spi_rst_q <= 1'b1;
+        // -----------------------------------------------------------------
+        // AXI-Lite write handshake tracking
+        // -----------------------------------------------------------------
+        if (is_axi_write_state(state_q)) begin
+          if (axi_req_o.aw_valid && axi_resp_i.aw_ready) aw_done_q <= 1'b1;
+          if (axi_req_o.w_valid  && axi_resp_i.w_ready)  w_done_q  <= 1'b1;
+          if (axi_resp_i.b_valid) begin
+            aw_done_q <= 1'b0;
+            w_done_q  <= 1'b0;
+          end
         end
-        S_CLEAN_ASSERT, S_CLEAN_HOLD: begin
-          // Assert all resets LOW for clean-slate
-          core_rst_q   <= 1'b0;
-          periph_rst_q <= 1'b0;
-          spi_rst_q    <= 1'b0;
+
+        // -----------------------------------------------------------------
+        // APB phase tracking: 0=setup → 1=access → 0 (on PREADY)
+        // -----------------------------------------------------------------
+        if (is_apb_state(state_q)) begin
+          if (!apb_phase_q)
+            apb_phase_q <= 1'b1;              // Setup → Access
+          else if (apb_mst_resp_i.pready)
+            apb_phase_q <= 1'b0;              // Access complete → reset
+        end else begin
+          apb_phase_q <= 1'b0;                // Reset between APB states
         end
-        S_CLEAN_RELEASE, S_DONE: begin
-          // Release all resets HIGH → runtime
-          core_rst_q   <= 1'b1;
-          periph_rst_q <= 1'b1;
-          spi_rst_q    <= 1'b1;
+
+        // -----------------------------------------------------------------
+        // Capture RX FIFO data on APB read completion
+        // -----------------------------------------------------------------
+        if (state_q == S_READ_FIFO && apb_phase_q && apb_mst_resp_i.pready)
+          rxfifo_data_q <= {apb_mst_resp_i.prdata[7:0],
+                            apb_mst_resp_i.prdata[15:8],
+                            apb_mst_resp_i.prdata[23:16],
+                            apb_mst_resp_i.prdata[31:24]};
+
+        // -----------------------------------------------------------------
+        // SRAM clear counter / address management
+        // -----------------------------------------------------------------
+        if (state_q == S_CLEAR_SRAM && axi_resp_i.b_valid) begin
+          clear_cnt_q <= clear_cnt_q + 1'b1;
+          if (clear_cnt_q + 1 == ISRAM_NUM_WORDS[CLEAR_CNT_W-1:0])
+            clear_addr_q <= DSRAM_BASE_ADDR;        // Cross from ISRAM to DSRAM
+          else
+            clear_addr_q <= clear_addr_q + AXI_ADDR_WIDTH'(4);
         end
-        default: ;   // Retain current values (set by async reset)
-      endcase
+
+        // -----------------------------------------------------------------
+        // Firmware word counter / address management
+        // -----------------------------------------------------------------
+        if (state_q == S_CHECK_DONE) begin
+          // flash_addr_q advances per word even though the flash auto-increments
+          // within a burst: that keeps it pointing at the correct byte address to
+          // program into SPIADR at the head of the NEXT chunk.
+          flash_addr_q <= flash_addr_q + 24'd4;
+          word_cnt_q   <= word_cnt_q + 1'b1;
+          if (chunk_left_q != '0)
+            chunk_left_q <= chunk_left_q - 1'b1;    // one word consumed from burst
+          if (word_cnt_q + 1 == NUM_INSTR_WORDS[WORD_CNT_W-1:0])
+            dest_addr_q <= DSRAM_BASE_ADDR;         // Cross from ISRAM to DSRAM
+          else
+            dest_addr_q <= dest_addr_q + AXI_ADDR_WIDTH'(4);
+        end
+
+        // -----------------------------------------------------------------
+        // Chunk word counter: armed when the burst length is programmed
+        // -----------------------------------------------------------------
+        if (state_q == S_INIT_SPILEN && apb_phase_q && apb_mst_resp_i.pready)
+          chunk_left_q <= chunk_size;
+
+        // -----------------------------------------------------------------
+        // Flash power-up wait counter
+        // -----------------------------------------------------------------
+        if (state_q == S_FLASH_WAIT)
+          flash_wait_cnt_q <= flash_wait_cnt_q + 1'b1;
+        else
+          flash_wait_cnt_q <= '0;
+
+        // -----------------------------------------------------------------
+        // Clean-slate reset hold counter
+        // -----------------------------------------------------------------
+        if (state_q == S_CLEAN_HOLD)
+          rst_hold_cnt_q <= rst_hold_cnt_q + 1'b1;
+        else
+          rst_hold_cnt_q <= '0;
+
+        // -----------------------------------------------------------------
+        // Reset output register management
+        // -----------------------------------------------------------------
+        // FIX: added S_RESET/S_CLEAR_SRAM/S_INIT_CLKDIV branch below to
+        // explicitly RELEASE spi_rst_q (0 -> 1) as soon as the FSM leaves
+        // S_RESET. This produces the genuine negedge->posedge pulse on
+        // spi_rst_ni_o that apb_spi_master's internal flops need to
+        // actually initialize, since spi_rst_q now starts at 0 (not X->1)
+        // on cold-boot entry above.
+        unique case (state_d)
+          S_CLEAR_SRAM, S_FLASH_WAIT, S_INIT_CLKDIV: begin
+            // First real states after S_RESET: release SPI IP from reset early,
+            // long before any APB access is made. Keep core/periph in reset
+            // until the clean-slate phase.
+            spi_rst_q <= 1'b1;
+          end
+          S_CLEAN_ASSERT, S_CLEAN_HOLD: begin
+            // Assert all resets LOW for clean-slate
+            core_rst_q   <= 1'b0;
+            periph_rst_q <= 1'b0;
+            spi_rst_q    <= 1'b0;
+          end
+          S_CLEAN_RELEASE, S_DONE: begin
+            // Release all resets HIGH → runtime
+            core_rst_q   <= 1'b1;
+            periph_rst_q <= 1'b1;
+            spi_rst_q    <= 1'b1;
+          end
+          default: ;   // Retain current values (set by async reset)
+        endcase
+      end  // soft_rst_sync_n
     end
   end
 

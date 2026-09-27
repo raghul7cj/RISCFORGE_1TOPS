@@ -109,6 +109,14 @@
 ../axi_lite_to_apb/rtl/axi_lite_to_apb.sv
 
 // =============================================================================
+// Section 6b: Bus Timeout Monitors
+// NOTE: apb_timeout_monitor is interposed on the APB response path only;
+//       axi_lite_timeout_monitor sits on the core's AXI-Lite master port.
+// =============================================================================
+../bus_monitors/apb_timeout_monitor.sv
+../bus_monitors/axi_lite_timeout_monitor.sv
+
+// =============================================================================
 // Section 7: APB I2C Master
 // NOTE: i2c_master_defines.sv is `included by apb_i2c.sv (resolved via +incdir)
 // =============================================================================

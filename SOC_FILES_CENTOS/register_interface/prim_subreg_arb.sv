@@ -50,9 +50,23 @@ module prim_subreg_arb #(
   end else if (SWACCESS == "W1C") begin : gen_w1c
     // If SWACCESS is W1C, then assume hw tries to set.
     // So, give a chance HW to set when SW tries to clear.
-    // If both try to set/clr at the same bit pos, SW wins.
+    //
+    // RISCFORGE CHANGE — HW set now wins when both occur at the same bit pos.
+    // Upstream is:
+    //     assign wr_data = (de ? d : q) & (we ? ~wd : '1);   // SW wins
+    // which silently drops an event that arrives on the exact clock edge
+    // software clears the flag: with de=1 (new event) and wd=1 (clear), the
+    // ~wd mask forces the result to 0 and nothing records that it happened.
+    // Found on the GPIO interrupt status registers (tb_gpio_apb_directed TC18).
+    //
+    // ONLY VALID FOR SINGLE-BIT FIELDS. Every W1C field in gpio_reg_top -- the
+    // only reggen register block in this SoC -- is DW=1, and its de means "an
+    // event occurred on this exact bit", so keeping d when de=1 cannot
+    // resurrect a bit the write was clearing. FOR A MULTI-BIT W1C FIELD THIS
+    // IS WRONG: d also carries the other, still-pending bits of the field.
+    // Re-check this branch before adding another reggen IP to the build.
     assign wr_en   = we | de;
-    assign wr_data = (de ? d : q) & (we ? ~wd : '1);
+    assign wr_data = de ? d : (q & (we ? ~wd : '1));
   end else if (SWACCESS == "W0C") begin : gen_w0c
     assign wr_en   = we | de;
     assign wr_data = (de ? d : q) & (we ? wd : '1);
