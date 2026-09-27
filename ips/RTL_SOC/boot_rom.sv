@@ -54,7 +54,9 @@ module boot_rom #(
   // the boot image over the top. Same pattern as Instruction_Memory.v.
   // -------------------------------------------------------------------------
   initial begin : init_rom
-    for (int i = 0; i < NUM_WORDS; i++) begin
+    mem[0] = 32'h0002_8137;  // lui x2, 0x28  (sp = 0x0002_8000 top of DSRAM)
+    mem[1] = 32'h7FD0_F06F;  // jal x0, +0xFFFC -> 0x0001_0000 (ISRAM base)
+    for (int i = 2; i < NUM_WORDS; i++) begin
       mem[i] = 32'h0000_0013;  // NOP (ADDI x0, x0, 0)
     end
     $readmemh(HEX_FILE, mem);

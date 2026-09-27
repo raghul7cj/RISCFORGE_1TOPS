@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RISCFORGE 1TOPS — Synopsys SpyGlass SoC Lint Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #eff6ff;
+      --accent: #0284c7;
+      --accent-light: #e0f2fe;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --info: #0369a1;
+      --info-bg: #f0f9ff;
+      --info-border: #bae6fd;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-size: 13.5px;
+      line-height: 1.6;
+      padding: 36px 16px;
+    }
+
+    .document-container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      padding: 48px 56px;
+    }
+
+    .doc-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .doc-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .doc-header .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .meta-badge-group {
+      text-align: right;
+    }
+
+    .status-badge {
+      display: inline-block;
+      background: var(--info-bg);
+      color: var(--info);
+      border: 1px solid var(--info-border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .meta-date {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-left: 3px solid var(--accent);
+      padding-left: 10px;
+      margin: 32px 0 14px;
+    }
+
+    h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 20px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0 22px;
+    }
+
+    .stat-card {
+      border-radius: 6px;
+      padding: 14px 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .stat-card.fatal { background: #fef2f2; border-color: #fecaca; }
+    .stat-card.error { background: #fff1f2; border-color: #fecdd3; }
+    .stat-card.warning { background: #fffbeb; border-color: #fde68a; }
+    .stat-card.info { background: #f0f9ff; border-color: #bae6fd; }
+
+    .stat-num {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.2;
+    }
+    .stat-card.fatal .stat-num { color: #991b1b; }
+    .stat-card.error .stat-num { color: #be123c; }
+    .stat-card.warning .stat-num { color: #b45309; }
+    .stat-card.info .stat-num { color: #0369a1; }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .diagram-wrapper {
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    tr:nth-child(even) td {
+      background: #fcfcfd;
+    }
+
+    .badge {
+      display: inline-block;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-error { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+    .badge-info { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+    .badge-pass { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 14px 16px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 12px 0 16px;
+    }
+
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-light);
+      padding: 12px 14px;
+      border-radius: 0 6px 6px 0;
+      margin: 14px 0;
+      font-size: 12.5px;
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      margin-top: 36px;
+      padding-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    @media print {
+      body { background: #ffffff; padding: 0; }
+      .document-container { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+      pre { white-space: pre-wrap; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="document-container">
+  <!-- Header -->
+  <div class="doc-header">
+    <div>
+      <h1>RISCFORGE 1TOPS — SpyGlass SoC Lint Report</h1>
+      <div class="subtitle">Complete SoC Subsystem (<code>riscforge_soc_subsystem</code>) Static RTL & Rule Quality Audit</div>
+    </div>
+    <div class="meta-badge-group">
+      <div class="status-badge">&#9679; Audit Completed</div>
+      <div class="meta-date">2026-09-09 | Synopsys SpyGlass U-2023.03-SP2</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Executive Summary -->
+  <h2>1. Executive Summary</h2>
+  <p>
+    A full static RTL lint analysis has been performed on the entire <strong>RISCFORGE 1TOPS SoC Subsystem</strong> (<code>riscforge_soc_subsystem</code>) using <strong>Synopsys SpyGlass U-2023.03-SP2</strong> on the server environment (<code>172.16.33.48</code>). The audit evaluated all 292 rules across GuideWare SoC methodologies, covering RTL coding guidelines, synthesis compatibility, multi-driven nets, inferred latches, port width integrity, and FSM structures.
+  </p>
+
+  <div class="highlight-grid">
+    <div class="stat-card fatal">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Fatal Errors</div>
+    </div>
+    <div class="stat-card error">
+      <div class="stat-num">42</div>
+      <div class="stat-label">Lint Errors</div>
+    </div>
+    <div class="stat-card warning">
+      <div class="stat-num">404</div>
+      <div class="stat-label">Turbo Warnings</div>
+    </div>
+    <div class="stat-card info">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Info Messages</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Key Audit Takeaways:</strong> The design has <strong>0 Fatal Syntax/Elaboration errors</strong> and successfully elaborated into full SoC netlists. The 42 reported Errors originate primarily from (1) Booth multiplier CSA partial product port width truncations (`W110`), (2) behavioral 32 KB memory array synthesis thresholds (`SYNTH_5273` / `W123`), and (3) one inferred latch in the legacy bootloader FSM (`InferLatch`).
+  </div>
+
+  <!-- Section 2: Methodology & Environment -->
+  <h2>2. Tool Configuration & Hierarchy Analyzed</h2>
+  <p>
+    The SpyGlass session was configured with SystemVerilog-2009 extensions (<code>set_option enableSV09 yes</code>) to support modern macro assertions and mixed Verilog/SystemVerilog RTL blocks across 15 design directories.
+  </p>
+
+  <div class="diagram-wrapper">
+    <svg width="740" height="230" viewBox="0 0 740 230" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background Framing -->
+      <rect x="10" y="10" width="720" height="210" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="25" y="32" font-family="Inter" font-size="12" font-weight="700" fill="#1e3a8a">SoC Hierarchy Linted: riscforge_soc_subsystem (Top)</text>
+
+      <!-- Core Box -->
+      <rect x="30" y="55" width="200" height="145" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2"/>
+      <text x="130" y="78" font-family="Inter" font-size="11.5" font-weight="700" fill="#1e3a8a" text-anchor="middle">i_riscv_core (top.v)</text>
+      <rect x="45" y="92" width="170" height="24" rx="4" fill="#ffffff" stroke="#93c5fd" stroke-width="1"/>
+      <text x="130" y="108" font-family="JetBrains Mono" font-size="10" fill="#1e40af" text-anchor="middle">Fetch / Decode / Memory</text>
+      <rect x="45" y="122" width="170" height="24" rx="4" fill="#ffffff" stroke="#93c5fd" stroke-width="1"/>
+      <text x="130" y="138" font-family="JetBrains Mono" font-size="10" fill="#1e40af" text-anchor="middle">Execute (ALU / LSU)</text>
+      <rect x="45" y="152" width="170" height="36" rx="4" fill="#fef2f2" stroke="#f87171" stroke-width="1"/>
+      <text x="130" y="167" font-family="JetBrains Mono" font-size="9.5" font-weight="700" fill="#991b1b" text-anchor="middle">rv32m_unit (u_mul / u_div)</text>
+      <text x="130" y="180" font-family="Inter" font-size="8.5" fill="#b91c1c" text-anchor="middle">33x W110 Width Mismatches</text>
+
+      <!-- Bus Interconnect Box -->
+      <rect x="250" y="55" width="220" height="145" rx="6" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.2"/>
+      <text x="360" y="78" font-family="Inter" font-size="11.5" font-weight="700" fill="#b45309" text-anchor="middle">Memory & Bus Infrastructure</text>
+      <rect x="265" y="92" width="190" height="24" rx="4" fill="#ffffff" stroke="#fcd34d" stroke-width="1"/>
+      <text x="360" y="108" font-family="JetBrains Mono" font-size="10" fill="#78350f" text-anchor="middle">axi_lite_xbar (2S x 3M)</text>
+      <rect x="265" y="122" width="190" height="24" rx="4" fill="#ffffff" stroke="#fcd34d" stroke-width="1"/>
+      <text x="360" y="138" font-family="JetBrains Mono" font-size="10" fill="#78350f" text-anchor="middle">axi_lite_to_apb (6 Slaves)</text>
+      <rect x="265" y="152" width="190" height="36" rx="4" fill="#ffffff" stroke="#fcd34d" stroke-width="1"/>
+      <text x="360" y="167" font-family="JetBrains Mono" font-size="9.5" fill="#78350f" text-anchor="middle">i_isram & i_dsram (sram_sp)</text>
+      <text x="360" y="180" font-family="Inter" font-size="8.5" fill="#92400e" text-anchor="middle">2x W123 Large Array Flags</text>
+
+      <!-- APB Peripherals & Bootloader Box -->
+      <rect x="490" y="55" width="220" height="145" rx="6" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.2"/>
+      <text x="600" y="78" font-family="Inter" font-size="11.5" font-weight="700" fill="#15803d" text-anchor="middle">Peripherals & Bootloader</text>
+      <rect x="505" y="92" width="190" height="24" rx="4" fill="#ffffff" stroke="#86efac" stroke-width="1"/>
+      <text x="600" y="108" font-family="JetBrains Mono" font-size="10" fill="#166534" text-anchor="middle">UART0 / SPI / I2C / Timers</text>
+      <rect x="505" y="122" width="190" height="24" rx="4" fill="#ffffff" stroke="#86efac" stroke-width="1"/>
+      <text x="600" y="138" font-family="JetBrains Mono" font-size="10" fill="#166534" text-anchor="middle">GPIO / Register Interface</text>
+      <rect x="505" y="152" width="190" height="36" rx="4" fill="#fef2f2" stroke="#f87171" stroke-width="1"/>
+      <text x="600" y="167" font-family="JetBrains Mono" font-size="9.5" font-weight="700" fill="#991b1b" text-anchor="middle">i_bootloader (bootloader.sv)</text>
+      <text x="600" y="180" font-family="Inter" font-size="8.5" fill="#b91c1c" text-anchor="middle">1x InferLatch (warm_boot_q)</text>
+    </svg>
+  </div>
+
+  <!-- Section 3: Summary of Rules by Severity -->
+  <h2>3. Rule Violation Summary Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Rule ID</th>
+        <th>Count</th>
+        <th>Sub-Policy</th>
+        <th>Description & Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-error">ERROR</span></td>
+        <td><strong>W110</strong></td>
+        <td>33</td>
+        <td>lint</td>
+        <td>Port width mismatches between formal and actual connections in multiplier CSA tree (<code>rv32m_mul.v</code>)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-error">ERROR</span></td>
+        <td><strong>ErrorAnalyzeBBox</strong></td>
+        <td>3</td>
+        <td>Blackbox</td>
+        <td>Unsynthesized design units (<code>boot_rom</code>, <code>sram_sp</code>, <code>Instruction_Memory_new</code>) due to simulation constructs</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-error">ERROR</span></td>
+        <td><strong>W123</strong></td>
+        <td>2</td>
+        <td>lint</td>
+        <td>Memory array bitwidth exceeds default 4096-bit <code>mthresh</code> (<code>sram_sp.sv</code> & <code>Instruction_Memory.v</code>)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-error">ERROR</span></td>
+        <td><strong>SYNTH_5273</strong></td>
+        <td>2</td>
+        <td>Design Read</td>
+        <td>Net variable bit count (262,144 bits) exceeds SpyGlass synthesis threshold</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-error">ERROR</span></td>
+        <td><strong>InferLatch</strong></td>
+        <td>1</td>
+        <td>latch</td>
+        <td>Unintentional latch inferred on <code>warm_boot_q</code> in <code>bootloader.sv</code></td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-error">ERROR</span></td>
+        <td><strong>SYNTH_5260</strong></td>
+        <td>1</td>
+        <td>Design Read</td>
+        <td>SV <code>string</code> parameter data type in <code>boot_rom.sv</code> (unsupported in static synthesis)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>W287b</strong></td>
+        <td>707</td>
+        <td>lint</td>
+        <td>Unconnected output ports on sub-module instances (AXI demuxes, GPIO, and UART status pins)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>W240</strong></td>
+        <td>258</td>
+        <td>lint</td>
+        <td>Declared inputs not read (e.g., unused MMIO register fields, unreferenced protocol bits)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>W415a</strong></td>
+        <td>178</td>
+        <td>lint</td>
+        <td>Signal multiply assigned in same procedural scope / default assignment pattern</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>W528</strong></td>
+        <td>61</td>
+        <td>lint</td>
+        <td>Declared internal signals driven/set but never consumed elsewhere</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>W263</strong></td>
+        <td>10</td>
+        <td>lint</td>
+        <td>Case expression width does not match case select expression width</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>STARC05-2.2.3.3</strong></td>
+        <td>6</td>
+        <td>starc2005</td>
+        <td>Flip-flop assigned over the same signal in sequential always block (<code>csr_regfile.v</code>, <code>bootloader.sv</code>)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-warning">WARNING</span></td>
+        <td><strong>STARC05-2.11.3.1</strong></td>
+        <td>3</td>
+        <td>starc2005</td>
+        <td>FSM sequential and combinational logic combined in single block (<code>apb_i2c</code>, <code>rv32m_div.v</code>)</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-info">INFO</span></td>
+        <td><strong>DetectTopDesignUnits</strong></td>
+        <td>1</td>
+        <td>Design Read</td>
+        <td>Top design unit identified as <code>riscforge_soc_subsystem</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 4: Deep-Dive on Significant Violations -->
+  <h2>4. Detailed Analysis of Significant Findings</h2>
+
+  <h3>4.1 RV32M Hardware Multiplier Port Width Truncations (Rule <code>W110</code> — 33 Violations)</h3>
+  <p>
+    Inside <code>ips/riscv_core/rtl/rv32m_mul.v</code>, the Booth Radix-4 multiplier instantiates 17 partial product generators (<code>pp_gen</code>) and 16 carry-save adder (<code>csa</code>) stages.
+  </p>
+  <ul>
+    <li><strong>Booth PP Generators</strong>: <code>u_ppg</code> instances connect formal 6-bit port <code>shift[5:0]</code> to literal indices <code>2*i</code> (actual width 2 to 5 bits). Verilog implicitly zero-extends, but SpyGlass flags this as width incompatibility.</li>
+    <li><strong>CSA Carry Tree</strong>: The CSA module declares <code>output [65:0] co</code> (66 bits), but the parent wire is declared as <code>[64:0]</code> (65 bits). Bit 65 of carry-out is dropped.</li>
+  </ul>
+<pre><code>// Example from rv32m_mul.v:
+genvar i;
+generate
+  for (i = 0; i < 17; i = i + 1) begin: gen_booth
+    // shift port is 6 bits wide; (2*i) evaluates to literal 2..5 bit integer:
+    pp_gen u_ppg (.a(a_reg), .booth_code(booth_code[i]), .shift(2*i), .pp(pp[i]));
+  end
+endgenerate</code></pre>
+
+  <h3>4.2 Inferred Latch in Bootloader (Rule <code>InferLatch</code> — 1 Violation)</h3>
+  <p>
+    In <code>ips/bootloader/bootloader.sv:476</code>, the signal <code>warm_boot_q</code> is assigned in an incomplete procedural block without full assignment across all branch paths, causing SpyGlass to infer an asynchronous transparent latch.
+  </p>
+<pre><code>// bootloader.sv:476
+// warm_boot_q is not assigned in all branches of the state machine, resulting in:
+Latch inferred for signal 'warm_boot_q' in module 'bootloader'</code></pre>
+
+  <h3>4.3 Large Memory Array Declarations (Rule <code>SYNTH_5273</code> & <code>W123</code>)</h3>
+  <p>
+    In <code>sram_sp.sv</code> and <code>Instruction_Memory.v</code>, behavioral memories (32 KB = 8,192 words &times; 32 bits = 262,144 bits) exceed the default static lint threshold (<code>mthresh = 4096</code>). For production ASIC flows, these behavioral arrays are mapped to compiled Foundry SRAM macros (SRAM BBox).
+  </p>
+
+  <!-- Section 5: Artifacts and Report Outputs -->
+  <h2>5. Generated Report Artifacts & File Deliverables</h2>
+  <p>
+    All raw SpyGlass logs, comprehensive rule reports, and design summaries have been generated on the server and synced to the local repository:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Report File</th>
+        <th>Path</th>
+        <th>Size</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>SpyGlass Summary</strong></td>
+        <td><code>ips/spyglass/reports/spyglass_summary.rpt</code></td>
+        <td>7.5 KB</td>
+        <td>Full categorical breakdown of messages across all 12 rule policies</td>
+      </tr>
+      <tr>
+        <td><strong>SpyGlass MoreSimple</strong></td>
+        <td><code>ips/spyglass/reports/spyglass_moresimple.rpt</code></td>
+        <td>388 KB</td>
+        <td>Line-by-line violation log with exact file paths, line numbers, and rule IDs</td>
+      </tr>
+      <tr>
+        <td><strong>Turbo Lint Summary</strong></td>
+        <td><code>ips/spyglass/reports/spyglass_turbo_summary.rpt</code></td>
+        <td>8.0 KB</td>
+        <td>Summary report for the optimized <code>lint/lint_turbo_rtl</code> goal</td>
+      </tr>
+      <tr>
+        <td><strong>Turbo MoreSimple</strong></td>
+        <td><code>ips/spyglass/reports/spyglass_turbo_moresimple.rpt</code></td>
+        <td>184 KB</td>
+        <td>Line-by-line violation report for Turbo lint goal</td>
+      </tr>
+      <tr>
+        <td><strong>Elaboration Summary</strong></td>
+        <td><code>ips/spyglass/reports/elab_summary.rpt</code></td>
+        <td>82.5 KB</td>
+        <td>Complete module elaboration tree and instantiated hierarchy report</td>
+      </tr>
+      <tr>
+        <td><strong>Signal Usage Report</strong></td>
+        <td><code>ips/spyglass/reports/SignalUsageReport.rpt</code></td>
+        <td>16.6 KB</td>
+        <td>Driver and load connectivity analysis for all SoC buses and pins</td>
+      </tr>
+      <tr>
+        <td><strong>SpyGlass Master Log</strong></td>
+        <td><code>ips/spyglass/reports/spyglass.log</code></td>
+        <td>1.48 MB</td>
+        <td>Full execution transcript from tool startup to license checkin</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>RISCFORGE 1TOPS — SoC Verification & Quality Assurance Suite</div>
+    <div>Synopsys SpyGlass U-2023.03-SP2 | Server: 172.16.33.48</div>
+  </div>
+</div>
+
+</body>
+</html>
+

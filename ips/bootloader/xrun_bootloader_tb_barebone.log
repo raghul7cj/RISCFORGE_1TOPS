@@ -1,0 +1,116 @@
+xrun(64): 22.09-s003: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	22.09-s003: Started on Jul 23, 2026 at 21:15:55 IST
+xrun
+	-f bootloader.f
+		-access +rwc
+		../SOC_FILES/include/common_cells/axi_pkg.sv
+		rtl/bootloader_tb_barebone.sv
+		rtl/bootloader.sv
+		../spi/spi_master/spi_master_clkgen.sv
+		../spi/spi_master/spi_master_fifo.sv
+		../spi/spi_master/spi_master_rx.sv
+		../spi/spi_master/spi_master_tx.sv
+		../spi/spi_master/spi_master_controller.sv
+		../spi/spi_master/spi_master_apb_if.sv
+		../spi/spi_master/apb_spi_master.sv
+		../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
+file: rtl/bootloader_tb_barebone.sv
+	package worklib.tb_bus_pkg:sv
+		errors: 0, warnings: 0
+	module worklib.bootloader_tb:sv
+		errors: 0, warnings: 0
+file: rtl/bootloader.sv
+	module worklib.bootloader:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_clkgen.sv
+	module worklib.spi_master_clkgen:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_fifo.sv
+	module worklib.spi_master_fifo:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_rx.sv
+	module worklib.spi_master_rx:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_tx.sv
+	module worklib.spi_master_tx:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_controller.sv
+	module worklib.spi_master_controller:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_apb_if.sv
+	module worklib.spi_master_apb_if:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/apb_spi_master.sv
+	module worklib.apb_spi_master:sv
+		errors: 0, warnings: 0
+file: ../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
+	module worklib.s25fs512s:sv
+		errors: 0, warnings: 0
+	module worklib.BUFFER:sv
+		errors: 0, warnings: 0
+	module worklib.memory_features:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		tb_bus_pkg
+		axi_pkg
+		bootloader_tb
+		apb_spi_master
+		s25fs512s
+xmelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.s25fs512s:sv <0x50674612>
+			streams: 278, words: 841535
+		worklib.spi_master_rx:sv <0x5cf93696>
+			streams:   9, words:  6682
+		worklib.spi_master_tx:sv <0x0717e58a>
+			streams:  10, words:  7293
+		worklib.spi_master_clkgen:sv <0x399fa317>
+			streams:   6, words:  3174
+		worklib.spi_master_controller:sv <0x2edab329>
+			streams:  38, words: 48081
+		worklib.spi_master_fifo:sv <0x5039f66e>
+			streams:  10, words:  5085
+		worklib.spi_master_apb_if:sv <0x462170a1>
+			streams:  24, words: 18896
+		worklib.apb_spi_master:sv <0x6110f939>
+			streams:  92, words: 29148
+		worklib.bootloader:sv <0x4bffc332>
+			streams:  33, words: 35184
+		worklib.bootloader_tb:sv <0x1f4a0509>
+			streams:  18, words: 14993
+		worklib.memory_features:sv <0x38d896dd>
+			streams:  32, words: 20082
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                     Instances  Unique
+		Modules:                    14      12
+		Verilog packages:            2       2
+		Primitives:                 12       2
+		Timing outputs:              4       4
+		Registers:                 656     651
+		Scalar wires:              240       -
+		Vectored wires:             85       -
+		Named events:                5       5
+		Always blocks:             104     101
+		Initial blocks:            130     130
+		Cont. assignments:          55     100
+		Pseudo assignments:        124     124
+		Timing checks:              44      20
+		Assertions:                  5       5
+		SV Class declarations:       3       3
+		SV Class specializations:    3       3
+		Simulation timescale:      1ps
+	Writing initial simulation snapshot: worklib.bootloader_tb:sv
+Loading snapshot worklib.bootloader_tb:sv .................... Done
+xmsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+xcelium> source /home/install/XCELIUM2209/tools/xcelium/files/xmsimrc
+xcelium> run
+[TB] Finished bootloader smoke test.
+Simulation complete via $finish(1) at time 5095 NS + 0
+./rtl/bootloader_tb_barebone.sv:163     $finish;
+xcelium> exit
+TOOL:	xrun(64)	22.09-s003: Exiting on Jul 23, 2026 at 21:16:00 IST  (total: 00:00:05)

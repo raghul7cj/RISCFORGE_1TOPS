@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RISCFORGE 1TOPS — Cadence JasperGold SoC Superlint Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    :root {
+      --primary: #581c87;
+      --primary-light: #faf5ff;
+      --primary-border: #d8b4fe;
+      --accent: #7e22ce;
+      --accent-light: #f3e8ff;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --info: #0369a1;
+      --info-bg: #f0f9ff;
+      --info-border: #bae6fd;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-size: 13.5px;
+      line-height: 1.6;
+      padding: 36px 16px;
+    }
+
+    .document-container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      padding: 48px 56px;
+    }
+
+    .doc-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .doc-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .doc-header .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .meta-badge-group {
+      text-align: right;
+    }
+
+    .status-badge {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .meta-date {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 32px;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    p { margin-bottom: 12px; color: #334155; }
+    
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .meta-item {
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .meta-val {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 18px 0 26px 0;
+    }
+
+    .metric-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+      background: #ffffff;
+    }
+
+    .metric-card.errors { border-color: var(--danger-border); background: var(--danger-bg); }
+    .metric-card.warnings { border-color: var(--warning-border); background: var(--warning-bg); }
+    .metric-card.info { border-color: var(--info-border); background: var(--info-bg); }
+    .metric-card.success { border-color: var(--success-border); background: var(--success-bg); }
+
+    .metric-val {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.2;
+    }
+
+    .metric-card.errors .metric-val { color: var(--danger); }
+    .metric-card.warnings .metric-val { color: var(--warning); }
+    .metric-card.info .metric-val { color: var(--info); }
+    .metric-card.success .metric-val { color: var(--success); }
+
+    .metric-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      padding: 9px 12px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    tbody tr:nth-child(even) { background-color: #fafafa; }
+    tbody tr:hover { background-color: #f1f5f9; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-err { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+    .badge-warn { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+    .badge-info { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+    .badge-pass { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .diagram-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    .diagram-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
+    .alert-box {
+      border-left: 4px solid var(--warning);
+      background: var(--warning-bg);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+
+    .alert-box.danger {
+      border-left-color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .alert-box.info {
+      border-left-color: var(--info);
+      background: var(--info-bg);
+    }
+
+    .doc-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 11.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="document-container">
+    <!-- Header -->
+    <header class="doc-header">
+      <div>
+        <h1>Cadence JasperGold SoC Superlint Audit</h1>
+        <div class="subtitle">RISCFORGE 1TOPS SoC Subsystem Static RTL Analysis & Formal Checks</div>
+      </div>
+      <div class="meta-badge-group">
+        <span class="status-badge">100% Elaborated (No BBOX)</span>
+        <div class="meta-date">Date: 2026-09-10 | Host: 172.16.33.51</div>
+      </div>
+    </header>
+
+    <!-- Metadata Grid -->
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">EDA Tool</div>
+        <div class="meta-val">JasperGold 2025.06</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Top Module</div>
+        <div class="meta-val">riscforge_soc_subsystem</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Synthesized Gates</div>
+        <div class="meta-val">40,923 Gates</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Total Flip-Flops</div>
+        <div class="meta-val">8,813 Flops</div>
+      </div>
+    </div>
+
+    <!-- Executive Summary Metrics -->
+    <h2>1. Executive Summary & Audit Metrics</h2>
+    <p>
+      Static RTL linting and structural checks were performed on the complete <strong>RISCFORGE 1TOPS SoC Subsystem</strong> using <strong>Cadence JasperGold Superlint (2025.06 FCS 64-bit)</strong> on the dedicated Cadence Server. The design synthesized cleanly with <strong>zero blackboxes</strong> across all 113 modules and 6 SystemVerilog packages.
+    </p>
+
+    <div class="card-grid">
+      <div class="metric-card errors">
+        <div class="metric-val">1</div>
+        <div class="metric-label">Structural Error</div>
+      </div>
+      <div class="metric-card warnings">
+        <div class="metric-val">25</div>
+        <div class="metric-label">Lint Warnings</div>
+      </div>
+      <div class="metric-card warnings">
+        <div class="metric-val">19</div>
+        <div class="metric-label">DFT / IO Warnings</div>
+      </div>
+      <div class="metric-card info">
+        <div class="metric-val">3</div>
+        <div class="metric-label">Info Messages</div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Domain / Category</th>
+          <th>Errors</th>
+          <th>Warnings</th>
+          <th>Info</th>
+          <th>Summary of Findings</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>STRUCTURAL (Reset Tree)</strong></td>
+          <td><span class="badge badge-err">1</span></td>
+          <td><span class="badge badge-warn">7</span></td>
+          <td>0</td>
+          <td><code>RST_IS_DCMB</code> (Combinational <code>sys_rst_n</code> driving 185 flops), Unregistered top inputs (<code>MOD_NO_IPRG</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>CODINGSTYLE (Ports & Connectivity)</strong></td>
+          <td>0</td>
+          <td><span class="badge badge-warn">17</span></td>
+          <td><span class="badge badge-info">3</span></td>
+          <td>Unconnected instance outputs (<code>OTP_UC_INST</code>), Internal reads of output ports (<code>OTP_NR_READ</code>), Redefined macros (<code>MAC_NR_DMUL</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>FILEFORMAT (Naming)</strong></td>
+          <td>0</td>
+          <td><span class="badge badge-warn">1</span></td>
+          <td>0</td>
+          <td><code>FIL_MS_DUNM</code>: Interface <code>REG_BUS</code> differs from filename <code>reg_intf.sv</code></td>
+        </tr>
+        <tr>
+          <td><strong>DFT_FUNCTIONAL (Testability)</strong></td>
+          <td>0</td>
+          <td><span class="badge badge-warn">19</span></td>
+          <td>0</td>
+          <td><code>OTP_NO_RGTM</code>: Unregistered top-level chip outputs (UART, SPI, I2C, GPIO, Timers)</td>
+        </tr>
+        <tr>
+          <td><strong>DESIGN_BUILD (Elaboration)</strong></td>
+          <td>0</td>
+          <td><span class="badge badge-warn">618</span></td>
+          <td>0</td>
+          <td>Bitwidth truncations (<code>VERI-1209</code>) & port mismatches (<code>VERI-1330</code>) during elaboration</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Diagram: Reset Architecture & Combinational Hazard -->
+    <h2>2. Reset Distribution Architecture & Combinational Hazard Analysis</h2>
+    <p>
+      JasperGold flagged <strong>1 critical structural error (<code>RST_IS_DCMB</code>)</strong> where the primary system reset net <code>sys_rst_n</code> is generated from combinational AND logic and directly fans out to reset pins of 185 flip-flops across the AXI crossbar, AXI-to-APB bridge, and SRAM interfaces.
+    </p>
+
+    <div class="diagram-card">
+      <svg width="740" height="230" viewBox="0 0 740 230" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Inter', sans-serif;">
+        <!-- Background -->
+        <rect width="740" height="230" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+        
+        <!-- Left Box: Reset Inputs -->
+        <rect x="25" y="40" width="130" height="35" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="90" y="62" text-anchor="middle" font-size="12" font-weight="600" fill="#1e3a8a">hard_rst_ni</text>
+        
+        <rect x="25" y="90" width="130" height="35" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="90" y="112" text-anchor="middle" font-size="12" font-weight="600" fill="#1e3a8a">soft_rst_ni</text>
+        
+        <rect x="25" y="140" width="130" height="35" rx="5" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+        <text x="90" y="162" text-anchor="middle" font-size="12" font-weight="600" fill="#991b1b">boot_sw_rst_req</text>
+
+        <!-- AND Logic Gate (Hazardous) -->
+        <path d="M 210,50 L 250,50 C 275,50 295,75 295,107.5 C 295,140 275,165 250,165 L 210,165 Z" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+        <text x="245" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="#b91c1c">AND Logic</text>
+
+        <!-- Connecting Lines to Gate -->
+        <line x1="155" y1="57" x2="210" y2="70" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="155" y1="107" x2="210" y2="107" stroke="#64748b" stroke-width="1.5"/>
+        <line x1="155" y1="157" x2="210" y2="145" stroke="#64748b" stroke-width="1.5"/>
+
+        <!-- Invert Bubble for sw_rst -->
+        <circle cx="205" cy="145" r="4" fill="#ffffff" stroke="#ef4444" stroke-width="1.5"/>
+
+        <!-- sys_rst_n Net -->
+        <line x1="295" y1="107.5" x2="390" y2="107.5" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="4,3"/>
+        <text x="342" y="98" text-anchor="middle" font-size="11" font-weight="700" fill="#b91c1c">sys_rst_n (Comb)</text>
+
+        <!-- Subsystem Destinations -->
+        <rect x="390" y="30" width="160" height="42" rx="5" fill="#fdf4ff" stroke="#d8b4fe" stroke-width="1.5"/>
+        <text x="470" y="52" text-anchor="middle" font-size="11.5" font-weight="600" fill="#581c87">AXI Crossbar</text>
+        <text x="470" y="66" text-anchor="middle" font-size="10" fill="#6b21a8">(Demux/Mux FIFOs & Spills)</text>
+
+        <rect x="390" y="86" width="160" height="42" rx="5" fill="#fdf4ff" stroke="#d8b4fe" stroke-width="1.5"/>
+        <text x="470" y="108" text-anchor="middle" font-size="11.5" font-weight="600" fill="#581c87">AXI-to-APB Bridge</text>
+        <text x="470" y="122" text-anchor="middle" font-size="10" fill="#6b21a8">(apb_state_q, Req Arbiter)</text>
+
+        <rect x="390" y="142" width="160" height="42" rx="5" fill="#fdf4ff" stroke="#d8b4fe" stroke-width="1.5"/>
+        <text x="470" y="164" text-anchor="middle" font-size="11.5" font-weight="600" fill="#581c87">SRAM AXI Interfaces</text>
+        <text x="470" y="178" text-anchor="middle" font-size="10" fill="#6b21a8">(ISRAM / DSRAM state_q)</text>
+
+        <!-- Lines to Destinations -->
+        <path d="M 390,107.5 L 360,107.5 L 360,51 L 390,51" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+        <path d="M 390,107.5 L 360,107.5 L 360,163 L 390,163" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+
+        <!-- Recommended Fix Block -->
+        <rect x="580" y="60" width="135" height="95" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+        <text x="647" y="84" text-anchor="middle" font-size="11.5" font-weight="700" fill="#166534">Recommended Fix</text>
+        <text x="647" y="104" text-anchor="middle" font-size="10" fill="#15803d">2-FF Synchronizer</text>
+        <text x="647" y="120" text-anchor="middle" font-size="10" fill="#15803d">Async Assert,</text>
+        <text x="647" y="136" text-anchor="middle" font-size="10" fill="#15803d">Sync De-assert</text>
+
+        <path d="M 550,107.5 L 580,107.5" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="3,3"/>
+      </svg>
+      <div class="diagram-caption">Figure 1: Combinational Reset Glitch Risk (<code>RST_IS_DCMB</code>) and Proposed Synchronous De-assertion Tree</div>
+    </div>
+
+    <!-- Comparative Matrix -->
+    <h2>3. Comparative Matrix: Synopsys SpyGlass vs. Cadence JasperGold</h2>
+    <p>
+      A dual-vendor static signoff approach provides deep cross-validation of SoC RTL quality. Below is the direct comparison of findings between <strong>Synopsys SpyGlass Lint</strong> and <strong>Cadence JasperGold Superlint</strong>:
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Analysis Domain</th>
+          <th>Synopsys SpyGlass (U-2023.03)</th>
+          <th>Cadence JasperGold (2025.06)</th>
+          <th>Cross-Tool Alignment & Consensus</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Reset Tree Logic</strong></td>
+          <td><code>W362</code> (Comb reset expression on <code>sys_rst_n</code>)</td>
+          <td><code>RST_IS_DCMB</code> [Error] (Comb reset driving 185 flops)</td>
+          <td><span class="badge badge-err">100% Agreement</span>: Both tools flag combinational reset logic as an ASIC timing hazard.</td>
+        </tr>
+        <tr>
+          <td><strong>Bootloader FSM Latches</strong></td>
+          <td><code>InferLatch</code> & <code>SYNTH_12608</code> (Inferred latch on <code>warm_boot_q</code>)</td>
+          <td>Evaluated during FSM check extraction (0 unclocked latches in gate synthesis)</td>
+          <td>SpyGlass checks RTL branch completeness; JasperGold synthesizes gated flop tree.</td>
+        </tr>
+        <tr>
+          <td><strong>Bitwidth Truncation</strong></td>
+          <td><code>W110</code> (33 errors in <code>rv32m_mul.v</code> & AXI bridge)</td>
+          <td><code>VERI-1209</code> & <code>VERI-1330</code> (Elab warnings on port & expression size)</td>
+          <td><span class="badge badge-warn">100% Agreement</span>: Literal shifts and CSA carry-out net width mismatches flagged by both engines.</td>
+        </tr>
+        <tr>
+          <td><strong>Port Connectivity</strong></td>
+          <td><code>W287b</code> (Unconnected output ports)</td>
+          <td><code>OTP_UC_INST</code> (9 unconnected instance outputs)</td>
+          <td><span class="badge badge-warn">100% Agreement</span>: Identifies unread signals (e.g. <code>PCSrcE1</code>, <code>pprot</code>, sub-word addresses).</td>
+        </tr>
+        <tr>
+          <td><strong>Primary IO Boundaries</strong></td>
+          <td><code>W240</code> (Unused inputs: <code>boot_addr_i</code>, <code>fetch_enable_i</code>)</td>
+          <td><code>INP_NO_LOAD</code> (2 unused inputs), <code>MOD_NO_IPRG</code> (7 unreg inputs), <code>OTP_NO_RGTM</code> (19 unreg outputs)</td>
+          <td><span class="badge badge-info">Complementary</span>: JasperGold provides thorough DFT boundary registration checking.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Violation Details & Recommendations -->
+    <h2>4. Violation Breakdown & Recommended Action Plan</h2>
+
+    <div class="alert-box danger">
+      <strong>Structural Issue #1: Combinational Reset (<code>RST_IS_DCMB</code>)</strong><br/>
+      <strong>Location:</strong> <code>riscforge_soc_subsystem.sv:469</code><br/>
+      <strong>Action:</strong> Replace direct combinational assign with a standard reset synchronizer instance (2-FF chain clocked by <code>clk_i</code>). Ensures glitch immunity during power-up and warm boot transitions.
+    </div>
+
+    <div class="alert-box">
+      <strong>Coding Style Issue #2: Top-Level Output Reads (<code>OTP_NR_READ</code>)</strong><br/>
+      <strong>Location:</strong> <code>riscforge_soc_subsystem.sv:708, 1131-1135</code><br/>
+      <strong>Action:</strong> Declare internal wires for peripheral interrupt lines (e.g. <code>uart_int_s</code>) and drive both the core CLIC and the top-level output port <code>assign uart_int_o = uart_int_s;</code>.
+    </div>
+
+    <div class="alert-box info">
+      <strong>DFT / IO Issue #3: Unregistered Primary Outputs (<code>OTP_NO_RGTM</code>)</strong><br/>
+      <strong>Location:</strong> Peripheral I/O ports (UART, SPI, I2C, GPIO)<br/>
+      <strong>Action:</strong> Register peripheral outputs at top-level boundary or verify pad-to-pad IO timing constraints in Cadence Innovus / Synopsys PrimeTime.
+    </div>
+
+    <!-- Sign-Off Summary Table -->
+    <h2>5. Sign-Off Summary & Tool Transcripts</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric / Step</th>
+          <th>Result</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Syntax & Elaboration</td>
+          <td><span class="badge badge-pass">PASSED</span></td>
+          <td>113 Verilog/SystemVerilog modules synthesized, 6 packages loaded</td>
+        </tr>
+        <tr>
+          <td>Black Box Audit</td>
+          <td><span class="badge badge-pass">PASSED</span></td>
+          <td>0 Black Boxes (100% hierarchy resolved)</td>
+        </tr>
+        <tr>
+          <td>Clock & Reset Trees</td>
+          <td><span class="badge badge-pass">ANALYZED</span></td>
+          <td>1 primary clock (<code>clk_i</code>), 2 primary resets (<code>hard_rst_ni</code>, <code>soft_rst_ni</code>)</td>
+        </tr>
+        <tr>
+          <td>Formal Checks Extracted</td>
+          <td><span class="badge badge-pass">393 CHECKS</span></td>
+          <td>120 signal toggle/deadlock properties, 273 assertion conflict checks</td>
+        </tr>
+        <tr>
+          <td>Reports Generated</td>
+          <td><span class="badge badge-pass">COMPLETE</span></td>
+          <td><code>superlint_summary.txt</code>, <code>superlint_violations.txt</code>, <code>superlint_signoff.html</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Footer -->
+    <footer class="doc-footer">
+      <div>RISCFORGE 1TOPS — RV32IM_Zicsr SoC Subsystem</div>
+      <div>Cadence JasperGold Superlint Verification Sign-Off</div>
+    </footer>
+  </div>
+
+</body>
+</html>
+

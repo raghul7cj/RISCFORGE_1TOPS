@@ -1,0 +1,7 @@
+/root/svp/timer/rtl/timer.sv
+/root/svp/timer/rtl/apb_timer.sv
+
+/root/svp/timer/tb/apb_timer_if.sv
+/root/svp/timer/tb/apb_timer_pkg.sv
+/root/svp/timer/tb/apb_timer_assertions.sv
+/root/svp/timer/tb/apb_timer_tb.sv

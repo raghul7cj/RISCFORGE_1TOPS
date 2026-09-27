@@ -1,0 +1,518 @@
+Jasper Apps 2025.06 FCS 64 bits 2025.06.25 13:01:28 UTC
+
+Any disclosure about the Cadence Design Systems software or its use
+model to any third party violates the written Non-Disclosure Agreement
+between Cadence Design Systems, Inc. and the customer.
+
+THIS SOFTWARE CONTAINS CONFIDENTIAL INFORMATION AND TRADE SECRETS OF
+CADENCE DESIGN SYSTEMS, INC. USE, DISCLOSURE, OR REPRODUCTION IS
+PROHIBITED WITHOUT THE PRIOR EXPRESS WRITTEN PERMISSION OF CADENCE
+DESIGN SYSTEMS, INC.
+
+Copyright (C) 2000-2025 Cadence Design Systems, Inc. All Rights
+Reserved.  Unpublished -- rights reserved under the copyright laws of
+the United States.
+
+This product includes software developed by others and redistributed
+according to license agreement. See doc/third_party_readme.txt for
+further details.
+
+RESTRICTED RIGHTS LEGEND
+
+Use, duplication, or disclosure by the Government is subject to
+restrictions as set forth in subparagraph (c) (1) (ii) of the Rights in
+Technical Data and Computer Software clause at DFARS 252.227-7013 or
+subparagraphs (c) (1) and (2) of Commercial Computer Software -- Restricted
+Rights at 48 CFR 52.227-19, as applicable.
+
+
+                          Cadence Design Systems, Inc.
+                          2655 Seely Avenue
+                          San Jose, CA 95134
+                          Phone: 408.943.1234
+
+For technical assistance visit http://support.cadence.com.
+
+Jasper Apps Analysis Session - /home/iiita/Documents/raghulcj/ips/jaspergold/jgproject/sessionLogs/session_0
+
+INFO: successfully checked out license "jasper_dao".
+INFO: reading configuration file "/home/iiita/.config/cadence/jasper.conf".
+% check_superlint -init
+INFO (ICD011): Message "VERI-1818" has been changed from "ignore" to "warning" level.
+% # =============================================================================
+% # RISCFORGE 1TOPS — JasperGold Superlint Tcl Script
+% # =============================================================================
+% # Tool: Cadence JasperGold 2025.06 FCS 64-bit
+% # Top:  riscforge_soc_subsystem
+% # =============================================================================
+% 
+% clear -all
+INFO (IPF121): Cleared environment completely for new design analysis.
+% 
+% # Enable Superlint Rules across all domains (LINT, STRUCTURAL, CODINGSTYLE, AUTO_FORMAL, etc.)
+% config_rtlds -rule -enable -domain all
+% 
+% # Analyze and elaborate design
+% analyze -sv -f jg_soc.f
+INFO (INL011): Processing "-f" file "/home/iiita/Documents/raghulcj/ips/jaspergold/jg_soc.f".
+[-- (VERI-1482)] Analyzing Verilog file '/home/install/jasper_2025.06/lib/verilog/packages/std/std.sv' into library 'std'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/cf_math_pkg.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/axi_pkg.sv'
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(25): parameter 'BurstWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(27): parameter 'RespWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(29): parameter 'CacheWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(31): parameter 'ProtWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(33): parameter 'QosWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(35): parameter 'RegionWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(37): parameter 'LenWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(39): parameter 'SizeWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(41): parameter 'LockWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(43): parameter 'AtopWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../axi_lite_xbar/include/common_cells/axi_pkg.sv(45): parameter 'NsaidWidth' declared inside package 'axi_pkg' shall be treated as localparam
+[-- (VERI-1482)] Analyzing Verilog file '../gpio-master/gpio_reg_pkg.sv'
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(10): parameter 'GPIOCount' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(13): parameter 'BlockAw' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(167): parameter 'GPIO_INFO_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(168): parameter 'GPIO_CFG_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(169): parameter 'GPIO_GPIO_MODE_0_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(170): parameter 'GPIO_GPIO_MODE_1_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(171): parameter 'GPIO_GPIO_EN_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(172): parameter 'GPIO_GPIO_IN_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(173): parameter 'GPIO_GPIO_OUT_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(174): parameter 'GPIO_GPIO_SET_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(175): parameter 'GPIO_GPIO_CLEAR_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(176): parameter 'GPIO_GPIO_TOGGLE_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(177): parameter 'GPIO_INTRPT_RISE_EN_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(178): parameter 'GPIO_INTRPT_FALL_EN_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(179): parameter 'GPIO_INTRPT_LVL_HIGH_EN_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(180): parameter 'GPIO_INTRPT_LVL_LOW_EN_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(181): parameter 'GPIO_INTRPT_STATUS_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(182): parameter 'GPIO_INTRPT_RISE_STATUS_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(183): parameter 'GPIO_INTRPT_FALL_STATUS_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(184): parameter 'GPIO_INTRPT_LVL_HIGH_STATUS_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(185): parameter 'GPIO_INTRPT_LVL_LOW_STATUS_OFFSET' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(188): parameter 'GPIO_INFO_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(189): parameter 'GPIO_INFO_VERSION_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(190): parameter 'GPIO_GPIO_IN_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(191): parameter 'GPIO_GPIO_SET_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(192): parameter 'GPIO_GPIO_CLEAR_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(193): parameter 'GPIO_GPIO_TOGGLE_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(194): parameter 'GPIO_INTRPT_STATUS_RESVAL' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[WARN (VERI-2418)] ../gpio-master/gpio_reg_pkg.sv(220): parameter 'GPIO_PERMIT' declared inside package 'gpio_reg_pkg' shall be treated as localparam
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/apb/apb_pkg.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_pkg.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_pkg.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/addr_decode_dync.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/addr_decode_dync.sv(17): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/addr_decode.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/fifo_v3.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(13): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/fall_through_register.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/spill_register.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/spill_register_flushable.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(14): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/counter.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/rr_arb_tree.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/rr_arb_tree.sv(16): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/lzc.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/lzc.sv(5): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/onehot_to_bin.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/onehot_to_bin.sv(13): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/delta_counter.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/id_queue.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/id_queue.sv(48): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[INFO (VERI-2561)] ../axi_lite_xbar/include/common_cells/id_queue.sv(193): undeclared symbol 'empty', assumed default net type 'wire'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/sync.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/common_cells/stream_register.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/common_cells/stream_register.sv(11): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/axi/axi_intf.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_intf.sv(356): analyzing included file '../axi_lite_xbar/include/axi/typedef.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/axi/axi_err_slv.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/axi/axi_atop_filter.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_atop_filter.sv(375): analyzing included file '../axi_lite_xbar/include/axi/assign.svh'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_atop_filter.sv(376): analyzing included file '../axi_lite_xbar/include/axi/typedef.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/axi/axi_lite_to_axi.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/axi/axi_lite_demux.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_lite_demux.sv(15): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_lite_demux.sv(482): analyzing included file '../axi_lite_xbar/include/axi/assign.svh'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_lite_demux.sv(483): analyzing included file '../axi_lite_xbar/include/axi/typedef.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/include/axi/axi_lite_mux.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_lite_mux.sv(21): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_lite_mux.sv(456): analyzing included file '../axi_lite_xbar/include/axi/assign.svh'
+[INFO (VERI-1328)] ../axi_lite_xbar/include/axi/axi_lite_mux.sv(457): analyzing included file '../axi_lite_xbar/include/axi/typedef.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_xbar/axi_lite_xbar.sv'
+[INFO (VERI-1328)] ../axi_lite_xbar/axi_lite_xbar.sv(20): analyzing included file '../axi_lite_xbar/include/axi/typedef.svh'
+[INFO (VERI-1328)] ../axi_lite_xbar/axi_lite_xbar.sv(242): analyzing included file '../axi_lite_xbar/include/axi/assign.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../axi_lite_to_apb/axi_lite_to_apb.sv'
+[INFO (VERI-1328)] ../axi_lite_to_apb/axi_lite_to_apb.sv(48): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[INFO (VERI-1328)] ../axi_lite_to_apb/axi_lite_to_apb.sv(384): analyzing included file '../axi_lite_xbar/include/axi/typedef.svh'
+[INFO (VERI-1328)] ../axi_lite_to_apb/axi_lite_to_apb.sv(385): analyzing included file '../axi_lite_xbar/include/axi/assign.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_i2c-master/i2c_master_bit_ctrl.sv'
+[INFO (VERI-1328)] ../apb_i2c-master/i2c_master_bit_ctrl.sv(137): analyzing included file '../apb_i2c-master/i2c_master_defines.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_i2c-master/i2c_master_byte_ctrl.sv'
+[INFO (VERI-1328)] ../apb_i2c-master/i2c_master_byte_ctrl.sv(69): analyzing included file '../apb_i2c-master/i2c_master_defines.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_i2c-master/apb_i2c.sv'
+[INFO (VERI-1328)] ../apb_i2c-master/apb_i2c.sv(1): analyzing included file '../apb_i2c-master/i2c_master_defines.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_timer-master/timer.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_timer-master/apb_timer.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/apb_to_obi.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/apb_to_obi.sv(7): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/apb_to_obi.sv(8): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_baudgen.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart_baudgen.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_rx.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart_rx.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_tx.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart_tx.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_interrupts.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart_interrupts.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_modem.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart_modem.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart_register.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart_register.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/obi/obi_uart.sv'
+[INFO (VERI-1328)] ../SOC_FILES/include/obi/obi_uart.sv(9): analyzing included file '../axi_lite_xbar/include/common_cells/registers.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_uart-main/rtl/apb_uart_wrap.sv'
+[INFO (VERI-1328)] ../apb_uart-main/rtl/apb_uart_wrap.sv(8): analyzing included file '../SOC_FILES/include/obi/typedef.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../apb_uart-main/rtl/apb_uart.sv'
+[INFO (VERI-1328)] ../apb_uart-main/rtl/apb_uart.sv(7): analyzing included file '../SOC_FILES/include/apb/typedef.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/register_interface/reg_intf.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/register_interface/apb_to_reg.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/register_interface/prim_subreg_arb.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/register_interface/prim_subreg.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../SOC_FILES/include/register_interface/prim_subreg_ext.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../gpio-master/gpio_input_stage_no_clk_gates.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../gpio-master/gpio_reg_top.sv'
+[INFO (VERI-1328)] ../gpio-master/gpio_reg_top.sv(8): analyzing included file '../axi_lite_xbar/include/common_cells/assertions.svh'
+[INFO (VERI-1328)] ../gpio-master/gpio_reg_top.sv(15455): analyzing included file '../SOC_FILES/include/register_interface/typedef.svh'
+[INFO (VERI-1328)] ../gpio-master/gpio_reg_top.sv(15456): analyzing included file '../SOC_FILES/include/register_interface/assign.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../gpio-master/gpio.sv'
+[INFO (VERI-1328)] ../gpio-master/gpio.sv(25): analyzing included file '../SOC_FILES/include/register_interface/typedef.svh'
+[INFO (VERI-1328)] ../gpio-master/gpio.sv(26): analyzing included file '../SOC_FILES/include/register_interface/assign.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../gpio-master/gpio_apb_wrap.sv'
+[INFO (VERI-1328)] ../gpio-master/gpio_apb_wrap.sv(23): analyzing included file '../SOC_FILES/include/apb/typedef.svh'
+[INFO (VERI-1328)] ../gpio-master/gpio_apb_wrap.sv(24): analyzing included file '../SOC_FILES/include/apb/assign.svh'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/spi_master_clkgen.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/spi_master_fifo.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/spi_master_rx.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/spi_master_tx.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/spi_master_controller.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/spi_master_apb_if.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../spi_master_ip/spi_master/apb_spi_master.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/sram_sp.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/sram_mux.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/axi_lite_sram_if.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../instr_module/Instruction_Memory.v'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/imem_sram_wrapper.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/boot_rom.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/instr_fetch_demux.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/PC.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/PC_Adder.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/Mux2.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/Mux_3_by_1.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/ALU.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/ALU_Decoder.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/Main_Decoder.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/Control_Unit_Top.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/Sign_Extend.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/Register_File.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/JB_unit.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/opcode_check.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/booth_enc.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/csa.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/pp_gen.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/rv32m_mul.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/rv32m_div.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/rv32m_unit.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/csr_regfile.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/wb_trap_mret_commit_controller.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/hazard_unit.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/imem_controller.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/ls_unit.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/fetch_cycle.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/decode_cycle.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/execute_cycle.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/memory_cycle.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/writeback_cycle.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/top.v'
+[-- (VERI-1482)] Analyzing Verilog file '../riscv_core/rtl/hybrid_mem_interface.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../bootloader/bootloader.sv'
+[-- (VERI-1482)] Analyzing Verilog file '../RTL_SOC/riscforge_soc_subsystem.sv'
+% elaborate -top riscforge_soc_subsystem
+INFO (ISW003): Top module name is "riscforge_soc_subsystem".
+[WARN (VERI-9027)] ../SOC_FILES/include/obi/obi_uart_rx.sv(243): variable 'break_d' is used before it is assigned in an always_comb block; synthesis - simulation differences may occur
+[WARN (VERI-9027)] ../SOC_FILES/include/obi/obi_uart_rx.sv(265): variable 'word_len_bits' is used before it is assigned in an always_comb block; synthesis - simulation differences may occur
+[WARN (VERI-9027)] ../SOC_FILES/include/obi/obi_uart_rx.sv(266): variable 'word_len_bits' is used before it is assigned in an always_comb block; synthesis - simulation differences may occur
+[WARN (VERI-9027)] ../SOC_FILES/include/obi/obi_uart_rx.sv(267): variable 'word_len_bits' is used before it is assigned in an always_comb block; synthesis - simulation differences may occur
+[WARN (VERI-9027)] ../SOC_FILES/include/obi/obi_uart_rx.sv(268): variable 'word_len_bits' is used before it is assigned in an always_comb block; synthesis - simulation differences may occur
+[WARN (VERI-9027)] ../SOC_FILES/include/obi/obi_uart_rx.sv(269): variable 'word_len_bits' is used before it is assigned in an always_comb block; synthesis - simulation differences may occur
+[WARN (VERI-1927)] ../riscv_core/rtl/top.v(585): port 'csr_valid_o' remains unconnected for this instance
+[WARN (VERI-1927)] ../riscv_core/rtl/execute_cycle.v(257): port 'Zero' remains unconnected for this instance
+[INFO (VERI-1018)] ../RTL_SOC/boot_rom.sv(31): compiling module 'boot_rom:(NUM_WORDS=32'b010000,DATA_WIDTH=32'b0100000)'
+[WARN (VDB-1002)] ../RTL_SOC/boot_rom.sv(50): net 'mem[0][31]' does not have a driver
+[INFO (VERI-1018)] ../RTL_SOC/instr_fetch_demux.sv(23): compiling module 'instr_fetch_demux:(BOOTROM_NUM_WORDS=32'b010000,ISRAM_NUM_WORDS=32'b010000000000000)'
+[INFO (VERI-1018)] ../RTL_SOC/sram_mux.sv(24): compiling module 'sram_mux:(ADDR_WIDTH=32'b01101,DATA_WIDTH=32'b0100000)'
+[INFO (VERI-1018)] ../instr_module/Instruction_Memory.v(5): compiling module 'Instruction_Memory_new:(MEM_DEPTH=8192,IMEM_BASE_BYTE=32'b010000000000000000)'
+[INFO (VERI-2571)] ../instr_module/Instruction_Memory.v(22): extracting RAM for identifier 'mem_array'
+[INFO (VERI-1018)] ../RTL_SOC/imem_sram_wrapper.sv(23): compiling module 'imem_sram_wrapper:(NUM_WORDS=32'b010000000000000,DATA_WIDTH=32'b0100000,IMEM_BASE_BYTE=32'b010000000000000000)'
+[INFO (VERI-1018)] ../RTL_SOC/sram_sp.sv(17): compiling module 'sram_sp:(NUM_WORDS=32'b010000000000000,DATA_WIDTH=32'b0100000)'
+[INFO (VERI-2571)] ../RTL_SOC/sram_sp.sv(36): extracting RAM for identifier 'mem'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/delta_counter.sv(13): compiling module 'delta_counter:(WIDTH=32'b01000)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/counter.sv(14): compiling module 'counter:(WIDTH=32'b01000)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/lzc.sv(17): compiling module 'lzc:(WIDTH=32'b010)'
+[INFO (VERI-1018)] ../apb_i2c-master/i2c_master_bit_ctrl.sv(139): compiling module 'i2c_master_bit_ctrl'
+[WARN (VERI-1209)] ../apb_i2c-master/i2c_master_bit_ctrl.sv(249): expression size 32 truncated to fit in target size 14
+[WARN (VERI-1173)] ../apb_i2c-master/i2c_master_bit_ctrl.sv(374): synthesis - simulation differences may occur when using full_case directive
+[INFO (VERI-1018)] ../apb_i2c-master/i2c_master_byte_ctrl.sv(71): compiling module 'i2c_master_byte_ctrl'
+[WARN (VERI-1173)] ../apb_i2c-master/i2c_master_byte_ctrl.sv(220): synthesis - simulation differences may occur when using full_case directive
+[INFO (VERI-1018)] ../apb_i2c-master/apb_i2c.sv(10): compiling module 'apb_i2c'
+[INFO (VERI-1018)] ../apb_timer-master/timer.sv(20): compiling module 'timer'
+[WARN (VERI-1209)] ../apb_timer-master/timer.sv(41): expression size 3 truncated to fit in target size 2
+[INFO (VERI-1018)] ../apb_timer-master/apb_timer.sv(13): compiling module 'apb_timer:(TIMER_CNT=32'b010)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/sync.sv(13): compiling module 'sync:(STAGES=32'b010)'
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart_modem.sv(12): compiling module 'obi_uart_modem'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/delta_counter.sv(13): compiling module 'delta_counter:(WIDTH=32'b010000)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/counter.sv(14): compiling module 'counter:(WIDTH=32'b010000)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/delta_counter.sv(13): compiling module 'delta_counter:(WIDTH=32'b0100)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/counter.sv(14): compiling module 'counter'
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart_baudgen.sv(12): compiling module 'obi_uart_baudgen'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/delta_counter.sv(13): compiling module 'delta_counter:(WIDTH=32'b0101)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/counter.sv(14): compiling module 'counter:(WIDTH=32'b0101)'
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart_rx.sv(11): compiling module 'obi_uart_rx'
+[WARN (VERI-1209)] ../SOC_FILES/include/obi/obi_uart_rx.sv(163): expression size 32 truncated to fit in target size 2
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(DATA_WIDTH=32'b01011,DEPTH=32'b010000)'
+[WARN (VERI-1209)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(83): expression size 32 truncated to fit in target size 4
+[WARN (VERI-1209)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(85): expression size 32 truncated to fit in target size 5
+[WARN (VERI-1209)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(95): expression size 32 truncated to fit in target size 4
+[WARN (VERI-1209)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(97): expression size 32 truncated to fit in target size 5
+[WARN (VERI-1209)] ../SOC_FILES/include/obi/obi_uart_rx.sv(229): expression size 6 truncated to fit in target size 4
+[WARN (VERI-1209)] ../SOC_FILES/include/obi/obi_uart_rx.sv(313): expression size 32 truncated to fit in target size 3
+[WARN (VERI-1209)] ../SOC_FILES/include/obi/obi_uart_rx.sv(454): expression size 32 truncated to fit in target size 4
+[WARN (VERI-1209)] ../SOC_FILES/include/obi/obi_uart_rx.sv(546): expression size 32 truncated to fit in target size 6
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart_tx.sv(11): compiling module 'obi_uart_tx'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(DATA_WIDTH=32'b01000,DEPTH=32'b010000)'
+[WARN (VERI-1209)] ../SOC_FILES/include/obi/obi_uart_tx.sv(157): expression size 32 truncated to fit in target size 3
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart_interrupts.sv(12): compiling module 'obi_uart_interrupts'
+[INFO (VERI-1018)] ../apb_uart-main/rtl/apb_uart.sv(10): compiling module 'apb_uart'
+[INFO (VERI-1018)] ../apb_uart-main/rtl/apb_uart_wrap.sv(11): compiling module 'apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart)'
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/apb_to_obi.sv(11): compiling module 'apb_to_obi:(ObiCfg='{1'b0,1'b0,32'b0101,32'b0100000,32'b01,1'b0,1'b1,'{1'b0,1'b0,1'b0,1'b0,32'b0,32'b0,32'b0,32'b0,32'b0,32'b0}},apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart,obi_req_t=obi_req_t_apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart),obi_rsp_t=obi_rsp_t_apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart))'
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart.sv(11): compiling module 'obi_uart:(ObiCfg='{1'b0,1'b0,32'b0101,32'b0100000,32'b01,1'b0,1'b1,'{1'b0,1'b0,1'b0,1'b0,32'b0,32'b0,32'b0,32'b0,32'b0,32'b0}},obi_req_t=obi_req_t_apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart),obi_rsp_t=obi_rsp_t_apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart))'
+[INFO (VERI-1018)] ../SOC_FILES/include/obi/obi_uart_register.sv(11): compiling module 'obi_uart_register:(obi_req_t=obi_req_t_apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart),obi_rsp_t=obi_rsp_t_apb_uart_wrap:(apb_req_t=apb_req_t_apb_uart,apb_rsp_t=apb_resp_t_apb_uart))'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/apb_to_reg.sv(14): compiling module 'apb_to_reg:(reg_o=REG_BUS:(ADDR_WIDTH=32,DATA_WIDTH=32)_out)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg_ext.sv(7): compiling module 'prim_subreg_ext:(DW=32'b01010)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg_arb.sv(7): compiling module 'prim_subreg_arb:(DW=1)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg.sv(7): compiling module 'prim_subreg:(DW=1,RESVAL=1'b0)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg_arb.sv(7): compiling module 'prim_subreg_arb:(DW=2)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg.sv(7): compiling module 'prim_subreg:(DW=2,RESVAL=2'b0)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg_ext.sv(7): compiling module 'prim_subreg_ext:(DW=32'b01)'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg_arb.sv(7): compiling module 'prim_subreg_arb:(DW=1,SWACCESS="W1C")'
+[INFO (VERI-1018)] ../SOC_FILES/include/register_interface/prim_subreg.sv(7): compiling module 'prim_subreg:(DW=1,SWACCESS="W1C",RESVAL=1'b0)'
+[INFO (VERI-1018)] ../gpio-master/gpio_input_stage_no_clk_gates.sv(1): compiling module 'gpio_input_stage'
+[INFO (VERI-1018)] ../gpio-master/gpio.sv(239): compiling module 'gpio_intf:(ADDR_WIDTH=32'b0100000,DATA_WIDTH=32'b0100000,reg_bus=REG_BUS:(ADDR_WIDTH=32,DATA_WIDTH=32)_in)'
+[INFO (VERI-1018)] ../gpio-master/gpio.sv(32): compiling module 'gpio:(reg_req_t=reg_bus_req_t_gpio_intf:(ADDR_WIDTH=32'b0100000,DATA_WIDTH=32'b0100000,reg_bus=REG_BUS:(ADDR_WIDTH=32,DATA_WIDTH=32)_in),reg_rsp_t=reg_bus_rsp_t_gpio_intf:(ADDR_WIDTH=32'b0100000,DATA_WIDTH=32'b0100000,reg_bus=REG_BUS:(ADDR_WIDTH=32,DATA_WIDTH=32)_in))'
+[INFO (VERI-1018)] ../gpio-master/gpio_reg_top.sv(10): compiling module 'gpio_reg_top:(reg_req_t=reg_bus_req_t_gpio_intf:(ADDR_WIDTH=32'b0100000,DATA_WIDTH=32'b0100000,reg_bus=REG_BUS:(ADDR_WIDTH=32,DATA_WIDTH=32)_in),reg_rsp_t=reg_bus_rsp_t_gpio_intf:(ADDR_WIDTH=32'b0100000,DATA_WIDTH=32'b0100000,reg_bus=REG_BUS:(ADDR_WIDTH=32,DATA_WIDTH=32)_in))'
+[WARN (VERI-1209)] ../gpio-master/gpio_reg_top.sv(57): expression size 32 truncated to fit in target size 11
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/spi_master_apb_if.sv(24): compiling module 'spi_master_apb_if:(BUFFER_DEPTH=32'b01010)'
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/spi_master_fifo.sv(13): compiling module 'spi_master_fifo:(BUFFER_DEPTH=32'b01010)'
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_fifo.sv(64): expression size 32 truncated to fit in target size 5
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_fifo.sv(67): expression size 32 truncated to fit in target size 5
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_fifo.sv(113): expression size 32 truncated to fit in target size 4
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_fifo.sv(126): expression size 32 truncated to fit in target size 4
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/spi_master_clkgen.sv(11): compiling module 'spi_master_clkgen'
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_clkgen.sv(51): expression size 32 truncated to fit in target size 8
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/spi_master_tx.sv(11): compiling module 'spi_master_tx'
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_tx.sv(84): expression size 32 truncated to fit in target size 16
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/spi_master_rx.sv(11): compiling module 'spi_master_rx'
+[WARN (VERI-1209)] ../spi_master_ip/spi_master/spi_master_rx.sv(79): expression size 32 truncated to fit in target size 16
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/spi_master_controller.sv(15): compiling module 'spi_master_controller'
+[INFO (VERI-1018)] ../spi_master_ip/spi_master/apb_spi_master.sv(13): compiling module 'apb_spi_master:(BUFFER_DEPTH=32'b01010)'
+[INFO (VERI-1018)] ../riscv_core/rtl/PC.v(25): compiling module 'PC:(RESET_PC=32'b0)'
+[INFO (VERI-1018)] ../riscv_core/rtl/PC_Adder.v(23): compiling module 'PC_Adder'
+[INFO (VERI-1018)] ../riscv_core/rtl/imem_controller.v(55): compiling module 'imem_controller'
+[INFO (VERI-1018)] ../riscv_core/rtl/fetch_cycle.v(50): compiling module 'fetch_cycle:(RESET_PC=32'b0)'
+[INFO (VERI-1018)] ../riscv_core/rtl/opcode_check.v(23): compiling module 'opcode_check'
+[INFO (VERI-1018)] ../riscv_core/rtl/Main_Decoder.v(25): compiling module 'Main_Decoder'
+[INFO (VERI-1018)] ../riscv_core/rtl/ALU_Decoder.v(26): compiling module 'ALU_Decoder'
+[INFO (VERI-1018)] ../riscv_core/rtl/Control_Unit_Top.v(20): compiling module 'Control_Unit_Top'
+[INFO (VERI-1018)] ../riscv_core/rtl/Register_File.v(17): compiling module 'Register_File'
+[INFO (VERI-1018)] ../riscv_core/rtl/Sign_Extend.v(22): compiling module 'Sign_Extend'
+[INFO (VERI-1018)] ../riscv_core/rtl/decode_cycle.v(24): compiling module 'decode_cycle'
+[INFO (VERI-1018)] ../riscv_core/rtl/Mux_3_by_1.v(23): compiling module 'Mux_3_by_1'
+[INFO (VERI-1018)] ../riscv_core/rtl/Mux2.v(25): compiling module 'Mux2'
+[INFO (VERI-1018)] ../riscv_core/rtl/ALU.v(21): compiling module 'ALU'
+[INFO (VERI-1018)] ../riscv_core/rtl/JB_unit.v(2): compiling module 'JB_unit'
+[INFO (VERI-1018)] ../riscv_core/rtl/csa.v(2): compiling module 'csa'
+[INFO (VERI-1018)] ../riscv_core/rtl/booth_enc.v(2): compiling module 'booth_enc'
+[INFO (VERI-1018)] ../riscv_core/rtl/pp_gen.v(23): compiling module 'pp_gen'
+[INFO (VERI-1018)] ../riscv_core/rtl/rv32m_mul.v(23): compiling module 'rv32m_mul'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(80): actual bit length 32 differs from formal bit length 6 for port 'shift'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(174): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(175): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(176): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(177): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(178): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(179): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(186): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(187): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(188): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(189): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(195): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(196): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(204): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(205): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(211): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1330)] ../riscv_core/rtl/rv32m_mul.v(218): actual bit length 65 differs from formal bit length 66 for port 'co'
+[WARN (VERI-1209)] ../riscv_core/rtl/rv32m_mul.v(247): expression size 66 truncated to fit in target size 64
+[INFO (VERI-1018)] ../riscv_core/rtl/rv32m_div.v(23): compiling module 'rv32m_div'
+[INFO (VERI-1018)] ../riscv_core/rtl/rv32m_unit.v(2): compiling module 'rv32m_unit'
+[WARN (VERI-1209)] ../riscv_core/rtl/rv32m_unit.v(75): expression size 32 truncated to fit in target size 2
+[INFO (VERI-1018)] ../riscv_core/rtl/execute_cycle.v(20): compiling module 'execute_cycle'
+[WARN (VERI-8028)] ../riscv_core/rtl/execute_cycle.v(251): missing/open ports on instance alu_inst of module ALU
+[INFO (VERI-1018)] ../riscv_core/rtl/ls_unit.v(8): compiling module 'ls_unit'
+[INFO (VERI-1018)] ../riscv_core/rtl/memory_cycle.v(35): compiling module 'memory_cycle'
+[INFO (VERI-1018)] ../riscv_core/rtl/writeback_cycle.v(23): compiling module 'writeback_cycle'
+[INFO (VERI-1018)] ../riscv_core/rtl/wb_trap_mret_commit_controller.v(22): compiling module 'wb_trap_mret_commit_controller'
+[INFO (VERI-1018)] ../riscv_core/rtl/csr_regfile.v(3): compiling module 'csr_regfile'
+[INFO (VERI-1018)] ../riscv_core/rtl/hazard_unit.v(26): compiling module 'hazard_unit'
+[INFO (VERI-1018)] ../riscv_core/rtl/top.v(24): compiling module 'top:(RESET_PC=32'b0)'
+[WARN (VERI-8028)] ../riscv_core/rtl/top.v(554): missing/open ports on instance csr_file of module csr_regfile
+[INFO (VERI-1018)] ../RTL_SOC/riscforge_soc_subsystem.sv(229): compiling module 'riscforge_soc_subsystem'
+[INFO (VERI-1018)] ../RTL_SOC/axi_lite_sram_if.sv(32): compiling module 'axi_lite_sram_if:(AXI_ADDR_WIDTH=32'b0100000,AXI_DATA_WIDTH=32'b0100000,SRAM_NUM_WORDS=32'b010000000000000,PRIV_WRITE_ONLY=1'b1,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../RTL_SOC/axi_lite_sram_if.sv(32): compiling module 'axi_lite_sram_if:(AXI_ADDR_WIDTH=32'b0100000,AXI_DATA_WIDTH=32'b0100000,SRAM_NUM_WORDS=32'b010000000000000,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/axi_lite_xbar.sv(22): compiling module 'axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/addr_decode.sv(35): compiling module 'addr_decode:(NoIndices=32'b011,NoRules=32'b011,addr_t=addr_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),rule_t=rule_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/addr_decode_dync.sv(40): compiling module 'addr_decode_dync:(NoRules=32'b011,addr_t=addr_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),rule_t=rule_t_riscforge_soc_subsystem,Napot=1'b0,idx_t=logic[1:0])'
+[WARN (VERI-1796)] ../axi_lite_xbar/include/common_cells/addr_decode_dync.sv(146): system function call isunknown with non-constant argument is not supported for synthesis
+[INFO (VERI-1018)] ../axi_lite_xbar/include/axi/axi_lite_demux.sv(27): compiling module 'axi_lite_demux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoMstPorts=32'b0100,MaxTrans=32'b0100)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=aw_chan_select_t_axi_lite_demux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoMstPorts=32'b0100,MaxTrans=32'b0100))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=aw_chan_select_t_axi_lite_demux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoMstPorts=32'b0100,MaxTrans=32'b0100))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(DEPTH=32'b0100,dtype=logic[1:0])'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=w_chan_t_riscforge_soc_subsystem,Bypass=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=w_chan_t_riscforge_soc_subsystem,Bypass=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=b_chan_t_riscforge_soc_subsystem,Bypass=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=b_chan_t_riscforge_soc_subsystem,Bypass=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=ar_chan_select_t_axi_lite_demux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoMstPorts=32'b0100,MaxTrans=32'b0100))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=ar_chan_select_t_axi_lite_demux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoMstPorts=32'b0100,MaxTrans=32'b0100))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=r_chan_t_riscforge_soc_subsystem,Bypass=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=r_chan_t_riscforge_soc_subsystem,Bypass=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/axi/axi_lite_to_axi.sv(18): compiling module 'axi_lite_to_axi:(AxiDataWidth=32'b0100000,req_lite_t=axi_req_t_riscforge_soc_subsystem,resp_lite_t=axi_resp_t_riscforge_soc_subsystem,axi_req_t=full_req_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),axi_resp_t=full_resp_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/axi/axi_err_slv.sv(19): compiling module 'axi_err_slv:(AxiIdWidth=32'b01,axi_req_t=full_req_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),axi_resp_t=full_resp_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),Resp=2'b11,ATOPs=1'b0)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(FALL_THROUGH=1'b1,DEPTH=32'b01,dtype=id_t_axi_err_slv:(AxiIdWidth=32'b01,axi_req_t=full_req_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),axi_resp_t=full_resp_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),Resp=2'b11,ATOPs=1'b0))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(DEPTH=32'b010,dtype=id_t_axi_err_slv:(AxiIdWidth=32'b01,axi_req_t=full_req_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),axi_resp_t=full_resp_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),Resp=2'b11,ATOPs=1'b0))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(DEPTH=32'b01,dtype=r_data_t_axi_err_slv:(AxiIdWidth=32'b01,axi_req_t=full_req_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),axi_resp_t=full_resp_t_axi_lite_xbar:(Cfg='{32'b010,32'b011,32'b0100,32'b0100,1'b0,axi_pkg::CUT_ALL_AX,32'b0,32'b0,32'b0,1'b0,32'b0100000,32'b0100000,32'b011},aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),Resp=2'b11,ATOPs=1'b0))'
+[WARN (VERI-1209)] ../axi_lite_xbar/include/axi/axi_err_slv.sv(196): expression size 64 truncated to fit in target size 32
+[INFO (VERI-1018)] ../axi_lite_xbar/include/axi/axi_lite_mux.sv(23): compiling module 'axi_lite_mux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoSlvPorts=32'b010,MaxTrans=32'b0100)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/rr_arb_tree.sv(49): compiling module 'rr_arb_tree:(NumIn=32'b010,DataType=aw_chan_t_riscforge_soc_subsystem,AxiVldRdy=1'b1,LockIn=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(DEPTH=32'b0100,dtype=select_t_axi_lite_mux:(aw_chan_t=aw_chan_t_riscforge_soc_subsystem,w_chan_t=w_chan_t_riscforge_soc_subsystem,b_chan_t=b_chan_t_riscforge_soc_subsystem,ar_chan_t=ar_chan_t_riscforge_soc_subsystem,r_chan_t=r_chan_t_riscforge_soc_subsystem,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,NoSlvPorts=32'b010,MaxTrans=32'b0100)_gen_mux)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=aw_chan_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=aw_chan_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/rr_arb_tree.sv(49): compiling module 'rr_arb_tree:(NumIn=32'b010,DataType=ar_chan_t_riscforge_soc_subsystem,AxiVldRdy=1'b1,LockIn=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register.sv(17): compiling module 'spill_register:(T=ar_chan_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/spill_register_flushable.sv(18): compiling module 'spill_register_flushable:(T=ar_chan_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_to_apb/axi_lite_to_apb.sv(50): compiling module 'axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/rr_arb_tree.sv(49): compiling module 'rr_arb_tree:(NumIn=32'b010,DataType=int_req_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),AxiVldRdy=1'b1,LockIn=1'b1)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fall_through_register.sv(16): compiling module 'fall_through_register:(T=int_req_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(FALL_THROUGH=1'b1,DEPTH=32'b01,dtype=int_req_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fall_through_register.sv(16): compiling module 'fall_through_register:(T=resp_t_axi_pkg)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(FALL_THROUGH=1'b1,DEPTH=32'b01,dtype=resp_t_axi_pkg)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fall_through_register.sv(16): compiling module 'fall_through_register:(T=int_resp_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/fifo_v3.sv(15): compiling module 'fifo_v3:(FALL_THROUGH=1'b1,DEPTH=32'b01,dtype=int_resp_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem))'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/addr_decode.sv(35): compiling module 'addr_decode:(NoIndices=32'b0110,NoRules=32'b0110,addr_t=addr_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),rule_t=rule_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../axi_lite_xbar/include/common_cells/addr_decode_dync.sv(40): compiling module 'addr_decode_dync:(NoRules=32'b0110,addr_t=addr_t_axi_lite_to_apb:(NoApbSlaves=32'b0110,NoRules=32'b0110,AddrWidth=32'b0100000,DataWidth=32'b0100000,axi_lite_req_t=axi_req_t_riscforge_soc_subsystem,axi_lite_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,rule_t=rule_t_riscforge_soc_subsystem),rule_t=rule_t_riscforge_soc_subsystem,Napot=1'b0,idx_t=logic[2:0])'
+[WARN (VERI-1330)] ../axi_lite_to_apb/axi_lite_to_apb.sv(305): actual bit length 32 differs from formal bit length 3 for port 'size'
+[WARN (VERI-1209)] ../axi_lite_to_apb/axi_lite_to_apb.sv(305): expression size 128 truncated to fit in target size 32
+[WARN (VERI-1330)] ../axi_lite_to_apb/axi_lite_to_apb.sv(333): actual bit length 32 differs from formal bit length 3 for port 'size'
+[WARN (VERI-1209)] ../axi_lite_to_apb/axi_lite_to_apb.sv(333): expression size 128 truncated to fit in target size 32
+[INFO (VERI-1018)] ../gpio-master/gpio_apb_wrap.sv(26): compiling module 'gpio_apb_wrap:(ADDR_WIDTH=32'b0100000,DATA_WIDTH=32'b0100000,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_rsp_t=apb_resp_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../riscv_core/rtl/hybrid_mem_interface.sv(16): compiling module 'hybrid_mem_interface:(MEM_DEPTH=8192,DMEM_BASE_BYTE=32'b0100000000000000000,MMIO_LIMIT=32'b01001111111111111111111111111111,axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem)'
+[INFO (VERI-1018)] ../bootloader/bootloader.sv(90): compiling module 'bootloader:(axi_req_t=axi_req_t_riscforge_soc_subsystem,axi_resp_t=axi_resp_t_riscforge_soc_subsystem,apb_req_t=apb_req_t_riscforge_soc_subsystem,apb_resp_t=apb_resp_t_riscforge_soc_subsystem,AXI_ADDR_WIDTH=32'b0100000,AXI_DATA_WIDTH=32'b0100000,ISRAM_BASE_ADDR=32'b010000000000000000,DSRAM_BASE_ADDR=32'b0100000000000000000,ISRAM_NUM_WORDS=32'b010000000000000,DSRAM_NUM_WORDS=32'b010000000000000,NUM_INSTR_WORDS=32'b01000000,NUM_DATA_WORDS=32'b0,FLASH_POWERUP_CYCLES=32'b0111010100110000)'
+INFO (INL208): Elaboration synthesis summary:
+  Number of synthesized netlists          132 (6 packages)
+  Single run mode                         On
+  Pipeline                                On (126 pipelined netlists)
+  Late hierarchical reference connection  On
+  Number of analyzed Verilog modules      113 (93 synthesized)
+  Number of analyzed VHDL entities        0 (0 synthesized)
+  Advanced Incremental run mode           Off
+INFO (INL003): Clearing all state information (assumes, stopats, and so forth).
+riscforge_soc_subsystem
+[<embedded>] % 
+[<embedded>] % # Clocks and Resets
+[<embedded>] % clock clk_i
+[<embedded>] % reset ~hard_rst_ni ~soft_rst_ni
+INFO (IPM031): Clearing proof results of all properties.
+INFO (IRS006): Current reset condition is "hard_rst_ni soft_rst_ni".
+[<embedded>] % 
+[<embedded>] % # Initialize and extract Superlint checks
+[<embedded>] % check_superlint -init
+[<embedded>] % check_superlint -extract -top
+INFO (IRS029): Starting reset analysis: phase 1 of 4.
+INFO (IRS030): Running reset analysis: phase 2 of 4.
+INFO (IRS031): Running reset analysis: phase 3 of 4.
+INFO (IRS020): Starting the reset analysis simulation with a limit of 100 iterations (phase 4 of 4).
+INFO (ISIM006): Running simulation: {mode = single, probe = all}.
+INFO (IRS024): Reset iterations 0 to 4 analyzed.
+INFO (ISIM008): Simulation is processing trace data. Total number of nets in analysis 65633.
+INFO (IRS018): Reset analysis simulation executed for 3 iterations. Assigned values for 6149 of 8750 design flops, 0 of 0 design latches, 1835 of 1835 internal elements.
+INFO (IRS039): Reset analysis complete.
+INFO (ISL018): Started adding FE messages
+INFO (ISL018): Finished adding FE messages
+INFO (ISL018): Started extraction of structural checks
+INFO (ISL018): Started building clock tree
+INFO (ISL018): Finished building clock tree
+INFO (ISL018): Started building reset tree
+INFO (ISL018): Finished building reset tree
+INFO (ISL018): Violation Count: Errors = 24 Warnings = 1297 Info = 3
+INFO (ISL018): Finished extraction of structural checks
+INFO (ISL018): Started generating formal checks
+INFO (ISL009): Started detection of FSM_IS_LVLK, FSM_IS_DDLK, FSM_NO_RCHB, FSM_NO_MTRN, FSM_NO_TRRN, FSM_IS_PLLK, FSM_IS_PDLK, FSM_IS_NLLK, FSM_IS_NDLK checks
+INFO (ISL014): Started extracting properties for FSM_IS_LVLK, FSM_IS_DDLK, FSM_NO_RCHB, FSM_NO_MTRN, FSM_NO_TRRN, FSM_IS_PLLK, FSM_IS_PDLK, FSM_IS_NLLK, FSM_IS_NDLK checks
+INFO (ISL015): Extracted 0 properties of FSM_IS_LVLK, FSM_IS_DDLK, FSM_NO_RCHB, FSM_NO_MTRN, FSM_NO_TRRN, FSM_IS_PLLK, FSM_IS_PDLK, FSM_IS_NLLK, FSM_IS_NDLK
+INFO (ISL009): Started detection of CAS_IS_DFRC, CAS_NO_UNIQ, CAS_NO_PRIO, IFC_NO_UNIQ checks
+INFO (ISL015): Extracted 0 properties of CAS_IS_DFRC, CAS_NO_UNIQ, CAS_NO_PRIO, IFC_NO_UNIQ
+INFO (ISL009): Started detection of ASG_IS_XRCH, ASG_AR_OVFL, ARY_IS_OOBI, EXP_AR_OVFL, ASG_IS_OVFL, EXP_IS_DVBZ, SHF_IS_OVFL, SHF_IS_ABSO, VAR_IS_CTOL checks
+INFO (ISL015): Extracted 0 properties of ASG_IS_XRCH, ASG_AR_OVFL, ARY_IS_OOBI, EXP_AR_OVFL, ASG_IS_OVFL, EXP_IS_DVBZ, SHF_IS_OVFL, SHF_IS_ABSO, VAR_IS_CTOL
+INFO (ISL009): Started detection of BLK_NO_RCHB checks
+INFO (ISL015): Extracted 0 properties of BLK_NO_RCHB
+INFO (ISL014): Started extracting properties for SIG_NO_TGRS, SIG_NO_TGFL, SIG_NO_TGST, SIG_IS_DLCK, SIG_IS_STCK checks
+INFO (ISL015): Extracted 120 properties of SIG_NO_TGRS, SIG_NO_TGFL, SIG_NO_TGST, SIG_IS_DLCK, SIG_IS_STCK
+INFO (ISL009): Started detection of BUS_IS_CONT, BUS_IS_FLOT, SIG_IS_MLAS checks
+INFO (ISL014): Started extracting properties for BUS_IS_CONT, BUS_IS_FLOT, SIG_IS_MLAS checks
+INFO (ISL015): Extracted 0 properties of BUS_IS_CONT, BUS_IS_FLOT, SIG_IS_MLAS
+INFO (ISL009): Started detection of MOD_IS_FCMB checks
+INFO (ISL014): Started extracting properties for MOD_IS_FCMB checks
+INFO (ISL015): Extracted 0 properties of MOD_IS_FCMB
+INFO (ISL014): Started extracting properties for ASR_IS_CNFL checks
+INFO (ISL015): Extracted 273 properties of ASR_IS_CNFL
+INFO (IRS026): Computing reset analysis for expressions.
+INFO (IRS027): Finished computing reset analysis for expressions.
+INFO (ISL018): Finished generating formal checks
+INFO (ISL018): Started grouping violations
+INFO (ISL018): Finished grouping violations
+466
+[<embedded>] % 
+[<embedded>] % # Output reports directory
+[<embedded>] % file mkdir reports
+[<embedded>] % 
+[<embedded>] % # Dump Superlint reports
+[<embedded>] % check_superlint -report -setup -file reports/superlint_setup.txt -force
+[<embedded>] % check_superlint -report -summary -file reports/superlint_summary.txt -force
+[<embedded>] % check_superlint -report -violation -detailed -verbose all -file reports/superlint_violations.txt -force
+[<embedded>] % check_superlint -report -violation -order severity -file reports/superlint_violations_by_severity.txt -force
+[<embedded>] % check_superlint -report -violation -csv -file reports/superlint_violations.csv -force
+[<embedded>] % check_superlint -report -signoff -file reports/superlint_signoff.txt -force
+[<embedded>] % check_superlint -report -signoff -html -file reports/superlint_signoff.html -force
+[<embedded>] % 
+[<embedded>] % puts "==============================================================="
+===============================================================
+[<embedded>] % puts "  JasperGold Superlint SoC Analysis Complete!                  "
+  JasperGold Superlint SoC Analysis Complete!                  
+[<embedded>] % puts "==============================================================="
+===============================================================
+[<embedded>] % 
+[<embedded>] % exit -force
+[<embedded>] % INFO (IPL005): Received request to exit from the console.
+INFO (IPL018): The peak resident set memory use for this session was 0.463 GB.
+INFO (IPL014): Waiting for the Tcl-thread to exit.
+INFO (IPL015): The Tcl-thread exited with status 0.
+INFO (IPL016): Exiting the analysis session with status 0.

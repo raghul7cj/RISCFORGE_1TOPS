@@ -1,0 +1,733 @@
+**********************************************
+  Title: Jasper(TM) - Superlint Setup Report  
+**********************************************
+
+  Date: Sep 10 00:02:03 IST 2026  
+  Tool Version: 2025.06 FCS 64 bits  
+  Top Module: riscforge_soc_subsystem  
+
+********************************************************************************************
+      Section 1: DESIGN STATISTICS
+********************************************************************************************
+
+      Design Size:
+============================================================================================
+------------------------------------
+ Number of Gates | Number of Flops 
+------------------------------------
+  40923             8813            
+
+
+      Black Boxes:
+============================================================================================
+--------------------------
+ Module Name | Bbox-Type 
+--------------------------
+  -             -         
+
+
+      Liberty Modules:
+============================================================================================
+------------------------------
+ Module/Cell Name | Filename 
+------------------------------
+  -                  -        
+
+
+      Design Parameters:
+============================================================================================
+--------------------------------------------------------------
+ Parameter Name       | Value                                
+--------------------------------------------------------------
+  AXI_ADDR_WIDTH         32'b00000000000000000000000000100000 
+  AXI_DATA_WIDTH         32'b00000000000000000000000000100000 
+  BOOTROM_NUM_WORDS      32'b00000000000000000000000000010000 
+  FLASH_POWERUP_CYCLES   32'b00000000000000000111010100110000 
+  NUM_DATA_WORDS         32'b00000000000000000000000000000000 
+  NUM_INSTR_WORDS        32'b00000000000000000000000001000000 
+  SPI_BUFFER_DEPTH       32'b00000000000000000000000000001010 
+  TIMER0_CNT             32'b00000000000000000000000000000010 
+  TIMER1_CNT             32'b00000000000000000000000000000010 
+
+********************************************************************************************
+      Section 2: TOOL CONFIGURATION
+********************************************************************************************
+============================================================================================
+      Section 2.1: Rule Configuration
+============================================================================================
+
+      Enabled Rules Summary:
+============================================================================================
+-------------------------------------------------------------
+ Category                          | Error | Warning | Info 
+-------------------------------------------------------------
+  FILEFORMAT                          0       3         0    
+  CODINGSTYLE                         17      101       2    
+  SIM_SYNTH                           2       13        0    
+  SYNTHESIS                           24      41        0    
+  STRUCTURAL                          4       11        0    
+  BLACKBOX                            1       3         2    
+  DFT_FUNCTIONAL                      3       17        2    
+  AUTO_FORMAL_OVERFLOW                7       0         0    
+  AUTO_FORMAL_BUS                     3       0         0    
+  AUTO_FORMAL_IF_CASE                 6       0         0    
+  AUTO_FORMAL_COMBO_LOOP              1       0         0    
+  AUTO_FORMAL_DEAD_CODE               1       0         0    
+  AUTO_FORMAL_FSM_DEADLOCK_LIVELOCK   2       2         2    
+  AUTO_FORMAL_FSM_REACHABILITY        3       0         0    
+  AUTO_FORMAL_OUT_OF_BOUND_INDEXING   1       0         0    
+  AUTO_FORMAL_SIGNALS                 5       0         0    
+  AUTO_FORMAL_X_ASSIGNMENT            1       0         0    
+  AUTO_FORMAL_ASSERTION_CODING        1       0         0    
+
+
+      Enabled Rules Detailed:
+============================================================================================
+--------------------------------------
+ Tag Name    | Alias Name | Severity 
+--------------------------------------
+  FIL_MS_DUNM   -            Warning  
+  FIL_NR_MMOD   -            Warning  
+  FIL_NS_SUFX   -            Warning  
+  ALW_NR_EMSL   -            Warning  
+  ASG_NR_FNCP   -            Warning  
+  ASG_NR_EXPR   -            Warning  
+  ASG_NR_EVNT   -            Error    
+  MOD_NR_STRN   -            Error    
+  ARY_MS_DRNG   -            Warning  
+  ARY_NR_LOPR   -            Warning  
+  ARY_NR_NERG   -            Warning  
+  ARY_NR_SLRG   -            Warning  
+  ASG_MS_RTRU   -            Warning  
+  ASG_MS_VALR   -            Warning  
+  ASG_NR_POVF   -            Warning  
+  ASG_NR_LMSB   -            Warning  
+  ASG_NR_MINP   -            Warning  
+  ASG_NR_NBFC   -            Warning  
+  ASG_NR_SOVF   -            Warning  
+  CAS_NO_CNST   -            Warning  
+  CAS_NO_DEFA   -            Warning  
+  CAS_NO_OTHR   -            Warning  
+  CAS_NR_CMUL   -            Warning  
+  CAS_NR_DEFN   -            Error    
+  CAS_NR_DEFX   -            Warning  
+  CAS_NR_EXCS   -            Warning  
+  CAS_NR_OVCI   -            Warning  
+  CAS_NR_UCIT   -            Warning  
+  CAS_NR_XCAZ   -            Warning  
+  CND_IR_CCAS   -            Warning  
+  CND_NR_BWOP   -            Warning  
+  CND_NR_DUPF   -            Warning  
+  CND_NR_EVXZ   -            Warning  
+  CND_NS_MBEX   -            Warning  
+  CST_MS_SIZE   -            Warning  
+  CST_NO_DELY   -            Warning  
+  CST_NO_HIER   -            Warning  
+  CST_NO_IVAL   -            Error    
+  CST_NR_REAL   -            Warning  
+  DLY_NO_CSAG   -            Error    
+  DLY_NR_NEGT   -            Error    
+  DUT_NO_USED   -            Warning  
+  EXP_NR_DIVZ   -            Warning  
+  EXP_NR_ITYC   -            Warning  
+  EXP_NR_OVFB   -            Warning  
+  EXP_NR_MXSU   -            Warning  
+  EXP_NR_STUS   -            Warning  
+  EXP_NR_TNST   -            Warning  
+  EXP_NR_USTS   -            Warning  
+  FNC_MS_AFPR   -            Warning  
+  FNC_MS_MTYP   -            Warning  
+  FNC_NO_AVAC   -            Warning  
+  FNC_NO_LRET   -            Warning  
+  FNC_NO_UASG   -            Warning  
+  FNC_NR_AVGV   -            Warning  
+  FNC_NR_NARG   -            Warning  
+  FNC_NR_RLRT   -            Warning  
+  FNC_NR_UGLV   -            Warning  
+  FNC_NR_SYSV   -            Error    
+  GEN_NO_GREP   -            Warning  
+  IFC_NO_FALW   -            Warning  
+  IFC_NR_DGEL   -            Warning  
+  INP_NO_LOAD   -            Warning  
+  INP_UC_INST   -            Error    
+  INP_NR_IOUT   -            Error    
+  INP_NR_TSUP   -            Warning  
+  INS_MS_PRMS   -            Error    
+  INS_MS_PSIZ   -            Error    
+  INS_NR_PODL   -            Warning  
+  INS_NR_PTEX   -            Warning  
+  IOP_NR_UASG   -            Warning  
+  LOP_NR_CTCE   -            Warning  
+  LOP_NR_FCND   -            Warning  
+  LOP_NR_MLPV   -            Error    
+  LOP_NR_MSTP   -            Warning  
+  MAC_NR_DMUL   -            Info     
+  MOD_NO_LGIC   -            Info     
+  MOD_NR_EBLK   -            Warning  
+  MOD_NR_INCD   -            Warning  
+  MOD_NR_PGAT   -            Warning  
+  MOD_NR_PRIM   -            Error    
+  MOD_NR_RPXZ   -            Warning  
+  MOD_NR_UNGN   -            Warning  
+  REP_NR_ZERO   -            Warning  
+  NAM_NR_REPU   -            Warning  
+  OPR_NR_LOSD   -            Warning  
+  OPR_NR_REAL   -            Warning  
+  OPR_NR_STRE   -            Warning  
+  OPR_NR_UCMP   -            Warning  
+  OPR_NR_UEOP   -            Warning  
+  OPR_NR_UEAS   -            Warning  
+  OPR_NR_TERN   -            Warning  
+  OPR_NR_UREL   -            Warning  
+  OTP_NO_FDRV   -            Warning  
+  OTP_NR_READ   -            Warning  
+  OTP_NR_TSUP   -            Warning  
+  OTP_NR_UDRV   -            Warning  
+  OTP_UC_INST   -            Warning  
+  PAR_MS_SDAS   -            Warning  
+  PRG_NR_PROF   -            Warning  
+  PRO_NR_WAIT   -            Warning  
+  PRT_NO_MODE   -            Warning  
+  PRT_NR_BUFF   -            Error    
+  PRT_NR_DFRG   -            Warning  
+  PRT_NR_LINK   -            Error    
+  REG_NR_UASR   -            Warning  
+  REP_NR_NPOS   -            Error    
+  REP_NR_UPAC   -            Warning  
+  RST_IS_CPLX   -            Warning  
+  SIG_NO_ASIG   -            Warning  
+  TSK_NR_ASGV   -            Warning  
+  TSK_NR_ESDE   -            Warning  
+  TSK_NR_UGLV   -            Warning  
+  VAR_NO_ASIG   -            Warning  
+  VAR_NR_NEGT   -            Warning  
+  VAR_NR_OUTL   -            Warning  
+  VAR_NR_PRCD   -            Warning  
+  VAR_NR_RDBA   -            Warning  
+  VAR_NR_RDEC   -            Warning  
+  VAR_NR_STRN   -            Warning  
+  VAR_NR_UBDL   -            Warning  
+  WIR_NR_IMPL   -            Error    
+  WIR_NR_UASR   -            Warning  
+  ALW_NR_MSLV   -            Warning  
+  ALW_NR_UNUV   -            Warning  
+  CAS_NR_FPIN   -            Warning  
+  CAS_NR_PUOV   -            Warning  
+  CST_NO_BWID   -            Warning  
+  CST_NR_MSBX   -            Warning  
+  CST_NR_MSBZ   -            Warning  
+  DLY_NR_XZVL   -            Warning  
+  ENM_NR_TOST   -            Warning  
+  FNC_NO_EVAL   -            Warning  
+  MOD_NR_ACCD   -            Error    
+  MOD_NR_LOCL   -            Warning  
+  MOD_NR_SYXZ   -            Warning  
+  VAR_NR_MBNB   -            Warning  
+  VAR_NR_NDCL   -            Error    
+  ALW_IC_SENL   -            Warning  
+  ALW_NO_COMB   -            Warning  
+  ALW_NO_ETRG   -            Warning  
+  ALW_NO_EVTS   -            Warning  
+  ALW_NR_MCLK   -            Error    
+  ALW_NR_MIFF   -            Warning  
+  ALW_NR_MXCK   -            Error    
+  ALW_NR_TCST   -            Error    
+  ASG_NR_NBCB   -            Warning  
+  ASG_NR_SUPN   -            Warning  
+  BLK_NR_PGDL   -            Error    
+  CAS_NR_EVLX   -            Error    
+  CLK_IS_NSYT   -            Error    
+  CLK_NR_DDBE   -            Warning  
+  CLK_NR_EDGE   -            Warning  
+  CND_NR_CMXZ   -            Warning  
+  CST_NR_CCAT   -            Warning  
+  DLY_NR_ASGN   -            Warning  
+  NOW_NS_FUNC   -            Error    
+  FLP_NR_ASMX   -            Warning  
+  FLP_NR_BLAS   -            Warning  
+  FLP_NR_MBCK   -            Warning  
+  FNC_NR_CREC   -            Warning  
+  FNC_NR_RESL   -            Warning  
+  IDX_NR_LBOU   -            Warning  
+  IDX_NR_ORNG   -            Warning  
+  IFC_NO_SENL   -            Warning  
+  INP_NR_ASGN   -            Warning  
+  INS_NR_TOKN   -            Warning  
+  LAT_NR_BLAS   -            Warning  
+  LAT_NR_MXCB   -            Warning  
+  LOP_NR_GLID   -            Warning  
+  LOP_NR_INFL   -            Warning  
+  LOP_NR_SRLG   -            Warning  
+  MOD_IS_RCMP   -            Warning  
+  MOD_NR_ALAS   -            Error    
+  MOD_NR_ASLD   -            Warning  
+  MOD_NR_CNDO   -            Warning  
+  MOD_NR_DATT   -            Warning  
+  MOD_NR_DSBC   -            Error    
+  MOD_NR_EVRP   -            Error    
+  MOD_NR_FKJN   -            Error    
+  MOD_NR_SPFY   -            Error    
+  MOD_NR_FORE   -            Error    
+  MOD_NR_FREL   -            Error    
+  MOD_NR_IFSM   -            Warning  
+  MOD_NR_NSLP   -            Error    
+  MOD_NR_NULP   -            Error    
+  MOD_NR_PHYD   -            Error    
+  MOD_NR_USWC   -            Error    
+  MOD_NS_ADAS   -            Warning  
+  MOD_NS_DCSP   -            Error    
+  MOD_NS_GTIN   -            Error    
+  OPR_NR_WCCO   -            Warning  
+  SIG_NO_HIER   -            Error    
+  SIG_NO_UHIR   -            Error    
+  SIG_NR_MDRV   -            Warning  
+  SIG_NR_TIME   -            Error    
+  TSK_NR_CLKE   -            Warning  
+  VAR_NO_COMR   -            Warning  
+  VAR_NR_MBLA   -            Warning  
+  VAR_NR_MNBA   -            Warning  
+  VAR_NR_OUTR   -            Warning  
+  VAR_NR_RDTA   -            Warning  
+  VAR_NR_REAL   -            Error    
+  CLK_NO_INPT   -            Warning  
+  CLK_NS_EDMX   -            Warning  
+  CLK_NR_GLKN   -            Warning  
+  CMB_NR_TLIO   -            Warning  
+  FLP_NO_ASRT   -            Warning  
+  FLP_NR_ASRT   -            Warning  
+  FLP_NR_ENCT   -            Warning  
+  FLP_IS_STRH   -            Warning  
+  MOD_NO_IPRG   -            Warning  
+  NET_NO_DRIV   -            Error    
+  RST_IS_DCMB   -            Error    
+  RST_IS_DFLP   -            Warning  
+  RST_IS_DLAT   -            Warning  
+  RST_NR_PENA   -            Error    
+  SIG_IS_MDRV   -            Error    
+  ELB_IS_ERRO   -            Error    
+  INS_IS_EBXE   -            Info     
+  MOD_IS_EBXE   -            Info     
+  MOD_IS_IBXE   -            Warning  
+  MOD_IS_RBXE   -            Warning  
+  SIG_IS_ATBX   -            Warning  
+  CLK_IS_DLAT   -            Warning  
+  CLK_IS_NDPI   -            Warning  
+  CLK_IS_BDPI   -            Warning  
+  CLK_IS_CDPI   -            Warning  
+  FLP_IS_ASFL   -            Error    
+  FLP_IS_CKLP   -            Error    
+  FLP_IS_CDFF   -            Warning  
+  FLP_IS_CSTD   -            Warning  
+  FLP_IS_GTCK   -            Warning  
+  FLP_NO_CNPI   -            Warning  
+  FLP_NO_SRST   -            Warning  
+  LAT_EN_NCPI   -            Warning  
+  LAT_IS_CSTD   -            Warning  
+  LAT_IS_INFR   -            Warning  
+  MOD_IS_CMBL   -            Error    
+  NUM_IS_LOOP   -            Info     
+  NUM_LP_CMBL   -            Info     
+  OTP_NO_RGTM   -            Warning  
+  INS_IS_FEED   -            Warning  
+  RST_IS_DDAF   -            Warning  
+  RST_MX_EDGE   -            Warning  
+  TRI_NO_EPTB   -            Warning  
+  ASG_AR_OVFL   -            Error    
+  EXP_AR_OVFL   -            Error    
+  ASG_IS_OVFL   -            Error    
+  EXP_IS_DVBZ   -            Error    
+  SHF_IS_OVFL   -            Error    
+  SHF_IS_ABSO   -            Error    
+  VAR_IS_CTOL   -            Error    
+  BUS_IS_CONT   -            Error    
+  BUS_IS_FLOT   -            Error    
+  SIG_IS_MLAS   -            Error    
+  CAS_NO_PRIO   -            Error    
+  CAS_NO_UNIQ   -            Error    
+  CAS_IS_DFRC   -            Error    
+  IFC_NO_UNIQ   -            Error    
+  SIG_IS_OHOT   -            Error    
+  SIG_IS_OCLD   -            Error    
+  MOD_IS_FCMB   -            Error    
+  BLK_NO_RCHB   -            Error    
+  FSM_IS_LVLK   -            Error    
+  FSM_IS_DDLK   -            Error    
+  FSM_IS_PLLK   -            Warning  
+  FSM_IS_PDLK   -            Warning  
+  FSM_IS_NLLK   -            Info     
+  FSM_IS_NDLK   -            Info     
+  FSM_NO_RCHB   -            Error    
+  FSM_NO_TRRN   -            Error    
+  FSM_NO_MTRN   -            Error    
+  SIG_NO_TGRS   -            Error    
+  SIG_NO_TGFL   -            Error    
+  SIG_NO_TGST   -            Error    
+  SIG_IS_DLCK   -            Error    
+  SIG_IS_STCK   -            Error    
+  ARY_IS_OOBI   -            Error    
+  ASG_IS_XRCH   -            Error    
+  ASR_IS_CNFL   -            Error    
+
+============================================================================================
+      Section 2.2: Parameter Configuration
+============================================================================================
+
+      Rule Parameters:
+============================================================================================
+---------------------------------------------------------------------------------------------------------------------------------
+ Parameter Name                             | Domain      | Tag         | Value                                                 
+---------------------------------------------------------------------------------------------------------------------------------
+  apply_auto_waivers                           Global        All           true                                                  
+  automatic_scheme_detection                   Global        All           true                                                  
+  ndff_detection                               Global        All           true                                                  
+  pulse_detection                              Global        All           true                                                  
+  edge_detection                               Global        All           true                                                  
+  mux_ndff_detection                           Global        All           false                                                 
+  mux_pulse_detection                          Global        All           false                                                 
+  handshake_detection                          Global        All           false                                                 
+  fifo_detection                               Global        All           false                                                 
+  gated_clock_detection                        Global        All           true                                                  
+  mux_loop_detection                           Global        All           true                                                  
+  strict_ndff_detection                        Global        All           true                                                  
+  allow_sync_chain_logic                       Global        All           false                                                 
+  allow_sync_chain_fanout                      Global        All           false                                                 
+  use_sdc_clock_period                         Global        All           true                                                  
+  add_stopat_for_internal_constants            Global        All           false                                                 
+  override_sdc_constants                       Global        All           true                                                  
+  all_clocks_sync_by_default                   Global        All           true                                                  
+  treat_data_ports_as_async                    Global        All           None                                                  
+  treat_undriven_as_units                      Global        All           false                                                 
+  auto_potential_sync_enabler_detection        Global        All           false                                                 
+  ignore_convergence_from_complex_schemes      Global        All           false                                                 
+  propagate_clock_through_control_path         Global        All           true                                                  
+  report_violations_on_unconnected_load        Global        All           false                                                 
+  report_violations_on_constant_load           Global        All           false                                                 
+  waive_power_control_to_clock_violations      Global        All           true                                                  
+  superlint_rule_profiler                      Global        All           false                                                 
+  superlint_verbosity_level                    Global        All           false                                                 
+  superlint_rule_profiler_per_tag_sample       Global        All           false                                                 
+  superlint_rule_profiler_measure_memory       Global        All           true                                                  
+  allow_padding_by_zero                        LINT          All           false                                                 
+  allow_truncation_by_zero                     LINT          All           false                                                 
+  assume_bbox_connected                        LINT          All           explicit_bbox                                         
+  case_selector_size_limit                     LINT          All           14                                                    
+  disable_partial_reporting                    LINT          All           false                                                 
+  global_pattern_style                         LINT          All           wildcard                                              
+  global_regex_pattern                         LINT          All                                                                 
+  hide_verific_messages                        LINT          All           true                                                  
+  local_regex_style                            LINT          All           ""                                                    
+  max_supported_bit_size                       LINT          All           16384                                                 
+  pattern_style                                LINT          All           ""                                                    
+  regex_style                                  LINT          All           ""                                                    
+  report_complex_indexed_expr                  LINT          All           false                                                 
+  report_partially_unused_vector               LINT          All           true                                                  
+  size_as_per_calculation                      LINT          All           false                                                 
+  tags_waiving_gate_no_load                    LINT          All           CLK_IS_NDPI                                           
+  traverse_inactive_blocks                     LINT          All           false                                                 
+  unbased_literal                              LINT          All           size_as_per_type                                      
+  unsized_literal                              LINT          All           size_as_per_type                                      
+  assume_bbox_connected                        DFT           All           explicit_bbox                                         
+  enable_test_coverage                         DFT           All           false                                                 
+  shift_mode_test_clock                        DFT           All           true                                                  
+  ignore_non_const                             LINT          MOD_NR_CNDO   true                                                  
+  multi_stmt_process_limit                     LINT          VAR_NR_MBLA   1024                                                  
+  mulnba_reset_mode                            LINT          VAR_NR_MNBA   false                                                 
+  multi_stmt_process_limit                     LINT          VAR_NR_MNBA   1024                                                  
+  primary_edge                                 LINT          CLK_NS_EDMX   posedge                                               
+  report_with_latch_in_path                    LINT          CMB_NR_TLIO   false                                                 
+  levels_of_combinational_logic                LINT          MOD_NO_IPRG   0                                                     
+  treat_multi_driven_as_combinational_logic    LINT          RST_IS_DCMB   true                                                  
+  ignore_z_drivers                             LINT          SIG_IS_MDRV   true                                                  
+  report_same_drivers                          LINT          SIG_IS_MDRV   false                                                 
+  local_pattern_style                          LINT          FIL_NS_SUFX   regex                                                 
+  local_regex_style                            LINT          FIL_NS_SUFX   full                                                  
+  pattern                                      LINT          FIL_NS_SUFX   (^vhd$|^vhdl$|^v$|^sv$)                               
+  direction                                    LINT          ARY_MS_DRNG   descending                                            
+  report_unpacked                              LINT          ARY_MS_DRNG   true                                                  
+  skip_component_declaration                   LINT          ARY_MS_DRNG   true                                                  
+  skip_unused_signal                           LINT          ARY_MS_DRNG   false                                                 
+  allow_truncation_by_zero                     LINT          ARY_NR_LOPR   true                                                  
+  skip_declarations                            LINT          ARY_NR_LOPR   true                                                  
+  top_only                                     LINT          ARY_NR_SLRG   false                                                 
+  skip_loop_declaration                        LINT          ASG_MS_RTRU   true                                                  
+  report_all_negative_assignment_to_unsigned   LINT          ASG_NR_POVF   false                                                 
+  skip_loop_declaration                        LINT          ASG_NR_POVF   true                                                  
+  skip_statement                               LINT          ASG_NR_POVF   ""                                                    
+  skip_loop_declaration                        LINT          ASG_NR_LMSB   true                                                  
+  consider_parallel_case_pragma                LINT          CAS_NR_CMUL   false                                                 
+  report_non_constant_case_item                LINT          CAS_NR_CMUL   false                                                 
+  case_default_specification                   LINT          CAS_NR_DEFN   relax                                                 
+  combinational_block_only                     LINT          CAS_NR_DEFN   false                                                 
+  consider_all_enum_covered_as_full            LINT          CAS_NR_DEFN   false                                                 
+  consider_default_item_as_full                LINT          CAS_NR_DEFN   true                                                  
+  consider_full_case_as_full                   LINT          CAS_NR_DEFN   false                                                 
+  full_case_with_no_default_allowed            LINT          CAS_NR_DEFN   true                                                  
+  verbose_report_all_missing_case_items        LINT          CAS_NR_DEFN   false                                                 
+  consider_all_enum_covered_as_full            LINT          CAS_NR_DEFX   false                                                 
+  consider_full_case_as_full                   LINT          CAS_NR_DEFX   false                                                 
+  skip_incomplete_case                         LINT          CAS_NR_DEFX   false                                                 
+  skip_loop_declaration                        LINT          CAS_NR_DEFX   true                                                  
+  ignore_operator                              LINT          CAS_NR_EXCS   concat:replicate:add:subtract:multiply:divide:modulus 
+  consider_parallel_case_pragma                LINT          CAS_NR_OVCI   false                                                 
+  ignore_overlap_except_unique                 LINT          CAS_NR_OVCI   false                                                 
+  ignore_within_list_overlap                   LINT          CAS_NR_OVCI   false                                                 
+  ignore_z_overlap                             LINT          CAS_NR_OVCI   false                                                 
+  allow_padding_by_zero                        LINT          CAS_NR_UCIT   true                                                  
+  allow_truncation_by_zero                     LINT          CAS_NR_UCIT   true                                                  
+  casesel_lessthan_casetag_allow               LINT          CAS_NR_UCIT   false                                                 
+  ignore_reverse_modeling                      LINT          CND_IR_CCAS   false                                                 
+  optimize_condition                           LINT          CND_IR_CCAS   true                                                  
+  report_parameter                             LINT          CND_IR_CCAS   false                                                 
+  report_params_in_condition                   LINT          CND_IR_CCAS   true                                                  
+  mode_type                                    LINT          CND_NR_BWOP                                                         
+  check_case_only                              LINT          CST_NR_REAL   false                                                 
+  skip_real_literal_inside_casting             LINT          CST_NR_REAL   true                                                  
+  skip_operation                               LINT          EXP_NR_ITYC   false                                                 
+  skip_declarations                            LINT          EXP_NR_OVFB   true                                                  
+  skip_concat                                  LINT          EXP_NR_MXSU   false                                                 
+  skip_const_unsigned_expr                     LINT          EXP_NR_MXSU   false                                                 
+  skip_expr_in_index                           LINT          EXP_NR_MXSU   true                                                  
+  skip_generate_condition                      LINT          EXP_NR_MXSU   false                                                 
+  nesting_limit                                LINT          EXP_NR_TNST   10                                                    
+  skip_loop_declaration                        LINT          EXP_NR_USTS   false                                                 
+  allow_padding_by_zero                        LINT          FNC_MS_AFPR   true                                                  
+  allow_truncation_by_zero                     LINT          FNC_MS_AFPR   true                                                  
+  skip_component_declaration                   LINT          FNC_MS_AFPR   true                                                  
+  allow_function_list                          LINT          FNC_NR_SYSV   ""                                                    
+  disallow_function_list                       LINT          FNC_NR_SYSV   ""                                                    
+  ignore_inout_ports                           LINT          INP_NO_LOAD   false                                                 
+  ignore_undriven_ports                        LINT          INP_NO_LOAD   true                                                  
+  top_only                                     LINT          INP_NO_LOAD   false                                                 
+  ignore_explicitly_unconnected_port           LINT          INP_UC_INST   false                                                 
+  ignore_inout_ports                           LINT          INP_UC_INST   false                                                 
+  ignore_port_with_no_load                     LINT          INP_UC_INST   false                                                 
+  report_partially_unused                      LINT          INP_UC_INST   true                                                  
+  ignore_inout_as_input_ports                  LINT          INP_NR_IOUT   true                                                  
+  allow_padding_by_zero                        LINT          INS_MS_PRMS   true                                                  
+  allow_truncation_by_zero                     LINT          INS_MS_PRMS   true                                                  
+  allow_padding_by_zero                        LINT          INS_MS_PSIZ   true                                                  
+  allow_truncation_by_zero                     LINT          INS_MS_PSIZ   true                                                  
+  check_tech_cells                             LINT          INS_NR_PODL   true                                                  
+  ignore_sized_literal                         LINT          INS_NR_PTEX   true                                                  
+  optimize_condition                           LINT          LOP_NR_CTCE   true                                                  
+  skip_loop_declaration                        LINT          LOP_NR_MLPV   true                                                  
+  disable_on_port_declaration                  LINT          OPR_NR_LOSD   false                                                 
+  skip_loop_declaration                        LINT          OPR_NR_LOSD   true                                                  
+  allow_padding_by_zero                        LINT          OPR_NR_UCMP   true                                                  
+  allow_truncation_by_zero                     LINT          OPR_NR_UCMP   true                                                  
+  skip_declarations                            LINT          OPR_NR_UCMP   true                                                  
+  skip_event_expression                        LINT          OPR_NR_UCMP   true                                                  
+  skip_loop_declaration                        LINT          OPR_NR_UCMP   true                                                  
+  skip_loop_index_comparison                   LINT          OPR_NR_UCMP   true                                                  
+  allow_padding_by_zero                        LINT          OPR_NR_UEOP   true                                                  
+  allow_truncation_by_zero                     LINT          OPR_NR_UEOP   true                                                  
+  ignore_addition                              LINT          OPR_NR_UEOP   false                                                 
+  ignore_subtraction                           LINT          OPR_NR_UEOP   false                                                 
+  skip_declarations                            LINT          OPR_NR_UEOP   true                                                  
+  skip_event_expression                        LINT          OPR_NR_UEOP   true                                                  
+  skip_loop_declaration                        LINT          OPR_NR_UEOP   true                                                  
+  skip_loop_index_comparison                   LINT          OPR_NR_UEOP   true                                                  
+  allow_padding_by_zero                        LINT          OPR_NR_UEAS   true                                                  
+  allow_truncation_by_zero                     LINT          OPR_NR_UEAS   true                                                  
+  skip_declarations                            LINT          OPR_NR_UEAS   true                                                  
+  skip_event_expression                        LINT          OPR_NR_UEAS   true                                                  
+  skip_loop_declaration                        LINT          OPR_NR_UEAS   true                                                  
+  skip_loop_index_comparison                   LINT          OPR_NR_UEAS   true                                                  
+  allow_padding_by_zero                        LINT          OPR_NR_TERN   true                                                  
+  allow_truncation_by_zero                     LINT          OPR_NR_TERN   true                                                  
+  skip_declarations                            LINT          OPR_NR_TERN   true                                                  
+  skip_loop_declaration                        LINT          OPR_NR_TERN   true                                                  
+  skip_loop_index_comparison                   LINT          OPR_NR_TERN   true                                                  
+  allow_padding_by_zero                        LINT          OPR_NR_UREL   true                                                  
+  allow_truncation_by_zero                     LINT          OPR_NR_UREL   true                                                  
+  skip_declarations                            LINT          OPR_NR_UREL   true                                                  
+  skip_event_expression                        LINT          OPR_NR_UREL   true                                                  
+  skip_loop_declaration                        LINT          OPR_NR_UREL   true                                                  
+  skip_loop_index_comparison                   LINT          OPR_NR_UREL   true                                                  
+  skip_signed_unsigned_functions               LINT          OPR_NR_UREL   true                                                  
+  ignore_inout_ports                           LINT          OTP_NO_FDRV   false                                                 
+  ignore_unloaded_ports                        LINT          OTP_NO_FDRV   true                                                  
+  top_only                                     LINT          OTP_NO_FDRV   false                                                 
+  skip_assigned_output                         LINT          OTP_NR_READ   false                                                 
+  ignore_inout_ports                           LINT          OTP_NR_UDRV   false                                                 
+  ignore_unloaded_ports                        LINT          OTP_NR_UDRV   true                                                  
+  top_only                                     LINT          OTP_NR_UDRV   false                                                 
+  check_on_std_cells                           LINT          OTP_UC_INST   true                                                  
+  ignore_explicitly_unconnected_port           LINT          OTP_UC_INST   false                                                 
+  ignore_inout_ports                           LINT          OTP_UC_INST   false                                                 
+  ignore_port_with_no_load                     LINT          OTP_UC_INST   false                                                 
+  report_partially_unused                      LINT          OTP_UC_INST   true                                                  
+  show_unconnected_bus_range                   LINT          OTP_UC_INST   false                                                 
+  allow_padding_by_zero                        LINT          PAR_MS_SDAS   true                                                  
+  allow_truncation_by_zero                     LINT          PAR_MS_SDAS   false                                                 
+  skip_if_only_one_range                       LINT          PRT_NR_DFRG   true                                                  
+  local_pattern_style                          LINT          REG_NR_UASR                                                         
+  local_regex_style                            LINT          REG_NR_UASR                                                         
+  pattern                                      LINT          REG_NR_UASR   ""                                                    
+  local_pattern_style                          LINT          SIG_NO_ASIG                                                         
+  local_regex_style                            LINT          SIG_NO_ASIG                                                         
+  pattern                                      LINT          SIG_NO_ASIG   ""                                                    
+  local_pattern_style                          LINT          VAR_NO_ASIG                                                         
+  local_regex_style                            LINT          VAR_NO_ASIG                                                         
+  pattern                                      LINT          VAR_NO_ASIG   ""                                                    
+  check_datatype                               LINT          VAR_NR_NEGT   reg:logic:wire                                        
+  enable_vhdl_support                          LINT          VAR_NR_RDBA   false                                                 
+  skip_flip_flop                               LINT          VAR_NR_RDBA   false                                                 
+  skip_loop_declaration                        LINT          VAR_NR_RDBA   true                                                  
+  local_pattern_style                          LINT          WIR_NR_UASR                                                         
+  local_regex_style                            LINT          WIR_NR_UASR                                                         
+  pattern                                      LINT          WIR_NR_UASR   ""                                                    
+  skip_implicit_sensitivity_list               LINT          ALW_NR_MSLV   true                                                  
+  skip_read_and_assigned                       LINT          ALW_NR_MSLV   false                                                 
+  report_partially_read_vector                 LINT          ALW_NR_UNUV   true                                                  
+  case_default_specification                   LINT          CAS_NR_FPIN   relax                                                 
+  combinational_block_only                     LINT          CAS_NR_FPIN   false                                                 
+  consider_all_enum_covered_as_full            LINT          CAS_NR_FPIN   false                                                 
+  consider_default_item_as_full                LINT          CAS_NR_FPIN   true                                                  
+  full_case_with_no_default_allowed            LINT          CAS_NR_FPIN   true                                                  
+  bit_width_allowed_bin_system                 LINT          CST_NO_BWID   5                                                     
+  bit_width_allowed_other_system               LINT          CST_NO_BWID   5                                                     
+  skip_declarations                            LINT          CST_NO_BWID   true                                                  
+  report_value_type                            LINT          MOD_NR_SYXZ   both                                                  
+  skip_case_default_statement                  LINT          MOD_NR_SYXZ   yes                                                   
+  skip_param_value                             LINT          MOD_NR_SYXZ   true                                                  
+  skip_tristate_logic                          LINT          MOD_NR_SYXZ   false                                                 
+  ignore_primitive                             LINT          VAR_NR_NDCL   ""                                                    
+  check_edge_sensitive_only                    LINT          ALW_NR_TCST   true                                                  
+  hide_verific_messages                        LINT          ALW_NR_TCST   false                                                 
+  allow_independent_NBA                        LINT          ASG_NR_NBCB   true                                                  
+  clock_using_bus_signal                       LINT          FLP_NR_MBCK   false                                                 
+  levels_of_combinational_logic                DFT           OTP_NO_RGTM   0                                                     
+  convention_for_set_reset_style               DFT           RST_MX_EDGE   mixed                                                 
+  controllable_thru_comb_logic                 DFT           TRI_NO_EPTB   false                                                 
+  check_behind_mux                             DFT           FLP_IS_CSTD   false                                                 
+  disallowed_combinational_logic               DFT           FLP_IS_GTCK   all                                                   
+  check_on_instance                            DFT           FLP_NO_SRST   false                                                 
+  ignore_constant_flops                        DFT           FLP_NO_SRST   false                                                 
+  controllable_thru_comb_logic                 DFT           LAT_EN_NCPI   false                                                 
+  print_full_name                              DFT           LAT_IS_INFR   false                                                 
+  skip_always_latch                            DFT           LAT_IS_INFR   false                                                 
+  disable_enumerated_loops                     DFT           MOD_IS_CMBL   false                                                 
+  include_latch_data                           DFT           MOD_IS_CMBL   true                                                  
+  loop_count_limit                             DFT           MOD_IS_CMBL   10                                                    
+  loop_unroll_limit                            DFT           MOD_IS_CMBL   10                                                    
+  include_latch_data                           AUTO_FORMAL   MOD_IS_FCMB   true                                                  
+  loop_count_limit                             AUTO_FORMAL   MOD_IS_FCMB   10                                                    
+
+
+============================================================================================
+      Section 2.3: Tool Settings:
+============================================================================================
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Setting                                                    | Value                                                                                                                                           
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  superlint_add_automatic_task_assumption_bitblasted           false                                                                                                                                           
+  superlint_arithmetic_overflow_counter_filter                 non_critical                                                                                                                                    
+  superlint_arithmetic_overflow_enable_exponentiation          false                                                                                                                                           
+  superlint_arithmetic_overflow_enable_multiplication          false                                                                                                                                           
+  superlint_conflicting_assertions_remove_design_constraints   true                                                                                                                                            
+  superlint_deadcode_full_case_filter                          false                                                                                                                                           
+  superlint_deadcode_unified_loop                              false                                                                                                                                           
+  superlint_debug_unreachable                                  false                                                                                                                                           
+  superlint_debug_unreachable_per_property_time_limit          5s                                                                                                                                              
+  superlint_debug_unreachable_time_limit                       7200s                                                                                                                                           
+  superlint_enable_compile_messages                            true                                                                                                                                            
+  superlint_enable_hier_lint                                   false                                                                                                                                           
+  superlint_enable_observability_tags                          BUS_IS_FLOT ASG_IS_XRCH ASG_IS_OVFL ASG_AR_OVFL EXP_AR_OVFL BUS_IS_CONT ARY_IS_OOBI EXP_IS_DVBZ SHF_IS_OVFL SHF_IS_ABSO VAR_IS_CTOL SIG_IS_MLAS 
+  superlint_enable_rtl_inline_waiver                           false                                                                                                                                           
+  superlint_engine_mode                                        Ht J N I L                                                                                                                                      
+  superlint_engine_mode_fsm_deadlock_livelock                  Tri M                                                                                                                                           
+  superlint_extract_default_case_x_assignment_checks           true                                                                                                                                            
+  superlint_extract_exclude_fsm                                                                                                                                                                                
+  superlint_extract_low_level_fsm                                                                                                                                                                              
+  superlint_filter_covered_reset                               true                                                                                                                                            
+  superlint_fsm_automatic_assumptions_type                     none                                                                                                                                            
+  superlint_fsm_ignore_self_transitions                        false                                                                                                                                           
+  superlint_fsm_max_state                                      100                                                                                                                                             
+  superlint_fsm_no_mtrn_max_state                              16                                                                                                                                              
+  superlint_leverage_formal                                    true                                                                                                                                            
+  superlint_limit_observable_boundary_signal                   10                                                                                                                                              
+  superlint_loop_count_limit                                   10                                                                                                                                              
+  superlint_loop_filter_startpoints                            on                                                                                                                                              
+  superlint_observability_local_expression_levels              2                                                                                                                                               
+  superlint_parallel_extraction                                1                                                                                                                                               
+  superlint_parallel_synthesis                                 false                                                                                                                                           
+  superlint_prove_keep_traces                                  assert                                                                                                                                          
+  superlint_prove_memory_limit                                 2048                                                                                                                                            
+  superlint_prove_parallel_tasks                               auto                                                                                                                                            
+  superlint_prove_strategy                                     hybrid                                                                                                                                          
+  superlint_prove_time_limit                                   7200s                                                                                                                                           
+  superlint_report_negative_result_overflow                    false                                                                                                                                           
+  superlint_report_same_drivers_multiple_assignment            false                                                                                                                                           
+  superlint_report_unsigned_casting                            true                                                                                                                                            
+  superlint_rule_profiler                                      off                                                                                                                                             
+  superlint_signal_type                                        flop output custom                                                                                                                              
+  superlint_signals_automatic_assumptions_type                 none                                                                                                                                            
+  superlint_signals_customize                                                                                                                                                                                  
+  superlint_signals_deadlock_bitblasted                        true                                                                                                                                            
+  superlint_signals_deadlock_max_width                         10                                                                                                                                              
+  superlint_signals_extraction_heuristic                       auto                                                                                                                                            
+  superlint_signals_filter_connected                           true                                                                                                                                            
+  superlint_signals_filter_constant                            true                                                                                                                                            
+  superlint_signals_filter_wide_signal                         auto                                                                                                                                            
+  superlint_signals_max_bits                                   1                                                                                                                                               
+  superlint_stuck_at_bitblasted                                false                                                                                                                                           
+  superlint_sva_max_depth                                      10                                                                                                                                              
+  superlint_sva_max_length                                     1000                                                                                                                                            
+  superlint_unified_deadcode_checks                            all                                                                                                                                             
+  superlint_verbosity_level                                    1                                                                                                                                               
+  superlint_waiver_export_version                              false                                                                                                                                           
+
+********************************************************************************************
+      Section 3: DESIGN CONFIGURATION
+********************************************************************************************
+
+============================================================================================
+      Section 3.1: Test Clocks:
+============================================================================================
+----------------------
+ Clock Signal | Mode 
+----------------------
+  -              -    
+
+
+============================================================================================
+      Section 3.2: Declared Clocks:
+============================================================================================
+--------------------------------------
+ Clock Signal | Clock Name | Command 
+--------------------------------------
+  clk_i          clk_i        clock   
+
+
+============================================================================================
+      Section 3.3: Declared Resets:
+============================================================================================
+------------------------------------------------
+ Reset Name  | Reset Type | Polarity | Command 
+------------------------------------------------
+  hard_rst_ni   async        low        reset   
+  soft_rst_ni   async        low        reset   
+
+============================================================================================
+      Section 3.4: Applied Constraints
+============================================================================================
+
+      Signal Configuration:
+============================================================================================
+---------------------------------------------
+ Signal Name | Type | Value | Mode | Source 
+---------------------------------------------
+  -             -      -       -      -      
+
+
+      DFT Memory:
+============================================================================================
+--------------
+ Module Name 
+--------------
+  -           
+
+
+
+

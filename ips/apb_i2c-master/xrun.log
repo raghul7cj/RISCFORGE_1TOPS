@@ -1,0 +1,237 @@
+xrun(64): 22.09-s003: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	22.09-s003: Started on Aug 29, 2026 at 17:43:57 IST
+xrun
+	-f files_thorough_tb.f
+		-access +rwc
+		-incdir rtl
+		rtl/i2c_master_defines.sv
+		rtl/i2c_master_bit_ctrl.sv
+		rtl/i2c_master_byte_ctrl.sv
+		rtl/apb_i2c.sv
+		rtl/i2c_thorough_tb.sv
+Recompiling... reason: file './rtl/i2c_thorough_tb.sv' is newer than expected.
+	expected: Sat Aug 29 17:16:23 2026
+	actual:   Sat Aug 29 17:43:53 2026
+file: rtl/i2c_thorough_tb.sv
+	module worklib.thorough_tb:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		thorough_tb
+xmelab: *W,DSEMEL: This SystemVerilog design will be simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.thorough_tb:sv <0x07d80865>
+			streams: 102, words: 224005
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                 Instances  Unique
+		Modules:                 4       4
+		Registers:             163     163
+		Scalar wires:           62       -
+		Expanded wires:          3       1
+		Vectored wires:          9       -
+		Always blocks:          21      21
+		Initial blocks:          4       4
+		Parallel blocks:        19      19
+		Cont. assignments:      20      29
+		Pseudo assignments:     25      25
+		Simulation timescale:  1ns
+	Writing initial simulation snapshot: worklib.thorough_tb:sv
+Loading snapshot worklib.thorough_tb:sv .................... Done
+xmsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
+xcelium> source /home/install/XCELIUM2209/tools/xcelium/files/xmsimrc
+xcelium> run
+
+================================================================
+     APB-I2C THOROUGH VERIFICATION TESTBENCH
+================================================================
+
+────────────────────────────────────────────────
+  SECTION 1 : REGISTER RESET VALUES
+────────────────────────────────────────────────
+[195] PASS : I2C bus idle after reset (SCL=1, SDA=1)
+[220] PASS : PRE reset value = 0x0000
+[250] PASS : CTRL reset value = 0x00
+[280] PASS : TX reset value = 0x00
+[310] PASS : CMD reset value = 0x00
+[340] PASS : STATUS reset value = 0x00
+[370] PASS : RX reset value = 0x00
+
+────────────────────────────────────────────────
+  SECTION 2 : APB PROTOCOL-LEVEL TESTS
+────────────────────────────────────────────────
+[370] PASS : PREADY is 1 at idle
+[370] PASS : PSLVERR is 0 at idle
+[460] PASS : PRE write/readback
+[490] PASS : CTRL write/readback
+[550] PASS : TX write/readback
+[640] PASS : Invalid addr write does not corrupt PRE
+[670] PASS : Read from invalid addr returns 0x00000000
+[730] PASS : Read from second invalid addr returns 0
+[790] PASS : Read from max invalid addr returns 0
+[850] PASS : Write to STATUS does not set reserved bits
+
+────────────────────────────────────────────────
+  SECTION 3 : PRESCALER RANGE TESTS
+────────────────────────────────────────────────
+[1130] PASS : PRE max value 0xFFFF readback
+[1190] PASS : PRE value 0x8000 readback
+[1250] PASS : PRE min value 0x0001 readback
+[1310] PASS : PRE value 0x0000 readback
+[1370] PASS : PRE upper 16 bits read as 0
+[1370] PASS : PRE lower 16 bits = 0x0005
+
+────────────────────────────────────────────────
+  SECTION 4 : CMD REGISTER — CORE DISABLED GATING
+────────────────────────────────────────────────
+[1620] PASS : CMD write ignored when core disabled
+
+────────────────────────────────────────────────
+  SECTION 5 : BASIC I2C WRITE & READ
+────────────────────────────────────────────────
+[14800] PASS : Basic I2C WRITE (addr=0x32, data=0xAA)
+[27670] PASS : Basic I2C READ  (addr=0x45, data=0x5A)
+
+────────────────────────────────────────────────
+  SECTION 6 : DATA PATTERN STRESS
+────────────────────────────────────────────────
+[40540] PASS : WRITE data=0x00
+[53410] PASS : WRITE data=0xFF
+[66280] PASS : WRITE data=0x55
+[79150] PASS : WRITE data=0xAA
+[92020] PASS : WRITE data=0x01 (LSB only)
+[104890] PASS : WRITE data=0x80 (MSB only)
+[117760] PASS : WRITE data=0x0F (lower nibble)
+[130630] PASS : WRITE data=0xF0 (upper nibble)
+[143500] PASS : READ data=0x00
+[156370] PASS : READ data=0xFF
+[169240] PASS : READ data=0x55
+[182110] PASS : READ data=0xAA
+[194980] PASS : READ data=0x01 (LSB only)
+[207850] PASS : READ data=0x80 (MSB only)
+
+────────────────────────────────────────────────
+  SECTION 7 : BACK-TO-BACK & MIXED DIRECTION
+────────────────────────────────────────────────
+[220720] PASS : Back-to-back WRITE #1
+[233590] PASS : Back-to-back WRITE #2
+[246460] PASS : Back-to-back WRITE #3
+[259330] PASS : Back-to-back READ #1
+[272200] PASS : Back-to-back READ #2
+[285070] PASS : Back-to-back READ #3
+[297940] PASS : Mixed: WRITE before READ
+[310810] PASS : Mixed: READ after WRITE (same addr)
+[323680] PASS : Mixed: READ before WRITE
+[336550] PASS : Mixed: WRITE after READ (same addr)
+
+────────────────────────────────────────────────
+  SECTION 8 : NACK HANDLING
+────────────────────────────────────────────────
+[336550] INFO : Testing slave NACK on address...
+[342940] PASS : STATUS[7] rxack set on addr NACK
+[349390] PASS : Address NACK handled without hang
+[349390] INFO : Testing slave NACK on data byte...
+[355810] PASS : Address ACK received (before data NACK)
+[362230] PASS : STATUS[7] rxack set on data NACK
+[362290] PASS : Data NACK handled without hang
+[362785] PASS : Bus idle after NACK scenarios
+
+────────────────────────────────────────────────
+  SECTION 9 : MULTI-BYTE TRANSFERS
+────────────────────────────────────────────────
+[381500] PASS : Multi-byte WRITE: slave received 0xDE, 0xAD
+[400160] PASS : Multi-byte READ: master received 0xBE, 0xEF
+
+────────────────────────────────────────────────
+  SECTION 10 : REPEATED START (COMBINED FORMAT)
+────────────────────────────────────────────────
+[425360] PASS : Combined: slave received write data 0x42
+[425360] PASS : Combined: master received read data 0x99
+
+────────────────────────────────────────────────
+  SECTION 11 : CLOCK STRETCHING
+────────────────────────────────────────────────
+[439790] PASS : Clock stretch: transfer completed correctly
+
+────────────────────────────────────────────────
+  SECTION 12 : BUS BUSY DETECTION
+────────────────────────────────────────────────
+[440810] PASS : STATUS[6] busy=0 when bus is idle
+[453710] PASS : STATUS[6] busy went high during transfer
+[454730] PASS : STATUS[6] busy returned to 0 after STOP
+
+────────────────────────────────────────────────
+  SECTION 13 : INTERRUPT TESTS
+────────────────────────────────────────────────
+[467820] PASS : interrupt_o stays low when IEN=0
+[480910] PASS : interrupt_o asserted when IEN=1
+[487330] PASS : IRQ flag set before IACK
+[487420] PASS : IRQ flag cleared after IACK
+
+────────────────────────────────────────────────
+  SECTION 14 : CMD AUTO-CLEAR AFTER TRANSFER
+────────────────────────────────────────────────
+[500290] PASS : CMD[7:4] auto-cleared after address phase done
+[506710] PASS : CMD[7:4] auto-cleared after data+stop done
+
+────────────────────────────────────────────────
+  SECTION 15 : TIP (TRANSFER IN PROGRESS)
+────────────────────────────────────────────────
+[519610] PASS : STATUS[1] TIP set during transfer
+[519640] PASS : STATUS[1] TIP cleared after transfer
+
+────────────────────────────────────────────────
+  SECTION 16 : RESET RECOVERY
+────────────────────────────────────────────────
+[519835] PASS : Bus idle after mid-test reset
+[532760] PASS : WRITE after reset recovery
+[545630] PASS : READ after reset recovery
+
+────────────────────────────────────────────────
+  SECTION 17 : RESET DURING ACTIVE TRANSFER
+────────────────────────────────────────────────
+[595630] PASS : Bus idle after reset-during-transfer
+[595650] PASS : CMD cleared after reset-during-transfer
+[595680] PASS : STATUS cleared after reset-during-transfer
+[608610] PASS : WRITE after reset-during-transfer recovery
+
+────────────────────────────────────────────────
+  SECTION 18 : BOUNDARY I2C ADDRESSES
+────────────────────────────────────────────────
+[621480] PASS : WRITE to I2C addr 0x00 (general call)
+[634350] PASS : WRITE to I2C addr 0x7F (max 7-bit)
+[647220] PASS : WRITE to I2C addr 0x01 (min non-zero)
+[660090] PASS : READ from I2C addr 0x00
+[672960] PASS : READ from I2C addr 0x7F
+
+────────────────────────────────────────────────
+  SECTION 19 : ARBITRATION LOST
+────────────────────────────────────────────────
+[678435] PASS : STATUS[5] AL flag set on arbitration lost
+[678460] PASS : CMD[7:4] auto-cleared on arbitration lost
+[695670] PASS : WRITE after arbitration-lost recovery
+
+────────────────────────────────────────────────
+  SECTION 20 : FINAL CHECKS
+────────────────────────────────────────────────
+[696165] PASS : I2C bus idle after all transfers
+[696165] PASS : START conditions were generated
+[696165] PASS : STOP conditions were generated
+
+================================================================
+              THOROUGH TEST REPORT
+================================================================
+  PASS        = 90
+  FAIL        = 0
+  START COUNT = 50
+  STOP COUNT  = 47
+================================================================
+        *** APB-I2C VERIFICATION PASSED ***
+================================================================
+Simulation complete via $finish(1) at time 696365 NS + 0
+./rtl/i2c_thorough_tb.sv:1482         $finish;
+xcelium> exit
+TOOL:	xrun(64)	22.09-s003: Exiting on Aug 29, 2026 at 17:44:04 IST  (total: 00:00:07)
