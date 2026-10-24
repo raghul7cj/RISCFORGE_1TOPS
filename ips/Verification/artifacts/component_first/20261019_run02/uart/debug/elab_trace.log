@@ -1,0 +1,35 @@
+Vivado Simulator v2022.2
+Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2022.2/bin/unwrapped/win64.o/xelab.exe --nolog --timescale 1ns/1ps tb_uart_trace -s uart_trace 
+Multi-threading is on. Using 14 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package work.apb_pkg
+Compiling package work.obi_pkg
+Compiling package work.cf_math_pkg
+Compiling package work.obi_uart_pkg
+Compiling module work.apb_to_obi(ObiCfg='{1'b0,1'b0,32...
+Compiling module work.obi_uart_register(obi_req_t=obi_...
+Compiling module work.sync(STAGES=32'b010)
+Compiling module work.obi_uart_modem
+Compiling module work.delta_counter(WIDTH=32'b010000)
+Compiling module work.counter(WIDTH=32'b010000)
+Compiling module work.delta_counter(WIDTH=32'b0100)
+Compiling module work.counter
+Compiling module work.obi_uart_baudgen
+Compiling module work.delta_counter(WIDTH=32'b0101)
+Compiling module work.counter(WIDTH=32'b0101)
+Compiling module work.fifo_v3(DATA_WIDTH=32'b01011,DEP...
+Compiling module work.obi_uart_rx
+Compiling module work.fifo_v3(DATA_WIDTH=32'b01000,DEP...
+Compiling module work.obi_uart_tx
+Compiling module work.obi_uart_interrupts
+Compiling module work.obi_uart(ObiCfg='{1'b0,1'b0,32'b...
+Compiling module work.apb_uart_wrap(apb_req_t=apb_req_...
+Compiling module work.apb_uart
+Compiling module work.tb_uart_trace
+Built simulation snapshot uart_trace

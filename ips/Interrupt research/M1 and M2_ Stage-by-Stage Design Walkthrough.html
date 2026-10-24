@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>M1 and M2: Stage-by-Stage Design Walkthrough</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d24;--mut:#5a6270;--card:#f3f5f9;--line:#c5ccd8;--acc:#1f5fd6;--m1:#0f7b6c;--m2:#b4531a;--bad:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171d;--fg:#e6e9ef;--mut:#9aa3b2;--card:#1d222b;--line:#3a4252;--acc:#7aa7ff;--m1:#4fd1bd;--m2:#ffa066;--bad:#ff7b6b}}
+:root[data-theme="dark"]{--bg:#14171d;--fg:#e6e9ef;--mut:#9aa3b2;--card:#1d222b;--line:#3a4252;--acc:#7aa7ff;--m1:#4fd1bd;--m2:#ffa066;--bad:#ff7b6b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:900px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;line-height:1.25;margin:.3em 0 .2em}
+h2{font-size:1.15rem;margin:2em 0 .5em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+h3{font-size:.95rem;margin:1.2em 0 .3em;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+p,li{margin:.35em 0}ul{padding-left:1.2em}
+.sub{color:var(--mut);font-size:.9rem}.m1{color:var(--m1);font-weight:600}.m2{color:var(--m2);font-weight:600}
+.w{overflow-x:auto}.w svg{min-width:660px}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:520px}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}th{background:var(--card)}
+code{background:var(--card);padding:0 4px;border-radius:3px;font-size:.88em}
+.card{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:8px 14px;margin:10px 0}
+svg{width:100%;height:auto;background:var(--card);border:1px solid var(--line);border-radius:6px}
+svg text{fill:var(--fg);font:11px system-ui,sans-serif}svg .s{font-size:9.5px;fill:var(--mut)}svg .t{font-weight:700;font-size:11.5px}
+.b{fill:var(--bg);stroke:var(--line);stroke-width:1.3}.hl{stroke:var(--m1);stroke-width:2}.ho{stroke:var(--m2);stroke-width:2}.hb{stroke:var(--acc);stroke-width:2}
+.a{stroke:var(--mut);stroke-width:1.3;fill:none;marker-end:url(#h)}.da{stroke-dasharray:4 3}
+.bar{fill:var(--line)}.g1{fill:var(--m1)}.g2{fill:var(--m2)}svg .w1{fill:#fff}
+</style></head><body><main>
+<h1>M1 and M2: Stage-by-Stage Design Walkthrough</h1>
+<p class="sub">RISCFORGE 5-stage RV32IM_Zicsr core · Stage 1 = what we have · Stage 2 = <span class="m1">M1 optimization</span> · Stage 3 = <span class="m2">M2 optimization</span>. Values marked "target" are goals to confirm by measurement, not results.</p>
+
+<h2>Stage 1 · Baseline: the trap and interrupt mechanism we have</h2>
+<div class="w"><svg viewBox="0 0 680 304" role="img" aria-label="Baseline trap and interrupt flow">
+<defs><marker id="h" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" style="fill:var(--mut)"/></marker></defs>
+<rect class="b" x="10" y="14" width="100" height="44" rx="4"/><text x="18" y="33">mip &amp; mie</text><text class="s" x="18" y="48">pending ∧ enabled</text>
+<rect class="b" x="130" y="14" width="130" height="44" rx="4"/><text x="138" y="33">priority encoder</text><text class="s" x="138" y="48">cause &gt; mintprio</text>
+<rect class="b" x="280" y="14" width="100" height="44" rx="4"/><text x="288" y="33">mstatus.MIE</text><text class="s" x="288" y="48">global enable</text>
+<path class="a" d="M110 36H130"/><path class="a" d="M260 36H280"/>
+<path class="a" d="M330 58V82H265V106"/><text class="s" x="338" y="78">① irq_pending</text>
+<rect class="b" x="10" y="106" width="90" height="44" rx="4"/><text class="t" x="18" y="126">IF</text><text class="s" x="18" y="141">fetch</text>
+<rect class="b" x="115" y="106" width="90" height="44" rx="4"/><text class="t" x="123" y="126">ID</text><text class="s" x="123" y="141">decode, exc tags</text>
+<rect class="b hb" x="220" y="106" width="90" height="44" rx="4"/><text class="t" x="228" y="126">EX</text><text class="s" x="228" y="141">ALU · MUL/DIV</text>
+<rect class="b" x="325" y="106" width="90" height="44" rx="4"/><text class="t" x="333" y="126">MEM</text><text class="s" x="333" y="141">LSU, tag passes</text>
+<rect class="b hb" x="430" y="106" width="90" height="44" rx="4"/><text class="t" x="438" y="126">WB</text><text class="s" x="438" y="141">commit point</text>
+<path class="a" d="M100 128H115"/><path class="a" d="M205 128H220"/><path class="a" d="M310 128H325"/><path class="a" d="M415 128H430"/>
+<rect class="b da" x="560" y="106" width="110" height="44" rx="4"/><text x="568" y="124">mret at WB:</text><text class="s" x="568" y="138">PC←mepc, MIE←MPIE</text><path class="a da" d="M520 128H560"/>
+<path class="a" d="M232 150V170H55V152"/><text class="s" x="62" y="166">③ flush IF/ID</text>
+<rect class="b" x="150" y="192" width="200" height="52" rx="4"/><text x="158" y="208">② accept in EX</text><text class="s" x="158" y="222">valid_E ∧ ¬exc ∧ ¬stallMUL</text><text class="s" x="158" y="236">tag as trap · squash rd/mem/CSR writes</text>
+<path class="a" d="M280 150V192"/>
+<text class="s" x="332" y="166">tag travels down; older</text><text class="s" x="332" y="177">instructions still retire</text>
+<rect class="b" x="380" y="192" width="200" height="52" rx="4"/><text x="388" y="208">④ commit at WB</text><text class="s" x="388" y="222">trap_commit = valid_W ∧ exc_valid_W</text><text class="s" x="388" y="236">single redirect point (precise)</text>
+<path class="a" d="M475 150V192"/>
+<rect class="b" x="10" y="262" width="330" height="34" rx="4"/><text x="18" y="276">⑤ mepc←PCE · mcause←{1,id} · mtval←0</text><text class="s" x="18" y="289">mstatus: MPIE←MIE · MIE←0 · MPP←11</text>
+<rect class="b" x="350" y="262" width="320" height="34" rx="4"/><text x="358" y="276">⑥ flush 4 pipe regs · PC ← trap target</text><text class="s" x="358" y="289">direct: mtvec base · vectored: base + 4·cause</text>
+<path class="a" d="M400 244V253H175V262"/><path class="a" d="M480 244V262"/>
+</svg></div>
+<h3>Approach after corner-case analysis</h3>
+<ul>
+<li><b>Gate in hardware, accept at an instruction boundary:</b> pending ∧ enabled, priority above <code>mintprio</code>, then global MIE; only then does EX consider it.</li>
+<li><b>Detect early, act late:</b> EX converts the instruction into a trap tag; only WB turns tags into traps, so there is one redirect point.</li>
+<li><b>Precise by construction:</b> older instructions retire, younger ones are flushed, and <code>mepc = PCE</code> so the interrupted instruction re-executes after <code>mret</code>.</li>
+<li><b>Synchronous exceptions win</b> over interrupts; the earlier tag is kept.</li>
+</ul>
+<h3>Corner cases (existing behavior and what it exposes)</h3>
+<div class="w"><table><tr><th>Case</th><th>Current behavior</th><th>Consequence</th></tr>
+<tr><td>Multi-cycle MUL/DIV in EX</td><td>Accept blocked by <code>stallMUL</code></td><td>Latency depends on the interrupted instruction → target of M1</td></tr>
+<tr><td>Exception already tagged</td><td>Interrupt not accepted this cycle</td><td>Correct; keep</td></tr>
+<tr><td>Taken branch in EX at accept</td><td><code>PCSrcE</code> not suppressed; flushed at WB</td><td>Add an assertion to confirm no wrong-path effect</td></tr>
+<tr><td>Trap and CSR write same cycle</td><td>Trap wins, CSR write dropped</td><td>Correct; keep</td></tr>
+<tr><td>Level-sensitive IRQ not cleared</td><td>Re-enters after <code>mret</code></td><td>Handler must clear source; check WDT clock-crossing delay</td></tr>
+<tr><td>MMIO access in MEM</td><td>Trap waits for bus response</td><td>Bounded by bus latency; out of scope</td></tr>
+<tr><td>Software context save</td><td>~16 stores in the handler</td><td>Cost S before any C code runs → target of M2</td></tr></table></div>
+<div class="card"><b>Baseline numbers to measure in week 1:</b> L0 (IRQ → first handler instruction, no multi-cycle op) · L<sub>div</sub> (same with a divide in flight) · jitter = L<sub>div</sub> − L0 · S (software save cost) · baseline gate and flop counts. Everything later is judged against these.</div>
+
+<h2>Stage 2 · <span class="m1">Optimization 1 (M1)</span>: interrupt-transparent multi-cycle units</h2>
+<div class="w"><svg viewBox="0 0 680 350" role="img" aria-label="M1 datapath and timeline">
+<text class="t" x="10" y="16">A · EX-stage datapath (new parts marked ▲)</text>
+<rect class="b hl" x="10" y="36" width="120" height="50" rx="4"/><text x="18" y="54">Accept logic</text><text class="s" x="18" y="68">irq_pending ∧ valid_E</text><text class="s" x="18" y="80">stallMUL gate removed ▲</text>
+<rect class="b hl" x="150" y="46" width="70" height="30" rx="4"/><text x="158" y="65">abort ▲</text>
+<path class="a" d="M130 61H150"/>
+<rect class="b" x="250" y="26" width="140" height="44" rx="4"/><text x="258" y="44">Divider FSM</text><text class="s" x="258" y="59">step · rem · quot</text>
+<rect class="b" x="250" y="84" width="140" height="44" rx="4"/><text x="258" y="102">Multiplier FSM</text><text class="s" x="258" y="117">partial product · step</text>
+<path class="a" d="M220 54H235V48H250"/><path class="a" d="M220 68H235V106H250"/>
+<rect class="b hl" x="430" y="42" width="160" height="70" rx="4"/><text x="438" y="60">Abort effects ▲</text><text class="s" x="438" y="74">1 drop op · RegWrite = 0</text><text class="s" x="438" y="87">2 trap tag · mepc = PC of op</text><text class="s" x="438" y="100">3 younger instrs flushed</text>
+<path class="a" d="M390 48H410V62H430"/><path class="a" d="M390 106H410V92H430"/>
+<rect class="b" x="610" y="54" width="60" height="46" rx="4"/><text x="618" y="74">WB</text><text class="s" x="618" y="88">commit</text><path class="a" d="M590 77H610"/>
+<rect class="b da" x="150" y="146" width="440" height="24" rx="4"/><text class="s" x="158" y="162">replay: mret → PC = mepc → the op re-executes; no checkpoint state kept</text>
+<text class="t" x="10" y="200">B · Interrupt entry timeline (cycles, illustrative; T<tspan baseline-shift="sub" font-size="8">div</tspan> to be measured)</text>
+<text x="10" y="236">Baseline</text>
+<rect class="bar" x="90" y="222" width="270" height="20" rx="3"/><text x="98" y="236">DIV runs · IRQ blocked (up to T_div)</text>
+<rect class="g2" x="360" y="222" width="34" height="20" rx="3"/><text class="w1" x="364" y="236">trap</text>
+<rect class="b hb" x="394" y="222" width="70" height="20" rx="3"/><text class="s" x="399" y="236">handler →</text>
+<path class="a" d="M90 252H360"/><text class="s" x="120" y="264">latency = L0 + up to T_div</text>
+<text x="10" y="296">M1</text>
+<rect class="bar" x="90" y="282" width="24" height="20" rx="3"/><text class="s" x="92" y="296">DIV</text>
+<rect class="g1" x="114" y="282" width="34" height="20" rx="3"/><text class="w1" x="118" y="296">abort</text>
+<rect class="g2" x="148" y="282" width="34" height="20" rx="3"/><text class="w1" x="152" y="296">trap</text>
+<rect class="b hb" x="182" y="282" width="70" height="20" rx="3"/><text class="s" x="187" y="296">handler →</text>
+<path class="a" d="M90 312H182"/><text class="s" x="96" y="326">latency = L0 + c (constant)</text>
+<rect class="b da" x="330" y="282" width="200" height="20" rx="3"/><text class="s" x="336" y="296">after mret: DIV replays (≤ T_div)</text>
+<path class="a" d="M90 340H600"/><text class="s" x="604" y="343">time</text>
+</svg></div>
+<h3>Approach after corner-case analysis</h3>
+<ul>
+<li><b>Abort, then replay:</b> one strobe drops the operation without writing <code>rd</code>; <code>mepc</code> already points at it, so <code>mret</code> re-executes it. No checkpoint register to keep consistent.</li>
+<li><b>One interface for divider and multiplier</b>, so the bound covers every multi-cycle unit.</li>
+<li><b>Progress condition:</b> if interrupt inter-arrival time exceeds ISR time plus one divide, every divide completes; an optional retry-limit CSR covers storm cases.</li>
+<li><b>Constant-time abort:</b> the abort path takes the same cycles regardless of step counter or operands, which removes the latency channel described in [3].</li>
+</ul>
+<h3>Corner cases</h3>
+<div class="w"><table><tr><th>Case</th><th>Rule</th></tr>
+<tr><td>Result completes in the accept cycle</td><td>Abort wins; <code>RegWrite</code> gated, so no double write-back</td></tr>
+<tr><td>Older synchronous exception in MEM/WB</td><td>Exception first (existing rule); the op is flushed</td></tr>
+<tr><td>Nested interrupt, or the ISR itself divides</td><td>Replay discards state; nothing shared to corrupt</td></tr>
+<tr><td><code>mret</code> to a different PC (RTOS switch)</td><td>Replay is architectural, so nothing stale survives</td></tr>
+<tr><td>Divide by zero, INT_MIN ÷ −1</td><td>Spec-defined results, recomputed identically</td></tr>
+<tr><td>Storm faster than one divide</td><td>Progress condition; retry-limit CSR as safety net</td></tr>
+<tr><td>Younger op depends on aborted result</td><td>Already flushed; no forwarding of the discarded value</td></tr></table></div>
+<div class="card"><b>Quantifiable outcome (targets, to confirm):</b><ul>
+<li>Worst-case entry with a divide or multiply in flight: L0 + up to T<sub>div</sub> → L0 + a small constant c.</li>
+<li>Latency distinguishability across operand classes: |t| &lt; 4.5 where the baseline exceeds it.</li>
+<li>Area: a few hundred gate equivalents (estimate). Replay cost: at most T<sub>div</sub> per interrupted operation.</li>
+<li>Proofs: replay equals uninterrupted result; latency identical for runs differing only in operands (bounded two-copy check).</li></ul></div>
+
+<h2>Stage 3 · <span class="m2">Optimization 2 (M2)</span>: bank-less background context save</h2>
+<div class="w"><svg viewBox="0 0 680 360" role="img" aria-label="M2 datapath and timeline">
+<text class="t" x="10" y="16">A · Save-engine dataflow (new parts marked ▲)</text>
+<rect class="b" x="10" y="34" width="100" height="44" rx="4"/><text x="18" y="52">WB trap commit</text><text class="s" x="18" y="66">sp ← sp − 4N</text>
+<rect class="b ho" x="135" y="28" width="150" height="56" rx="4"/><text x="143" y="46">Save engine FSM ▲</text><text class="s" x="143" y="60">idx · saved[15:0] · base=sp</text><text class="s" x="143" y="73">no second register bank</text>
+<rect class="b ho" x="310" y="34" width="100" height="44" rx="4"/><text x="318" y="52">RF snapshot ▲</text><text class="s" x="318" y="66">extra read port</text>
+<rect class="b ho" x="435" y="28" width="120" height="56" rx="4"/><text x="443" y="46">SRAM arbiter ▲</text><text class="s" x="443" y="60">LSU first</text><text class="s" x="443" y="73">starvation counter N</text>
+<rect class="b" x="580" y="34" width="90" height="44" rx="4"/><text x="588" y="52">DSRAM</text><text class="s" x="588" y="66">stack frame</text>
+<path class="a" d="M110 56H135"/><path class="a" d="M285 56H310"/><path class="a" d="M410 56H435"/><path class="a" d="M555 56H580"/>
+<rect class="b ho" x="135" y="116" width="170" height="44" rx="4"/><text x="143" y="134">Write interlock (ID) ▲</text><text class="s" x="143" y="148">rd ∉ saved → stall the writer</text>
+<rect class="b ho" x="325" y="116" width="170" height="44" rx="4"/><text x="333" y="134">Stack-range check (LSU) ▲</text><text class="s" x="333" y="148">unwritten slot → stall access</text>
+<rect class="b ho" x="515" y="116" width="155" height="44" rx="4"/><text x="523" y="134">Nesting gate ▲</text><text class="s" x="523" y="148">new trap waits: saved = all</text>
+<path class="a da" d="M220 116V84"/><path class="a da" d="M410 116V100H495V84"/><path class="a da" d="M592 116V96H285V84" style="stroke-opacity:.6"/>
+<text class="s" x="10" y="184">Saved set: ra, t0–t2, a0–a7, t3–t6 (16 caller-saved registers). Snapshot starts at WB commit, after all older instructions retire.</text>
+<text class="t" x="10" y="212">B · Interrupt entry timeline (cycles, illustrative)</text>
+<text x="10" y="246">Software</text>
+<rect class="g2" x="90" y="232" width="30" height="20" rx="3"/><text class="w1" x="94" y="246">trap</text>
+<rect class="bar" x="120" y="232" width="250" height="20" rx="3"/><text x="128" y="246">handler pushes 16 registers (S cycles)</text>
+<rect class="b hb" x="370" y="232" width="70" height="20" rx="3"/><text class="s" x="375" y="246">C code →</text>
+<path class="a" d="M90 262H370"/><text class="s" x="120" y="274">entry = L0 + S</text>
+<text x="10" y="306">M2</text>
+<rect class="g2" x="90" y="292" width="30" height="20" rx="3"/><text class="w1" x="94" y="306">trap</text>
+<rect class="b hb" x="120" y="292" width="200" height="20" rx="3"/><text class="s" x="126" y="306">C code runs from here →</text>
+<rect class="g1" x="120" y="316" width="190" height="10" rx="2"/><text class="s" x="316" y="325">saver runs in the background</text>
+<rect x="196" y="292" width="8" height="20" fill="var(--bad)"/><rect x="262" y="292" width="8" height="20" fill="var(--bad)"/><text class="s" x="210" y="340" style="fill:var(--bad)">red = hazard stalls (write to unsaved reg, unwritten slot)</text>
+<path class="a" d="M90 350H120" style="stroke-width:2"/><text class="s" x="126" y="353">entry = L0 + small</text>
+<rect class="b da" x="470" y="232" width="200" height="40" rx="4"/><text class="s" x="478" y="248">exit (v1): software restore,</text><text class="s" x="478" y="261">unchanged; hardware unstack = stretch</text>
+</svg></div>
+<h3>Approach after corner-case analysis</h3>
+<ul>
+<li><b>Snapshot at commit, not at accept:</b> at EX-accept, older instructions are still in flight; at WB commit they have all retired, so the register file is architecturally exact.</li>
+<li><b>No second bank:</b> the engine reads the register file in the background and stalls the handler only on real hazards (a write to an unsaved register, or an access to an unwritten stack slot).</li>
+<li><b>Bounded by construction:</b> the LSU keeps fixed priority, and a starvation counter forces a save slot every N cycles, so save completion has a proven bound.</li>
+<li><b>Plain C handlers:</b> vector stub is <code>jal isr_c</code>, software restore, <code>mret</code>. v1 keeps exit cost unchanged and reports it separately; hardware unstacking is a stretch.</li>
+</ul>
+<h3>Corner cases</h3>
+<div class="w"><table><tr><th>Case</th><th>Rule</th></tr>
+<tr><td>ISR writes an unsaved register</td><td>Interlock stalls the writer until it is saved</td></tr>
+<tr><td>ISR loads or stores an unwritten stack slot</td><td>Stack-range compare stalls the access</td></tr>
+<tr><td>Nested trap before saving finishes</td><td>Blocked until saved = all (bounded)</td></tr>
+<tr><td>Exception inside the ISR during save</td><td>Finish the save first, then take the exception</td></tr>
+<tr><td><code>sp</code> misaligned or outside DSRAM</td><td>Engine disabled, status bit set, stub falls back to software save</td></tr>
+<tr><td>Load-heavy ISR starves the saver</td><td>Starvation counter guarantees a slot every N cycles</td></tr>
+<tr><td>Very short ISR reaches <code>mret</code> early</td><td><code>mret</code> waits for saved = all</td></tr>
+<tr><td>Extra read port too costly (FPGA)</td><td>Save in spare cycles of existing ports; bound grows</td></tr></table></div>
+<div class="card"><b>Quantifiable outcome (targets, to confirm):</b><ul>
+<li>Entry to first C-callable instruction: L0 + S (about 33 cycles for a software-save baseline in [1]) → about 12 cycles or better, the Cortex-M4 reference in [1].</li>
+<li>Added state: tens of flops (estimate) against a 512-flop 16-register bank; SRAM writes unchanged at 16 per entry.</li>
+<li>Hazard stall cycles per ISR reported for five ISR types, including a load-heavy one.</li>
+<li>Proofs: each stacked word equals the register at trap entry; interlock never lets an unsaved register be overwritten; entry and save completion within a stated bound.</li></ul></div>
+<p class="sub">[1] Balas, Ottaviano, Benini, CV32RT, IEEE TVLSI 2024. [3] Van Bulck, Piessens, Strackx, Nemesis, ACM CCS 2018.</p>
+</main></body></html>

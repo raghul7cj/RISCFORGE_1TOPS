@@ -1,0 +1,30 @@
+{
+  "scenario": "stage1_hello",
+  "boot_mode": "WARM",
+  "seed": 1,
+  "verdict": "FAIL",
+  "started_utc": "2026-10-18T12:19:17.495385Z",
+  "environment": {
+    "LM_LICENSE_FILE": "5280@14.139.1.126",
+    "CDS_LIC_FILE": "5280@14.139.1.126",
+    "CDS_AUTO_64BIT": "ALL"
+  },
+  "tool_version": "TOOL:\txrun(64)\t24.09-s001",
+  "filelist_sha256": "efe0aa122cfc66f0509f7a3de7ba6fc264788c10440742de4347571f5bb5895c",
+  "input_hashes": {
+    "stage1.elf": "42cec2ecde2be24d86dc073507be31916b339e3c25648f0424683d6eb05963cd",
+    "stage1_imem.hex": "b7c3daf2d6f370184b6d551db4d38b50a5140d2a79c9e9ab45884d47be4a6454",
+    "stage1_dmem.hex": "d7b7e1a4b0fa9c3b94a6d3aab5bc3916a945221f58062eca07bf532b2ebd7ae7",
+    "riscforge_bootrom.hex": "74dcf3784d8e2e45a801ec6013926e95215d520ed766acc829d86644661e310f"
+  },
+  "plusargs": [
+    "+BOOT_MODE=WARM",
+    "+IMEM_HEX=/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/results/inputs/stage1_imem.hex",
+    "+DMEM_HEX=/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/results/inputs/stage1_dmem.hex",
+    "+TIMEOUT=1000000"
+  ],
+  "simulator_exit_code": 1,
+  "scope": "Stage1 execution verdict only; canonical module inventory comparison and explicit attestation write counting not implemented, so full P0 closure is not claimed.",
+  "reason": "See simulation logs and counter extracts.",
+  "finished_utc": "2026-10-18T12:19:26.703941Z"
+}

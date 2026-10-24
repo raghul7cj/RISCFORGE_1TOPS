@@ -1,0 +1,79 @@
+{
+  "test": "SPI component BFM TC1-TC6",
+  "backend": "Vivado XSim",
+  "version": "2022.2",
+  "host": "Windows",
+  "mode": "behavioral, non-project",
+  "top": "tb_apb_spi_master_bfm",
+  "clock": "HCLK 10 ns",
+  "runtime_bound": "250 us testbench watchdog",
+  "sim_time_ns": 90665,
+  "random_seed": null,
+  "compile_command": "xvlog -sv -nolog -f xvlog.f",
+  "elaboration_command": "xelab -nolog tb_apb_spi_master_bfm -s spi_eot_retry",
+  "simulation_command": "xsim spi_eot_retry -runall -log sim.log",
+  "waveform_elaboration_command": "xelab -nolog -debug typical tb_apb_spi_master_bfm -s spi_eot_wave",
+  "waveform_capture_command": "xsim -tclbatch capture_waveform.tcl -log sim_capture_debug.log spi_eot_wave",
+  "verdict": "PASS",
+  "terminal_marker": "TEST_PASS checks=26 eot_events=9",
+  "waveform": {
+    "path": "spi_focused.vcd",
+    "size_bytes": 330522,
+    "capture": "Focused top-level clock/reset, APB, SPI, and event outputs; non-empty and parsed for declarations."
+  },
+  "testbench_sha256": "20360A520746BCFE2C51AD5B6D0A4167F447003D9B2C9749DA965642548E890B",
+  "source_hashes": [
+    {
+      "File": "apb_spi_master.sv",
+      "SHA256": "BACD296F5BAC3714FD46BA205DA1070A7667278B5495433D43E7D2F616C3852A"
+    },
+    {
+      "File": "spi_master_apb_if.sv",
+      "SHA256": "717CFFFC08E01F905575BFAE622BE13ADE6A8DC3AF82BBCCDDA7B35D861709F0"
+    },
+    {
+      "File": "spi_master_clkgen.sv",
+      "SHA256": "B0D4EDAF397097C6C187B9767203F56A4098C8017A2404EA50BAB7AFB6489269"
+    },
+    {
+      "File": "spi_master_controller.sv",
+      "SHA256": "18A6FB5AC16FED772FD2A78CD22EF4E691308CEB53046EAF0A7B378368081961"
+    },
+    {
+      "File": "spi_master_fifo.sv",
+      "SHA256": "663F35CA54A8228E2CCFA7E2B73E6AE551C33C87D9865A19F12C274CBA0F8F8D"
+    },
+    {
+      "File": "spi_master_rx.sv",
+      "SHA256": "6CCEEBF8D49A8B4FB34C607BBC898AF9419E0B5B5382229A93E2240575A313DD"
+    },
+    {
+      "File": "spi_master_tx.sv",
+      "SHA256": "CE7F0725FA33C151B781547351F8D480F770AB93C33B42AFFF2FDF6E9966CB52"
+    },
+    {
+      "File": "spi_bfm.sv",
+      "SHA256": "5D6A7CB0E28ED1B16201ABF3B4F5B3FE6AEB4ACDFF51275AF2ACBFABE2ED0B2F"
+    },
+    {
+      "File": "spi_master_m_bfm_tb.sv",
+      "SHA256": "20360A520746BCFE2C51AD5B6D0A4167F447003D9B2C9749DA965642548E890B"
+    }
+  ],
+  "known_warnings": [
+    "$shm_open and $shm_probe are unsupported by XSim and ignored; functional checks do not depend on them."
+  ],
+  "diagnostic_notes": [
+    "A first VCD attempt without trace-enabled elaboration stopped with XSIM 45-10; re-elaborating with -debug typical produced the VCD and the same TEST_PASS marker."
+  ],
+  "artifacts": [
+    "compile.log",
+    "elab.log",
+    "sim.log",
+    "sim_capture_debug.log",
+    "capture_waveform.tcl",
+    "spi_focused.vcd",
+    "exit_status.txt",
+    "capture_debug_exit_status.txt"
+  ]
+}

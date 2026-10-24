@@ -180,6 +180,16 @@ module apb_i2c
             al       <= i2c_al | (al & ~sta);
             rxack    <= s_irxack;
             tip      <= (rd | wr);
+            // TODO(interrupt race, not fixed yet): a new event coincident with
+            // the acknowledge is lost. If s_done or i2c_al asserts on the same
+            // clock edge software writes iack, the & ~iack term zeroes the OR
+            // and irq_flag never records the event -- a completed transfer or
+            // an arbitration loss is silently dropped, one clock window wide.
+            // Same defect class as the GPIO W1C race that was fixed in
+            // prim_subreg_arb.sv (gen_w1c); this one is independent hand-written
+            // logic and needs its own fix here, e.g. let the event win:
+            //     irq_flag <= s_done | i2c_al | (irq_flag & ~iack);
+            // Verify against the I2C testbench before changing.
             irq_flag <= (s_done | i2c_al | irq_flag) & ~iack; // interrupt request flag is always generated
         end
     end

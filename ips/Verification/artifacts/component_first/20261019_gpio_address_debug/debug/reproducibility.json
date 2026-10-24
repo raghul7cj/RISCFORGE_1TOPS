@@ -1,0 +1,29 @@
+{
+  "run_id": "20261019_gpio_address_debug",
+  "test": "tb_gpio_apb_directed / TC05 standalone GPIO APB address aliasing",
+  "date_local": "2026-10-19",
+  "simulator": "Vivado XSim 2022.2",
+  "commands": [
+    "xvlog --sv -nolog -f xvlog.f",
+    "xelab tb_gpio_apb_directed -s gpio_sim --timescale 1ns/1ps",
+    "xsim gpio_sim -runall"
+  ],
+  "status": {
+    "compile": "PASS (exit 0)",
+    "elaboration": "PASS (exit 0)",
+    "simulation": "PASS (exit 0)",
+    "testbench_summary": "312 passed / 0 failed / 2 suspected RTL issues"
+  },
+  "observations": [
+    {"stimulus": "read APB offset 0x800", "pslverr": 0, "rdata": "0x00000820", "interpretation": "aliases INFO at offset 0"},
+    {"stimulus": "write APB offset 0x980 with 0xdeadbeef", "pslverr": 0, "gpio_out": "0xdeadbeef", "interpretation": "aliases GPIO_OUT at offset 0x180"}
+  ],
+  "scope": "Standalone wrapper only; does not test SoC routing. Current SoC GPIO map is 2 KiB [0x40003000,0x40003800).",
+  "rtl_modified": false,
+  "testbench_modified": false,
+  "source_sha256": {
+    "ips/gpio-master/tb_gpio_apb_directed.sv": "0820AB07B42436F09362CDBD9733C551189A38CD4577E52A1AF4A6D8F7D66BBE",
+    "ips/gpio-master/gpio_reg_top.sv": "8FCBFB2189098099AE2CAD84C2DDD5FD85241AD3483D574F3EC9E6016F3ED5FB"
+  },
+  "files": ["README.md", "reproducibility.json", "compile.log", "elab.log", "sim.log", "xvlog.f", "source_tb_gpio_apb_directed.f"]
+}

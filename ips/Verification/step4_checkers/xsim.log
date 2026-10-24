@@ -1,0 +1,1129 @@
+#-----------------------------------------------------------
+# xsim v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Fri Oct  2 16:20:45 2026
+# Process ID: 19440
+# Current directory: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers
+# Command line: xsim.exe -mode tcl -source {xsim.dir/step4_sim/xsim_script.tcl}
+# Log file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/xsim.log
+# Journal file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers\xsim.jou
+# Running On: DESKTOP-BSAEVVC, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 12, Host memory: 16779 MB
+#-----------------------------------------------------------
+source xsim.dir/step4_sim/xsim_script.tcl
+# xsim {step4_sim} -autoloadwcfg -tclbatch {step4_run.tcl} -runall
+Time resolution is 1 ps
+WARNING: [Simtcl 6-25] Warning: Both '-runall' and '-tclbatch' were specified. The '-runall' was ignored
+source step4_run.tcl
+## log_wave -r /step4_smoke_tb/u_br/*
+WARNING: [Simtcl 6-197] One or more HDL objects could not be logged because of object type or size limitations.  To see details please rerun the command with -verbose (-v).
+## log_wave -r /step4_smoke_tb/u_sb/*
+WARNING: [Simtcl 6-197] One or more HDL objects could not be logged because of object type or size limitations.  To see details please rerun the command with -verbose (-v).
+## run -all
+
+=========================================================
+  RISCFORGE Step 4 -- checker self-proof
+=========================================================
+
+-- PHASE 1 : clean traffic, zero findings expected --
+[STEP4] PHASE 1 traffic: lsu=17 awr=8 ard=9 apb=14
+[STEP4] PHASE 1 PASS : 0 findings on clean traffic
+
+-- PHASE 2 : fault injection matrix --
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : strobe/apb
+  time / cycle    : 1485000 ps   /  145
+  VERDICT         : *** BLAME = PATH  (check PATH-3007) ***
+  blame check     : PATH-3007
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : byte strobes survive the path unchanged: 1111
+  actual          : byte strobes 1100, expected 1111 -- a byte lane was dropped or duplicated
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3007
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   141  LSU  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (1 of 16 retained)
+    #  0 c   145  AXR  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   144  APB  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1100 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 1 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   141  LSU  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (1 of 16 retained)
+    #  0 c   145  AXR  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   144  APB  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1100 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 1 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI             strobe/apb ->    PATH-3007 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : strobe/axi
+  time / cycle    : 1975000 ps   /  194
+  VERDICT         : *** BLAME = PATH  (check PATH-3007) ***
+  blame check     : PATH-3007
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : byte strobes survive the path unchanged: 1111
+  actual          : byte strobes 0011, expected 1111 -- a byte lane was dropped or duplicated
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3007
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   187  LSU  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   187  AXI  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=0011 slot=        - ok
+    #  1 c   191  AXR  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   190  APB  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 1 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   187  LSU  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   187  AXI  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=0011 slot=        - ok
+    #  1 c   191  AXR  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   190  APB  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 1 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI             strobe/axi ->    PATH-3007 OK
+
+Time: 2405 ns Started: 2395 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:251
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : wait-state
+  time / cycle    : 2445000 ps   /  241
+  VERDICT         : *** BLAME = PROTOCOL  (check APB-2004) ***
+  blame check     : APB-2004
+  location        : apb-bridge/APB[1]/TIMER0
+  expected        : APB[1] (TIMER0) completes within 64 wait states at PADDR 0x00000000
+  actual          : APB[1] still not ready after 64 cycles
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  BLAME APB-2004
+            PATH  quiet -
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   233  LSU  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   233  AXI  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   237  AXR  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   236  APB  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 1 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   233  LSU  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   233  AXI  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   237  AXR  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   236  APB  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 1 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+
+Time: 3045 ns Started: 2405 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3055 ns Started: 2415 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3065 ns Started: 2425 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3075 ns Started: 2435 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3085 ns Started: 2445 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3095 ns Started: 2455 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3105 ns Started: 2465 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3115 ns Started: 2475 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3125 ns Started: 2485 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3135 ns Started: 2495 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3145 ns Started: 2505 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3155 ns Started: 2515 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3165 ns Started: 2525 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3175 ns Started: 2535 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3185 ns Started: 2545 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3195 ns Started: 2555 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3205 ns Started: 2565 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3215 ns Started: 2575 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3225 ns Started: 2585 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3235 ns Started: 2595 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3245 ns Started: 2605 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3255 ns Started: 2615 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3265 ns Started: 2625 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3275 ns Started: 2635 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3285 ns Started: 2645 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3295 ns Started: 2655 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3305 ns Started: 2665 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3315 ns Started: 2675 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3325 ns Started: 2685 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3335 ns Started: 2695 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3345 ns Started: 2705 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3355 ns Started: 2715 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3365 ns Started: 2725 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3375 ns Started: 2735 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3385 ns Started: 2745 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3395 ns Started: 2755 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3405 ns Started: 2765 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3415 ns Started: 2775 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3425 ns Started: 2785 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3435 ns Started: 2795 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3445 ns Started: 2805 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3455 ns Started: 2815 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3465 ns Started: 2825 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3475 ns Started: 2835 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3485 ns Started: 2845 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3495 ns Started: 2855 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3505 ns Started: 2865 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3515 ns Started: 2875 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3525 ns Started: 2885 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3535 ns Started: 2895 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3545 ns Started: 2905 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3555 ns Started: 2915 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3565 ns Started: 2925 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3575 ns Started: 2935 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3585 ns Started: 2945 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3595 ns Started: 2955 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3605 ns Started: 2965 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3615 ns Started: 2975 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3625 ns Started: 2985 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3635 ns Started: 2995 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3645 ns Started: 3005 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3655 ns Started: 3015 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3665 ns Started: 3025 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3675 ns Started: 3035 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3685 ns Started: 3045 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3695 ns Started: 3055 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3705 ns Started: 3065 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3715 ns Started: 3075 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3725 ns Started: 3085 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3735 ns Started: 3095 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3745 ns Started: 3105 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3755 ns Started: 3115 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3765 ns Started: 3125 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3775 ns Started: 3135 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3785 ns Started: 3145 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3795 ns Started: 3155 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3805 ns Started: 3165 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3815 ns Started: 3175 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3825 ns Started: 3185 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3835 ns Started: 3195 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3845 ns Started: 3205 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3855 ns Started: 3215 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3865 ns Started: 3225 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3875 ns Started: 3235 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3885 ns Started: 3245 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3895 ns Started: 3255 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3905 ns Started: 3265 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3915 ns Started: 3275 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3925 ns Started: 3285 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3935 ns Started: 3295 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3945 ns Started: 3305 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3955 ns Started: 3315 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3965 ns Started: 3325 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3975 ns Started: 3335 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3985 ns Started: 3345 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 3995 ns Started: 3355 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4005 ns Started: 3365 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4015 ns Started: 3375 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4025 ns Started: 3385 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4035 ns Started: 3395 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4045 ns Started: 3405 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4055 ns Started: 3415 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4065 ns Started: 3425 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4075 ns Started: 3435 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4085 ns Started: 3445 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4095 ns Started: 3455 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4105 ns Started: 3465 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4115 ns Started: 3475 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4125 ns Started: 3485 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4135 ns Started: 3495 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4145 ns Started: 3505 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4155 ns Started: 3515 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4165 ns Started: 3525 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4175 ns Started: 3535 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4185 ns Started: 3545 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4195 ns Started: 3555 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4205 ns Started: 3565 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4215 ns Started: 3575 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4225 ns Started: 3585 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4235 ns Started: 3595 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4245 ns Started: 3605 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4255 ns Started: 3615 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4265 ns Started: 3625 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4275 ns Started: 3635 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4285 ns Started: 3645 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4295 ns Started: 3655 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4305 ns Started: 3665 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4315 ns Started: 3675 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+
+Time: 4325 ns Started: 3685 ns Scope: /step4_smoke_tb/u_apb_sva File: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_apb_sva.sv Line:240
+[STEP4] FI             wait-state ->     APB-2004 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : parity-trigger
+  time / cycle    : 4945000 ps   /  491
+  VERDICT         : *** BLAME = PATH  (check PATH-3009) ***
+  blame check     : PATH-3009
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : APB PSLVERR reaches the core as RESP_SLVERR
+  actual          : the APB slave raised PSLVERR but the AXI response was OKAY
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3009
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   479  LSU  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   479  AXI  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   483  AXR  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   482  APB  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C BAD
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 1 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   479  LSU  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   479  AXI  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   483  AXR  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   482  APB  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C BAD
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 1 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI         parity-trigger ->    PATH-3009 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : timeout-trigger
+  time / cycle    : 5355000 ps   /  532
+  VERDICT         : *** BLAME = PATH  (check PATH-3008) ***
+  blame check     : PATH-3008
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : AXI RDATA equals the APB PRDATA read from the slot: 0xdeadbeef
+  actual          : AXI RDATA 0x00000000, the APB slave returned 0xdeadbeef
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3008
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   525  LSU  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   525  AXI  R addr=0x40005080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   529  AXR  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   528  APB  R addr=0x40005080 wdata=0x11223344 rdata=0xdeadbeef strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 0 0 1
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   525  LSU  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   525  AXI  R addr=0x40005080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   529  AXR  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   528  APB  R addr=0x40005080 wdata=0x11223344 rdata=0xdeadbeef strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 0 0 1
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI        timeout-trigger ->    PATH-3008 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : paddr-corruptor
+  time / cycle    : 5845000 ps   /  581
+  VERDICT         : *** BLAME = PATH  (check PATH-3005) ***
+  blame check     : PATH-3005
+  location        : core-MMIO-path
+  expected        : PADDR equals the 4-byte-aligned AXI address: 0x40000080
+  actual          : PADDR 0x40000180 for an access to 0x40000080
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3005
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   571  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   571  AXI  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   575  AXR  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   574  APB  W addr=0x40000180 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 1 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   571  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   571  AXI  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   575  AXR  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   574  APB  W addr=0x40000180 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 1 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI        paddr-corruptor ->    PATH-3005 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : axi-addr
+  time / cycle    : 6255000 ps   /  622
+  VERDICT         : *** BLAME = PATH  (check PATH-3001) ***
+  blame check     : PATH-3001
+  location        : core-MMIO-path
+  expected        : the access to 0x40001080 reaches the AXI fabric as one transaction
+  actual          : no AW/W or AR was ever issued for 0x40001080
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3001
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   617  LSU  R addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   617  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   621  AXR  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   620  APB  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 1 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   617  LSU  R addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   617  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   621  AXR  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   620  APB  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 1 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI               axi-addr ->    PATH-3001 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : pwrite-data/apb
+  time / cycle    : 6745000 ps   /  671
+  VERDICT         : *** BLAME = PATH  (check PATH-3006) ***
+  blame check     : PATH-3006
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : write data survives the path unchanged: 0x11223344
+  actual          : write data 0xeeddccbb, expected 0x11223344
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3006
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   663  LSU  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   663  AXI  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   667  AXR  W addr=0x40004080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   666  APB  W addr=0x40004080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 0 1 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   663  LSU  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   663  AXI  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   667  AXR  W addr=0x40004080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   666  APB  W addr=0x40004080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 0 1 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI        pwrite-data/apb ->    PATH-3006 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : pwrite-data/axi
+  time / cycle    : 7155000 ps   /  712
+  VERDICT         : *** BLAME = PATH  (check PATH-3006) ***
+  blame check     : PATH-3006
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : write data survives the path unchanged: 0x11223344
+  actual          : write data 0xeeddccbb, expected 0x11223344
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3006
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   709  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (1 of 16 retained)
+    #  0 c   709  AXI  W addr=0x40000080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (0 of 16 retained)
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 1 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   709  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (1 of 16 retained)
+    #  0 c   709  AXI  W addr=0x40000080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (0 of 16 retained)
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 1 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI        pwrite-data/axi ->    PATH-3006 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : pread-data/apb
+  time / cycle    : 7645000 ps   /  761
+  VERDICT         : *** BLAME = PATH  (check PATH-3008) ***
+  blame check     : PATH-3008
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : AXI RDATA equals the APB PRDATA read from the slot: 0xeeddccbb
+  actual          : AXI RDATA 0x11223344, the APB slave returned 0xeeddccbb
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3008
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   755  LSU  R addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   755  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   759  AXR  R addr=0x40000080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   758  APB  R addr=0x40000080 wdata=0x11223344 rdata=0xeeddccbb strb=1111 slot=      I2C ok
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 1 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   755  LSU  R addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   755  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   759  AXR  R addr=0x40000080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   758  APB  R addr=0x40000080 wdata=0x11223344 rdata=0xeeddccbb strb=1111 slot=      I2C ok
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 1 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI         pread-data/apb ->    PATH-3008 OK
+
+================================================================================
+  RISCFORGE SoC   STEP 4 CHECKERS   --  FIRST FATAL
+================================================================================
+  test            : resp/unmapped
+  time / cycle    : 8135000 ps   /  810
+  VERDICT         : *** BLAME = PATH  (check PATH-3014) ***
+  blame check     : PATH-3014
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : an unmapped MMIO address (0x40006000) returns RESP_DECERR
+  actual          : returned OKAY
+  findings        : 1 recorded, 0 downstream (suppressed), 0 reassignments
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3014
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+  FROZEN WINDOWS -- captured at the fatal cycle, not overwritten since
+================================================================================
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   801  LSU  R addr=0x40006000 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   801  AXI  R addr=0x40006000 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   803  AXR  R addr=0x40006000 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (0 of 16 retained)
+================================================================================
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+================================================================================
+  NEXT: read the two lines above, in this order --
+    1. disassemble the newest retired instruction and check access
+       width, missing volatile, hidden reads and reordering
+    2. compare the frozen AXI and APB windows row by row
+    3. only then open waveforms
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+                                CORE LSU (1 of 16 retained)
+    #  0 c   801  LSU  R addr=0x40006000 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   801  AXI  R addr=0x40006000 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   803  AXR  R addr=0x40006000 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (0 of 16 retained)
+  COUNTERS  (vacuity evidence for the pass rule)
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb xfers [I2C T0 UART GPIO SPI T1] = 0 0 0 0 0 0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+    mailbox drops: axi=0 apb=0 scoreboard=0 (total 0)
+[STEP4] FI          resp/unmapped ->    PATH-3014 OK
+
+=========================================================
+  STEP 4 SELF-PROOF : phase1_findings=0  fi_pass=11  fi_fail=0
+  RESULT : PASS  -- every injected fault was named by the right check
+=========================================================
+
+$finish called at time : 8435 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/step4_checkers/step4_smoke_tb.sv" Line 612
+## exit
+INFO: [Common 17-206] Exiting xsim at Fri Oct  2 16:20:47 2026...

@@ -1,0 +1,77 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/challenge_sim/xsim_script.tcl
+# xsim {challenge_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+
+================================================================================
+       RISCFORGE M1 EMPIRICAL CHALLENGE SUITE (adversarial stress testing)      
+================================================================================
+
+--- [TEST SUITE 1] In-Order Execution & Shadow PC Association ---
+[CHALLENGE] [PASS]                    SHADOW.seq_addi_x1 Exp: 0x00100093, Got: 0x00100093
+[CHALLENGE] [PASS]                    SHADOW.seq_addi_x2 Exp: 0x00200113, Got: 0x00200113
+[CHALLENGE] [PASS]                     SHADOW.seq_add_x3 Exp: 0x002081b3, Got: 0x002081b3
+[CHALLENGE] [PASS]                     SHADOW.seq_lui_x4 Exp: 0x00018237, Got: 0x00018237
+
+--- [TEST SUITE 2] Branch Taken & Speculative Flush Verification ---
+[CHALLENGE] [PASS]                SHADOW.branch_recorded Branch opcode recorded
+[CHALLENGE] [PASS]                SHADOW.flush1_recorded Wrong path 1 recorded at fetch
+[CHALLENGE] [PASS]                SHADOW.flush2_recorded Wrong path 2 recorded at fetch
+[CHALLENGE] [PASS]                SHADOW.target_recorded Target opcode recorded
+[DEBUG] Retire monitor head_ptr=6, total_retired=6
+[DEBUG] Ring[0]: cyc=11 PC=0x00001000 instr=0x00100093
+[DEBUG] Ring[1]: cyc=12 PC=0x00001004 instr=0x00200113
+[DEBUG] Ring[2]: cyc=13 PC=0x00001008 instr=0x002081b3
+[DEBUG] Ring[3]: cyc=14 PC=0x0000100c instr=0x00018237
+[DEBUG] Ring[4]: cyc=52 PC=0x00001020 instr=0x02208463
+[DEBUG] Ring[5]: cyc=56 PC=0x00001040 instr=0x33333313
+[CHALLENGE] [PASS]              RETIRE.flush1_suppressed Flushed instruction 0x1024 appeared 0 times in retire log (Exp: 0)
+[CHALLENGE] [PASS]              RETIRE.flush2_suppressed Flushed instruction 0x1028 appeared 0 times in retire log (Exp: 0)
+[CHALLENGE] [PASS]                RETIRE.target_accurate Branch target 0x1040 successfully retired with accurate shadow opcode
+
+--- [TEST SUITE 3] Multi-Iteration Loop Invariance ---
+[CHALLENGE] [PASS]                   SHADOW.loop1_opcode Loop body instr 1 preserved
+[CHALLENGE] [PASS]                   SHADOW.loop2_opcode Loop body instr 2 preserved
+
+--- [TEST SUITE 4] Pipeline Stalls & Memory Wait-States ---
+[CHALLENGE] [PASS]                      SHADOW.lw_opcode Load word opcode preserved
+[CHALLENGE] [PASS]                   SHADOW.stalled_addi Stalled addi opcode preserved
+
+--- [TEST SUITE 5] Exception / Trap Commit Handling ---
+[CHALLENGE] [PASS]             RETIRE.ecall_trap_capture ECALL trap committed with accurate opcode 0x00000073 and trap flag
+
+--- [TEST SUITE 6] 64-Entry Ring Buffer Wrap-Around Integrity ---
+[CHALLENGE] [PASS]                    RING.fetch_wrapped Total fetches: 168 (> 64)
+[CHALLENGE] [PASS]                   RING.retire_wrapped Total retired: 143 (> 64)
+[CHALLENGE] [PASS]         RING.head_ptr_in_bounds_fetch Fetch head_ptr=40 within [0..63]
+[CHALLENGE] [PASS]        RING.head_ptr_in_bounds_retire Retire head_ptr=16 within [0..63]
+[CHALLENGE] [PASS]           RING.head_ptr_in_bounds_lsu LSU head_ptr=63 within [0..63]
+[CHALLENGE] [PASS]          RING.head_ptr_in_bounds_axil AXI head_ptr=0 within [0..63]
+[CHALLENGE] [PASS]           RING.head_ptr_in_bounds_apb APB head_ptr=0 within [0..63]
+
+--- [TEST SUITE 7] Simultaneous Freeze Broadcast (Cycle-0 Lock) ---
+[CHALLENGE] [PASS]                   FREEZE.fetch_locked Fetch head_ptr held at 46 (now 46)
+[CHALLENGE] [PASS]                  FREEZE.retire_locked Retire head_ptr held at 22 (now 22)
+[CHALLENGE] [PASS]                     FREEZE.lsu_locked LSU head_ptr held at 4 (now 4)
+[CHALLENGE] [PASS]                     FREEZE.axi_locked AXI head_ptr held at 0 (now 0)
+[CHALLENGE] [PASS]                     FREEZE.apb_locked APB head_ptr held at 0 (now 0)
+[CHALLENGE] [PASS]                     FREEZE.irq_locked IRQ head_ptr held at 1 (now 1)
+
+--- [TEST SUITE 8] Non-Intrusiveness & 0 DUT Driver Sign-Off ---
+[CHALLENGE] [PASS]         NON_INTRUSIVE.lockstep_cycles Lockstep compared 442 continuous cycles between monitored and golden DUT
+[CHALLENGE] [PASS]        NON_INTRUSIVE.zero_timing_delta Zero signal mismatches across 442 cycles (mismatches: 0)
+
+================================================================================
+  ALL 25 EMPIRICAL CHALLENGES PASSED (0 Errors). VERDICT: APPROVED
+================================================================================
+
+[MON] post-mortem written to monitor_postmortem.txt
+$finish called at time : 4455001 ps
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 02:35:54 2026...

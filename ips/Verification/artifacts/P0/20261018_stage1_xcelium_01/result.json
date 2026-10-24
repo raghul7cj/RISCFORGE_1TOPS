@@ -1,0 +1,27 @@
+{
+  "run_id": "20261018_stage1_xcelium_01",
+  "verdict": "BLOCKED",
+  "phase": "RTL compilation",
+  "simulation_executed": false,
+  "rtl_modified": false,
+  "scenario": "stage1_hello",
+  "intended_boot": "WARM",
+  "seed": 1,
+  "intended_plusargs": [
+    "+BOOT_MODE=WARM",
+    "+IMEM_HEX=<generated absolute path>",
+    "+DMEM_HEX=<generated absolute path>",
+    "+TIMEOUT=1000000"
+  ],
+  "tool": "Xcelium 24.09-s001",
+  "blocker": "ips/riscv_core/rtl/top.v:236 trap_commit_cause used before declaration at line 247",
+  "g0": "INCOMPLETE",
+  "g1": "NOT_RUN",
+  "instructions_retired": null,
+  "axi_transfers": null,
+  "apb_transfers": null,
+  "attestation_words_written": null,
+  "artifact_locator": "ips/Verification/artifacts/P0/20261018_stage1_xcelium_01",
+  "final_attempt": "results",
+  "report": "README.md"
+}

@@ -1,0 +1,428 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/gpio_sim/xsim_script.tcl
+# xsim {gpio_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+
+===============================================================
+ tb_gpio_apb_directed - GPIO (gpio_apb_wrap), 32 pins
+===============================================================
+ random seed = 1 (override with +SEED=<n>)
+
+---------------------------------------------------------------
+ TC01 Reset values of outputs and registers
+---------------------------------------------------------------
+  [PASS] gpio_out after reset got=0x00000000 exp=0x00000000
+  [PASS] gpio_tx_en_o after reset got=0x00000000 exp=0x00000000
+  [PASS] gpio_in_sync_o after reset got=0x00000000 exp=0x00000000
+  [PASS] pin_level_interrupts_o after reset got=0x00000000 exp=0x00000000
+  [PASS] global_interrupt_o after reset (got=0 exp=0)
+  [PASS] INFO: version=2, gpio_cnt=32 got=0x00000820 exp=0x00000820
+  [PASS] CFG: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_MODE_0: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_MODE_1: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_EN: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_IN: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_OUT: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_SET: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_CLEAR: reset value got=0x00000000 exp=0x00000000
+  [PASS] GPIO_TOGGLE: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_EN: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_EN: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_LVL_HIGH_EN: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_LVL_LOW_EN: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_STATUS: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_LVL_HIGH_STATUS: reset value got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_LVL_LOW_STATUS: reset value got=0x00000000 exp=0x00000000
+
+---------------------------------------------------------------
+ TC02 RW register round-trip (walking-1, walking-0, random)
+---------------------------------------------------------------
+  [PASS] CFG: 76 patterns round-trip (0 mismatches)
+  [PASS] GPIO_MODE_0: 76 patterns round-trip (0 mismatches)
+  [PASS] GPIO_MODE_1: 76 patterns round-trip (0 mismatches)
+  [PASS] GPIO_EN: 76 patterns round-trip (0 mismatches)
+  [PASS] GPIO_OUT: 76 patterns round-trip (0 mismatches)
+  [PASS] INTRPT_RISE_EN: 76 patterns round-trip (0 mismatches)
+  [PASS] INTRPT_FALL_EN: 76 patterns round-trip (0 mismatches)
+  [PASS] INTRPT_LVL_HIGH_EN: 76 patterns round-trip (0 mismatches)
+  [PASS] INTRPT_LVL_LOW_EN: 76 patterns round-trip (0 mismatches)
+  [PASS] all 9 RW registers hold distinct values simultaneously (0 mismatches)
+
+---------------------------------------------------------------
+ TC03 Read-only (INFO, GPIO_IN) and write-only (SET/CLEAR/TOGGLE)
+---------------------------------------------------------------
+  [INFO] write to INFO returned pslverr=0
+  [PASS] INFO: unchanged after write of 0xFFFFFFFF got=0x00000820 exp=0x00000820
+  [PASS] GPIO_IN: mirrors gpio_in got=0xa5c30f96 exp=0xa5c30f96
+  [INFO] write to GPIO_IN returned pslverr=0
+  [PASS] GPIO_IN: unchanged after write of 0 got=0xa5c30f96 exp=0xa5c30f96
+  [PASS] GPIO_SET: write-only, reads 0 got=0x00000000 exp=0x00000000
+  [PASS] GPIO_CLEAR: write-only, reads 0 got=0x00000000 exp=0x00000000
+  [PASS] GPIO_TOGGLE: write-only, reads 0 got=0x00000000 exp=0x00000000
+  [PASS] gpio_out unaffected by SET/CLEAR/TOGGLE reads got=0x12345678 exp=0x12345678
+  [PASS] GPIO_OUT: unaffected by SET/CLEAR/TOGGLE reads got=0x12345678 exp=0x12345678
+
+---------------------------------------------------------------
+ TC04 Unmapped offsets return PSLVERR and change nothing
+---------------------------------------------------------------
+  [PASS] 11 unmapped reads flagged with PSLVERR (0 mismatches)
+  [PASS] 11 unmapped writes flagged with PSLVERR (0 mismatches)
+  [PASS] gpio_out still 0 got=0x00000000 exp=0x00000000
+  [PASS] all registers still at reset values after unmapped writes (0 mismatches)
+
+---------------------------------------------------------------
+ TC05 Address aliasing above offset 0x7FF
+---------------------------------------------------------------
+  [BUG?] read at +0x800 (above the register block) returns PSLVERR -- pslverr=0 rdata=0x00000820 (INFO reads 0x00000820)
+  [BUG?] write at +0x980 does not reach GPIO_OUT (0x180) -- pslverr=0 gpio_out=0xdeadbeef
+
+---------------------------------------------------------------
+ TC06 Back-to-back APB transfers
+---------------------------------------------------------------
+  [PASS] 3 writes + 3 reads with PSEL held high (0 mismatches)
+
+---------------------------------------------------------------
+ TC07 Pin modes: tx_en and gpio_out per GPIO_MODE
+---------------------------------------------------------------
+  [PASS] all pins INPUT, GPIO_OUT=0x00000000: gpio_out got=0x00000000 exp=0x00000000
+  [PASS] all pins INPUT, GPIO_OUT=0x00000000: gpio_tx_en_o got=0x00000000 exp=0x00000000
+  [PASS] all pins INPUT, GPIO_OUT=0xffffffff: gpio_out got=0xffffffff exp=0xffffffff
+  [PASS] all pins INPUT, GPIO_OUT=0xffffffff: gpio_tx_en_o got=0x00000000 exp=0x00000000
+  [PASS] all pins INPUT, GPIO_OUT=0xa5a55a5a: gpio_out got=0xa5a55a5a exp=0xa5a55a5a
+  [PASS] all pins INPUT, GPIO_OUT=0xa5a55a5a: gpio_tx_en_o got=0x00000000 exp=0x00000000
+  [PASS] all pins INPUT, GPIO_OUT=0x76fc9c85: gpio_out got=0x76fc9c85 exp=0x76fc9c85
+  [PASS] all pins INPUT, GPIO_OUT=0x76fc9c85: gpio_tx_en_o got=0x00000000 exp=0x00000000
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0x00000000: gpio_out got=0x00000000 exp=0x00000000
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0x00000000: gpio_tx_en_o got=0xffffffff exp=0xffffffff
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0xffffffff: gpio_out got=0xffffffff exp=0xffffffff
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0xffffffff: gpio_tx_en_o got=0xffffffff exp=0xffffffff
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0xa5a55a5a: gpio_out got=0xa5a55a5a exp=0xa5a55a5a
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0xa5a55a5a: gpio_tx_en_o got=0xffffffff exp=0xffffffff
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0x38d66aa4: gpio_out got=0x38d66aa4 exp=0x38d66aa4
+  [PASS] all pins PUSH_PULL, GPIO_OUT=0x38d66aa4: gpio_tx_en_o got=0xffffffff exp=0xffffffff
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0x00000000: gpio_out got=0x00000000 exp=0x00000000
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0x00000000: gpio_tx_en_o got=0x00000000 exp=0x00000000
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0xffffffff: gpio_out got=0xffffffff exp=0xffffffff
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0xffffffff: gpio_tx_en_o got=0xffffffff exp=0xffffffff
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0xa5a55a5a: gpio_out got=0xa5a55a5a exp=0xa5a55a5a
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0xa5a55a5a: gpio_tx_en_o got=0xa5a55a5a exp=0xa5a55a5a
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0x3995dc25: gpio_out got=0x3995dc25 exp=0x3995dc25
+  [PASS] all pins OPEN_DRAIN0, GPIO_OUT=0x3995dc25: gpio_tx_en_o got=0x3995dc25 exp=0x3995dc25
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0x00000000: gpio_out got=0x00000000 exp=0x00000000
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0x00000000: gpio_tx_en_o got=0xffffffff exp=0xffffffff
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0xffffffff: gpio_out got=0xffffffff exp=0xffffffff
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0xffffffff: gpio_tx_en_o got=0x00000000 exp=0x00000000
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0xa5a55a5a: gpio_out got=0xa5a55a5a exp=0xa5a55a5a
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0xa5a55a5a: gpio_tx_en_o got=0x5a5aa5a5 exp=0x5a5aa5a5
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0x50c21658: gpio_out got=0x50c21658 exp=0x50c21658
+  [PASS] all pins OPEN_DRAIN1, GPIO_OUT=0x50c21658: gpio_tx_en_o got=0xaf3de9a7 exp=0xaf3de9a7
+  [PASS] GPIO_MODE_0: readback got=0xe4e4e4e4 exp=0xe4e4e4e4
+  [PASS] GPIO_MODE_1: readback got=0xe4e4e4e4 exp=0xe4e4e4e4
+  [PASS] mixed modes, GPIO_OUT=0x75ef780b: gpio_out got=0x75ef780b exp=0x75ef780b
+  [PASS] mixed modes, GPIO_OUT=0x75ef780b: gpio_tx_en_o got=0xee66e2a2 exp=0xee66e2a2
+  [PASS] mixed modes, GPIO_OUT=0x1426a147: gpio_out got=0x1426a147 exp=0x1426a147
+  [PASS] mixed modes, GPIO_OUT=0x1426a147: gpio_tx_en_o got=0xaeae2aee exp=0xaeae2aee
+  [PASS] mixed modes, GPIO_OUT=0x5a2c6e75: gpio_out got=0x5a2c6e75 exp=0x5a2c6e75
+  [PASS] mixed modes, GPIO_OUT=0x5a2c6e75: gpio_tx_en_o got=0xe2a6e6ee exp=0xe2a6e6ee
+  [PASS] mixed modes, GPIO_OUT=0x6cec1491: gpio_out got=0x6cec1491 exp=0x6cec1491
+  [PASS] mixed modes, GPIO_OUT=0x6cec1491: gpio_tx_en_o got=0xe666ae2a exp=0xe666ae2a
+
+---------------------------------------------------------------
+ TC08 GPIO_SET / GPIO_CLEAR / GPIO_TOGGLE
+---------------------------------------------------------------
+  [PASS] TOGGLE/SET/CLEAR/TOGGLE walked over all 32 pins (0 mismatches)
+  [PASS] GPIO_OUT: matches gpio_out after per-pin walk got=0xffffffff exp=0xffffffff
+  [PASS] writing 0 to SET/CLEAR/TOGGLE leaves gpio_out alone got=0xffffffff exp=0xffffffff
+  [PASS] 20 multi-bit SET/CLEAR/TOGGLE masks (0 mismatches)
+  [PASS] OPEN_DRAIN0: SET drives tx_en on the set pins got=0x0000ffff exp=0x0000ffff
+  [PASS] OPEN_DRAIN0: CLEAR releases tx_en on the cleared pins got=0x0000ff00 exp=0x0000ff00
+  [PASS] SET is visible on gpio_out immediately after the commit edge got=0x00000001 exp=0x00000001
+
+---------------------------------------------------------------
+ TC09 Random MODE / OUT / SET / CLEAR / TOGGLE sequence
+---------------------------------------------------------------
+  [PASS] 200 random output operations (0 mismatches)
+  [PASS] GPIO_OUT: final value after random sequence got=0x83828242 exp=0x83828242
+  [PASS] GPIO_MODE_0: final value after random sequence got=0x021a927f exp=0x021a927f
+  [PASS] GPIO_MODE_1: final value after random sequence got=0x29aad04b exp=0x29aad04b
+
+---------------------------------------------------------------
+ TC10 Input latency: gpio_in -> gpio_in_sync_o in 3 edges
+---------------------------------------------------------------
+  [PASS] 0xffffffff: unchanged after 1 edge got=0x00000000 exp=0x00000000
+  [PASS] 0xffffffff: unchanged after 2 edges got=0x00000000 exp=0x00000000
+  [PASS] 0xffffffff: visible after 3 edges got=0xffffffff exp=0xffffffff
+  [PASS] GPIO_IN: reads 0xffffffff got=0xffffffff exp=0xffffffff
+  [PASS] 0x00000000: unchanged after 1 edge got=0xffffffff exp=0xffffffff
+  [PASS] 0x00000000: unchanged after 2 edges got=0xffffffff exp=0xffffffff
+  [PASS] 0x00000000: visible after 3 edges got=0x00000000 exp=0x00000000
+  [PASS] GPIO_IN: reads 0x00000000 got=0x00000000 exp=0x00000000
+  [PASS] 0x5a5aa5a5: unchanged after 1 edge got=0x00000000 exp=0x00000000
+  [PASS] 0x5a5aa5a5: unchanged after 2 edges got=0x00000000 exp=0x00000000
+  [PASS] 0x5a5aa5a5: visible after 3 edges got=0x5a5aa5a5 exp=0x5a5aa5a5
+  [PASS] GPIO_IN: reads 0x5a5aa5a5 got=0x5a5aa5a5 exp=0x5a5aa5a5
+  [PASS] 0xb19c4f2d: unchanged after 1 edge got=0x5a5aa5a5 exp=0x5a5aa5a5
+  [PASS] 0xb19c4f2d: unchanged after 2 edges got=0x5a5aa5a5 exp=0x5a5aa5a5
+  [PASS] 0xb19c4f2d: visible after 3 edges got=0xb19c4f2d exp=0xb19c4f2d
+  [PASS] GPIO_IN: reads 0xb19c4f2d got=0xb19c4f2d exp=0xb19c4f2d
+
+---------------------------------------------------------------
+ TC11 GPIO_EN: disabled pins freeze their sampled value
+---------------------------------------------------------------
+  [PASS] only enabled pins sample the high input got=0x0000ffff exp=0x0000ffff
+  [PASS] GPIO_IN: matches gpio_in_sync_o got=0x0000ffff exp=0x0000ffff
+  [PASS] newly enabled pins pick the input up got=0xffffffff exp=0xffffffff
+  [PASS] disabled pins hold their last sampled value got=0xffff0000 exp=0xffff0000
+  [PASS] GPIO_IN: holds the frozen value got=0xffff0000 exp=0xffff0000
+  [PASS] re-enabled pins resample the low input got=0x00000000 exp=0x00000000
+  [PASS] enable walked over all 32 pins (0 mismatches)
+
+---------------------------------------------------------------
+ TC12 Fast input sampling (new vector every clock cycle)
+---------------------------------------------------------------
+  [PASS] 128 back-to-back input vectors sampled in order (0 mismatches)
+  [PASS] GPIO_IN: holds the last applied vector got=0x17b5c2d6 exp=0x17b5c2d6
+
+---------------------------------------------------------------
+ TC13 Edge interrupts (rise / fall / both, pulse, sticky, glitch)
+---------------------------------------------------------------
+  [PASS] RISE pin 0: no interrupt after 1 edge (got=0 exp=0)
+  [PASS] RISE pin 0: interrupt asserted after 2 edges (got=1 exp=1)
+  [PASS] RISE pin 0: pin_level_interrupts_o got=0x00000001 exp=0x00000001
+  [PASS] RISE pin 0: interrupt is a 1-cycle pulse (CFG=0) (got=0 exp=0)
+  [PASS] RISE pin 0: pin_level_interrupts_o back low got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: rising edge on pin 0 latched got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_FALL_STATUS: no falling-edge status got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: aggregated status set got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_FALL_STATUS: falling edge ignored while INTRPT_FALL_EN=0 got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: rise status is sticky got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_RISE_STATUS: cleared by W1C got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: aggregated status cleared got=0x00000000 exp=0x00000000
+  [PASS] FALL pin 0: no interrupt after 1 edge (got=0 exp=0)
+  [PASS] FALL pin 0: interrupt asserted after 2 edges (got=1 exp=1)
+  [PASS] FALL pin 0: pin_level_interrupts_o got=0x00000001 exp=0x00000001
+  [PASS] FALL pin 0: interrupt is a 1-cycle pulse (CFG=0) (got=0 exp=0)
+  [PASS] FALL pin 0: pin_level_interrupts_o back low got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_STATUS: falling edge on pin 0 latched got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_RISE_STATUS: no rising-edge status got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: both-edge mode: rise latched got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_FALL_STATUS: both-edge mode: fall latched got=0x00000001 exp=0x00000001
+  [PASS] CFG=3 pin 0: interrupt asserted with the status bit (got=1 exp=1)
+  [PASS] CFG=3: pin_level_interrupts_o follows the status bits got=0x00000001 exp=0x00000001
+  [PASS] CFG=3: interrupt stays asserted until the status is cleared (got=1 exp=1)
+  [PASS] CFG=3: interrupt drops when the status is cleared (got=0 exp=0)
+  [PASS] RISE pin 31: no interrupt after 1 edge (got=0 exp=0)
+  [PASS] RISE pin 31: interrupt asserted after 2 edges (got=1 exp=1)
+  [PASS] RISE pin 31: pin_level_interrupts_o got=0x80000000 exp=0x80000000
+  [PASS] RISE pin 31: interrupt is a 1-cycle pulse (CFG=0) (got=0 exp=0)
+  [PASS] RISE pin 31: pin_level_interrupts_o back low got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: rising edge on pin 31 latched got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_FALL_STATUS: no falling-edge status got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: aggregated status set got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_FALL_STATUS: falling edge ignored while INTRPT_FALL_EN=0 got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: rise status is sticky got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_RISE_STATUS: cleared by W1C got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: aggregated status cleared got=0x00000000 exp=0x00000000
+  [PASS] FALL pin 31: no interrupt after 1 edge (got=0 exp=0)
+  [PASS] FALL pin 31: interrupt asserted after 2 edges (got=1 exp=1)
+  [PASS] FALL pin 31: pin_level_interrupts_o got=0x80000000 exp=0x80000000
+  [PASS] FALL pin 31: interrupt is a 1-cycle pulse (CFG=0) (got=0 exp=0)
+  [PASS] FALL pin 31: pin_level_interrupts_o back low got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_STATUS: falling edge on pin 31 latched got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_RISE_STATUS: no rising-edge status got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: both-edge mode: rise latched got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_FALL_STATUS: both-edge mode: fall latched got=0x80000000 exp=0x80000000
+  [PASS] CFG=3 pin 31: interrupt asserted with the status bit (got=1 exp=1)
+  [PASS] CFG=3: pin_level_interrupts_o follows the status bits got=0x80000000 exp=0x80000000
+  [PASS] CFG=3: interrupt stays asserted until the status is cleared (got=1 exp=1)
+  [PASS] CFG=3: interrupt drops when the status is cleared (got=0 exp=0)
+  [PASS] RISE pin 5: no interrupt after 1 edge (got=0 exp=0)
+  [PASS] RISE pin 5: interrupt asserted after 2 edges (got=1 exp=1)
+  [PASS] RISE pin 5: pin_level_interrupts_o got=0x00000020 exp=0x00000020
+  [PASS] RISE pin 5: interrupt is a 1-cycle pulse (CFG=0) (got=0 exp=0)
+  [PASS] RISE pin 5: pin_level_interrupts_o back low got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: rising edge on pin 5 latched got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_FALL_STATUS: no falling-edge status got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: aggregated status set got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_FALL_STATUS: falling edge ignored while INTRPT_FALL_EN=0 got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: rise status is sticky got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_RISE_STATUS: cleared by W1C got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: aggregated status cleared got=0x00000000 exp=0x00000000
+  [PASS] FALL pin 5: no interrupt after 1 edge (got=0 exp=0)
+  [PASS] FALL pin 5: interrupt asserted after 2 edges (got=1 exp=1)
+  [PASS] FALL pin 5: pin_level_interrupts_o got=0x00000020 exp=0x00000020
+  [PASS] FALL pin 5: interrupt is a 1-cycle pulse (CFG=0) (got=0 exp=0)
+  [PASS] FALL pin 5: pin_level_interrupts_o back low got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_STATUS: falling edge on pin 5 latched got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_RISE_STATUS: no rising-edge status got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_RISE_STATUS: both-edge mode: rise latched got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_FALL_STATUS: both-edge mode: fall latched got=0x00000020 exp=0x00000020
+  [PASS] CFG=3 pin 5: interrupt asserted with the status bit (got=1 exp=1)
+  [PASS] CFG=3: pin_level_interrupts_o follows the status bits got=0x00000020 exp=0x00000020
+  [PASS] CFG=3: interrupt stays asserted until the status is cleared (got=1 exp=1)
+  [PASS] CFG=3: interrupt drops when the status is cleared (got=0 exp=0)
+  [PASS] rise/fall interrupt walked over all 32 pins (0 mismatches)
+  [PASS] sub-cycle glitch raises no interrupt (got=0 exp=0)
+  [PASS] INTRPT_RISE_STATUS: no rise status from a glitch got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_STATUS: no fall status from a glitch got=0x00000000 exp=0x00000000
+
+---------------------------------------------------------------
+ TC14 Level interrupts (high / low, re-latch while asserted)
+---------------------------------------------------------------
+  [PASS] HIGH pin 0: idle low, no interrupt (got=0 exp=0)
+  [PASS] HIGH pin 0: not asserted after 2 edges (got=0 exp=0)
+  [PASS] HIGH pin 0: asserted after 3 edges (got=1 exp=1)
+  [PASS] pin_level_interrupts_o got=0x00000001 exp=0x00000001
+  [PASS] level interrupt held while the input stays high (got=1 exp=1)
+  [PASS] INTRPT_LVL_HIGH_STATUS: level-high status latched got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_LVL_HIGH_STATUS: re-latches while the level is still present got=0x00000001 exp=0x00000001
+  [PASS] CFG=0: interrupt follows the level down (got=0 exp=0)
+  [PASS] INTRPT_LVL_HIGH_STATUS: status stays set after the level goes away got=0x00000001 exp=0x00000001
+  [PASS] INTRPT_LVL_HIGH_STATUS: clears once the level is gone got=0x00000000 exp=0x00000000
+  [PASS] LOW pin 0: input high, no interrupt (got=0 exp=0)
+  [PASS] LOW pin 0: not asserted after 2 edges (got=0 exp=0)
+  [PASS] LOW pin 0: asserted after 3 edges (got=1 exp=1)
+  [PASS] INTRPT_LVL_LOW_STATUS: level-low status latched got=0x00000001 exp=0x00000001
+  [PASS] HIGH pin 31: idle low, no interrupt (got=0 exp=0)
+  [PASS] HIGH pin 31: not asserted after 2 edges (got=0 exp=0)
+  [PASS] HIGH pin 31: asserted after 3 edges (got=1 exp=1)
+  [PASS] pin_level_interrupts_o got=0x80000000 exp=0x80000000
+  [PASS] level interrupt held while the input stays high (got=1 exp=1)
+  [PASS] INTRPT_LVL_HIGH_STATUS: level-high status latched got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_LVL_HIGH_STATUS: re-latches while the level is still present got=0x80000000 exp=0x80000000
+  [PASS] CFG=0: interrupt follows the level down (got=0 exp=0)
+  [PASS] INTRPT_LVL_HIGH_STATUS: status stays set after the level goes away got=0x80000000 exp=0x80000000
+  [PASS] INTRPT_LVL_HIGH_STATUS: clears once the level is gone got=0x00000000 exp=0x00000000
+  [PASS] LOW pin 31: input high, no interrupt (got=0 exp=0)
+  [PASS] LOW pin 31: not asserted after 2 edges (got=0 exp=0)
+  [PASS] LOW pin 31: asserted after 3 edges (got=1 exp=1)
+  [PASS] INTRPT_LVL_LOW_STATUS: level-low status latched got=0x80000000 exp=0x80000000
+  [PASS] HIGH pin 21: idle low, no interrupt (got=0 exp=0)
+  [PASS] HIGH pin 21: not asserted after 2 edges (got=0 exp=0)
+  [PASS] HIGH pin 21: asserted after 3 edges (got=1 exp=1)
+  [PASS] pin_level_interrupts_o got=0x00200000 exp=0x00200000
+  [PASS] level interrupt held while the input stays high (got=1 exp=1)
+  [PASS] INTRPT_LVL_HIGH_STATUS: level-high status latched got=0x00200000 exp=0x00200000
+  [PASS] INTRPT_LVL_HIGH_STATUS: re-latches while the level is still present got=0x00200000 exp=0x00200000
+  [PASS] CFG=0: interrupt follows the level down (got=0 exp=0)
+  [PASS] INTRPT_LVL_HIGH_STATUS: status stays set after the level goes away got=0x00200000 exp=0x00200000
+  [PASS] INTRPT_LVL_HIGH_STATUS: clears once the level is gone got=0x00000000 exp=0x00000000
+  [PASS] LOW pin 21: input high, no interrupt (got=0 exp=0)
+  [PASS] LOW pin 21: not asserted after 2 edges (got=0 exp=0)
+  [PASS] LOW pin 21: asserted after 3 edges (got=1 exp=1)
+  [PASS] INTRPT_LVL_LOW_STATUS: level-low status latched got=0x00200000 exp=0x00200000
+  [PASS] level-high and level-low walked over all 32 pins (0 mismatches)
+
+---------------------------------------------------------------
+ TC15 Status registers: write-1-to-clear semantics
+---------------------------------------------------------------
+  [PASS] INTRPT_RISE_STATUS: pins 3:0 latched got=0x0000000f exp=0x0000000f
+  [PASS] INTRPT_RISE_STATUS: only the written bits clear got=0x0000000a exp=0x0000000a
+  [PASS] INTRPT_RISE_STATUS: writing 0 clears nothing got=0x0000000a exp=0x0000000a
+  [PASS] INTRPT_RISE_STATUS: 1s on bits that are not pending are harmless got=0x0000000a exp=0x0000000a
+  [PASS] INTRPT_STATUS: aggregated view got=0x0000000a exp=0x0000000a
+  [PASS] INTRPT_RISE_STATUS: aggregated W1C clears the per-type bit got=0x00000008 exp=0x00000008
+  [PASS] INTRPT_STATUS: aggregated view after clear got=0x00000008 exp=0x00000008
+  [PASS] INTRPT_RISE_STATUS: pin 5 rise got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_FALL_STATUS: pin 5 fall got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_LVL_HIGH_STATUS: pin 5 high got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_LVL_LOW_STATUS: pin 5 low got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_STATUS: aggregated got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_STATUS: write of 0 leaves all four types set got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_STATUS: clearing other pins leaves this one set got=0x00000020 exp=0x00000020
+  [PASS] INTRPT_RISE_STATUS: aggregated W1C cleared rise got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_FALL_STATUS: aggregated W1C cleared fall got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_LVL_HIGH_STATUS: aggregated W1C cleared high got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_LVL_LOW_STATUS: aggregated W1C cleared low got=0x00000000 exp=0x00000000
+  [PASS] global_interrupt_o low once every status is clear (got=0 exp=0)
+
+---------------------------------------------------------------
+ TC16 CFG interrupt-mode bits are independent
+---------------------------------------------------------------
+  [PASS] CFG: glbl_intrpt_mode=1, pin_lvl_intrpt_mode=0 got=0x00000001 exp=0x00000001
+  [PASS] CFG=1: pin output pulses with the edge (got=1 exp=1)
+  [PASS] CFG=1: global output still low (status not latched yet) (got=0 exp=0)
+  [PASS] CFG=1: pin output back low after the pulse (got=0 exp=0)
+  [PASS] CFG=1: global output follows the latched status (got=1 exp=1)
+  [PASS] CFG=1: global output stays asserted (got=1 exp=1)
+  [PASS] CFG=1: global output drops on status clear (got=0 exp=0)
+  [PASS] CFG: glbl_intrpt_mode=0, pin_lvl_intrpt_mode=1 got=0x00000002 exp=0x00000002
+  [PASS] CFG=2: global output pulses with the edge (got=1 exp=1)
+  [PASS] CFG=2: pin output still low (got=0 exp=0)
+  [PASS] CFG=2: global output back low after the pulse (got=0 exp=0)
+  [PASS] CFG=2: pin output follows the latched status (got=1 exp=1)
+  [PASS] CFG=2: pin output stays asserted (got=1 exp=1)
+  [PASS] CFG=2: pin output drops on status clear (got=0 exp=0)
+
+---------------------------------------------------------------
+ TC17 Masked interrupts never fire
+---------------------------------------------------------------
+  [PASS] no interrupt with every enable at 0 (got=0 exp=0)
+  [PASS] no pin interrupt with every enable at 0 got=0x00000000 exp=0x00000000
+  [PASS] INTRPT_STATUS: no status with every enable at 0 got=0x00000000 exp=0x00000000
+  [PASS] only pin 3 drives pin_level_interrupts_o got=0x00000000 exp=0x00000000
+  [PASS] pin 3 did report (got=1 exp=1)
+  [PASS] rise status limited to the enabled pin got=0x00000000 exp=0x00000000
+  [PASS] fall status limited to the enabled pin got=0x00000000 exp=0x00000000
+  [PASS] no level-high status while masked got=0x00000000 exp=0x00000000
+  [PASS] no level-low status while masked got=0x00000000 exp=0x00000000
+
+---------------------------------------------------------------
+ TC18 W1C clear on the same edge as a new edge event
+---------------------------------------------------------------
+  [PASS] control: clear one cycle early, edge still latched got=0x00000001 exp=0x00000001
+  [PASS] rising edge coincident with an INTRPT_RISE_STATUS W1C survives
+  [PASS] rising edge coincident with an INTRPT_STATUS W1C survives
+
+---------------------------------------------------------------
+ TC19 Interrupts from a disabled pin (GPIO_EN = 0)
+---------------------------------------------------------------
+  [PASS] disabled pin 7 does not latch a rising-edge interrupt
+  [PASS] edge interrupt output stays a pulse (CFG=0)
+  [PASS] disabled pin 7 with a high input raises no level-low interrupt
+
+---------------------------------------------------------------
+ TC20 Asynchronous reset during an APB ACCESS phase
+---------------------------------------------------------------
+  [PASS] sanity: interrupt asserted before reset (got=1 exp=1)
+  [PASS] gpio_out cleared asynchronously by reset got=0x00000000 exp=0x00000000
+  [PASS] gpio_tx_en_o cleared by reset got=0x00000000 exp=0x00000000
+  [PASS] global_interrupt_o cleared by reset (got=0 exp=0)
+  [PASS] all 19 registers back at their reset values (0 mismatches)
+
+---------------------------------------------------------------
+ TC21 Random mixed input/output activity
+---------------------------------------------------------------
+  [PASS] 300 random mixed operations (0 mismatches)
+
+---------------------------------------------------------------
+ TC22 Sub-word writes are rejected with PSLVERR
+---------------------------------------------------------------
+  [PASS] GPIO_OUT: 8 partial-strobe writes return PSLVERR (0 mismatches)
+  [PASS] GPIO_OUT: 8 partial-strobe writes leave the pins unchanged (0 mismatches)
+  [PASS] GPIO_OUT: unchanged after partial-strobe writes got=0xa5a5a5a5 exp=0xa5a5a5a5
+  [PASS] GPIO_SET byte write returns PSLVERR (got=1 exp=1)
+  [PASS] GPIO_SET byte write drives no pin got=0xa5a5a5a5 exp=0xa5a5a5a5
+  [PASS] INTRPT_RISE_STATUS: pins 7:0 latched got=0x000000ff exp=0x000000ff
+  [PASS] INTRPT_RISE_STATUS byte write returns PSLVERR (got=1 exp=1)
+  [PASS] INTRPT_RISE_STATUS: pending bits not cleared by a byte write got=0x000000ff exp=0x000000ff
+  [PASS] back-to-back: half-word write rejected (got=1 exp=1)
+  [PASS] back-to-back: following full-word write accepted (got=0 exp=0)
+  [PASS] back-to-back: full-word write takes effect got=0x12345678 exp=0x12345678
+
+===============================================================
+ TB SUMMARY: 312 PASSED / 0 FAILED / 2 SUSPECTED RTL ISSUES
+===============================================================
+*** NO FUNCTIONAL FAILURES - 2 [BUG?] ITEM(S) NEED REVIEW ***
+
+$finish called at time : 108626 ns : File "C:/Users/cj/AppData/Local/Temp/riscforge_gpio_aperture_debug_20261019/gpio-master/tb_gpio_apb_directed.sv" Line 1763
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 00:01:59 2026...

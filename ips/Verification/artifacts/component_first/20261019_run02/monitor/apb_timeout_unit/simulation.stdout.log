@@ -1,0 +1,28 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/apb_tmo_unit/xsim_script.tcl
+# xsim {apb_tmo_unit} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+CHECK_PASS reset clears status
+CHECK_PASS ready response passes through
+CHECK_PASS ready response no timeout
+CHECK_PASS pre-threshold completion passes
+CHECK_PASS pre-threshold completion no timeout
+CHECK_PASS timeout pulse asserted
+CHECK_PASS timeout response forces ready
+CHECK_PASS timeout response sets slverr
+CHECK_PASS timeout response uses sentinel
+CHECK_PASS timeout becomes sticky
+CHECK_PASS pulse clears after access
+CHECK_PASS sticky survives access
+CHECK_PASS reset clears status
+CHECK_PASS reset clears sticky
+TEST_PASS checks=14
+$finish called at time : 160 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/apb_timeout_unit/inputs/tb_apb_timeout_monitor.sv" Line 127
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 10:38:30 2026...

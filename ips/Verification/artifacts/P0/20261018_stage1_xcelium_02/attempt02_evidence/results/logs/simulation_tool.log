@@ -1,0 +1,76 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Oct 18, 2026 at 17:46:31 IST
+xrun
+	-64bit
+	-R
+	-xmlibdirname /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/results/work/xcelium.d
+	-svseed 1
+	+BOOT_MODE=WARM
+	+IMEM_HEX=/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/results/inputs/stage1_imem.hex
+	+DMEM_HEX=/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/results/inputs/stage1_dmem.hex
+	+TIMEOUT=1000000
+	-l /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/results/logs/simulation_tool.log
+
+   User defined plus("+") options:
+	+BOOT_MODE=WARM
+	+IMEM_HEX=/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/results/inputs/stage1_imem.hex
+	+DMEM_HEX=/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/results/inputs/stage1_dmem.hex
+	+TIMEOUT=1000000
+
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xmsim: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+Loading snapshot worklib.soc_tb_top:sv .................... Done
+SVSEED set from command line: 1
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+
+================================================================================
+               RISCFORGE SoC Verification Testbench Launch                      
+================================================================================
+  BOOT MODE       : WARM
+  WATCHDOG LIMIT  : 1000000 cycles
+[TB Reset] Releasing hard reset while warm soft reset remains asserted.
+[TB Preload] Backdooring SRAM after warm reset synchronization...
+[TB Reset] Released hard reset, then warm soft reset. Core running at ISRAM 0x0001_0000.
+
+[FATAL TIMEOUT] Simulation exceeded watchdog limit (1000000 cycles)!
+
+================================================================================
+                 RISCFORGE SoC VERIFICATION FAILURE REPORT                      
+================================================================================
+  FATAL CHECK ID   : WATCHDOG_TIMEOUT
+  BLAME LAYER      : 6 (1:Protocol, 2:Path, 3:Reg, 4:Pin, 5:IRQ, 6:Firmware)
+  SIMULATION TIME  : 10000235.00 ns (Cycle ~1000023)
+  FAILING PC       : 0x00000000
+  DETAILS          : Test exceeded maximum allowed simulation cycles (1000000). Retired=0 AXI=0 APB=0 FW_ATTEST=0x00000000
+  FATALS RECORDED  : 1
+================================================================================
+
+=== Last 10 Retired Instructions ===
+=== Last 10 LSU Memory Transactions ===
+
+=======================================================
+ AXI4-LITE RECENT TRANSACTIONS DUMP (Total WR: 0, RD: 0)
+=======================================================
+ [TIME]     DIR   ADDR         DATA         STRB  RESP
+-------------------------------------------------------
+=======================================================
+
+
+=======================================================
+ APB RECENT TRANSACTIONS DUMP (Total APB Transfers: 0)
+=======================================================
+ [TIME]     SLOT  DIR  PADDR        PWDATA       PRDATA       PSLVERR
+---------------------------------------------------------------------
+=======================================================
+
+Memory Usage - Current physical: 44.6M, Current virtual: 249.4M, Peak physical: 44.6M
+CPU Usage - 0.0s system + 0.7s user = 0.7s total (47.6% cpu)
+Simulation complete via $finish(2) at time 10000235 NS + 0
+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_02_exec02/snapshot/Verification/infrastructure/tb/soc_tb_top.sv:653         $finish(2);
+xcelium> exit
+TOOL:	xrun(64)	24.09-s001: Exiting on Oct 18, 2026 at 17:46:33 IST  (total: 00:00:02)

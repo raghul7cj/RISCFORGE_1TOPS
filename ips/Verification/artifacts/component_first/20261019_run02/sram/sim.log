@@ -1,0 +1,21 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/sram_sim/xsim_script.tcl
+# xsim {sram_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+[PASS] word zero full write/read got=aabbccdd expected=aabbccdd
+[PASS] byte lanes 0 and 2 update only got=aa22cc44 expected=aa22cc44
+[PASS] zero byte mask leaves word unchanged got=aa22cc44 expected=aa22cc44
+[PASS] last valid word address got=5a963cc3 expected=5a963cc3
+[PASS] same-cycle write returns pre-write data got=aa22cc44 expected=aa22cc44
+[PASS] write data visible on following read got=deadbeef expected=deadbeef
+[PASS] chip-select low holds output got=deadbeef expected=deadbeef
+SRAM_SP_SUMMARY pass=7 fail=0
+$finish called at time : 236 ns : File "C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_run02/sram/sram_sp_component_tb.sv" Line 81
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 01:18:31 2026...

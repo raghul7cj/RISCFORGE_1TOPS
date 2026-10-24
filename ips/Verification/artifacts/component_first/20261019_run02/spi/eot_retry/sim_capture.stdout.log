@@ -1,0 +1,13 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/spi_eot_retry/xsim_script.tcl
+# xsim {spi_eot_retry} -autoloadwcfg -tclbatch {capture_waveform.tcl}
+Time resolution is 1 ps
+source capture_waveform.tcl
+## open_vcd {C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/spi/eot_retry/spi_focused.vcd}
+ERROR: [Simulator 45-10] The current simulation was compiled without trace information.  To perform the requested operation, please recompile the design with -debug all or typical.
+xsim% INFO: [Common 17-206] Exiting xsim at Mon Oct 19 04:52:01 2026...

@@ -25,6 +25,7 @@ module rv32m_div (
     input         rst_n,
 
     input         valid_in,
+    input         abort_i,
     output reg    stall,
     output reg    valid_out,
 
@@ -99,6 +100,10 @@ module rv32m_div (
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
+            state     <= IDLE;
+            stall     <= 1'b0;
+            valid_out <= 1'b0;
+        end else if (abort_i) begin
             state     <= IDLE;
             stall     <= 1'b0;
             valid_out <= 1'b0;

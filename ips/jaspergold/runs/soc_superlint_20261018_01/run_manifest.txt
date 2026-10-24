@@ -1,0 +1,14 @@
+Run: soc_superlint_20261018_01
+Purpose: Cadence JasperGold Superlint of riscforge_soc_subsystem
+Tool target: JasperGold 2025.06 FCS 64-bit
+Source manifest: RTL_SOC/soc_subsystem.f
+Source filelist SHA-256: A931D6B425A197BB03AC237378839B7628CC0893743BC59F25A4D29F1A0E5407
+JasperGold filelist: derived jg_soc.f (tool-only -sv/-timescale/-top switches removed)
+Top source SHA-256: BA730AB4A76AF6E4C8990A697AC28ECE5C50A0B8A22111D1D9E32A7A654B5508
+Source snapshot: selected current RTL source directories, packaged for remote run
+Snapshot ZIP SHA-256: E3AFC9F378520E6C6F74C4F01A366CDB8F401D180EF3C9BA91DEBBEF2B7B5576
+Run date: 2026-10-18
+
+Effective JasperGold source additions: OBI UART packages, APB-to-OBI adapter, OBI UART modules, apb_uart_wrap.sv. The current SoC top instantiates apb_uart, which instantiates apb_uart_wrap; the canonical soc_subsystem.f omitted that dependency chain. The project filelist was not modified.
+Effective JasperGold filelist SHA-256: B5F6D25A5795C9A692B4B46D0B4B05ECED9B3A43C3223ABED990B7606F80DAFA
+Updated snapshot ZIP SHA-256: 7AC8135A7FCEEF0DF4F5FEB86854F1AAE0731C30C32888DE64AFB2263C9F315F

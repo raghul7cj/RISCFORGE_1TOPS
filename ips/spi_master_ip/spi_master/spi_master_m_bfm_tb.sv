@@ -39,6 +39,10 @@ module tb_apb_spi_master_bfm;
   logic [31:0]               PWDATA, PRDATA;
   logic                      PWRITE, PSEL, PENABLE, PREADY, PSLVERR;
   logic [1:0]                events_o;
+  int                        check_count = 0;
+  int                        fail_count = 0;
+  int                        eot_count = 0;
+  int                        eot_baseline = 0;
 
   logic        spi_clk;
   logic        spi_csn0, spi_csn1, spi_csn2, spi_csn3;
@@ -79,6 +83,13 @@ module tb_apb_spi_master_bfm;
 
   initial HCLK = 1'b0;
   always #(CLK_PERIOD/2) HCLK = ~HCLK;
+
+  // EOT is a one-cycle combinational event. Count it at every active clock
+  // edge so a later APB response cannot make the testbench miss the pulse.
+  always @(posedge HCLK) begin
+    if (HRESETn && (events_o[1] === 1'b1))
+      eot_count++;
+  end
 
   // -----------------------------------------------------------------------
   // SPI Slave BFM Tasks
@@ -158,7 +169,10 @@ module tb_apb_spi_master_bfm;
   endtask
 
   task automatic trigger_read(input logic [3:0] cs = 4'b0001);
-    u_apb_bfm.apb_write(reg_addr(REG_STATUS), {20'h0, cs, 4'h0, 4'b0001});
+    begin
+      eot_baseline = eot_count;
+      u_apb_bfm.apb_write(reg_addr(REG_STATUS), {20'h0, cs, 4'h0, 4'b0001});
+    end
   endtask
 
   task automatic core_read_rx(output logic [31:0] data);
@@ -173,13 +187,15 @@ module tb_apb_spi_master_bfm;
     int cnt;
     begin
       cnt = 0;
-      while ((dut.s_eot !== 1'b1) && (cnt < timeout_cycles)) begin
-        @(posedge HCLK); cnt++;
+      while ((eot_count <= eot_baseline) && (cnt < timeout_cycles)) begin
+        @(posedge HCLK); #1; cnt++;
       end
-      if (cnt >= timeout_cycles)
-        $display("  [TIMEOUT] EOT not seen after %0d cycles", timeout_cycles);
-      else
+      if (eot_count <= eot_baseline) begin
+        $display("  [FAIL] EOT not seen after %0d cycles", timeout_cycles);
+        fail_count++;
+      end else begin
         $display("  [EOT] after %0d cycles", cnt);
+      end
       @(posedge HCLK);
     end
   endtask
@@ -193,10 +209,13 @@ module tb_apb_spi_master_bfm;
     input logic [31:0] exp,
     input logic [31:0] mask = 32'hFFFF_FFFF
   );
+    check_count++;
     if ((got & mask) === (exp & mask))
       $display("  [PASS] %-45s  got=0x%08X  exp=0x%08X", msg, got, exp);
-    else
+    else begin
       $display("  [FAIL] %-45s  got=0x%08X  exp=0x%08X", msg, got, exp);
+      fail_count++;
+    end
   endtask
 
   // -----------------------------------------------------------------------
@@ -449,8 +468,10 @@ module tb_apb_spi_master_bfm;
           $display("  [OBSERVER] Checking bus... PREADY is currently: %b", PREADY);
           if (PREADY === 1'b0)
             $display("  [OBSERVER] SUCCESS: Read is stalled, wait-states are active.");
-          else
+          else begin
             $display("  [OBSERVER] FAIL: PREADY should be 0!");
+            fail_count++;
+          end
         end
       join
 
@@ -462,13 +483,19 @@ module tb_apb_spi_master_bfm;
     $display("\n================================================================");
     $display("  Simulation complete");
     $display("================================================================\n");
-    #100; $finish;
+    #100;
+    if (fail_count == 0)
+      $display("TEST_PASS checks=%0d eot_events=%0d", check_count, eot_count);
+    else
+      $display("TEST_FAIL checks=%0d failures=%0d eot_events=%0d", check_count, fail_count, eot_count);
+    $finish;
   end
 
   initial begin
     #250_000;
-    $display("[WATCHDOG] Timeout — simulation hung");
-    $finish;
+    fail_count++;
+    $display("TEST_FAIL watchdog: simulation hung at %0t", $time);
+    $fatal(1, "SPI BFM watchdog expired");
   end
 
   initial begin

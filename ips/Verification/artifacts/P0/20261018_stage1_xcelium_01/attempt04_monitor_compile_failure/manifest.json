@@ -1,0 +1,22 @@
+{
+  "scenario": "stage1_hello",
+  "boot_mode": "WARM",
+  "seed": 1,
+  "verdict": "INCOMPLETE",
+  "started_utc": "2026-10-18T11:44:04.776675Z",
+  "environment": {
+    "LM_LICENSE_FILE": "5280@14.139.1.126",
+    "CDS_LIC_FILE": "5280@14.139.1.126",
+    "CDS_AUTO_64BIT": "ALL"
+  },
+  "tool_version": "TOOL:\txrun(64)\t24.09-s001",
+  "filelist_sha256": "c580e22e5da90455c11b405ccf39652c2d44209e1aad3cec2f4d98d537bde00d",
+  "input_hashes": {
+    "stage1.elf": "fb7e7bd12ed10b7618059e7394c396e3b396638f61bd14173ebc04296f090882",
+    "stage1_imem.hex": "b7c3daf2d6f370184b6d551db4d38b50a5140d2a79c9e9ab45884d47be4a6454",
+    "stage1_dmem.hex": "d7b7e1a4b0fa9c3b94a6d3aab5bc3916a945221f58062eca07bf532b2ebd7ae7",
+    "riscforge_bootrom.hex": "74dcf3784d8e2e45a801ec6013926e95215d520ed766acc829d86644661e310f"
+  },
+  "reason": "Compilation/elaboration failed",
+  "finished_utc": "2026-10-18T11:44:06.895267Z"
+}

@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RISCFORGE SoC &amp; Peripheral Figure Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --display:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",monospace;
+  --ground:#ffffff; --paper:#ffffff;
+  --ink:#18202c; --ink-2:#475063; --ink-3:#626d7f;
+  --rule:#e2e8f0; --rule-2:#cbd5e1; --tint:#f8fafc;
+  --core:#2d56c8; --core-f:rgba(45,86,200,.08);
+  --mem:#0c8577;  --mem-f:rgba(12,133,119,.08);
+  --bus:#7445bd;  --bus-f:rgba(116,69,189,.08);
+  --per:#a8660c;  --per-f:rgba(190,120,20,.09);
+  --irq:#c92c37;  --irq-f:rgba(201,44,55,.08);
+  --pass:#15803d; --pass-f:rgba(21,128,61,.08);
+  --warn:#b45309; --warn-f:rgba(180,83,9,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:#ffffff;color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.62;padding-inline:16px;padding-block:32px 48px;-webkit-font-smoothing:antialiased}
+.sheet{max-width:880px;margin-inline:auto;background:#ffffff;border:1px solid var(--rule);border-radius:6px;box-shadow:0 4px 24px rgba(0,0,0,0.04);padding:56px 64px 48px}
+@media (max-width:720px){body{padding-block:16px 32px}.sheet{padding:28px 20px 32px;border:none;box-shadow:none}}
+
+@page{size:A4 portrait;margin:14mm 12mm 16mm 12mm}
+@media print{
+  html,body{width:100%!important;margin:0!important;padding:0!important;background:#ffffff!important;color:#18202c!important;font-size:13px!important;line-height:1.5!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .sheet{border:none!important;box-shadow:none!important;padding:0!important;max-width:100%!important;width:100%!important;margin:0!important}
+  section{margin-top:24px!important;padding-top:16px!important;page-break-inside:auto!important;break-inside:auto!important}
+  h1,h2,h3,h4{page-break-after:avoid!important;break-after:avoid!important}
+  figure,.tbl,.note,pre,tr,.facts,.toc{page-break-inside:avoid!important;break-inside:avoid!important}
+  figure{margin:16px 0 0!important}
+  figcaption{margin:8px 0 0!important}
+  .fig-scroll{border:1px solid var(--rule)!important;border-radius:4px!important;padding:8px!important;overflow:visible!important;background:#ffffff!important}
+  .dg{min-width:0!important;width:100%!important;max-width:100%!important;height:auto!important}
+  .split{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important;page-break-inside:avoid!important;break-inside:avoid!important}
+  .tbl{margin-top:12px!important;border:1px solid var(--rule)!important;overflow:visible!important}
+  table{width:100%!important;table-layout:fixed!important;font-size:11.5px!important}
+  th,td{padding:5px 7px!important;font-size:11px!important}
+  .chip{padding:2px 4px!important;font-size:9.5px!important}
+}
+
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;color:var(--ink);margin:0}
+h1{font-size:clamp(28px,4.5vw,38px);font-weight:750;font-stretch:112%;letter-spacing:-.01em;line-height:1.12}
+h2{font-size:22px;font-weight:680;font-stretch:108%;line-height:1.2;display:flex;gap:14px;align-items:baseline}
+h2 .no{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink-3);min-width:1.6em}
+h3{font-size:12px;font-weight:650;font-stretch:115%;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2);margin-top:22px}
+p,ul,ol{max-width:72ch;margin:10px 0 0}
+ul,ol{padding-left:1.2em}
+li{margin-top:5px}
+code:not(pre code),.reg{font-family:var(--mono);font-size:.88em;background:var(--tint);border:1px solid var(--rule);border-radius:3px;padding:1px .35em;white-space:nowrap}
+a{color:var(--core);text-decoration-thickness:1px;text-underline-offset:2px}
+
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+.lede{font-size:16.5px;line-height:1.55;color:var(--ink-2);margin-top:14px;max-width:68ch}
+.scope{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:22px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
+.scope b{font-weight:600;color:var(--ink)}
+.toc{margin-top:28px;padding:18px 20px;background:var(--tint);border:1px solid var(--rule);border-radius:4px}
+.toc ol{list-style:none;padding:0;margin:0;max-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 20px;counter-reset:t}
+.toc li{margin:0;counter-increment:t;font-size:13.5px}
+.toc li::before{content:counter(t);font-family:var(--mono);font-size:12px;color:var(--ink-3);display:inline-block;width:1.9em}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--core);text-decoration:underline}
+section{margin-top:48px;padding-top:28px;border-top:1px solid var(--rule)}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;margin:22px 0 0;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.facts div{padding:12px 14px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-right:-1px;margin-bottom:-1px}
+.facts dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.facts dd{margin:3px 0 0;font-size:13.5px;line-height:1.45;font-weight:500}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+figure{margin:24px 0 0}
+.fig-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:4px;background:var(--paper);padding:14px 12px}
+.fig-scroll img{display:block;width:100%;height:auto;border:0}
+figcaption{font-size:12.5px;line-height:1.5;color:var(--ink-2);margin:10px 0 0;max-width:82ch}
+.tbl{overflow:hidden;margin-top:18px;border:1px solid var(--rule);border-radius:4px;width:100%}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12.5px;line-height:1.45}
+th,td{text-align:left;vertical-align:middle;padding:7px 9px;border-bottom:1px solid var(--rule);word-break:break-word}
+thead th{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);background:var(--tint)}
+td.m,th.m{font-family:var(--mono);font-size:11.5px}
+.chip{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;line-height:1;padding:2.5px 5px;border-radius:3px;border:1px solid;white-space:nowrap}
+.chip.pass{color:var(--pass);background:var(--pass-f);border-color:var(--pass)}
+.chip.warn{color:var(--warn);background:var(--warn-f);border-color:var(--warn)}
+.chip.fail{color:var(--irq);background:var(--irq-f);border-color:var(--irq)}
+.chip.core{color:var(--core);background:var(--core-f);border-color:var(--core)}
+.chip.mem{color:var(--mem);background:var(--mem-f);border-color:var(--mem)}
+.chip.bus{color:var(--bus);background:var(--bus-f);border-color:var(--bus)}
+.chip.per{color:var(--per);background:var(--per-f);border-color:var(--per)}
+.note{margin-top:18px;padding:12px 16px;border-left:3px solid var(--rule-2);background:var(--tint);font-size:13.5px}
+.note b{font-weight:600}
+.note.warn{border-left-color:var(--warn);background:var(--warn-f)}
+.note.pass{border-left-color:var(--pass);background:var(--pass-f)}
+.note.fail{border-left-color:var(--irq);background:var(--irq-f)}
+pre{background:#0d1117;color:#c9d1d9;padding:14px 16px;border-radius:6px;font-family:var(--mono);font-size:12px;line-height:1.6;overflow-x:auto;margin-top:12px;border:1px solid #30363d;white-space:pre}
+pre code{font-family:inherit;font-size:inherit;background:transparent;border:none;padding:0;display:block}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<main class="sheet">
+
+<header>
+  <p class="eyebrow">RISCFORGE 1TOPS SoC &middot; Figure Set &middot; 18 Figures</p>
+  <h1>SoC Topology, Peripheral Internals &amp; State Machines</h1>
+  <p class="lede">Eighteen publication-grade figures covering the SoC interconnect, every APB peripheral, the interrupt subsystem and the RV32 pipeline. Each figure states one interview takeaway, is grounded in the real RTL signal and register names, and names the failure mode it exists to prevent. Every figure was machine-checked for label collisions and then visually inspected.</p>
+  <div class="scope">
+    <span><b>Source</b> rtl/ips &mdash; RTL_SOC, axi_lite_xbar, axi_lite_to_apb, bus_monitors, apb_uart, apb_timer, aon_timer, apb_i2c, spi_master_ip, gpio-master, clic-master, risc_core</span>
+    <span><b>Format</b> PNG 220&nbsp;dpi + SVG</span>
+    <span><b>QA</b> 18/18 clean</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <ol>
+    <li><a href="#sys">SoC System &amp; Interconnect (1&ndash;5)</a></li>
+    <li><a href="#bus">Bus Protocol &amp; Resilience (6)</a></li>
+    <li><a href="#uart">UART (7&ndash;8)</a></li>
+    <li><a href="#tim">Timers (9&ndash;10)</a></li>
+    <li><a href="#i2c">I2C Master (11&ndash;12)</a></li>
+    <li><a href="#spi">SPI Master &amp; GPIO (13&ndash;14)</a></li>
+    <li><a href="#irq">Interrupts (15&ndash;16)</a></li>
+    <li><a href="#core">RV32 Core (17&ndash;18)</a></li>
+  </ol>
+</nav>
+
+<section id="sys">
+  <h2><span class="no">1</span>SoC System &amp; Interconnect</h2>
+  <dl class="facts">
+    <div><dt>Figures</dt><dd>5 topology, decode, crossbar, bridge, monitors</dd></div>
+    <div><dt>Key finding</dt><dd>The SoC top does not instantiate the CLIC or the AON timer</dd></div>
+    <div><dt>Decode</dt><dd>3 crossbar rules + 6 APB rules, exactly one hit</dd></div>
+    <div><dt>Watchdog</dt><dd>AXI 16 / 131072 cycles, APB 16 cycles</dd></div>
+  </dl>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig01_soc_topology.png" alt="SoC topology: core, memories, crossbar, APB bridge, six APB targets, in-core interrupt fan-in"></div>
+    <figcaption><span class="chip core">core</span> <b>fig01 &mdash; SoC topology.</b> One RV32 core, one shared SRAM pair and one AXI-Lite crossbar fan out six APB peripherals. The boot path deliberately bypasses the crossbar: <span class="reg">RESET_PC = 0x0000_0000</span> fetches from BootROM, the bootloader copies to ISRAM, then releases reset. AON timer is drawn dashed because it is not instantiated at SoC level today.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig02_soc_address_map.png" alt="SoC address map and APB decode ladder with SLVERR holes"></div>
+    <figcaption><span class="chip bus">bus</span> <b>fig02 &mdash; Address map and decode.</b> Decode is a range compare over 3 crossbar rules and 6 APB rules, exactly one hit. GPIO is only 2&nbsp;KB at <span class="reg">0x4000_3800</span>, which is precisely why the rest of its 4&nbsp;KB aperture is a hatched SLVERR hole instead of a silent second window.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig03_axi_xbar_internals.png" alt="AXI-Lite crossbar internals with independent read and write arbitration"></div>
+    <figcaption><span class="chip bus">bus</span> <b>fig03 &mdash; Crossbar internals.</b> AW and AR each get their own round-robin arbiter and their own 4-deep select FIFO, so the only thing that can remove an AW grant is a full write FIFO and the only thing that can remove an AR grant is a full read FIFO. Nothing is shared between the two directions, which is what removes head-of-line blocking.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig04_axil_to_apb_bridge_fsm.png" alt="AXI-Lite to APB bridge FSM alongside the AXI transaction it generates"></div>
+    <figcaption><span class="chip bus">bus</span> <b>fig04 &mdash; Bridge FSM and transaction.</b> AXI channels are independent but APB is not, so the bridge must serialise: it parks AW and W until the APB access phase completes. The waveform deliberately shows AW retiring at clk1 and W at clk4 to prove channel independence with a single commit point at PREADY.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig05_bus_timeout_monitors.png" alt="AXI-Lite and APB bus timeout monitors with progress detect and escalation"></div>
+    <figcaption><span class="chip warn">resilience</span> <b>fig05 &mdash; Timeout monitors.</b> A stalled slave is indistinguishable from a slow one, so the monitors count <i>no-progress</i> cycles, not elapsed cycles, saturate instead of wrapping, and escalate to SLVERR (<span class="reg">0xDEAD_BEEF</span> / <span class="reg">0xDEAD_DEAD</span>) which the core turns into a load/store access fault.</figcaption>
+  </figure>
+</section>
+
+<section id="bus">
+  <h2><span class="no">2</span>Bus Protocol &amp; Resilience</h2>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig06_apb_protocol_timing.png" alt="APB protocol timing showing SETUP and ACCESS phases with wait states"></div>
+    <figcaption><span class="chip bus">bus</span> <b>fig06 &mdash; APB4 timing.</b> APB is a two-phase handshake: PSEL/PENABLE are asserted a full cycle before any transfer, and PENABLE may only drop on PREADY. One shared cycle grid carries a write, a read and a 2-wait-state read so the cycle arithmetic <span class="reg">1 SETUP + 1 + N ACCESS</span> is visible directly.</figcaption>
+  </figure>
+</section>
+
+<section id="uart">
+  <h2><span class="no">3</span>UART</h2>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig07_uart_internals.png" alt="APB UART internals: register map, TX and RX datapath, line status"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig07 &mdash; UART internals.</b> Every software-visible behaviour traces to one of eight latched LSR bits and a five-source priority encoder. The FIFOs are 16 deep and invisible; when <span class="reg">fifo_full</span> silently swallows a THR write, LSR[5]/[6] refusing to read 1 is the only evidence.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig08_uart_tx_rx_fsm.png" alt="UART transmit and receive bit sequencers with a bit-level frame waveform"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig08 &mdash; TX/RX sequencers.</b> The two differ only in their tick: TX shifts one bit per <span class="reg">baud_rate_edge</span>, RX samples on <span class="reg">timing_bit_center_edge = (count == 8)</span>, i.e. the middle of the bit. Everything else &mdash; start-bit sync, framing error, back-to-back behaviour &mdash; follows from that one asymmetry.</figcaption>
+  </figure>
+</section>
+
+<section id="tim">
+  <h2><span class="no">4</span>Timers</h2>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig09_apb_timer_internals.png" alt="APB timer internals: three registers, prescaler, counter and combinational compare"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig09 &mdash; APB timer.</b> Only three registers exist (<span class="reg">TIMER</span> +0x00, <span class="reg">CTRL</span> +0x04, <span class="reg">CMP</span> +0x08) and <span class="reg">irq_o[1]</span> is combinational <span class="reg">TIMER == CMP</span>. The same comparison raises the interrupt and zeroes the counter, so there is no status bit, no mask and no reload.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig10_aon_timer_fsm.png" alt="AON timer reset domain, state machine and wrap to compare boundary"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig10 &mdash; AON timer.</b> The AON-ness is a reset-domain fact, not a feature: <span class="reg">rst_aon_ni</span> is the core's only reset, so the count&rarr;threshold match is the only event that can still be pending when everything else sits at its reset value.</figcaption>
+  </figure>
+</section>
+
+<section id="i2c">
+  <h2><span class="no">5</span>I2C Master</h2>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig11_i2c_master_fsm.png" alt="I2C master byte sequencer with quarter-bit SCL phases and branch lanes"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig11 &mdash; I2C master FSM.</b> The byte sequencer only sequences bits; the liveness of the slave exists solely in the ACK bit captured in <span class="reg">ST_ACK</span>. The bit controller genuinely quarters SCL (five phases per command), and clock stretching is handled by <span class="reg">slave_wait</span>.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig12_i2c_timing_waveform.png" alt="I2C SCL and SDA waveform for one byte transfer with ACK clock and clock stretch"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig12 &mdash; I2C waveform.</b> A byte is nine clocks, not eight: the master drives eight bits, then stops touching SDA entirely and pulses SCL a ninth time so the slave can answer. START and STOP are visibly the only SDA edges taken while SCL is high.</figcaption>
+  </figure>
+</section>
+
+<section id="spi">
+  <h2><span class="no">6</span>SPI Master &amp; GPIO</h2>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig13_spi_master_fsm.png" alt="SPI master controller FSM with CPOL/CPHA handling and a full duplex byte waveform"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig13 &mdash; SPI master.</b> SPI has no handshake, so the only back-pressure is the 10-deep TX FIFO filling up and the clock stalling. The RTL implements <b>neither CPOL nor CPHA</b> &mdash; it is hard-wired mode 0, and <span class="reg">spi_mode[1:0]</span> is actually the bus-width code, not a mode field. That trap is called out on the figure.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig14_gpio_internals.png" alt="GPIO input path with two-stage synchronizer, edge detect and atomic output register"></div>
+    <figcaption><span class="chip per">peripheral</span> <b>fig14 &mdash; GPIO.</b> The pad never reaches software directly: the input register, all four edge/level detectors, every mask and every status bit are fed from the <i>second</i> synchronizer flop, and the waveform shows the flag arming two clocks after the pad moved.</figcaption>
+  </figure>
+</section>
+
+<section id="irq">
+  <h2><span class="no">7</span>Interrupts</h2>
+  <div class="note warn">
+    <p><b>Architectural gap surfaced by this figure set</b></p>
+    <p style="font-size:13px;color:var(--ink-2);margin-top:4px;">The CLIC IP is fully implemented in the repository but is <b>not instantiated</b> by <span class="reg">riscforge_soc_subsystem</span>: the sixth APB slot is documented as replacing it and <span class="reg">ext_irq_i</span>/<span class="reg">sw_irq_i</span> are tied to 0. What is actually live is an in-core <span class="reg">irq_gateway</span> + <span class="reg">irq_arbiter</span> with no claim mechanism. fig15 and fig16 draw both, marking the CLIC side as intended rather than present.</p>
+  </div>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig15_clic_internals.png" alt="CLIC internals: gateway, pending and priority bank, claim and complete, vector generation"></div>
+    <figcaption><span class="chip fail">interrupt</span> <b>fig15 &mdash; CLIC internals.</b> The CLIC resolves priority only when software asks: a max-tree picks a winner but only the claim pulse clears the pending bit. The tie-break is a strict <span class="reg">&gt;</span>, so the <b>lower</b> interrupt ID wins ties, and priority is a packed key with mode as the MSB.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig16_irq_arbitration.png" alt="Interrupt arbitration: source classes, in-core arbiter, and claim-based scheme comparison"></div>
+    <figcaption><span class="chip fail">interrupt</span> <b>fig16 &mdash; IRQ arbitration.</b> Arbitration resolves at two different points and gives different winners: the live in-core arbiter uses fixed inter-class priority (C2 &gt; C1 &gt; C0) with round-robin inside a class, while a CLIC would hand the choice to software at claim time. The figure also flags that <span class="reg">fast_irq_i[10:4]</span> are wired at SoC level but dropped in the core, so <span class="reg">mip[20..26]</span> can never be set.</figcaption>
+  </figure>
+</section>
+
+<section id="core">
+  <h2><span class="no">8</span>RV32 Core</h2>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig17_rv32_pipeline.png" alt="Five-stage RV32 pipeline with forwarding network, hazard unit and load-use bubble tables"></div>
+    <figcaption><span class="chip core">core</span> <b>fig17 &mdash; Five-stage pipeline.</b> Forwarding covers ALU-to-ALU with zero cost; the hazard unit only has to earn its keep on the one case a bypass cannot fix. The two cycle tables isolate it: dependent ALU ops retire with <span class="reg">ForwardAE = 2'b10</span> and no bubble, load&rarr;ALU pays exactly one bubble because DMEM returns data after MEM.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="fig-scroll"><img src="fig18_trap_mret_fsm.png" alt="Trap and mret control: state decode, exception priority, CSR writes and pipeline flush"></div>
+    <figcaption><span class="chip core">core</span> <b>fig18 &mdash; Trap / mret control.</b> A trap is a state machine, not an exception: cause, tval and PC are latched together in writeback and the pipeline restarts from mtvec, so a handler never sees a half-updated context. Interrupt is a <i>sub-mode</i> of the trap path (<span class="reg">cause[5]</span>), and MRET is subordinate &mdash; any exception on the same instruction wins.</figcaption>
+  </figure>
+</section>
+
+<footer>
+  <p><b>Quality gate.</b> All figures are produced by the shared kernel <code>_figstyle.py</code>; each <code>d_*.py</code> script is standalone and idempotent. Re-run any of them with <code>py -3 d_&lt;topic&gt;.py</code> from this directory. Every script calls <code>qa_report()</code>, which machine-checks text/text overlap, text/wire collision, text escaping its box, canvas clipping and grouping-brace collisions &mdash; all 18 report <span class="chip pass">clean</span>. Each figure was additionally reviewed by eye as a rendered image and refined; defects fixed in that pass included wire-label pills wider than the gap they sat in, titles and footers overhanging the frame, badges half-outside their cells, healthy states painted in fault colours, and grouping braces slicing through labels.</p>
+</footer>
+
+</main>
+</body>
+</html>

@@ -13,8 +13,14 @@ module gpio_input_stage #(
   logic         serial, serial_q;
 
   assign serial_o =  serial_q;
-  assign f_edge_o = (~serial) & serial_q;
-  assign r_edge_o = serial & (~serial_q);
+  // The edge outputs are qualified with en_i. Unlike the clock-gated version of
+  // this stage, the synchronizer here keeps running while the GPIO is disabled
+  // while serial_q stays frozen, so without this qualifier the edge outputs
+  // stay asserted for as long as the pin differs from the frozen sample. That
+  // raises interrupts on a disabled GPIO and holds global_interrupt_o high
+  // instead of pulsing it.
+  assign f_edge_o = en_i & (~serial) & serial_q;
+  assign r_edge_o = en_i & serial & (~serial_q);
 
   sync #(
     .STAGES (NrSyncStages)

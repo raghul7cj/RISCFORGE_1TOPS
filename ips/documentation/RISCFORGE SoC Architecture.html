@@ -1,0 +1,1148 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>RISCFORGE SoC Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+
+  --ground:#e8ecf1;
+  --paper:#ffffff;
+  --ink:#18202c;
+  --ink-2:#475063;
+  --ink-3:#7a8394;
+  --rule:#e0e5ec;
+  --rule-2:#c6cdd8;
+  --tint:#f4f6f9;
+
+  --core:#2d56c8;  --core-f:rgba(45,86,200,.09);
+  --mem:#0c8577;   --mem-f:rgba(12,133,119,.10);
+  --bus:#7445bd;   --bus-f:rgba(116,69,189,.09);
+  --per:#a8660c;   --per-f:rgba(190,120,20,.11);
+  --irq:#c92c37;   --irq-f:rgba(201,44,55,.08);
+  --mute:#98a0ac;  --mute-f:rgba(152,160,172,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0c1016; --paper:#151a22; --ink:#e3e7ee; --ink-2:#a8b1c0; --ink-3:#7b8494;
+    --rule:#252d39; --rule-2:#364150; --tint:#1a212b;
+    --core:#88a6ff; --core-f:rgba(136,166,255,.13);
+    --mem:#45c6b5;  --mem-f:rgba(69,198,181,.12);
+    --bus:#b995f3;  --bus-f:rgba(185,149,243,.13);
+    --per:#e6ab52;  --per-f:rgba(230,171,82,.13);
+    --irq:#ff7a80;  --irq-f:rgba(255,122,128,.12);
+    --mute:#6d7686; --mute-f:rgba(109,118,134,.10);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0c1016; --paper:#151a22; --ink:#e3e7ee; --ink-2:#a8b1c0; --ink-3:#7b8494;
+  --rule:#252d39; --rule-2:#364150; --tint:#1a212b;
+  --core:#88a6ff; --core-f:rgba(136,166,255,.13);
+  --mem:#45c6b5;  --mem-f:rgba(69,198,181,.12);
+  --bus:#b995f3;  --bus-f:rgba(185,149,243,.13);
+  --per:#e6ab52;  --per-f:rgba(230,171,82,.13);
+  --irq:#ff7a80;  --irq-f:rgba(255,122,128,.12);
+  --mute:#6d7686; --mute-f:rgba(109,118,134,.10);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15.5px;
+  line-height:1.62;
+  padding-inline:16px;
+  padding-block:32px 48px;
+  -webkit-font-smoothing:antialiased;
+}
+.sheet{
+  max-width:860px;
+  margin-inline:auto;
+  background:var(--paper);
+  border:1px solid var(--rule);
+  border-radius:4px;
+  padding:56px 64px 48px;
+}
+@media (max-width:720px){
+  body{padding-block:16px 32px}
+  .sheet{padding:28px 20px 32px}
+}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:var(--display);text-wrap:balance;color:var(--ink);margin:0}
+h1{font-size:clamp(30px,5vw,42px);font-weight:750;font-stretch:112%;letter-spacing:-.01em;line-height:1.08}
+h2{font-size:24px;font-weight:680;font-stretch:108%;line-height:1.2;display:flex;gap:14px;align-items:baseline}
+h2 .no{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink-3);min-width:1.6em}
+h3{font-size:12px;font-weight:650;font-stretch:115%;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2);margin-top:22px}
+p,ul,ol{max-width:68ch;margin:10px 0 0}
+ul,ol{padding-left:1.2em}
+li{margin-top:5px}
+li::marker{color:var(--ink-3)}
+strong{font-weight:600}
+code,.reg{font-family:var(--mono);font-size:.88em;background:var(--tint);border:1px solid var(--rule);border-radius:3px;padding:0 .3em;white-space:nowrap}
+a{color:var(--core);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--core);outline-offset:2px;border-radius:2px}
+
+/* ---------- header ---------- */
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+.lede{font-size:17px;line-height:1.55;color:var(--ink-2);margin-top:14px;max-width:62ch}
+.scope{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:22px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
+.scope b{font-weight:600;color:var(--ink)}
+
+.toc{margin-top:28px;padding:18px 20px;background:var(--tint);border:1px solid var(--rule);border-radius:4px}
+.toc ol{list-style:none;padding:0;margin:0;max-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 20px;counter-reset:t}
+.toc li{margin:0;counter-increment:t;font-size:14px}
+.toc li::before{content:counter(t);font-family:var(--mono);font-size:12px;color:var(--ink-3);display:inline-block;width:1.9em}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--core);text-decoration:underline}
+
+section{margin-top:52px;padding-top:30px;border-top:1px solid var(--rule)}
+section > h2 + p{margin-top:14px}
+
+/* ---------- facts ---------- */
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0;margin:22px 0 0;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.facts div{padding:12px 16px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-right:-1px;margin-bottom:-1px}
+.facts dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.facts dd{margin:3px 0 0;font-size:14px;line-height:1.45}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+.split p{margin-top:6px;font-size:14.5px}
+@media (max-width:640px){.split{grid-template-columns:1fr;gap:4px}}
+
+/* ---------- figures ---------- */
+figure{margin:26px -24px 0;}
+@media (max-width:720px){figure{margin-inline:0}}
+.fig-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:4px;background:var(--paper);padding:14px 12px}
+figcaption{font-size:13px;line-height:1.5;color:var(--ink-2);margin:10px 24px 0;max-width:80ch}
+@media (max-width:720px){figcaption{margin-inline:0}}
+figcaption b{color:var(--ink);font-weight:600}
+
+.dg{display:block;width:100%;height:auto;min-width:660px}
+.dg text{font-family:var(--sans);fill:var(--ink);font-size:12px}
+.dg .tt{font-weight:600;font-size:12.5px}
+.dg .ts{font-size:10.5px;fill:var(--ink-2)}
+.dg .tm{font-family:var(--mono);font-size:10.5px;fill:var(--ink-2)}
+.dg .ti{font-family:var(--mono);font-size:10px;fill:var(--irq)}
+.dg .tlab{font-size:10.5px;fill:var(--ink-2);font-style:italic}
+.dg .tmu{fill:var(--ink-3)}
+.dg .tbus{fill:var(--bus);font-weight:600;font-size:11px;letter-spacing:.05em}
+.dg rect{stroke-width:1.2}
+.n-core{fill:var(--core-f);stroke:var(--core)}
+.n-stage{fill:var(--paper);stroke:var(--core)}
+.n-mem{fill:var(--mem-f);stroke:var(--mem)}
+.n-bus{fill:var(--bus-f);stroke:var(--bus)}
+.n-per{fill:var(--per-f);stroke:var(--per)}
+.n-irq{fill:var(--irq-f);stroke:var(--irq)}
+.n-plain{fill:var(--paper);stroke:var(--rule-2)}
+.n-mute{fill:var(--mute-f);stroke:var(--mute);stroke-dasharray:4 3}
+.e{fill:none;stroke:var(--ink-2);stroke-width:1.4}
+.e-core{fill:none;stroke:var(--core);stroke-width:1.6}
+.e-mem{fill:none;stroke:var(--mem);stroke-width:1.5}
+.e-bus{fill:none;stroke:var(--bus);stroke-width:1.5}
+.e-apb{fill:none;stroke:var(--bus);stroke-width:2.6}
+.e-irq{fill:none;stroke:var(--irq);stroke-width:1.4;stroke-dasharray:5 4}
+.e-irqs{fill:none;stroke:var(--irq);stroke-width:1.5}
+.e-mute{fill:none;stroke:var(--mute);stroke-width:1.4;stroke-dasharray:4 4}
+.e-thin{fill:none;stroke:var(--rule-2);stroke-width:1;stroke-dasharray:2 3}
+.ah{fill:var(--ink-2)} .ah-core{fill:var(--core)} .ah-mem{fill:var(--mem)} .ah-bus{fill:var(--bus)} .ah-irq{fill:var(--irq)} .ah-mute{fill:var(--mute)}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:12px 24px 0;font-size:12.5px;color:var(--ink-2)}
+@media (max-width:720px){.legend{margin-inline:0}}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:14px;height:10px;border-radius:2px;border:1.2px solid;display:inline-block}
+.sw.core{background:var(--core-f);border-color:var(--core)}
+.sw.mem{background:var(--mem-f);border-color:var(--mem)}
+.sw.bus{background:var(--bus-f);border-color:var(--bus)}
+.sw.per{background:var(--per-f);border-color:var(--per)}
+.sw.mute{background:var(--mute-f);border-color:var(--mute);border-style:dashed}
+.sw.irq{width:18px;height:0;border:0;border-top:1.6px dashed var(--irq);border-radius:0}
+
+/* ---------- tables ---------- */
+.tbl{overflow-x:auto;margin-top:18px;border:1px solid var(--rule);border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;line-height:1.45;font-variant-numeric:tabular-nums}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--rule)}
+tr:last-child td{border-bottom:0}
+thead th{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);background:var(--tint);white-space:nowrap}
+td.m,th.m{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+td.c,th.c{text-align:center}
+td .sub{display:block;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+.muted-row td{color:var(--ink-3)}
+
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;line-height:1;padding:4px 6px;border-radius:3px;border:1px solid;white-space:nowrap}
+.chip.hold{color:var(--core);background:var(--core-f);border-color:var(--core)}
+.chip.bub{color:var(--per);background:var(--per-f);border-color:var(--per)}
+.chip.flush{color:var(--irq);background:var(--irq-f);border-color:var(--irq)}
+.chip.fwd{color:var(--mem);background:var(--mem-f);border-color:var(--mem)}
+.chip.redir{color:var(--bus);background:var(--bus-f);border-color:var(--bus)}
+.dash{color:var(--rule-2)}
+.chip-key{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;font-size:12.5px;color:var(--ink-2);align-items:center}
+
+/* ---------- note ---------- */
+.note{margin-top:18px;padding:12px 16px;border-left:3px solid var(--rule-2);background:var(--tint);font-size:14px;max-width:none}
+.note p{margin:0;max-width:74ch}
+.note p + p{margin-top:6px}
+.note b{font-weight:600}
+
+/* ---------- peripherals ---------- */
+.periph{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+@media (max-width:680px){.periph{grid-template-columns:1fr}}
+.pcard{border:1px solid var(--rule);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column}
+.pcard header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.pcard h4{font-family:var(--display);font-size:17px;font-weight:680;font-stretch:108%;margin:0}
+.pcard .addr{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.pcard .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-family:var(--mono);font-size:11px;padding:3px 6px;border-radius:3px;border:1px solid var(--rule-2);color:var(--ink-2)}
+.tag.irq{border-color:var(--irq);color:var(--irq);background:var(--irq-f)}
+.pcard p{font-size:14px;margin-top:10px}
+.pcard ul{font-size:14px;margin-top:6px}
+.pcard.out{background:var(--tint);border-style:dashed}
+.pcard.out h4,.pcard.out p{color:var(--ink-3)}
+
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<main class="sheet">
+
+<header>
+  <p class="eyebrow">Internship project · Technical overview</p>
+  <h1>RISCFORGE SoC Architecture</h1>
+  <p class="lede">A microcontroller-class system-on-chip built around a 5-stage RV32IM_Zicsr RISC-V core. This page explains what each block does, why a RISC-V system needs it, and how we built it: the privileged-architecture blocks (CSRs, exceptions, trap/MRET, interrupts), the load/store and hazard logic, the AXI-Lite/APB peripheral subsystem, and the always-on watchdog timer (AON WDT).</p>
+  <div class="scope">
+    <span><b>Covered</b> CSR file · exceptions · trap &amp; MRET controller · interrupts · LSU · hazard unit · AXI-Lite · APB peripherals · AON WDT</span>
+    <span><b>Not covered</b> boot flow · bootloader · SPI master</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <ol>
+    <li><a href="#goal">Goal of the SoC</a></li>
+    <li><a href="#architecture">System architecture</a></li>
+    <li><a href="#csr">CSR file (Zicsr)</a></li>
+    <li><a href="#exceptions">Exceptions</a></li>
+    <li><a href="#trap">Trap controller &amp; MRET</a></li>
+    <li><a href="#interrupts">Interrupts</a></li>
+    <li><a href="#lsu">Load/store unit</a></li>
+    <li><a href="#hazards">Hazard unit</a></li>
+    <li><a href="#axi">AXI-Lite interconnect</a></li>
+    <li><a href="#apb">AXI-Lite → APB bridge</a></li>
+    <li><a href="#peripherals">APB peripherals</a></li>
+    <li><a href="#aon_wdt">AON Watchdog Timer</a></li>
+    <li><a href="#summary">Why each block exists</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ 1 -->
+<section id="goal">
+  <h2><span class="no">1</span>Goal of the SoC</h2>
+  <p>RISCFORGE is meant to be a complete, self-contained computer on one die. The core runs ordinary RISC-V programs compiled with the standard GNU toolchain. Code and data live in on-chip SRAM. The core responds to hardware events through interrupts and talks to the outside world through serial, timer and GPIO peripherals on standard AMBA buses.</p>
+  <p>One rule drives the architecture: <strong>keep the common case fast and simple, and put the slow parts behind a bus.</strong> Instruction fetch and data access go straight to SRAM. Peripheral registers are accessed rarely and can tolerate latency, so they sit behind AXI-Lite and APB, where their extra cycles can't slow down ordinary code.</p>
+
+  <dl class="facts">
+    <div><dt>ISA</dt><dd>RV32I base + M (multiply/divide) + Zicsr</dd></div>
+    <div><dt>Pipeline</dt><dd>5 stages, in-order, full operand forwarding</dd></div>
+    <div><dt>Privilege</dt><dd>Machine mode only</dd></div>
+    <div><dt>Traps</dt><dd>8 precise exception causes, committed at write-back</dd></div>
+    <div><dt>Interrupts</dt><dd>6 wired sources + 1 reserved line; priority + threshold</dd></div>
+    <div><dt>On-chip memory</dt><dd>32 KB ISRAM · 32 KB DSRAM · 64 B BootROM</dd></div>
+    <div><dt>Interconnect</dt><dd>AXI4-Lite crossbar (2 masters × 3 targets) → APB4 bridge</dd></div>
+    <div><dt>Peripherals</dt><dd>I2C · UART · GPIO · 2 × dual timer · SPI · AON WDT</dd></div>
+  </dl>
+
+  <div class="split">
+    <div>
+      <h3>Designed in this project</h3>
+      <p>The processor core: pipeline, CSR file, trap/MRET commit controller, interrupt arbiter, hazard unit, load/store unit, and the hybrid memory interface. Also the SoC integration: fetch demux, AXI-to-SRAM adapters, SRAM port muxes and the address map.</p>
+    </div>
+    <div>
+      <h3>Integrated open-source IP</h3>
+      <p>AXI-Lite crossbar, AXI-Lite→APB bridge, GPIO and timers from the PULP platform (ETH Zürich / University of Bologna), plus open-source 16550 UART and I2C master cores. Each was adapted to the SoC's bus types and address map.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="architecture">
+  <h2><span class="no">2</span>System architecture</h2>
+  <p>The diagram shows every path a request can take out of the core. There are three kinds of traffic, and each takes a different route.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 960 660" role="img" aria-label="RISCFORGE SoC block diagram. The RV32IM_Zicsr core fetches instructions through a fetch demux from BootROM or ISRAM, and sends loads and stores to a hybrid memory interface. That interface reaches DSRAM directly and sends only peripheral accesses to the AXI-Lite crossbar. The crossbar also connects to ISRAM, DSRAM and an AXI-Lite to APB bridge, which serves seven APB slots: I2C, Timer 0, UART, GPIO, SPI, Timer 1, and an AON Watchdog Timer. Interrupt lines from I2C, Timer 0, UART, GPIO, SPI and the AON WDT return to the core's interrupt arbiter.">
+      <defs>
+        <marker id="d1a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah"/></marker>
+        <marker id="d1b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-bus"/></marker>
+        <marker id="d1i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+        <marker id="d1m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-mute"/></marker>
+        <marker id="d1t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-mem"/></marker>
+      </defs>
+
+      <!-- Core -->
+      <rect class="n-core" x="24" y="16" width="500" height="178" rx="6"/>
+      <text class="tt" x="38" y="37">RV32IM_Zicsr core</text>
+      <text class="ts" x="510" y="37" text-anchor="end">5-stage in-order · machine mode</text>
+
+      <rect class="n-stage" x="38"  y="48" width="84" height="40" rx="3"/>
+      <rect class="n-stage" x="134" y="48" width="84" height="40" rx="3"/>
+      <rect class="n-stage" x="230" y="48" width="84" height="40" rx="3"/>
+      <rect class="n-stage" x="326" y="48" width="84" height="40" rx="3"/>
+      <rect class="n-stage" x="422" y="48" width="84" height="40" rx="3"/>
+      <text class="tt" x="80"  y="65" text-anchor="middle">IF</text><text class="ts" x="80"  y="80" text-anchor="middle">fetch</text>
+      <text class="tt" x="176" y="65" text-anchor="middle">ID</text><text class="ts" x="176" y="80" text-anchor="middle">decode</text>
+      <text class="tt" x="272" y="65" text-anchor="middle">EX</text><text class="ts" x="272" y="80" text-anchor="middle">ALU · MUL/DIV</text>
+      <text class="tt" x="368" y="65" text-anchor="middle">MEM</text><text class="ts" x="368" y="80" text-anchor="middle">memory access</text>
+      <text class="tt" x="464" y="65" text-anchor="middle">WB</text><text class="ts" x="464" y="80" text-anchor="middle">commit</text>
+      <path class="e" d="M122,68 H133" marker-end="url(#d1a)"/>
+      <path class="e" d="M218,68 H229" marker-end="url(#d1a)"/>
+      <path class="e" d="M314,68 H325" marker-end="url(#d1a)"/>
+      <path class="e" d="M410,68 H421" marker-end="url(#d1a)"/>
+
+      <rect class="n-irq"   x="38"  y="102" width="180" height="32" rx="3"/>
+      <text x="128" y="122" text-anchor="middle">Interrupt arbiter</text>
+      <path class="e-irqs" d="M218,118 H272 V89" marker-end="url(#d1i)"/>
+      <text class="ti" x="224" y="112">inject</text>
+
+      <rect class="n-stage" x="326" y="102" width="84" height="32" rx="3"/>
+      <text x="368" y="122" text-anchor="middle">LSU</text>
+      <rect class="n-stage" x="422" y="102" width="84" height="32" rx="3"/>
+      <text x="464" y="122" text-anchor="middle">CSR file</text>
+      <path class="e-thin" d="M368,88 V102"/>
+      <path class="e-thin" d="M464,88 V102"/>
+
+      <rect class="n-stage" x="38" y="144" width="276" height="32" rx="3"/>
+      <text x="176" y="164" text-anchor="middle">Hazard unit — forward · stall · flush</text>
+      <rect class="n-stage" x="422" y="144" width="84" height="32" rx="3"/>
+      <text x="464" y="164" text-anchor="middle">Trap / MRET</text>
+      <path class="e-thin" d="M464,134 V144"/>
+
+      <!-- Bootloader (out of scope) -->
+      <rect class="n-mute" x="560" y="16" width="236" height="44" rx="4"/>
+      <text class="tt tmu" x="678" y="35" text-anchor="middle">Bootloader</text>
+      <text class="ts tmu" x="678" y="51" text-anchor="middle">boot flow — not covered here</text>
+      <path class="e-mute" d="M700,60 V229" marker-end="url(#d1m)"/>
+      <text class="ts tmu" x="706" y="150">2nd bus master</text>
+
+      <!-- Fetch path -->
+      <path class="e" d="M100,194 V229" marker-end="url(#d1a)"/>
+      <text class="tlab" x="107" y="215">fetch</text>
+      <rect class="n-bus" x="34" y="230" width="132" height="40" rx="3"/>
+      <text class="tt" x="100" y="247" text-anchor="middle">Fetch demux</text>
+      <text class="ts" x="100" y="262" text-anchor="middle">BootROM / ISRAM</text>
+
+      <!-- LSU path -->
+      <path class="e" d="M368,134 V229" marker-end="url(#d1a)"/>
+      <text class="tlab" x="375" y="215">load / store</text>
+      <rect class="n-bus" x="286" y="230" width="170" height="40" rx="3"/>
+      <text class="tt" x="371" y="247" text-anchor="middle">Hybrid memory interface</text>
+      <text class="ts" x="371" y="262" text-anchor="middle">SRAM direct · MMIO → AXI</text>
+
+      <!-- Crossbar -->
+      <rect class="n-bus" x="540" y="230" width="180" height="80" rx="4"/>
+      <text class="tt" x="630" y="260" text-anchor="middle">AXI-Lite crossbar</text>
+      <text class="ts" x="630" y="277" text-anchor="middle">2 masters × 3 targets</text>
+      <text class="ts" x="630" y="292" text-anchor="middle">address decode · arbitration</text>
+      <path class="e-bus" d="M456,250 H539" marker-end="url(#d1b)"/>
+      <text class="tlab" x="498" y="243" text-anchor="middle">MMIO only</text>
+
+      <!-- Memories -->
+      <rect class="n-mem" x="24"  y="330" width="84"  height="46" rx="3"/>
+      <text class="tt" x="66" y="349" text-anchor="middle">BootROM</text><text class="ts" x="66" y="365" text-anchor="middle">64 B</text>
+      <rect class="n-mem" x="122" y="330" width="110" height="46" rx="3"/>
+      <text class="tt" x="177" y="349" text-anchor="middle">ISRAM</text><text class="ts" x="177" y="365" text-anchor="middle">32 KB · code</text>
+      <rect class="n-mem" x="316" y="330" width="110" height="46" rx="3"/>
+      <text class="tt" x="371" y="349" text-anchor="middle">DSRAM</text><text class="ts" x="371" y="365" text-anchor="middle">32 KB · data</text>
+
+      <path class="e-mem" d="M66,270 V329" marker-end="url(#d1t)"/>
+      <path class="e-mem" d="M150,270 V329" marker-end="url(#d1t)"/>
+      <path class="e-mem" d="M371,270 V329" marker-end="url(#d1t)"/>
+      <text class="tlab" x="377" y="303">direct</text>
+
+      <path class="e-bus" d="M570,310 V394 H390 V377" marker-end="url(#d1b)"/>
+      <text class="tlab" x="480" y="409" text-anchor="middle">bus port</text>
+      <path class="e-bus" d="M600,310 V424 H200 V377" marker-end="url(#d1b)"/>
+      <text class="tlab" x="400" y="439" text-anchor="middle">bus port · privileged writes only</text>
+
+      <!-- Bridge -->
+      <path class="e-bus" d="M660,310 V449" marker-end="url(#d1b)"/>
+      <rect class="n-bus" x="560" y="450" width="236" height="40" rx="3"/>
+      <text class="tt" x="678" y="467" text-anchor="middle">AXI-Lite → APB bridge</text>
+      <text class="ts" x="678" y="482" text-anchor="middle">decode to 7 × 4 KB windows</text>
+
+      <!-- APB bus — extended to x=876 for AON WDT slot -->
+      <path class="e-apb" d="M678,490 V514"/>
+      <path class="e-apb" d="M84,514 H876"/>
+      <text class="tbus" x="30" y="518">APB</text>
+      <path class="e-bus" d="M84,514 V529"  marker-end="url(#d1b)"/>
+      <path class="e-bus" d="M216,514 V529" marker-end="url(#d1b)"/>
+      <path class="e-bus" d="M348,514 V529" marker-end="url(#d1b)"/>
+      <path class="e-bus" d="M480,514 V529" marker-end="url(#d1b)"/>
+      <path class="e-mute" d="M612,514 V529" marker-end="url(#d1m)"/>
+      <path class="e-bus" d="M744,514 V529" marker-end="url(#d1b)"/>
+      <path class="e-bus" d="M876,514 V529" marker-end="url(#d1b)"/>
+
+      <!-- Peripherals (slots 0-5 unchanged, slot 6 = AON WDT) -->
+      <rect class="n-per"  x="24"  y="530" width="120" height="50" rx="3"/>
+      <rect class="n-per"  x="156" y="530" width="120" height="50" rx="3"/>
+      <rect class="n-per"  x="288" y="530" width="120" height="50" rx="3"/>
+      <rect class="n-per"  x="420" y="530" width="120" height="50" rx="3"/>
+      <rect class="n-mute" x="552" y="530" width="120" height="50" rx="3"/>
+      <rect class="n-per"  x="684" y="530" width="120" height="50" rx="3"/>
+      <rect class="n-per"  x="816" y="530" width="120" height="50" rx="3"/>
+      <text class="tt" x="84"  y="551" text-anchor="middle">I2C master</text><text class="tm" x="84"  y="568" text-anchor="middle">0x4000_0000</text>
+      <text class="tt" x="216" y="551" text-anchor="middle">Timer 0</text><text class="tm" x="216" y="568" text-anchor="middle">0x4000_1000</text>
+      <text class="tt" x="348" y="551" text-anchor="middle">UART 16550</text><text class="tm" x="348" y="568" text-anchor="middle">0x4000_2000</text>
+      <text class="tt" x="480" y="551" text-anchor="middle">GPIO × 32</text><text class="tm" x="480" y="568" text-anchor="middle">0x4000_3000</text>
+      <text class="tt tmu" x="612" y="551" text-anchor="middle">SPI master</text><text class="tm tmu" x="612" y="568" text-anchor="middle">0x4000_4000</text>
+      <text class="tt" x="744" y="551" text-anchor="middle">Timer 1</text><text class="tm" x="744" y="568" text-anchor="middle">0x4000_5000</text>
+      <text class="tt" x="876" y="551" text-anchor="middle">AON WDT</text><text class="tm" x="876" y="568" text-anchor="middle">0x4000_6000</text>
+
+      <!-- Interrupt lines -->
+      <path class="e-irq" d="M84,580 V606"/>
+      <path class="e-irq" d="M216,580 V606"/>
+      <path class="e-irq" d="M348,580 V606"/>
+      <path class="e-irq" d="M480,580 V606"/>
+      <path class="e-irq" d="M612,580 V606"/>
+      <path class="e-irq" d="M876,580 V630"/>
+      <text class="ti" x="89"  y="597">mip[17]</text>
+      <text class="ti" x="221" y="597">mip[7]</text>
+      <text class="ti" x="353" y="597">mip[19]</text>
+      <text class="ti" x="485" y="597">mip[16]</text>
+      <text class="ti" x="617" y="597">mip[18]</text>
+      <text class="ti" x="836" y="597">mip[20]</text>
+      <!-- AON WDT interrupt loops back through the bottom rail to the arbiter -->
+      <path class="e-irq" d="M876,630 H12 V118 H37" marker-end="url(#d1i)"/>
+      <!-- Legacy 5-peripheral bottom collect line (I2C..SPI) still runs as before -->
+      <path class="e-irq" d="M612,606 H12 V118" />
+      <text class="ti" x="370" y="648" text-anchor="middle">interrupt request lines → core</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 1 — RISCFORGE SoC.</b> Instruction fetch and DSRAM data have direct paths from the core. Only accesses to peripheral registers (MMIO) cross the AXI-Lite crossbar and APB bridge. Each SRAM's second port belongs to the bus, which the bootloader uses to load images. Timer 1's interrupt outputs leave the SoC as pins and are not wired to the core. The AON WDT (slot 6, <code>0x4000_6000</code>) is always-powered and raises <code>mip[20]</code> on timeout.</figcaption>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw core"></i>Core</span>
+      <span><i class="sw mem"></i>Memory</span>
+      <span><i class="sw bus"></i>Routing &amp; interconnect</span>
+      <span><i class="sw per"></i>APB peripheral</span>
+      <span><i class="sw irq"></i>Interrupt path</span>
+      <span><i class="sw mute"></i>Out of scope</span>
+    </div>
+  </figure>
+
+  <h3>Three kinds of traffic</h3>
+  <ul>
+    <li><strong>Instruction fetch</strong> goes to the fetch demux, which picks BootROM or ISRAM by address. It is a single-cycle SRAM read with no bus and no handshake.</li>
+    <li><strong>Loads and stores to DSRAM</strong> go through the hybrid memory interface straight to the SRAM. There is no arbitration, and a read costs one wait cycle.</li>
+    <li><strong>Loads and stores to <code>0x4000_0000–0x4FFF_FFFF</code></strong> are the only accesses that become AXI-Lite transactions. They cross the crossbar, then the APB bridge, then reach the peripheral register.</li>
+  </ul>
+
+  <h3>Why split it this way</h3>
+  <p>A bus access costs several cycles of valid/ready handshaking. If every load and store went over AXI, memory instructions would be the slowest thing the core does, and they are among the most frequent. Peripheral registers are touched rarely and don't care about a few extra cycles, so only they pay the bus cost.</p>
+  <p>Each SRAM has one physical port shared by a 2:1 mux. The core's direct port has fixed priority, and the bus port waits for it. ISRAM accepts bus writes only when they are marked privileged. The core's own bus accesses are unprivileged, so running software can't overwrite its own code through the bus.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Region</th><th class="m">Address range</th><th>Size</th><th>Reached by</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td>BootROM</td><td class="m">0x0000_0000 – 0x0000_003F</td><td>64 B</td><td>Core fetch only</td><td>Reset vector; jumps to ISRAM</td></tr>
+        <tr><td>ISRAM</td><td class="m">0x0001_0000 – 0x0001_7FFF</td><td>32 KB</td><td>Core fetch · bus (privileged writes)</td><td>Program code</td></tr>
+        <tr><td>DSRAM</td><td class="m">0x0002_0000 – 0x0002_7FFF</td><td>32 KB</td><td>Core LSU direct · bus</td><td>Data, stack, heap</td></tr>
+        <tr><td>I2C master</td><td class="m">0x4000_0000 – 0x4000_0FFF</td><td>4 KB</td><td>APB slot 0</td><td>Two-wire serial bus</td></tr>
+        <tr><td>Timer 0</td><td class="m">0x4000_1000 – 0x4000_1FFF</td><td>4 KB</td><td>APB slot 1</td><td>System tick (drives MTIP)</td></tr>
+        <tr><td>UART</td><td class="m">0x4000_2000 – 0x4000_2FFF</td><td>4 KB</td><td>APB slot 2</td><td>Console / host link</td></tr>
+        <tr><td>GPIO</td><td class="m">0x4000_3000 – 0x4000_3FFF</td><td>4 KB</td><td>APB slot 3</td><td>32 general-purpose pins</td></tr>
+        <tr class="muted-row"><td>SPI master</td><td class="m">0x4000_4000 – 0x4000_4FFF</td><td>4 KB</td><td>APB slot 4</td><td>Flash interface (not covered)</td></tr>
+        <tr><td>Timer 1</td><td class="m">0x4000_5000 – 0x4000_5FFF</td><td>4 KB</td><td>APB slot 5</td><td>Application timers</td></tr>
+        <tr><td>AON WDT</td><td class="m">0x4000_6000 – 0x4000_6FFF</td><td>4 KB</td><td>APB slot 6</td><td>Always-on watchdog; resets chip on timeout</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="csr">
+  <h2><span class="no">3</span>CSR file (Zicsr)</h2>
+
+  <h3>What it is</h3>
+  <p>The Zicsr extension adds a second register space of up to 4096 <em>control and status registers</em>. They hold the processor's own state rather than program data. Zicsr also adds six instructions that read a CSR and write, set bits in, or clear bits in it, all in one atomic step.</p>
+
+  <h3>Why RISC-V needs it</h3>
+  <p>Firmware has to control the core itself. It needs to say where traps go, which interrupts are allowed, why the last trap happened and where to return afterwards, and it needs to count cycles for profiling. This state can't live in the 32 general registers, because programs use those freely. It can't live in memory either, because the hardware needs it every cycle. The read-and-set and read-and-clear forms matter because an interrupt arriving between a separate read and write could otherwise lose an update.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>CSR</th><th class="m">Addr</th><th>Role</th><th>Implementation detail</th></tr></thead>
+      <tbody>
+        <tr><td class="m">mstatus</td><td class="m">0x300</td><td>Global interrupt enable (MIE), saved enable (MPIE), previous privilege (MPP)</td><td>Only legal bits are writable (WARL mask <code>0x188A</code>). The mask was corrected after RISCOF compliance runs against the Sail reference model showed a mismatch.</td></tr>
+        <tr><td class="m">mie</td><td class="m">0x304</td><td>Per-source interrupt enables</td><td>Software (3), timer (7), external (11) and 16 fast local lines (31:16)</td></tr>
+        <tr><td class="m">mip</td><td class="m">0x344</td><td>Interrupt pending bits</td><td>Not stored: it shows the live interrupt wires. Only the software bit MSIP is writable.</td></tr>
+        <tr><td class="m">mtvec</td><td class="m">0x305</td><td>Trap handler address + mode</td><td>Mode 0 = direct (one handler); mode 1 = vectored (one entry per interrupt cause)</td></tr>
+        <tr><td class="m">mepc</td><td class="m">0x341</td><td>PC of the trapped instruction</td><td>Written by hardware on trap entry; MRET jumps back to it</td></tr>
+        <tr><td class="m">mcause</td><td class="m">0x342</td><td>Why the trap happened</td><td>Bit 31 = interrupt, low bits = cause code</td></tr>
+        <tr><td class="m">mtval</td><td class="m">0x343</td><td>Extra trap information</td><td>Bad address, bad instruction bits, or zero</td></tr>
+        <tr><td class="m">mscratch</td><td class="m">0x340</td><td>Scratch word for the handler</td><td>Lets a handler save a pointer without disturbing any general register</td></tr>
+        <tr><td class="m">mintprio</td><td class="m">0x7C0</td><td>Interrupt priority threshold</td><td>Custom CSR, placed in RISC-V's reserved custom machine range (0x7C0–0x7FF). See §6.</td></tr>
+        <tr><td class="m">mcycle / h</td><td class="m">0xB00 / 0xB80</td><td>Clock-cycle counter</td><td>64-bit, read as two 32-bit halves</td></tr>
+        <tr><td class="m">minstret / h</td><td class="m">0xB02 / 0xB82</td><td>Retired-instruction counter</td><td>64-bit; with mcycle, gives instructions per cycle</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>Read in EX, write at WB.</strong> A combinational read port gives a CSR instruction its old value in the execute stage. The new value is written only at write-back, once the instruction is certain to commit. A CSR instruction later cancelled by a branch or trap therefore never changes anything.</li>
+    <li><strong>Three write sources with a fixed priority:</strong>
+      <ol>
+        <li>Trap entry: <code>mepc</code>, <code>mcause</code>, <code>mtval</code> and <code>mstatus</code> are updated together in one cycle.</li>
+        <li>MRET: the trap controller restores <code>mstatus</code> through its own port.</li>
+        <li>CSR instructions: normal writes, filtered through each register's writable-bit mask.</li>
+      </ol>
+      If a trap and a CSR write arrive in the same cycle, the trap wins and the instruction's write is dropped.
+    </li>
+    <li><strong>Hardware-driven bits.</strong> <code>mip</code> is assembled from the peripheral interrupt wires every cycle. <code>mcycle</code> increments on every clock and <code>minstret</code> on every retired instruction.</li>
+    <li><strong>Hazards.</strong> Because writes happen late, a CSR read that follows a pending write to the same CSR must wait. The hazard unit handles this (§8).</li>
+  </ul>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="exceptions">
+  <h2><span class="no">4</span>Exceptions</h2>
+
+  <h3>What they are</h3>
+  <p>Exceptions are <em>synchronous</em> traps. The instruction itself causes them, at the same point every time the program runs. Examples are an unknown opcode, a misaligned load, or a store to an address with nothing behind it.</p>
+
+  <h3>Why RISC-V needs them</h3>
+  <p>A processor must never quietly carry on after something it can't do correctly. It must hand control to a handler that can report the error, emulate the operation or recover. ECALL and EBREAK use the same mechanism on purpose: they are how software makes system calls and how a debugger sets breakpoints.</p>
+  <p>In a pipeline, exceptions must also be <strong>precise</strong>. With five instructions in flight, the handler must see every older instruction finished, no younger instruction started, and <code>mepc</code> pointing at exactly the instruction that faulted. Otherwise, returning from the handler would repeat or skip work.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 262" role="img" aria-label="Where exceptions are detected. IF detects a misaligned PC. ID detects illegal instructions, EBREAK and ECALL. EX detects misaligned branch or jump targets and injects accepted interrupts. MEM detects misaligned loads and stores and access faults. WB holds the trap and MRET controller, which commits the trap, updates CSRs, flushes the pipeline and redirects fetch to mtvec or mepc.">
+      <defs>
+        <marker id="d2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah"/></marker>
+        <marker id="d2c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-core"/></marker>
+      </defs>
+      <text class="ts" x="404" y="16" text-anchor="middle">Each instruction carries an exception tag (valid · cause · tval · PC) down the pipeline</text>
+      <path class="e" d="M24,28 H783" marker-end="url(#d2a)"/>
+
+      <rect class="n-stage" x="24"  y="44" width="136" height="48" rx="3"/>
+      <rect class="n-stage" x="180" y="44" width="136" height="48" rx="3"/>
+      <rect class="n-stage" x="336" y="44" width="136" height="48" rx="3"/>
+      <rect class="n-stage" x="492" y="44" width="136" height="48" rx="3"/>
+      <rect class="n-stage" x="648" y="44" width="136" height="48" rx="3"/>
+      <text class="tt" x="92"  y="64" text-anchor="middle">IF</text><text class="ts" x="92"  y="81" text-anchor="middle">fetch</text>
+      <text class="tt" x="248" y="64" text-anchor="middle">ID</text><text class="ts" x="248" y="81" text-anchor="middle">decode</text>
+      <text class="tt" x="404" y="64" text-anchor="middle">EX</text><text class="ts" x="404" y="81" text-anchor="middle">execute</text>
+      <text class="tt" x="560" y="64" text-anchor="middle">MEM</text><text class="ts" x="560" y="81" text-anchor="middle">memory</text>
+      <text class="tt" x="716" y="64" text-anchor="middle">WB</text><text class="ts" x="716" y="81" text-anchor="middle">write-back · commit</text>
+      <path class="e" d="M160,68 H179" marker-end="url(#d2a)"/>
+      <path class="e" d="M316,68 H335" marker-end="url(#d2a)"/>
+      <path class="e" d="M472,68 H491" marker-end="url(#d2a)"/>
+      <path class="e" d="M628,68 H647" marker-end="url(#d2a)"/>
+
+      <path class="e-thin" d="M92,92 V116"/>
+      <path class="e-thin" d="M248,92 V116"/>
+      <path class="e-thin" d="M404,92 V116"/>
+      <path class="e-thin" d="M560,92 V116"/>
+      <path class="e-thin" d="M716,92 V116"/>
+
+      <rect class="n-plain" x="24" y="116" width="136" height="88" rx="3"/>
+      <text class="ts" x="92" y="148" text-anchor="middle">Misaligned PC (0)</text>
+
+      <rect class="n-plain" x="180" y="116" width="136" height="88" rx="3"/>
+      <text class="ts" x="248" y="140" text-anchor="middle">Illegal instr. (2)</text>
+      <text class="ts" x="248" y="157" text-anchor="middle">EBREAK (3)</text>
+      <text class="ts" x="248" y="174" text-anchor="middle">ECALL (11)</text>
+
+      <rect class="n-plain" x="336" y="116" width="136" height="40" rx="3"/>
+      <text class="ts" x="404" y="132" text-anchor="middle">Misaligned branch /</text>
+      <text class="ts" x="404" y="147" text-anchor="middle">jump target (0)</text>
+      <rect class="n-irq" x="336" y="164" width="136" height="40" rx="3"/>
+      <text class="ts" x="404" y="180" text-anchor="middle">Interrupt accepted:</text>
+      <text class="ts" x="404" y="195" text-anchor="middle">instr. tagged (§6)</text>
+
+      <rect class="n-plain" x="492" y="116" width="136" height="88" rx="3"/>
+      <text class="ts" x="560" y="136" text-anchor="middle">Load misaligned (4)</text>
+      <text class="ts" x="560" y="153" text-anchor="middle">Load access fault (5)</text>
+      <text class="ts" x="560" y="170" text-anchor="middle">Store misaligned (6)</text>
+      <text class="ts" x="560" y="187" text-anchor="middle">Store access fault (7)</text>
+
+      <rect class="n-core" x="648" y="116" width="136" height="88" rx="3"/>
+      <text class="tt" x="716" y="140" text-anchor="middle">Trap / MRET</text>
+      <text class="ts" x="716" y="159" text-anchor="middle">commit · update CSRs</text>
+      <text class="ts" x="716" y="175" text-anchor="middle">flush · redirect PC</text>
+
+      <path class="e-core" d="M716,204 V234 H10 V68 H23" marker-end="url(#d2c)"/>
+      <text class="ts" x="404" y="252" text-anchor="middle">Redirect: PC ← mtvec (trap) or mepc (MRET); all four pipeline registers flushed</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 2 — Detect early, commit late.</b> Each stage checks for what it can see and tags the instruction instead of acting. Only the write-back stage turns a tag into a trap. Cause codes are shown in brackets.</figcaption>
+  </figure>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th class="c">Cause</th><th>Exception</th><th>Detected in</th><th><span class="m">mtval</span> receives</th></tr></thead>
+      <tbody>
+        <tr><td class="c m">0</td><td>Instruction address misaligned</td><td>IF (next PC) · EX (branch/jump target not 4-byte aligned; the branch is not taken)</td><td>Target address</td></tr>
+        <tr><td class="c m">2</td><td>Illegal instruction</td><td>ID</td><td>The instruction bits</td></tr>
+        <tr><td class="c m">3</td><td>Breakpoint (EBREAK)</td><td>ID</td><td>PC</td></tr>
+        <tr><td class="c m">4</td><td>Load address misaligned</td><td>MEM (LW needs 4-byte, LH/LHU 2-byte alignment)</td><td>Address</td></tr>
+        <tr><td class="c m">5</td><td>Load access fault</td><td>MEM (unmapped address or bus error response)</td><td>Address</td></tr>
+        <tr><td class="c m">6</td><td>Store address misaligned</td><td>MEM</td><td>Address</td></tr>
+        <tr><td class="c m">7</td><td>Store access fault</td><td>MEM</td><td>Address</td></tr>
+        <tr><td class="c m">11</td><td>Environment call (ECALL) from M-mode</td><td>ID</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>Tag, don't act.</strong> The detecting stage attaches a tag to the instruction, and the tag travels in the pipeline registers. If an instruction already carries a tag from an earlier stage, the earlier tag is kept, because that fault happened first.</li>
+    <li><strong>No side effects.</strong> A tagged or misaligned load/store never sends its memory request. A branch with a misaligned target does not redirect fetch.</li>
+    <li><strong>Clear the path behind it.</strong> While a tagged instruction moves down the pipeline, the younger instructions behind it are flushed.</li>
+    <li><strong>Wrong-path safety.</strong> If a taken branch flushes a tagged instruction before it reaches WB, the exception simply disappears. It was never on the real program path.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="trap">
+  <h2><span class="no">5</span>Trap controller &amp; MRET</h2>
+
+  <h3>What it is</h3>
+  <p>A small combinational controller at the write-back stage, which is the point where instructions retire. It turns a tagged instruction into a trap, and an MRET instruction into a return from the handler.</p>
+
+  <h3>Why RISC-V needs it</h3>
+  <p>The privileged specification requires trap entry to be <strong>atomic</strong>. Saving the return PC, recording the cause, disabling interrupts and jumping to the handler all happen as one step. If software had to do this, an interrupt could arrive halfway through and overwrite the saved state. MRET is the exact inverse, so the interrupted program resumes as if nothing had happened.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 170" role="img" aria-label="Trap entry and MRET. Trap entry moves the program from running with MIE equal to 1 into the handler with MIE equal to 0 and MPIE equal to 1, saving mepc, mcause and mtval and jumping to mtvec. MRET restores MIE from MPIE, sets MPIE to 1 and jumps back to mepc.">
+      <defs>
+        <marker id="d3a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+        <marker id="d3b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-core"/></marker>
+      </defs>
+      <rect class="n-core" x="24" y="40" width="200" height="100" rx="4"/>
+      <text class="tt" x="124" y="78" text-anchor="middle">Program running</text>
+      <text class="tm" x="124" y="98" text-anchor="middle">MIE = 1</text>
+      <text class="ts" x="124" y="116" text-anchor="middle">interrupts can be taken</text>
+
+      <rect class="n-irq" x="596" y="40" width="200" height="100" rx="4"/>
+      <text class="tt" x="696" y="78" text-anchor="middle">Trap handler</text>
+      <text class="tm" x="696" y="98" text-anchor="middle">MIE = 0 · MPIE = 1</text>
+      <text class="ts" x="696" y="116" text-anchor="middle">interrupts masked</text>
+
+      <text class="tt" x="410" y="60" text-anchor="middle">Trap entry — one atomic hardware step</text>
+      <path class="e-irqs" d="M224,70 H595" marker-end="url(#d3a)"/>
+      <text class="tm" x="410" y="88" text-anchor="middle">MPIE ← MIE · MIE ← 0 · MPP ← M</text>
+      <text class="tm" x="410" y="103" text-anchor="middle">mepc ← PC · mcause · mtval · PC ← mtvec</text>
+
+      <path class="e-core" d="M596,122 H225" marker-end="url(#d3b)"/>
+      <text class="tt" x="410" y="141" text-anchor="middle">MRET — return from handler</text>
+      <text class="tm" x="410" y="158" text-anchor="middle">MIE ← MPIE · MPIE ← 1 · PC ← mepc</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 3 — What trap entry and MRET do to machine state.</b> Clearing MIE on entry stops a still-pending interrupt from re-entering the handler right away. Saving the old value in MPIE lets MRET restore exactly what the program had.</figcaption>
+  </figure>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>Commit decision.</strong> A trap commits when a valid, tagged instruction reaches WB. An MRET commits when a valid MRET reaches WB with no tag.</li>
+    <li><strong>Target address.</strong> Traps go to the <code>mtvec</code> base. In vectored mode an interrupt goes to <em>base + 4 × cause</em>, so each source has its own entry and no software dispatch is needed. Exceptions always use the base. MRET goes to <code>mepc</code>.</li>
+    <li><strong>Flush and redirect in one cycle.</strong> All four pipeline registers are flushed. The redirect overrides every stall, so fetch starts at the new PC on the next cycle.</li>
+    <li><strong>CSR updates.</strong> The controller drives the highest-priority trap-entry write into the CSR file, and a separate port for the MRET update of <code>mstatus</code>.</li>
+    <li><strong>Why only at WB.</strong> One redirect point means two stages can never issue conflicting redirects. At WB every older instruction has already finished, so the state the handler sees is exact.</li>
+  </ul>
+  <div class="note">
+    <p><b>Where mepc points.</b> For an exception, <code>mepc</code> is the faulting instruction, so an ECALL handler adds 4 before returning to skip it. For an interrupt, <code>mepc</code> is the instruction that was interrupted. That instruction never completed and runs again after MRET.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="interrupts">
+  <h2><span class="no">6</span>Interrupts</h2>
+
+  <h3>What they are</h3>
+  <p>Interrupts are <em>asynchronous</em> requests from hardware outside the instruction stream: a byte arrived on the UART, a timer expired, a GPIO pin changed.</p>
+
+  <h3>Why RISC-V needs them</h3>
+  <p>Without interrupts, firmware has to poll status registers in a loop. That wastes cycles and power, and the response comes late whenever the loop is busy elsewhere. With interrupts, the core does useful work, or idles, and reacts within a few cycles of the event.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th class="m">mip bit</th><th>Source</th><th>Event</th><th class="c">Priority</th></tr></thead>
+      <tbody>
+        <tr><td class="m">19</td><td>UART</td><td>Data received / transmitter empty / line status</td><td class="c">1 (highest)</td></tr>
+        <tr class="muted-row"><td class="m">18</td><td>SPI master</td><td>Transfer or FIFO event (not covered)</td><td class="c">2</td></tr>
+        <tr><td class="m">17</td><td>I2C master</td><td>Byte transfer finished</td><td class="c">3</td></tr>
+        <tr><td class="m">16</td><td>GPIO</td><td>Configured pin edge or level</td><td class="c">4</td></tr>
+        <tr><td class="m">20</td><td>AON WDT</td><td>Watchdog timeout — fires before the hard reset if interrupt mode is enabled</td><td class="c">5</td></tr>
+        <tr><td class="m">11</td><td>MEIP (external)</td><td>Reserved for a platform interrupt controller; tied off</td><td class="c">—</td></tr>
+        <tr><td class="m">7</td><td>MTIP (timer)</td><td>Timer 0 compare match: the system tick</td><td class="c">6</td></tr>
+        <tr><td class="m">3</td><td>MSIP (software)</td><td>Set by software writing <code>mip</code>; no external source</td><td class="c">7</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 208" role="img" aria-label="Interrupt path. A pending and enabled line passes a priority encoder where the highest cause wins, then a threshold gate requiring cause greater than mintprio, then the global enable mstatus.MIE. The EX stage accepts it if the instruction is valid, has no exception and no multiply or divide is busy. The instruction is tagged as an interrupt and IF and ID are flushed. It commits at WB, saving mepc and mcause, and the core enters the handler at mtvec, or mtvec plus four times the cause in vectored mode.">
+      <defs>
+        <marker id="d4a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+      </defs>
+      <rect class="n-irq"   x="24"  y="24" width="170" height="64" rx="3"/>
+      <rect class="n-plain" x="214" y="24" width="170" height="64" rx="3"/>
+      <rect class="n-plain" x="404" y="24" width="170" height="64" rx="3"/>
+      <rect class="n-plain" x="594" y="24" width="170" height="64" rx="3"/>
+      <text class="tt" x="109" y="51" text-anchor="middle">Pending ∧ enabled</text>
+      <text class="ts" x="109" y="69" text-anchor="middle">mip AND mie, per bit</text>
+      <text class="tt" x="299" y="51" text-anchor="middle">Priority encoder</text>
+      <text class="ts" x="299" y="69" text-anchor="middle">highest cause wins</text>
+      <text class="tt" x="489" y="51" text-anchor="middle">Threshold gate</text>
+      <text class="ts" x="489" y="69" text-anchor="middle">cause &gt; mintprio</text>
+      <text class="tt" x="679" y="51" text-anchor="middle">Global enable</text>
+      <text class="ts" x="679" y="69" text-anchor="middle">mstatus.MIE = 1</text>
+      <path class="e-irqs" d="M194,56 H213" marker-end="url(#d4a)"/>
+      <path class="e-irqs" d="M384,56 H403" marker-end="url(#d4a)"/>
+      <path class="e-irqs" d="M574,56 H593" marker-end="url(#d4a)"/>
+      <path class="e-irqs" d="M679,88 V131" marker-end="url(#d4a)"/>
+      <text class="ti" x="686" y="114">irq pending</text>
+
+      <rect class="n-core" x="594" y="132" width="170" height="64" rx="3"/>
+      <rect class="n-core" x="404" y="132" width="170" height="64" rx="3"/>
+      <rect class="n-core" x="214" y="132" width="170" height="64" rx="3"/>
+      <rect class="n-core" x="24"  y="132" width="170" height="64" rx="3"/>
+      <text class="tt" x="679" y="153" text-anchor="middle">Accept in EX</text>
+      <text class="ts" x="679" y="170" text-anchor="middle">valid instr, no exception,</text>
+      <text class="ts" x="679" y="185" text-anchor="middle">MUL/DIV not busy</text>
+      <text class="tt" x="489" y="153" text-anchor="middle">Tag &amp; flush</text>
+      <text class="ts" x="489" y="170" text-anchor="middle">EX instr → interrupt trap</text>
+      <text class="ts" x="489" y="185" text-anchor="middle">IF, ID flushed</text>
+      <text class="tt" x="299" y="153" text-anchor="middle">Commit at WB</text>
+      <text class="ts" x="299" y="170" text-anchor="middle">mepc ← PC of that instr</text>
+      <text class="ts" x="299" y="185" text-anchor="middle">mcause ← 1 · cause</text>
+      <text class="tt" x="109" y="153" text-anchor="middle">Enter handler</text>
+      <text class="ts" x="109" y="170" text-anchor="middle">direct: mtvec</text>
+      <text class="ts" x="109" y="185" text-anchor="middle">vectored: mtvec + 4·cause</text>
+      <path class="e-irqs" d="M594,164 H575" marker-end="url(#d4a)"/>
+      <path class="e-irqs" d="M404,164 H385" marker-end="url(#d4a)"/>
+      <path class="e-irqs" d="M214,164 H195" marker-end="url(#d4a)"/>
+    </svg>
+    </div>
+    <figcaption><b>Figure 4 — From interrupt wire to handler.</b> The top row is combinational logic that runs every cycle. The bottom row is how the pipeline turns a pending request into a precise trap, using the same commit path as exceptions.</figcaption>
+  </figure>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>Four gates must be open.</strong> The peripheral's own interrupt-enable register (for example UART IER or I2C IEN), the source's <code>mie</code> bit, a priority above the <code>mintprio</code> threshold, and the global <code>mstatus.MIE</code>.</li>
+    <li><strong>Fixed priority.</strong> When several sources are pending, the highest cause number wins: the fast local lines (UART, SPI, I2C, GPIO in that order), then external, timer, software.</li>
+    <li><strong>Priority threshold (<code>mintprio</code>, 0x7C0).</strong> An interrupt is taken only if its cause number is above the threshold. A handler can raise the threshold so that only more urgent sources can preempt it. This gives CLIC-style priority levels without the area of a full CLIC. The repository includes a complete CLIC IP, but in the integrated SoC its APB slot went to a second timer and prioritisation happens inside the core.</li>
+    <li><strong>Injected at EX.</strong> An accepted interrupt converts the instruction in EX into an interrupt trap (<code>mcause</code> bit 31 = 1), and the fetch and decode stages are flushed. EX is the right place because that instruction has not yet touched memory (MEM) or registers (WB), while the older instructions ahead of it finish normally. The interrupt is therefore precise.</li>
+    <li><strong>When it waits.</strong> An instruction that already carries an exception is not converted, so synchronous faults are handled first. A multiply or divide in progress is allowed to finish before the interrupt is taken, which keeps the extra delay bounded.</li>
+    <li><strong>Level-sensitive.</strong> <code>mip</code> mirrors the wire, so a handler must clear the request at the peripheral (for example GPIO write-1-to-clear status or I2C IACK) before MRET. Otherwise it re-enters immediately.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ 7 -->
+<section id="lsu">
+  <h2><span class="no">7</span>Load/store unit &amp; memory router</h2>
+
+  <h3>What it is</h3>
+  <p>The LSU turns RISC-V byte, halfword and word loads and stores into 32-bit memory transactions. Behind it, the hybrid memory interface sends each transaction to DSRAM or to the AXI-Lite bus, depending on the address.</p>
+
+  <h3>Why RISC-V needs it</h3>
+  <p>RISC-V is a load/store architecture: loads and stores are the only instructions that touch memory. Memory is byte-addressed, but the SRAMs and buses are 32 bits wide. Something has to put a byte into the right lane on a store, pull it out and sign- or zero-extend it on a load, and refuse accesses the hardware can't do in one transfer.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Store</th><th>Address bits [1:0]</th><th>Byte enables (lane 3 → 0)</th><th>Matching loads</th></tr></thead>
+      <tbody>
+        <tr><td>SB (byte)</td><td class="m">00 · 01 · 10 · 11</td><td class="m">0001 · 0010 · 0100 · 1000</td><td>LB sign-extends the byte, LBU zero-extends it</td></tr>
+        <tr><td>SH (halfword)</td><td class="m">00 · 10</td><td class="m">0011 · 1100</td><td>LH sign-extends, LHU zero-extends</td></tr>
+        <tr><td>SW (word)</td><td class="m">00</td><td class="m">1111</td><td>LW passes the word unchanged</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Other alignments are caught in the MEM stage <em>before</em> any request goes out, and raise exception 4 (load) or 6 (store). The RISC-V specification allows this, and it keeps the LSU from having to split one access into two.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 252" role="img" aria-label="LSU routing. The load/store unit sends a request to the hybrid memory interface, which decodes the address. The DSRAM range goes directly to SRAM, with one stall cycle for reads and none for writes. The peripheral range goes to AXI-Lite, stalling until the response. Any other address gives an access fault. Stall, read data and error return to the LSU in the same cycle.">
+      <defs>
+        <marker id="d5a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah"/></marker>
+        <marker id="d5t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-mem"/></marker>
+        <marker id="d5b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-bus"/></marker>
+        <marker id="d5i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+      </defs>
+      <rect class="n-core" x="24" y="92" width="170" height="70" rx="3"/>
+      <text class="tt" x="109" y="116" text-anchor="middle">Load/store unit</text>
+      <text class="ts" x="109" y="134" text-anchor="middle">byte lanes · extension</text>
+      <text class="ts" x="109" y="150" text-anchor="middle">misalignment check</text>
+
+      <path class="e" d="M194,127 H247" marker-end="url(#d5a)"/>
+      <text class="tlab" x="221" y="120" text-anchor="middle">request</text>
+
+      <rect class="n-bus" x="248" y="92" width="160" height="70" rx="3"/>
+      <text class="tt" x="328" y="116" text-anchor="middle">Hybrid interface</text>
+      <text class="ts" x="328" y="134" text-anchor="middle">address decode</text>
+      <text class="ts" x="328" y="150" text-anchor="middle">+ AXI master FSMs</text>
+
+      <path class="e-mem" d="M408,127 H438 V44 H469" marker-end="url(#d5t)"/>
+      <path class="e-bus" d="M408,127 H469" marker-end="url(#d5b)"/>
+      <path class="e-irqs" d="M438,127 V210 H469" marker-end="url(#d5i)"/>
+
+      <rect class="n-mem" x="470" y="16" width="326" height="56" rx="3"/>
+      <text class="tt" x="486" y="39">DSRAM range → direct SRAM</text>
+      <text class="ts" x="486" y="57">reads: 1 stall cycle · writes: no stall</text>
+
+      <rect class="n-bus" x="470" y="99" width="326" height="56" rx="3"/>
+      <text class="tt" x="486" y="122">Peripheral range → AXI-Lite</text>
+      <text class="ts" x="486" y="140">0x4000_0000 – 0x4FFF_FFFF · stall until response</text>
+
+      <rect class="n-irq" x="470" y="182" width="326" height="56" rx="3"/>
+      <text class="tt" x="486" y="205">Anything else → access fault</text>
+      <text class="ts" x="486" y="223">load cause 5 · store cause 7 (also on bus error)</text>
+
+      <path class="e" d="M328,162 V240 H109 V163" marker-end="url(#d5a)"/>
+      <text class="tlab" x="218" y="232" text-anchor="middle">stall · data · error, same cycle</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 5 — One request, three outcomes.</b> The address alone decides the path. Only the peripheral range pays the bus round-trip. Stall, read data and error go back to the LSU combinationally, so the pipeline reacts in the same cycle.</figcaption>
+  </figure>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>DSRAM reads cost exactly one stall cycle.</strong> The SRAM has a registered output, so data arrives the cycle after the address. One cycle is the minimum for a synchronous SRAM. Writes return nothing, so they don't stall at all.</li>
+    <li><strong>AXI write FSM.</strong> It presents address and data together. The crossbar may accept them in different cycles, so the FSM tracks each channel separately before waiting for the write response. The read FSM sends the address, then waits for data.</li>
+    <li><strong>Same-cycle stall.</strong> The stall comes combinationally from the FSM state. The pipeline freezes in the very cycle a bus request appears, and the address and data it drives stay stable for the whole transaction.</li>
+    <li><strong>Errors become exceptions.</strong> An unmapped address, or a SLVERR/DECERR bus response, is reported as an access fault on the completing cycle.</li>
+  </ul>
+  <div class="note">
+    <p><b>Found in SoC-level simulation.</b> An early version registered the stall, so a peripheral load retired before its bus transaction had even started. Another version waited on the wrong ready signal and deadlocked on the first peripheral write, because the crossbar accepts the address a cycle before the data. Both were fixed and are why the handshake is now combinational and tracked per channel.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 8 -->
+<section id="hazards">
+  <h2><span class="no">8</span>Hazard unit</h2>
+
+  <h3>What it is</h3>
+  <p>The hazard unit is the pipeline's traffic controller. Every cycle it decides, for each stage, whether to let the instruction advance, <em>hold</em> it, or <em>flush</em> it into a bubble, and whether an operand should be taken from a later stage instead of the register file.</p>
+
+  <h3>Why a pipeline needs it</h3>
+  <p>Pipelining overlaps up to five instructions, which creates three kinds of conflict:</p>
+  <ul>
+    <li><strong>Data hazards:</strong> an instruction needs a result that an older instruction hasn't written back yet.</li>
+    <li><strong>Control hazards:</strong> a branch is resolved in EX, after two younger instructions were already fetched from the wrong path.</li>
+    <li><strong>Latency hazards:</strong> an operation takes more than one cycle, such as multiply/divide or a memory access.</li>
+  </ul>
+  <p>Without the hazard unit the core would compute with stale values and execute instructions that should never have run.</p>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Situation</th><th class="c">IF</th><th class="c">ID</th><th class="c">EX</th><th class="c">MEM</th><th class="c">WB</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td>ALU result needed by next instructions<span class="sub">producer in MEM or WB</span></td><td class="c dash">—</td><td class="c dash">—</td><td class="c"><span class="chip fwd">fwd</span></td><td class="c dash">—</td><td class="c dash">—</td><td>0 cycles</td></tr>
+        <tr><td>Load-use<span class="sub">load in EX, consumer in ID</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip bub">bubble</span></td><td class="c dash">—</td><td class="c dash">—</td><td>1 cycle</td></tr>
+        <tr><td>CSR result used<span class="sub">CSR instr in EX writes the consumer's source</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip bub">bubble</span></td><td class="c dash">—</td><td class="c dash">—</td><td>≥ 1 cycle</td></tr>
+        <tr><td>CSR read after CSR write<span class="sub">same CSR pending in EX, MEM or WB</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip bub">bubble</span></td><td class="c dash">—</td><td class="c dash">—</td><td>up to 3 cycles</td></tr>
+        <tr><td>Multiply / divide busy<span class="sub">multi-cycle M-unit running</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip bub">bubble</span></td><td class="c"><span class="chip bub">bubble</span></td><td class="c dash">—</td><td>until done</td></tr>
+        <tr><td>Memory wait<span class="sub">DSRAM read or AXI access in MEM</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c"><span class="chip hold">hold</span></td><td class="c dash">—</td><td>1 cycle (SRAM) · bus round-trip (MMIO)</td></tr>
+        <tr><td>Branch / jump taken<span class="sub">resolved in EX</span></td><td class="c"><span class="chip redir">new PC</span></td><td class="c"><span class="chip flush">flush</span></td><td class="c"><span class="chip flush">flush</span></td><td class="c dash">—</td><td class="c dash">—</td><td>2 cycles</td></tr>
+        <tr><td>Exception in flight<span class="sub">tagged instr in EX (flush ID) or MEM (flush ID + EX)</span></td><td class="c dash">—</td><td class="c"><span class="chip flush">flush</span></td><td class="c"><span class="chip flush">flush</span></td><td class="c dash">—</td><td class="c dash">—</td><td>—</td></tr>
+        <tr><td>Trap / MRET commit<span class="sub">at WB; overrides every stall</span></td><td class="c"><span class="chip redir">new PC</span></td><td class="c"><span class="chip flush">flush</span></td><td class="c"><span class="chip flush">flush</span></td><td class="c"><span class="chip flush">flush</span></td><td class="c"><span class="chip flush">flush</span></td><td>pipeline refill</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="chip-key" aria-hidden="true">
+    <span><span class="chip fwd">fwd</span> operand bypassed from a later stage</span>
+    <span><span class="chip hold">hold</span> stage register frozen</span>
+    <span><span class="chip bub">bubble</span> no-op inserted</span>
+    <span><span class="chip flush">flush</span> wrong-path instruction discarded</span>
+    <span><span class="chip redir">new PC</span> fetch redirected</span>
+  </div>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>Forwarding first.</strong> When an older instruction in MEM or WB is writing a register that EX needs, the value is bypassed. MEM has priority because it holds the newer value. Register x0 is never forwarded, since it is always zero.</li>
+    <li><strong>Loads can't be forwarded in time.</strong> Load data arrives at the end of MEM, one cycle too late for the next instruction's EX, so the core inserts one bubble.</li>
+    <li><strong>CSR results take a different path.</strong> CSR results come from the CSR file rather than the ALU result path, and CSR writes happen only at WB (§3). A dependent instruction therefore waits instead of forwarding.</li>
+    <li><strong>Redirects win.</strong> A trap or MRET redirect at WB cancels every stall and flushes the whole pipeline, so the handler starts on the next cycle.</li>
+  </ul>
+</section>
+
+<!-- ============================================================ 9 -->
+<section id="axi">
+  <h2><span class="no">9</span>AXI-Lite interconnect</h2>
+
+  <h3>What it is</h3>
+  <p>AXI4-Lite is the simple subset of ARM's AMBA AXI4 bus. It has five independent channels: write address, write data, write response, read address and read data. Each channel uses a <em>valid/ready</em> handshake, and each transaction moves one 32-bit word, with no bursts and no transaction IDs.</p>
+
+  <h3>Why the SoC needs it</h3>
+  <ul>
+    <li><strong>Standard interface.</strong> Any AXI-Lite master can reach any AXI-Lite target. Existing IP drops in without custom glue, and bus verification components can be reused.</li>
+    <li><strong>Safe backpressure.</strong> Valid/ready lets a slow target hold off the master for as long as it needs, without losing data.</li>
+    <li><strong>More than one master.</strong> The core and the bootloader both need to reach memory and peripherals. A crossbar shares the targets between them instead of wiring every pair point-to-point.</li>
+  </ul>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>2 × 3 crossbar.</strong> Two master-side ports (the core's MMIO path and the bootloader) and three target-side ports (ISRAM, DSRAM, APB bridge). A rule table decodes each address to one target. An unmapped address gets a decode error, which the core sees as an access fault.</li>
+    <li><strong>Register slices on the address channels.</strong> The crossbar cuts every address channel with a spill register. This breaks long combinational paths for timing closure, at the cost of one cycle, and only peripheral accesses pay it.</li>
+    <li><strong>AXI-to-SRAM adapters.</strong> These let the bus reach ISRAM and DSRAM through the low-priority side of each SRAM's 2:1 mux. The ISRAM adapter accepts only writes marked privileged by the AXI protection bits and answers everything else with SLVERR. This protects the program image once it is loaded.</li>
+  </ul>
+  <div class="note">
+    <p><b>Naming.</b> In AXI crossbar terms, the ports that <em>face masters</em> are called slave ports, and the ports that face targets are called master ports. The crossbar is a target to the core and a master to the memories.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 10 -->
+<section id="apb">
+  <h2><span class="no">10</span>AXI-Lite → APB bridge</h2>
+
+  <h3>What it is</h3>
+  <p>A protocol converter. It takes each AXI-Lite read or write from the crossbar and performs it as an APB4 transfer on one of six peripherals, each owning a 4 KB window.</p>
+
+  <h3>Why APB, and why a bridge</h3>
+  <p>APB is the AMBA bus designed for peripheral registers. A transfer has two phases: <em>SETUP</em>, where the peripheral's select line rises with a valid address, and <em>ACCESS</em>, where the enable line rises and the transfer holds until the peripheral asserts ready. There is only one transfer at a time and no pipelining. An APB slave interface is a few flip-flops and a read mux, so it is small, low-power and easy to close timing on. Peripherals are accessed rarely and one word at a time, so they don't need more.</p>
+  <p>Putting the AXI logic in one bridge, instead of in all six peripherals, is what keeps the peripherals cheap.</p>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li>Decodes the AXI address against six rules and drives the matching select line.</li>
+    <li>Takes write data and byte strobes from the AXI write-data channel, and returns read data on the AXI read channel.</li>
+    <li>Converts the peripheral's error signal (PSLVERR) into an AXI SLVERR response. An address outside the six windows gets DECERR, and no APB transfer is made.</li>
+  </ul>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 156" role="img" aria-label="Path of a store to a UART register. The core's MEM stage stalls while the hybrid interface issues AXI write address and data. The crossbar decodes and registers it, the APB bridge selects the UART slot and runs setup then access, and the UART register is written. PREADY returns to the bridge, a write response returns OKAY through the crossbar, and the stall is released.">
+      <defs>
+        <marker id="d6a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-bus"/></marker>
+        <marker id="d6r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-mem"/></marker>
+      </defs>
+      <rect class="n-core" x="24"  y="64" width="130" height="56" rx="3"/>
+      <rect class="n-bus"  x="184" y="64" width="130" height="56" rx="3"/>
+      <rect class="n-bus"  x="344" y="64" width="130" height="56" rx="3"/>
+      <rect class="n-bus"  x="504" y="64" width="130" height="56" rx="3"/>
+      <rect class="n-per"  x="664" y="64" width="130" height="56" rx="3"/>
+      <text class="tt" x="89"  y="87" text-anchor="middle">Core · MEM</text><text class="ts" x="89"  y="104" text-anchor="middle">store stalls here</text>
+      <text class="tt" x="249" y="87" text-anchor="middle">Hybrid interface</text><text class="ts" x="249" y="104" text-anchor="middle">AW + W issued</text>
+      <text class="tt" x="409" y="87" text-anchor="middle">AXI-Lite crossbar</text><text class="ts" x="409" y="104" text-anchor="middle">decode · spill reg</text>
+      <text class="tt" x="569" y="87" text-anchor="middle">APB bridge</text><text class="ts" x="569" y="104" text-anchor="middle">select UART slot</text>
+      <text class="tt" x="729" y="87" text-anchor="middle">UART</text><text class="ts" x="729" y="104" text-anchor="middle">register written</text>
+
+      <path class="e-bus" d="M154,78 H183" marker-end="url(#d6a)"/>
+      <path class="e-bus" d="M314,78 H343" marker-end="url(#d6a)"/>
+      <path class="e-bus" d="M474,78 H503" marker-end="url(#d6a)"/>
+      <path class="e-bus" d="M634,78 H663" marker-end="url(#d6a)"/>
+      <text class="tlab" x="169" y="52" text-anchor="middle">store</text>
+      <text class="tlab" x="329" y="52" text-anchor="middle">AW · W</text>
+      <text class="tlab" x="489" y="52" text-anchor="middle">AW · W</text>
+      <text class="tlab" x="649" y="52" text-anchor="middle">SETUP → ACCESS</text>
+
+      <path class="e-mem" d="M663,106 H635" marker-end="url(#d6r)"/>
+      <path class="e-mem" d="M503,106 H475" marker-end="url(#d6r)"/>
+      <path class="e-mem" d="M343,106 H315" marker-end="url(#d6r)"/>
+      <path class="e-mem" d="M183,106 H155" marker-end="url(#d6r)"/>
+      <text class="tlab" x="649" y="138" text-anchor="middle">PREADY</text>
+      <text class="tlab" x="489" y="138" text-anchor="middle">B · OKAY</text>
+      <text class="tlab" x="329" y="138" text-anchor="middle">B · OKAY</text>
+      <text class="tlab" x="169" y="138" text-anchor="middle">stall released</text>
+      <text class="ts" x="24" y="24">Request travels right (violet); the response travels back left (teal).</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 6 — Life of a peripheral write.</b> The store instruction retires only after the write response has come back. Holding the pipeline for the whole round-trip is what makes peripheral accesses precise: a bus error can still become an exception on the right instruction.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================================================ 11 -->
+<section id="peripherals">
+  <h2><span class="no">11</span>APB peripherals</h2>
+  <p>Each peripheral is a block of memory-mapped registers. Firmware configures and uses it with ordinary loads and stores to its 4 KB window, and it can raise an interrupt when something needs attention.</p>
+
+  <div class="periph">
+    <article class="pcard">
+      <header><h4>I2C master</h4><span class="addr">0x4000_0000 · slot 0</span></header>
+      <p><strong>Function.</strong> Drives a two-wire bus (SCL clock, SDA data) shared by sensors, EEPROMs, real-time clocks and power-management chips. Many devices share just two pins.</p>
+      <ul>
+        <li>Firmware writes a byte plus a command (START, WRITE, READ, STOP, ACK). The hardware generates the bus conditions, shifts bits, samples the acknowledge and detects lost arbitration.</li>
+        <li>Clock speed is programmable: SCL = PCLK / (5 × (PRE + 1)).</li>
+        <li>Open-drain pads, driven through output-enable signals.</li>
+      </ul>
+      <div class="tags"><span class="tag irq">IRQ mip[17] · byte done</span><span class="tag">PRE · CTR · TXR/RXR · CR/SR</span></div>
+    </article>
+
+    <article class="pcard">
+      <header><h4>Timer 0</h4><span class="addr">0x4000_1000 · slot 1</span></header>
+      <p><strong>Function.</strong> Two independent 32-bit counters, each with an enable, a 3-bit prescaler and a compare register. When a counter reaches its compare value it resets and raises an interrupt, which gives a steady periodic tick.</p>
+      <ul>
+        <li>The compare-match output drives the core's <strong>machine timer interrupt</strong>. The SoC has no separate CLINT, so this timer is the system tick used for scheduling, timeouts and delays.</li>
+        <li>An overflow interrupt is also available for each counter.</li>
+      </ul>
+      <div class="tags"><span class="tag irq">IRQ mip[7] · MTIP</span><span class="tag">VAL · CTRL · CMP</span></div>
+    </article>
+
+    <article class="pcard">
+      <header><h4>UART (16550)</h4><span class="addr">0x4000_2000 · slot 2</span></header>
+      <p><strong>Function.</strong> Asynchronous serial port with TX/RX and modem-control lines. It is the console and host link: text output, command input, data logging.</p>
+      <ul>
+        <li>Programmable baud-rate divisor, 5–8 data bits, parity, 1–2 stop bits, FIFOs, and line/modem status.</li>
+        <li>Being 16550-compatible means standard, well-known drivers work unchanged.</li>
+        <li>It has the highest interrupt priority, which suits a device whose receive FIFO overflows if it is serviced late.</li>
+      </ul>
+      <div class="tags"><span class="tag irq">IRQ mip[19] · RX / TX / status</span><span class="tag">RBR/THR · IER · LCR · LSR</span></div>
+    </article>
+
+    <article class="pcard">
+      <header><h4>GPIO × 32</h4><span class="addr">0x4000_3000 · slot 3</span></header>
+      <p><strong>Function.</strong> General-purpose pins for buttons, LEDs, chip selects and simple handshakes with other chips.</p>
+      <ul>
+        <li>Per-pin direction and mode. Inputs are synchronised to the clock to guard against metastability.</li>
+        <li>SET / CLEAR / TOGGLE registers change the chosen pins in a single write, with no read-modify-write. This stays safe even if an interrupt handler is driving other pins at the same moment.</li>
+        <li>Per-pin interrupt on rising edge, falling edge, high level or low level, with write-1-to-clear status.</li>
+      </ul>
+      <div class="tags"><span class="tag irq">IRQ mip[16] · pin event</span><span class="tag">EN · IN · OUT · SET/CLR/TGL</span></div>
+    </article>
+
+    <article class="pcard">
+      <header><h4>Timer 1</h4><span class="addr">0x4000_5000 · slot 5</span></header>
+      <p><strong>Function.</strong> A second, identical dual-timer block for application timing (measurements, timeouts, periodic tasks) that doesn't disturb the system tick.</p>
+      <ul>
+        <li>Occupies the APB slot originally planned for the CLIC.</li>
+        <li>Its interrupt outputs leave the SoC as pins and are not routed into the core.</li>
+      </ul>
+      <div class="tags"><span class="tag">no core IRQ</span><span class="tag">VAL · CTRL · CMP</span></div>
+    </article>
+
+    <article class="pcard">
+      <header><h4>AON WDT <span style="font-size:11px;font-weight:400;color:var(--irq)">always-on</span></h4><span class="addr">0x4000_6000 · slot 6</span></header>
+      <p><strong>Function.</strong> An always-on watchdog timer that detects software lockups and drives a full chip reset if firmware fails to feed it within a programmable window. It is the last safety net: it keeps running even when all other clocks are gated.</p>
+      <ul>
+        <li><strong>Two-stage timeout.</strong> Stage 1 fires <code>mip[20]</code> (interrupt mode) to give the handler a last chance to save state or signal a fault. Stage 2 fires the hard reset line if the watchdog is still not serviced.</li>
+        <li><strong>Feed by writing WDOGFEED</strong> with the unlock key <code>0x1ACCE551</code> followed by any write to <code>WDOGCOUNT</code> clear.</li>
+        <li><strong>Lock register.</strong> Once locked, only a reset can re-enable configuration writes, preventing a runaway program from disabling its own watchdog.</li>
+        <li><strong>Prescaler.</strong> Counts at <code>WDOGCLK / (PRE+1)</code>; works with slow always-on oscillators down to 32 kHz.</li>
+      </ul>
+      <div class="tags"><span class="tag irq">IRQ mip[20] · WDT timeout (stage 1)</span><span class="tag">WDOGCFG · WDOGCOUNT · WDOGFEED · WDOGKEY</span></div>
+    </article>
+
+    <article class="pcard out">
+      <header><h4>SPI master</h4><span class="addr">0x4000_4000 · slot 4</span></header>
+      <p>Shares its APB slot with the bootloader and is outside the scope of this document, along with the boot flow.</p>
+      <div class="tags"><span class="tag">IRQ mip[18]</span></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================================================ 12 -->
+<section id="aon_wdt">
+  <h2><span class="no">12</span>AON Watchdog Timer</h2>
+
+  <h3>What it is</h3>
+  <p>The AON WDT is a free-running counter in the always-on power domain. Firmware must periodically write a key sequence to clear it. If it reaches its limit without being cleared, it first raises <code>mip[20]</code> (giving software one last interrupt window) and then, if still not fed, asserts the chip-level reset request.</p>
+
+  <h3>Why the SoC needs it</h3>
+  <p>Any real embedded system can deadlock: an infinite loop, a bus hang, a bad interrupt vector, or corrupted stack. A watchdog guarantees the system returns to a known state automatically instead of staying stuck until someone power-cycles it. The <em>always-on</em> qualifier means the watchdog clock is independent of the main clock tree; it cannot be silenced by a bug that gates the system clock.</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 162" role="img" aria-label="AON WDT two-stage timeout. A free-running counter advances from 0. At the stage-1 threshold mip[20] is raised. If the counter is not cleared before the stage-2 threshold, a hard reset is issued. A WDOGFEED write clears the counter at any point.">
+      <defs>
+        <marker id="dwi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+        <marker id="dwa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah"/></marker>
+      </defs>
+      <!-- Timeline bar -->
+      <rect class="n-plain" x="24" y="64" width="528" height="36" rx="3"/>
+      <text class="ts" x="36" y="78">0</text>
+      <text class="ts" x="36" y="92">counter</text>
+      <!-- Stage 1 line -->
+      <line x1="312" y1="56" x2="312" y2="108" stroke="var(--irq)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="ts" x="248" y="52" text-anchor="middle" fill="var(--irq)">Stage-1 threshold (IRQ)</text>
+      <!-- Stage 2 line -->
+      <line x1="552" y1="56" x2="552" y2="108" stroke="var(--ink-2)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text class="ts" x="620" y="52" text-anchor="middle">Stage-2 threshold</text>
+      <!-- IRQ arrow -->
+      <path class="e-irq" d="M312,64 V30" marker-end="url(#dwi)"/>
+      <text class="ti" x="320" y="26">mip[20] raised</text>
+      <!-- Reset arrow -->
+      <path class="e" d="M552,64 V30" marker-end="url(#dwa)"/>
+      <text class="ts" x="560" y="26">hard reset issued</text>
+      <!-- Feed annotation -->
+      <rect class="n-core" x="640" y="58" width="156" height="48" rx="3"/>
+      <text class="tt" x="718" y="78" text-anchor="middle">WDOGFEED</text>
+      <text class="ts" x="718" y="95" text-anchor="middle">key → counter ← 0</text>
+      <path class="e-core" d="M640,82 H553" marker-end="url(#dwa)"/>
+      <text class="tlab" x="597" y="76" text-anchor="middle">clear</text>
+      <!-- Prescaler label -->
+      <text class="ts" x="288" y="130" text-anchor="middle">counts at WDOGCLK / (PRE+1) — works down to 32 kHz AON oscillator</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 7 — AON WDT two-stage timeout.</b> Stage 1 raises the watchdog interrupt and gives the handler a short window to save state. Stage 2 issues a hard reset. A <code>WDOGFEED</code> write at any point before stage 2 resets the counter and restarts both windows.</figcaption>
+  </figure>
+
+  <h3>Register map</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Register</th><th class="m">Offset</th><th>Function</th><th>Reset</th></tr></thead>
+      <tbody>
+        <tr><td class="m">WDOGCFG</td><td class="m">+0x00</td><td>Prescaler (PRE[2:0]), enable (EN), interrupt-enable (IE), reset-enable (RST_EN), lock (LOCK)</td><td class="m">0x0000_0000</td></tr>
+        <tr><td class="m">WDOGCOUNT</td><td class="m">+0x08</td><td>Current counter value (read) / clear to 0 (write after WDOGFEED unlock)</td><td class="m">0x0000_0000</td></tr>
+        <tr><td class="m">WDOGS</td><td class="m">+0x10</td><td>Scaled counter snapshot: WDOGCOUNT &gt;&gt; PRE</td><td class="m">—</td></tr>
+        <tr><td class="m">WDOGFEED</td><td class="m">+0x18</td><td>Write <code>0x1ACCE551</code> to unlock one WDOGCOUNT clear; lock re-arms after the write</td><td class="m">—</td></tr>
+        <tr><td class="m">WDOGKEY</td><td class="m">+0x1C</td><td>Read: returns 1 when unlocked; write: same as WDOGFEED</td><td class="m">0x1</td></tr>
+        <tr><td class="m">WDOGCMP0</td><td class="m">+0x20</td><td>Stage-1 compare (IRQ threshold). Interrupt fires when scaled counter ≥ WDOGCMP0</td><td class="m">0xFFFF</td></tr>
+        <tr><td class="m">WDOGCMP1</td><td class="m">+0x28</td><td>Stage-2 compare (reset threshold). Hard reset fires when scaled counter ≥ WDOGCMP1 and RST_EN=1</td><td class="m">0xFFFF</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>How we built it</h3>
+  <ul>
+    <li><strong>AON clock domain.</strong> The counter advances on <code>aon_clk</code>, which is an always-on 32 kHz oscillator independent of the main <code>sys_clk</code>. CDC synchronisers gate the APB register interface into the AON domain on every access.</li>
+    <li><strong>Two-stage protection.</strong> Firmware has the window between WDOGCMP0 and WDOGCMP1 to handle the interrupt and feed the watchdog. This gives a graceful recovery path before the hard reset fires.</li>
+    <li><strong>Write-key unlock.</strong> Direct writes to WDOGCOUNT are ignored until WDOGFEED is written with the magic key <code>0x1ACCE551</code>. This prevents accidental clearing by a stray store instruction.</li>
+    <li><strong>Lock bit.</strong> Setting WDOGCFG.LOCK makes all configuration fields read-only until the next reset. Software sets this during boot after programming the timeouts, so a runaway program cannot disable the watchdog.</li>
+    <li><strong>APB interface.</strong> The WDT sits on APB slot 6 and is reached through the same AXI-Lite → APB bridge as all other peripherals. The PCLK-domain registers are synchronised into the AON domain before driving the counter control logic.</li>
+  </ul>
+
+  <div class="note">
+    <p><b>Usage pattern.</b> Enable with <code>WDOGCFG.EN=1</code>, set WDOGCMP0 to the IRQ timeout, WDOGCMP1 to the reset timeout, then set <code>LOCK=1</code>. The main loop, or a periodic timer ISR, must write the feed sequence within the CMP0 window. If the system stalls, the IRQ handler can log a fault signature and call <code>WDOGFEED</code>; if even the handler stalls, the hard reset fires after the CMP1 window.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 13 -->
+<section id="summary">
+  <h2><span class="no">13</span>Why each block exists</h2>
+  <p>Each block solves one specific problem. The right-hand column shows what the system would lose without it.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Block</th><th>Problem it solves</th><th>Without it</th></tr></thead>
+      <tbody>
+        <tr><td>CSR file</td><td>Gives software control over the core: trap vectors, interrupt enables, trap cause, counters</td><td>No way to configure traps, enable interrupts or find out what went wrong</td></tr>
+        <tr><td>Exceptions</td><td>Stops on operations the hardware can't perform; provides system calls and breakpoints</td><td>Silent data corruption; no OS services or debugger</td></tr>
+        <tr><td>Trap / MRET controller</td><td>Atomic, precise entry to the handler and exact return</td><td>Lost return addresses, corrupted state, interrupt storms</td></tr>
+        <tr><td>Interrupt logic</td><td>Reacts to hardware events with priorities and a threshold</td><td>Busy-wait polling: wasted cycles and power, late responses</td></tr>
+        <tr><td>LSU + hybrid interface</td><td>Byte/halfword/word access to 32-bit memories; SRAM fast path, bus only for peripherals</td><td>Wrong byte lanes; every load pays bus latency</td></tr>
+        <tr><td>Hazard unit</td><td>Keeps overlapping instructions correct with the fewest lost cycles</td><td>Stale operands and executed wrong-path instructions</td></tr>
+        <tr><td>AXI-Lite crossbar</td><td>One standard, shared path for two masters and three targets</td><td>Custom point-to-point wiring; no IP reuse</td></tr>
+        <tr><td>AXI-Lite → APB bridge</td><td>Cheap, simple register access for slow peripherals</td><td>AXI logic duplicated in every peripheral: more area and power</td></tr>
+        <tr><td>APB peripherals</td><td>Connect the chip to the outside world</td><td>A processor with no I/O</td></tr>
+        <tr><td>AON WDT</td><td>Hardware safety net — guarantees recovery from any software lockup, even with clocks gated</td><td>A deadlocked system that never recovers without manual power-cycle</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  Based on the integrated RTL: the core in <code>riscv_core/rtl</code> and the SoC top-level in <code>RTL_SOC</code>. Addresses, bit positions and interrupt priorities match the SoC top-level as integrated.
+</footer>
+
+</main>
+
+</body></html>

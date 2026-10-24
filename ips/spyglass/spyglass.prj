@@ -58,8 +58,8 @@ read_file -type verilog {
     ../apb_i2c-master/i2c_master_bit_ctrl.sv
     ../apb_i2c-master/i2c_master_byte_ctrl.sv
     ../apb_i2c-master/apb_i2c.sv
-    ../apb_timer-master/timer.sv
-    ../apb_timer-master/apb_timer.sv
+    ../apb_timer-master/rtl/timer.sv
+    ../apb_timer-master/rtl/apb_timer.sv
     ../SOC_FILES/include/obi/apb_to_obi.sv
     ../SOC_FILES/include/obi/obi_uart_baudgen.sv
     ../SOC_FILES/include/obi/obi_uart_rx.sv
@@ -114,6 +114,8 @@ read_file -type verilog {
     ../riscv_core/rtl/csr_regfile.v
     ../riscv_core/rtl/wb_trap_mret_commit_controller.v
     ../riscv_core/rtl/hazard_unit.v
+    ../riscv_core/rtl/irq_gateway.v
+    ../riscv_core/rtl/irq_arbiter.v
     ../riscv_core/rtl/imem_controller.v
     ../riscv_core/rtl/ls_unit.v
     ../riscv_core/rtl/fetch_cycle.v
@@ -124,6 +126,8 @@ read_file -type verilog {
     ../riscv_core/rtl/top.v
     ../riscv_core/rtl/hybrid_mem_interface.sv
     ../bootloader/bootloader.sv
+    ../bus_monitors/apb_timeout_monitor.sv
+    ../bus_monitors/axi_lite_timeout_monitor.sv
     ../RTL_SOC/riscforge_soc_subsystem.sv
 }
 

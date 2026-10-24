@@ -1,0 +1,346 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/timer0_correct_timescale/xsim_script.tcl
+# xsim {timer0_correct_timescale} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+WARNING: File imem.hex referenced on C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/bootloader/bootloader.sv at line 829 cannot be opened for reading. Please ensure that this file is available in the current working directory.
+[TB] @0 (cyc 0) Bootloader -> S_RESET
+[FLASH-PRELOAD] addr=0 data=b7
+[TB] ============================================================
+[TB]  RISCFORGE SoC���� full boot-to-runtime test (Timer 0 program)
+[TB] ============================================================
+[TB]  Flash image : ../mem_files/riscforge_timer0_flash.mem
+[TB]  Instr words : 11 -> ISRAM 0x00010000
+[TB]  Data  words : 4 -> DSRAM 0x00020000
+[TB] ============================================================
+[TB]  PHASE 0: FLASH IMAGE PRELOAD (mem_file_name backdoor readback)
+[TB] ============================================================
+[TB]   PASS: flash[0] (instr) = 0x400010b7
+[TB]   PASS: flash[1] (instr) = 0x00900113
+[TB]   PASS: flash[2] (instr) = 0x0020a223
+[TB]   PASS: flash[3] (instr) = 0x0040a183
+[TB]   PASS: flash[4] (instr) = 0x00020237
+[TB]   PASS: flash[5] (instr) = 0x00310663
+[TB]   PASS: flash[6] (instr) = 0x00000293
+[TB]   PASS: flash[7] (instr) = 0x0080006f
+[TB]   PASS: flash[8] (instr) = 0x00100293
+[TB]   PASS: flash[9] (instr) = 0x00522023
+[TB]   PASS: flash[10] (instr) = 0x00000063
+[TB]   PASS: flash[11] (data) = 0xdeadbeef
+[TB]   PASS: flash[12] (data) = 0xcafebabe
+[TB]   PASS: flash[13] (data) = 0x12345678
+[TB]   PASS: flash[14] (data) = 0xa5a5a5a5
+[TB] ============================================================
+[TB]  PHASE 1: COLD BOOT (vendor flash, tPU = 300 us)
+[TB] ============================================================
+[TB]   PASS: all resets LOW while hard_rst_ni asserted
+[TB] Releasing hard_rst_ni @cyc 9
+[TB] @135000 (cyc 14) Bootloader -> S_CLEAR_SRAM
+[ISRAM-AW] #1 @cyc 16 addr=0x00010000 prot=3'b001        (privileged - passes gate)
+[ISRAM-AW] #2 @cyc 21 addr=0x00010004 prot=3'b001        (privileged - passes gate)
+[ISRAM-AW] #3 @cyc 26 addr=0x00010008 prot=3'b001        (privileged - passes gate)
+[TB] ... boot in progress @cyc 25000: state=S_CLEAR_SRAM clear_cnt=4997 word_cnt=0
+[TB] ... boot in progress @cyc 50000: state=S_CLEAR_SRAM clear_cnt=9997 word_cnt=0
+[TB] ... boot in progress @cyc 75000: state=S_CLEAR_SRAM clear_cnt=14997 word_cnt=0
+[TB] @819335000 (cyc 81934) Bootloader -> S_FLASH_WAIT
+[TB] ... boot in progress @cyc 100000: state=S_FLASH_WAIT clear_cnt=16384 word_cnt=0
+[TB] @1119335000 (cyc 111934) Bootloader -> S_INIT_CLKDIV
+[SPI-APB] n=0 t=1119355000 state=S_INIT_CLKDIV addr=004 wr=1 wdata=00000004 rdata=00000000 err=0 captured=00000000
+[TB] @1119355000 (cyc 111936) Bootloader -> S_INIT_SPICMD
+[SPI-APB] n=1 t=1119375000 state=S_INIT_SPICMD addr=008 wr=1 wdata=03000000 rdata=00000000 err=0 captured=00000000
+[TB] @1119375000 (cyc 111938) Bootloader -> S_INIT_SPIDUM
+[SPI-APB] n=2 t=1119395000 state=S_INIT_SPIDUM addr=014 wr=1 wdata=00000000 rdata=00000000 err=0 captured=00000000
+[TB] @1119395000 (cyc 111940) Bootloader -> S_INIT_SPILEN
+[SPI-APB] n=3 t=1119415000 state=S_INIT_SPILEN addr=010 wr=1 wdata=01e01808 rdata=00000000 err=0 captured=00000000
+[TB] @1119415000 (cyc 111942) Bootloader -> S_CFG_SPIADR
+[SPI-APB] n=4 t=1119435000 state=S_CFG_SPIADR addr=00c wr=1 wdata=00000000 rdata=00000000 err=0 captured=00000000
+[TB] @1119435000 (cyc 111944) Bootloader -> S_TRIGGER
+[SPI-APB] n=5 t=1119455000 state=S_TRIGGER addr=000 wr=1 wdata=00000101 rdata=00000001 err=0 captured=00000000
+[TB] @1119455000 (cyc 111946) Bootloader -> S_READ_FIFO
+[SPI-PIN] edge=0 t=1119505000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=1 t=1119555000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=2 t=1119605000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=3 t=1119655000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=4 t=1119705000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=5 t=1119755000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=6 t=1119805000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=7 t=1119855000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=8 t=1119905000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=9 t=1119955000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=10 t=1120005000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=11 t=1120055000 csn=0 sck=0 mosi=1 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=12 t=1120105000 csn=0 sck=1 mosi=1 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=13 t=1120155000 csn=0 sck=0 mosi=1 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=14 t=1120205000 csn=0 sck=1 mosi=1 miso=z model_drive=z model_out=z powered=1 instr=00 bus_state=1 address=000000
+[SPI-PIN] edge=15 t=1120255000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=16 t=1120305000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=17 t=1120355000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=18 t=1120405000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=19 t=1120455000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=20 t=1120505000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=21 t=1120555000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=22 t=1120605000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=23 t=1120655000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=24 t=1120705000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=25 t=1120755000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=26 t=1120805000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=27 t=1120855000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=28 t=1120905000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=29 t=1120955000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=30 t=1121005000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=31 t=1121055000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=32 t=1121105000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=33 t=1121155000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=34 t=1121205000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=35 t=1121255000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=36 t=1121305000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=37 t=1121355000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=38 t=1121405000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=39 t=1121455000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=40 t=1121505000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=41 t=1121555000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=42 t=1121605000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=43 t=1121655000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=44 t=1121705000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=45 t=1121755000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=46 t=1121805000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=47 t=1121855000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=48 t=1121905000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=49 t=1121955000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=50 t=1122005000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=51 t=1122055000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=52 t=1122105000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=53 t=1122155000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=54 t=1122205000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=55 t=1122255000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=56 t=1122305000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=57 t=1122355000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=58 t=1122405000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=59 t=1122455000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=60 t=1122505000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=61 t=1122555000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=62 t=1122605000 csn=0 sck=1 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=2 address=000000
+[SPI-PIN] edge=63 t=1122655000 csn=0 sck=0 mosi=0 miso=z model_drive=z model_out=z powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=64 t=1122705000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=65 t=1122755000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=66 t=1122805000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=67 t=1122855000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=68 t=1122905000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=69 t=1122955000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=70 t=1123005000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=71 t=1123055000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=72 t=1123105000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=73 t=1123155000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=74 t=1123205000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=75 t=1123255000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=76 t=1123305000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=77 t=1123355000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=78 t=1123405000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=79 t=1123455000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=80 t=1123505000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=81 t=1123555000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=82 t=1123605000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=83 t=1123655000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=84 t=1123705000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=85 t=1123755000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=86 t=1123805000 csn=0 sck=1 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=87 t=1123855000 csn=0 sck=0 mosi=0 miso=1 model_drive=1 model_out=1 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=88 t=1123905000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=89 t=1123955000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=90 t=1124005000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=91 t=1124055000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=92 t=1124105000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=93 t=1124155000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=94 t=1124205000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=95 t=1124255000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=96 t=1124305000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=97 t=1124355000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=98 t=1124405000 csn=0 sck=1 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-PIN] edge=99 t=1124455000 csn=0 sck=0 mosi=0 miso=0 model_drive=0 model_out=0 powered=1 instr=03 bus_state=5 address=000000
+[SPI-APB] n=6 t=1125815000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=b7100040 err=0 captured=00000000
+[TB] @1125815000 (cyc 112582) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8193 @cyc 112585 addr=0x0000 data=0x400010b7 mask=0xf
+[TB] @1125865000 (cyc 112587) Bootloader -> S_CHECK_DONE
+[TB] @1125875000 (cyc 112588) Bootloader -> S_READ_FIFO
+[SPI-APB] n=7 t=1129015000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=13019000 err=0 captured=400010b7
+[TB] @1129015000 (cyc 112902) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8194 @cyc 112905 addr=0x0001 data=0x00900113 mask=0xf
+[TB] @1129065000 (cyc 112907) Bootloader -> S_CHECK_DONE
+[TB] @1129075000 (cyc 112908) Bootloader -> S_READ_FIFO
+[SPI-APB] n=8 t=1132215000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=23a22000 err=0 captured=00900113
+[TB] @1132215000 (cyc 113222) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8195 @cyc 113225 addr=0x0002 data=0x0020a223 mask=0xf
+[TB] @1132265000 (cyc 113227) Bootloader -> S_CHECK_DONE
+[TB] @1132275000 (cyc 113228) Bootloader -> S_READ_FIFO
+[SPI-APB] n=9 t=1135415000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=83a14000 err=0 captured=0020a223
+[TB] @1135415000 (cyc 113542) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8196 @cyc 113545 addr=0x0003 data=0x0040a183 mask=0xf
+[TB] @1135465000 (cyc 113547) Bootloader -> S_CHECK_DONE
+[TB] @1135475000 (cyc 113548) Bootloader -> S_READ_FIFO
+[SPI-APB] n=10 t=1138615000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=37020200 err=0 captured=0040a183
+[TB] @1138615000 (cyc 113862) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8197 @cyc 113865 addr=0x0004 data=0x00020237 mask=0xf
+[TB] @1138665000 (cyc 113867) Bootloader -> S_CHECK_DONE
+[TB] @1138675000 (cyc 113868) Bootloader -> S_READ_FIFO
+[SPI-APB] n=11 t=1141815000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=63063100 err=0 captured=00020237
+[TB] @1141815000 (cyc 114182) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8198 @cyc 114185 addr=0x0005 data=0x00310663 mask=0xf
+[TB] @1141865000 (cyc 114187) Bootloader -> S_CHECK_DONE
+[TB] @1141875000 (cyc 114188) Bootloader -> S_READ_FIFO
+[SPI-APB] n=12 t=1145015000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=93020000 err=0 captured=00310663
+[TB] @1145015000 (cyc 114502) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8199 @cyc 114505 addr=0x0006 data=0x00000293 mask=0xf
+[TB] @1145065000 (cyc 114507) Bootloader -> S_CHECK_DONE
+[TB] @1145075000 (cyc 114508) Bootloader -> S_READ_FIFO
+[SPI-APB] n=13 t=1148215000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=6f008000 err=0 captured=00000293
+[TB] @1148215000 (cyc 114822) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8200 @cyc 114825 addr=0x0007 data=0x0080006f mask=0xf
+[TB] @1148265000 (cyc 114827) Bootloader -> S_CHECK_DONE
+[TB] @1148275000 (cyc 114828) Bootloader -> S_READ_FIFO
+[SPI-APB] n=14 t=1151415000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=93021000 err=0 captured=0080006f
+[TB] @1151415000 (cyc 115142) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8201 @cyc 115145 addr=0x0008 data=0x00100293 mask=0xf
+[TB] @1151465000 (cyc 115147) Bootloader -> S_CHECK_DONE
+[TB] @1151475000 (cyc 115148) Bootloader -> S_READ_FIFO
+[SPI-APB] n=15 t=1154615000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=23205200 err=0 captured=00100293
+[TB] @1154615000 (cyc 115462) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8202 @cyc 115465 addr=0x0009 data=0x00522023 mask=0xf
+[TB] @1154665000 (cyc 115467) Bootloader -> S_CHECK_DONE
+[TB] @1154675000 (cyc 115468) Bootloader -> S_READ_FIFO
+[SPI-APB] n=16 t=1157815000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=63000000 err=0 captured=00522023
+[TB] @1157815000 (cyc 115782) Bootloader -> S_WRITE_SRAM
+[ISRAM-WR] #8203 @cyc 115785 addr=0x000a data=0x00000063 mask=0xf
+[TB] @1157865000 (cyc 115787) Bootloader -> S_CHECK_DONE
+[TB] @1157875000 (cyc 115788) Bootloader -> S_READ_FIFO
+[SPI-APB] n=17 t=1161015000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=efbeadde err=0 captured=00000063
+[TB] @1161015000 (cyc 116102) Bootloader -> S_WRITE_SRAM
+[TB] @1161065000 (cyc 116107) Bootloader -> S_CHECK_DONE
+[TB] @1161075000 (cyc 116108) Bootloader -> S_READ_FIFO
+[SPI-APB] n=18 t=1164215000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=bebafeca err=0 captured=deadbeef
+[TB] @1164215000 (cyc 116422) Bootloader -> S_WRITE_SRAM
+[TB] @1164265000 (cyc 116427) Bootloader -> S_CHECK_DONE
+[TB] @1164275000 (cyc 116428) Bootloader -> S_READ_FIFO
+[SPI-APB] n=19 t=1167415000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=78563412 err=0 captured=cafebabe
+[TB] @1167415000 (cyc 116742) Bootloader -> S_WRITE_SRAM
+[TB] @1167465000 (cyc 116747) Bootloader -> S_CHECK_DONE
+[TB] @1167475000 (cyc 116748) Bootloader -> S_READ_FIFO
+[SPI-APB] n=20 t=1170615000 state=S_READ_FIFO addr=020 wr=0 wdata=00000000 rdata=a5a5a5a5 err=0 captured=12345678
+[TB] @1170615000 (cyc 117062) Bootloader -> S_WRITE_SRAM
+[TB] @1170665000 (cyc 117067) Bootloader -> S_CHECK_DONE
+[TB] @1170675000 (cyc 117068) Bootloader -> S_CLEAN_ASSERT
+[TB] @1170685000 (cyc 117069) Bootloader -> S_CLEAN_HOLD
+[TB] @1170725000 (cyc 117073) Bootloader -> S_CLEAN_RELEASE
+[TRACE] pc=00000000 req=1 fetch_addr=00000004 demux_req=0 demux_addr=00000004 isram_cs=0 isram_we=0 isram_addr=0 isram_rdata=00000000 core_instr=00028137 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TB] @1170735000 (cyc 117074) Bootloader -> S_DONE
+[TRACE] pc=00000004 req=1 fetch_addr=00000008 demux_req=0 demux_addr=00000008 isram_cs=0 isram_we=0 isram_addr=0 isram_rdata=00000000 core_instr=7fd0f06f lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TB]   PASS: SPI activity occurred during boot
+[TB]   PASS: bootloader parked in S_DONE
+[TB] ============================================================
+[TB]  PHASE 2: RESET SEQUENCE
+[TB] ============================================================
+[TB]   PASS: spi_rst_n released
+[TB]   PASS: core_rst_n released
+[TB]   PASS: periph_rst_n released
+[TB]   PASS: spi_rst_n released BEFORE core_rst_n
+[TB]   PASS: core & periph released together
+[TB]   (spi @cyc 14, core @cyc 117073, periph @cyc 117073)
+[TB] ============================================================
+[TB]  PHASE 3: IMAGE PLACEMENT (SPI -> ISRAM / DSRAM)
+[TB] ============================================================
+[TB] -- Boot write-path counters --
+[TB]   ISRAM writes reaching the macro : 8203  (expected 8203)
+[TB]   DSRAM writes reaching the macro : 8196  (expected 8196)
+[TB]   ISRAM AW handshakes at bridge   : 8203
+[TB]   ISRAM error responses (SLVERR)  : 0
+[TB]   last aw.prot seen by the gate   : 3'b001                                              
+[TB]   >> ISRAM write path OK: every write reached the macro, no errors.
+[TB] -- ISRAM (instruction words) --
+[TB]   PASS: ISRAM[0] = 0x400010b7
+[TB]   PASS: ISRAM[1] = 0x00900113
+[TB]   PASS: ISRAM[2] = 0x0020a223
+[TB]   PASS: ISRAM[3] = 0x0040a183
+[TB]   PASS: ISRAM[4] = 0x00020237
+[TB]   PASS: ISRAM[5] = 0x00310663
+[TB]   PASS: ISRAM[6] = 0x00000293
+[TB]   PASS: ISRAM[7] = 0x0080006f
+[TB]   PASS: ISRAM[8] = 0x00100293
+[TB]   PASS: ISRAM[9] = 0x00522023
+[TB]   PASS: ISRAM[10] = 0x00000063
+[TB]   PASS: ISRAM[11] cleared beyond image = 0x00000000
+[TB] -- DSRAM (data words) --
+[TB]   PASS: DSRAM[0] = 0xdeadbeef
+[TB]   PASS: DSRAM[1] = 0xcafebabe
+[TB]   PASS: DSRAM[2] = 0x12345678
+[TB]   PASS: DSRAM[3] = 0xa5a5a5a5
+[TB] ============================================================
+[TB]  PHASE 4: RUNTIME (BootROM -> ISRAM program)
+[TB] ============================================================
+[TRACE] pc=00000008 req=1 fetch_addr=0000000c demux_req=0 demux_addr=0000000c isram_cs=0 isram_we=0 isram_addr=0 isram_rdata=00000000 core_instr=00000013 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=0000000c req=1 fetch_addr=00010000 demux_req=1 demux_addr=00010000 isram_cs=1 isram_we=0 isram_addr=0 isram_rdata=00000000 core_instr=00000013 lsu_req=0 lsu_addr=00028000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TB] First write to x2 @cyc 117077: 0x00028000  (BootROM lui should give 0x00028000)
+[TRACE] pc=00010000 req=1 fetch_addr=00010000 demux_req=1 demux_addr=00010000 isram_cs=1 isram_we=0 isram_addr=0 isram_rdata=400010b7 core_instr=400010b7 lsu_req=0 lsu_addr=0000fffc lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010000 req=1 fetch_addr=00010004 demux_req=1 demux_addr=00010004 isram_cs=1 isram_we=0 isram_addr=1 isram_rdata=400010b7 core_instr=400010b7 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010004 req=1 fetch_addr=00010008 demux_req=1 demux_addr=00010008 isram_cs=1 isram_we=0 isram_addr=2 isram_rdata=00900113 core_instr=00900113 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010008 req=1 fetch_addr=0001000c demux_req=1 demux_addr=0001000c isram_cs=1 isram_we=0 isram_addr=3 isram_rdata=0020a223 core_instr=0020a223 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=0001000c req=1 fetch_addr=00010010 demux_req=1 demux_addr=00010010 isram_cs=1 isram_we=0 isram_addr=4 isram_rdata=0040a183 core_instr=0040a183 lsu_req=0 lsu_addr=40001000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010010 req=1 fetch_addr=00010014 demux_req=1 demux_addr=00010014 isram_cs=1 isram_we=0 isram_addr=5 isram_rdata=00020237 core_instr=00020237 lsu_req=0 lsu_addr=00000009 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010014 req=1 fetch_addr=00010014 demux_req=1 demux_addr=00010014 isram_cs=1 isram_we=0 isram_addr=5 isram_rdata=00310663 core_instr=00310663 lsu_req=1 lsu_addr=40001004 lsu_stall=1 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010014 req=1 fetch_addr=00010014 demux_req=1 demux_addr=00010014 isram_cs=1 isram_we=0 isram_addr=5 isram_rdata=00310663 core_instr=00310663 lsu_req=1 lsu_addr=40001004 lsu_stall=1 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010014 req=1 fetch_addr=00010014 demux_req=1 demux_addr=00010014 isram_cs=1 isram_we=0 isram_addr=5 isram_rdata=00310663 core_instr=00310663 lsu_req=1 lsu_addr=40001004 lsu_stall=1 apb_t0_sel=1 en=0 ready=1
+[TRACE] pc=00010014 req=1 fetch_addr=00010018 demux_req=1 demux_addr=00010018 isram_cs=1 isram_we=0 isram_addr=6 isram_rdata=00310663 core_instr=00310663 lsu_req=1 lsu_addr=40001004 lsu_stall=0 apb_t0_sel=1 en=1 ready=1
+[TRACE] pc=00010018 req=1 fetch_addr=00010018 demux_req=1 demux_addr=00010018 isram_cs=1 isram_we=0 isram_addr=6 isram_rdata=00000293 core_instr=00000293 lsu_req=1 lsu_addr=40001004 lsu_stall=1 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010018 req=1 fetch_addr=00010018 demux_req=1 demux_addr=00010018 isram_cs=1 isram_we=0 isram_addr=6 isram_rdata=00000293 core_instr=00000293 lsu_req=1 lsu_addr=40001004 lsu_stall=1 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010018 req=1 fetch_addr=00010018 demux_req=1 demux_addr=00010018 isram_cs=1 isram_we=0 isram_addr=6 isram_rdata=00000293 core_instr=00000293 lsu_req=1 lsu_addr=40001004 lsu_stall=1 apb_t0_sel=1 en=0 ready=1
+[TRACE] pc=00010018 req=1 fetch_addr=0001001c demux_req=1 demux_addr=0001001c isram_cs=1 isram_we=0 isram_addr=7 isram_rdata=00000293 core_instr=00000293 lsu_req=1 lsu_addr=40001004 lsu_stall=0 apb_t0_sel=1 en=1 ready=1
+[TRACE] pc=0001001c req=1 fetch_addr=00010020 demux_req=1 demux_addr=00010020 isram_cs=1 isram_we=0 isram_addr=8 isram_rdata=0080006f core_instr=0080006f lsu_req=0 lsu_addr=00020000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010020 req=1 fetch_addr=00010020 demux_req=1 demux_addr=00010020 isram_cs=1 isram_we=0 isram_addr=8 isram_rdata=00100293 core_instr=00100293 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010020 req=1 fetch_addr=00010024 demux_req=1 demux_addr=00010024 isram_cs=1 isram_we=0 isram_addr=9 isram_rdata=00100293 core_instr=00100293 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010024 req=1 fetch_addr=00010028 demux_req=1 demux_addr=00010028 isram_cs=1 isram_we=0 isram_addr=10 isram_rdata=00522023 core_instr=00522023 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010028 req=1 fetch_addr=0001002c demux_req=1 demux_addr=0001002c isram_cs=1 isram_we=0 isram_addr=11 isram_rdata=00000063 core_instr=00000063 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=0001002c req=1 fetch_addr=00010030 demux_req=1 demux_addr=00010030 isram_cs=1 isram_we=0 isram_addr=12 isram_rdata=00000000 core_instr=00000000 lsu_req=0 lsu_addr=00000001 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[DSRAM-RUNTIME-WR] #8197 @cyc 117097 addr=0 data=00000001 mask=f
+[TRACE] pc=00010030 req=1 fetch_addr=00010028 demux_req=1 demux_addr=00010028 isram_cs=1 isram_we=0 isram_addr=10 isram_rdata=00000000 core_instr=00000000 lsu_req=1 lsu_addr=00020000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[RESULT-CAPTURE] preassign=00000001 pc_wait=21 store_wait=3 cyc=117098
+[TRACE] pc=00010028 req=1 fetch_addr=00010028 demux_req=1 demux_addr=00010028 isram_cs=1 isram_we=0 isram_addr=10 isram_rdata=00000063 core_instr=00000063 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[RESULT-CAPTURE] saved=00000001 live_after_1ns=00000001
+[TB] Program stored its result @cyc 117099 (PC wait 21, store commit wait 3 cycles)
+[TRACE] pc=00010028 req=1 fetch_addr=0001002c demux_req=1 demux_addr=0001002c isram_cs=1 isram_we=0 isram_addr=11 isram_rdata=00000063 core_instr=00000063 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=0001002c req=1 fetch_addr=00010030 demux_req=1 demux_addr=00010030 isram_cs=1 isram_we=0 isram_addr=12 isram_rdata=00000000 core_instr=00000000 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010030 req=1 fetch_addr=00010028 demux_req=1 demux_addr=00010028 isram_cs=1 isram_we=0 isram_addr=10 isram_rdata=00000000 core_instr=00000000 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[TRACE] pc=00010028 req=1 fetch_addr=00010028 demux_req=1 demux_addr=00010028 isram_cs=1 isram_we=0 isram_addr=10 isram_rdata=00000063 core_instr=00000063 lsu_req=0 lsu_addr=00000000 lsu_stall=0 apb_t0_sel=0 en=0 ready=1
+[RESULT-DRAIN] saved=00000001 live=00000001
+[TB] -- BootROM preamble --
+[TB]   PASS: x2 (sp) from BootROM l������ first write, before the program reused it = 0x00028000
+[TB]   (first x2 write @cyc 117077; x2 written 5 times total; x2 now = 0x00000009)
+[TB]   PASS: PC left BootROM and reached ISRAM
+[TB] -- Program register state --
+[TB]   PASS: x1 = Timer 0 base = 0x40001000
+[TB]   PASS: x3 = TIMER_CTRL readback = 0x00000009
+[TB]   PASS: x4 = DSRAM base = 0x00020000
+[TB]   PASS: x5 = PASS code = 0x00000001
+[TB] -- MMIO path (core -> AXI -> APB -> Timer 0) --
+[TB]   PASS: Timer 0 TIMER_CTRL register = 0x00000009
+[TB]   PASS: Timer 0 is counting (TIMER_VAL non-zero)
+[TB]   Timer 0 TIMER_VAL = 0x0000000f
+[TB] -- Direct DSRAM store --
+[TB]   PASS: DSRAM[0] = program result = 0x00000001
+[TB] -- Data image survived runtime --
+[TB]   PASS: DSRAM[1] sentinel intact = 0xcafebabe
+[TB]   PASS: DSRAM[2] sentinel intact = 0x12345678
+[TB]   PASS: DSRAM[3] sentinel intact = 0xa5a5a5a5
+[TB] -- Core parked in its final loop --
+[TB]   PASS: PC parked at the final self-branch (stable AND at the right address)
+[TB]   final PC = 0x00010028 (expected 0x00010028)                                              
+[TB] ============================================================
+[TB]  *** ALL 52 CHECKS PASSED ***
+[TB] ============================================================
+$finish called at time : 1171485 ns : File "C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv" Line 741
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 280.496 ; gain = 0.000
+exit
+INFO: xsimkernel Simulation Memory Usage: 17872 KB (Peak: 17872 KB), Simulation CPU Usage: 10483 ms
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 02:01:33 2026...

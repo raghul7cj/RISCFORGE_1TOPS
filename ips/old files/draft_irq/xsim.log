@@ -1,0 +1,63 @@
+#-----------------------------------------------------------
+# xsim v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Wed Sep 30 16:40:44 2026
+# Process ID: 11720
+# Current directory: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq
+# Command line: xsim.exe -mode tcl -source {xsim.dir/sim_smoke/xsim_script.tcl}
+# Log file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/xsim.log
+# Journal file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq\xsim.jou
+# Running On: DESKTOP-BSAEVVC, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 12, Host memory: 16779 MB
+#-----------------------------------------------------------
+source xsim.dir/sim_smoke/xsim_script.tcl
+# xsim {sim_smoke} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================
+RISCFORGE Two-Level Priority Class Interrupt Architecture Verification
+================================================================
+
+--- [TEST 1] Gateway Pulse Capture & Pulse-Wins Precedence ---
+[PASS] T-01: Timer0 single-cycle pulse captured and held sticky
+[PASS] T-01b: Timer0 pending cleared by clear_i[4]
+[PASS] T-01c: Level mode UART passes through combinationally
+[PASS] T-01d: Level mode UART de-asserts immediately when raw drops
+[PASS] T-04: Pulse-wins race condition resolved in favor of new pulse
+
+--- [TEST 2] Arbiter Inter-Class Strict Priority ---
+[PASS] T-07a: Class 2 (Timer0, id=7) strictly preempts Class 1 and Class 0
+[PASS] T-07b: Class 1 (UART, id=19) strictly preempts Class 0 (GPIO)
+[PASS] T-07c: Class 0 (GPIO, id=16) selected when Class 2 and 1 are silent
+
+--- [TEST 3] Intra-Class Round-Robin Fairness (UART vs SPI) ---
+[PASS] T-08a: Initial winner is UART (id=19)
+[PASS] T-08b: After UART commit, SPI (id=18) is selected next
+[PASS] T-08c: After SPI commit, UART (id=19) is selected again (Fair Round-Robin)
+[PASS] T-09a: Initial Class 0 winner is I2C (id=17)
+[PASS] T-09b: After I2C commit, GPIO (id=16) is selected next
+
+--- [TEST 4] Preemption Gating & Threshold ---
+[PASS] G4.1: Equal-class interrupt (Class 1) blocked during Class 1 ISR
+[PASS] G4.1b: Higher class (Class 2 Timer0) successfully passes preemption threshold
+
+--- [TEST 5] Iterative Divider Abortion & Quick Recovery ---
+[PASS] T-05a: Divider computation active (stall=1)
+[PASS] T-05b: Divider immediately aborted to IDLE within 1 cycle, stall dropped
+[PASS] T-05c: Restarted division completed with exact correct quotient (84 / 7 = 12)
+
+--- [TEST 6] 2-Deep Hardware Shadow Stack Push/Pop Verification ---
+[PASS] T-11a: Initial nest_depth is 0 (Main Thread)
+[PASS] T-11b: Level 1 trap pushed to stack: mepc=0x1000, nest_depth=1, cur_class=0
+[PASS] T-11c: Level 2 trap pushed to stack: mepc=0x2050, nest_depth=2, cur_class=1
+[PASS] T-11d: MRET from Level 2 popped stack: mepc restored to 0x1000, cur_class restored to 0
+[PASS] T-11e: MRET from Level 1 popped stack: returned to Main Thread (nest_depth=0)
+
+================================================================
+VERIFICATION SUMMARY: 23 PASSED, 0 FAILED
+================================================================
+>>> ALL TESTS PASSED SUCCESSFULLY! <<<
+
+$finish called at time : 616 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/tb/tb_smoke_irq.sv" Line 417
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Sep 30 16:40:51 2026...

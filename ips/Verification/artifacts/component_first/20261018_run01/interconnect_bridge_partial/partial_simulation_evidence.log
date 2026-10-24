@@ -1,0 +1,125 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/bridge_sim/xsim_script.tcl
+# xsim {bridge_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+
+
+============================================================
+  AXI4-Lite to APB4 Bridge — Verification Testbench
+============================================================
+  Address Map:
+    Slave0: 0x1000_0000 – 0x1000_0FFF
+    Slave1: 0x2000_0000 – 0x2000_0FFF
+============================================================
+
+========== TC1: Single Write to Slave0 + Readback ==========
+  [DBG] WR: valid driven at 80000, addr=0x10000000
+  [DBG] WR: @posedge+1 86000 aw_ready=0 w_ready=0 b_valid=0
+  [DBG] WR: @posedge+1 96000 aw_ready=0 w_ready=0 b_valid=1
+  [DBG] WR: @posedge+1 106000 aw_ready=1 w_ready=1 b_valid=0
+  [DBG] WR: valid deasserted at 110000, waiting for b_valid
+
+Time: 115 ns Started: 105 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:174
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] lock_req: It is disallowed to deassert unserved request signals when LockIn is enabled. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:174)
+Time: 115 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 174
+
+Time: 115 ns Started: 115 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:317
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] req1: Req out implies req in. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:317)
+Time: 115 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 317
+  [DBG] WR: @posedge+1 116000 b_valid=0 b_resp=00 | raw_resp=0x0
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 126000 b_valid=1 b_resp=00 | raw_resp=0x1000000000
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 130000, resp=00
+  [PASS] TC1: Write resp OKAY  resp=00 (expected 00)
+  [DBG] RD: valid driven at 140000, addr=0x10000000
+  [DBG] RD: @posedge+1 146000 ar_ready=0 r_valid=0
+  [DBG] RD: @posedge+1 156000 ar_ready=0 r_valid=1
+  [DBG] RD: @posedge+1 166000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 170000, waiting for r_valid
+
+Time: 175 ns Started: 165 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:174
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] lock_req: It is disallowed to deassert unserved request signals when LockIn is enabled. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:174)
+Time: 175 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 174
+
+Time: 175 ns Started: 175 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:317
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] req1: Req out implies req in. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:317)
+Time: 175 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 317
+  [DBG] RD: @posedge+1 176000 r_valid=0 r_data=0xdeadbeef r_resp=00
+  [DBG] RD: @posedge+1 186000 r_valid=1 r_data=0xdeadbeef r_resp=00
+  [DBG] RD: done at 190000
+  [PASS] TC1: Read data matches  got=0xdeadbeef  exp=0xdeadbeef
+  [PASS] TC1: Read resp OKAY  resp=00 (expected 00)
+
+========== TC2: Write+Read Slave1 ==========
+  [DBG] WR: valid driven at 200000, addr=0x20000010
+  [DBG] WR: @posedge+1 206000 aw_ready=0 w_ready=0 b_valid=0
+  [DBG] WR: @posedge+1 216000 aw_ready=0 w_ready=0 b_valid=1
+  [DBG] WR: @posedge+1 226000 aw_ready=1 w_ready=1 b_valid=0
+  [DBG] WR: valid deasserted at 230000, waiting for b_valid
+
+Time: 235 ns Started: 225 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:174
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] lock_req: It is disallowed to deassert unserved request signals when LockIn is enabled. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:174)
+Time: 235 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 174
+
+Time: 235 ns Started: 235 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:317
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] req1: Req out implies req in. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:317)
+Time: 235 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 317
+  [DBG] WR: @posedge+1 236000 b_valid=0 b_resp=00 | raw_resp=0x6f56df778
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge+1 246000 b_valid=1 b_resp=00 | raw_resp=0x16f56df778
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 250000, resp=00
+  [PASS] TC2: Write resp  resp=00 (expected 00)
+  [DBG] RD: valid driven at 260000, addr=0x20000010
+  [DBG] RD: @posedge+1 266000 ar_ready=0 r_valid=0
+  [DBG] RD: @posedge+1 276000 ar_ready=0 r_valid=1
+  [DBG] RD: @posedge+1 286000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 290000, waiting for r_valid
+
+Time: 295 ns Started: 285 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:174
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] lock_req: It is disallowed to deassert unserved request signals when LockIn is enabled. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:174)
+Time: 295 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 174
+
+Time: 295 ns Started: 295 ns Scope: /tb_axi_lite_to_apb/dut/i_req_arb File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line:317
+Error: [ASSERT FAILED] [tb_axi_lite_to_apb.dut.i_req_arb] req1: Req out implies req in. (C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv:317)
+Time: 295 ns  Iteration: 2  Process: /tb_axi_lite_to_apb/dut/i_req_arb//tb_axi_lite_to_apb/dut/i_req_arb  Scope: tb_axi_lite_to_apb.dut.i_req_arb  File: C:/Users/cj/AppData/Local/Temp/riscforge_component_first_bridge_02/apb_uart-main/include/common_cells/rr_arb_tree.sv Line: 317
+  [DBG] RD: @posedge+1 296000 r_valid=0 r_data=0xcafebabe r_resp=00
+  [DBG] RD: @posedge+1 306000 r_valid=1 r_data=0xcafebabe r_resp=00
+  [DBG] RD: done at 310000
+  [PASS] TC2: Read Slave1  got=0xcafebabe  exp=0xcafebabe
+
+========== TC3: Decode Error (Unmapped Address) ==========
+  [DBG] WR: valid driven at 320000, addr=0x30000000
+  [DBG] WR: @posedge+1 326000 aw_ready=1 w_ready=1 b_valid=1
+  [DBG] WR: valid deasserted at 330000, waiting for b_valid
+  [DBG] WR: @posedge+1 336000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 346000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 356000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 366000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 376000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 386000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 396000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 406000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 416000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 426000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 436000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge+1 446000 b_valid=0 b_resp=11 | raw_resp=0x6657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0

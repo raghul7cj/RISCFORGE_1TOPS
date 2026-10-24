@@ -60,8 +60,8 @@
 ../apb_i2c-master/apb_i2c.sv
 
 // Section 5: APB Timer
-../apb_timer-master/timer.sv
-../apb_timer-master/apb_timer.sv
+../apb_timer-master/rtl/timer.sv
+../apb_timer-master/rtl/apb_timer.sv
 
 // Section 6: APB UART (16550)
 ../SOC_FILES/include/obi/apb_to_obi.sv
@@ -125,7 +125,9 @@
 ../riscv_core/rtl/rv32m_unit.v
 ../riscv_core/rtl/csr_regfile.v
 ../riscv_core/rtl/wb_trap_mret_commit_controller.v
-../riscv_core/rtl/hazard_unit.v
+
+../riscv_core/rtl/irq_gateway.v
+../riscv_core/rtl/irq_arbiter.v
 ../riscv_core/rtl/imem_controller.v
 ../riscv_core/rtl/ls_unit.v
 ../riscv_core/rtl/fetch_cycle.v
@@ -136,5 +138,8 @@
 ../riscv_core/rtl/top.v
 ../riscv_core/rtl/hybrid_mem_interface.sv
 ../bootloader/bootloader.sv
+../bus_monitors/apb_timeout_monitor.sv
+../bus_monitors/axi_lite_timeout_monitor.sv
 ../RTL_SOC/riscforge_soc_subsystem.sv
+
 

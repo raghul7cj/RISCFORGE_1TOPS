@@ -1,0 +1,51 @@
+
+================================================================================
+            RISCFORGE SoC POST-MORTEM MONITOR DUMP
+================================================================================
+  FIRST FATAL : none
+
+---- MONITOR TOTALS ------------------------------------------------
+==      FETCH layer=          2(Path) events=4 suppressed=0 span=[9..12]
+==     RETIRE layer=          2(Path) events=4 suppressed=0 span=[13..16]
+==        LSU layer=          2(Path) events=0 suppressed=0 span=[0..0]
+==    AXILITE layer=          1(Protocol) events=0 suppressed=0 span=[0..0]
+==        APB layer=          1(Protocol) events=0 suppressed=0 span=[0..0]
+==        IRQ layer=          5(IRQ) events=0 suppressed=0 span=[0..0]
+==        PIN layer=          4(Pin) events=2 suppressed=0 span=[0..0]
+
+---- CYCLIC HISTORY (newest first) ----------------------------------
+----        FETCH 4/256 retained ----
+stall_cycles=0 branches=0
+  cyc        9  rel        9  PC=0x00001000  I=0x00100093     UNMAPPED
+  cyc       10  rel       10  PC=0x00001004  I=0x00200113     UNMAPPED
+  cyc       11  rel       11  PC=0x00001008  I=0x002081b3     UNMAPPED
+  cyc       12  rel       12  PC=0x0000100c  I=0x00018237     UNMAPPED
+
+----       RETIRE 4/256 retained ----
+commit=4 regwe=4 trap=0 irq=0 mret=0 csr=0
+  cyc       13  rel       13  PC=0x00001000  x00100093  rd x1=0x00000001               
+  cyc       14  rel       14  PC=0x00001004  x00200113  rd x2=0x00000002               
+  cyc       15  rel       15  PC=0x00001008  x002081b3  rd x3=0x00000003               
+  cyc       16  rel       16  PC=0x0000100c  x00018237  rd x4=0x00018000               
+
+----          LSU 0/256 retained ----
+req=0 load=0 store=0 mmio=0 err=0
+
+----      AXILITE 0/256 retained ----
+AW=0 W=0 B=0 AR=0 R=0 stalls(AW/W/B/AR/R)=0/0/0/0/0
+
+  slot           0    I2C xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           1 TIMER0 xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           2   UART xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           3   GPIO xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           4    SPI xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           5 TIMER1 xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+----          APB 0/256 retained ----
+
+----          IRQ 0/256 retained ----
+assert=0 grant=0 ack=0 mret=0
+
+
+---- CROSS-LAYER JOIN (newest MMIO accesses) -----------------------
+  (no MMIO accesses observed - scoreboard would be VACUOUS)
+

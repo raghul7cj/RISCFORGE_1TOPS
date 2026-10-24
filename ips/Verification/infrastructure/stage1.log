@@ -1,0 +1,73 @@
+#-----------------------------------------------------------
+# xsim v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Fri Oct  2 19:39:51 2026
+# Process ID: 17200
+# Current directory: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure
+# Command line: xsim.exe -log stage1.log -mode tcl -source {xsim.dir/soc_sim_snap/xsim_script.tcl}
+# Log file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure/stage1.log
+# Journal file: C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure\xsim.jou
+# Running On: DESKTOP-BSAEVVC, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 12, Host memory: 16779 MB
+#-----------------------------------------------------------
+source xsim.dir/soc_sim_snap/xsim_script.tcl
+# xsim {soc_sim_snap} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+WARNING: File ../mem_files/riscforge_bootrom.hex referenced on C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure/monitors/retire_monitor.sv at line 42 cannot be opened for reading. Please ensure that this file is available in the current working directory.
+
+================================================================================
+               RISCFORGE SoC Verification Testbench Launch                      
+================================================================================
+  BOOT MODE       : WARM
+  WATCHDOG LIMIT  : 1000000 cycles
+[TB Preload] Backdooring memory arrays (WARM BOOT)...
+[TB Reset] De-asserted reset. Core running at ISRAM 0x0001_0000.
+
+[FATAL TIMEOUT] Simulation exceeded watchdog limit (1000000 cycles)!
+
+================================================================================
+                 RISCFORGE SoC VERIFICATION FAILURE REPORT                      
+================================================================================
+  FATAL CHECK ID   : WATCHDOG_TIMEOUT
+  BLAME LAYER      : 6 (1:Protocol, 2:Path, 3:Reg, 4:Pin, 5:IRQ, 6:Firmware)
+  SIMULATION TIME  : 10000195.00 ns (Cycle ~1000019)
+  FAILING PC       : 0x00000048
+  DETAILS          : Test exceeded maximum allowed simulation cycles (1000000). Retired=16 AXI=0 APB=0 FW_ATTEST=0x00000000
+  FATALS RECORDED  : 1
+================================================================================
+
+=== Last 10 Retired Instructions ===
+  [102854.00 ns] PC=0x00000018 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102855.00 ns] PC=0x0000001c Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102856.00 ns] PC=0x00000020 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102857.00 ns] PC=0x00000024 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102858.00 ns] PC=0x00000028 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102859.00 ns] PC=0x0000002c Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102860.00 ns] PC=0x00000030 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102861.00 ns] PC=0x00000034 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102862.00 ns] PC=0x00000038 Instr=0x00000013                     (rd=x0, val=0x00000000)
+  [102863.00 ns] PC=0x0000003c Instr=0x00000013                     (rd=x0, val=0x00000000)
+=== Last 10 LSU Memory Transactions ===
+
+=======================================================
+ AXI4-LITE RECENT TRANSACTIONS DUMP (Total WR: 0, RD: 0)
+=======================================================
+ [TIME]     DIR   ADDR         DATA         STRB  RESP
+-------------------------------------------------------
+=======================================================
+
+
+=======================================================
+ APB RECENT TRANSACTIONS DUMP (Total APB Transfers: 0)
+=======================================================
+ [TIME]     SLOT  DIR  PADDR        PWDATA       PRDATA       PSLVERR
+---------------------------------------------------------------------
+=======================================================
+
+$finish called at time : 10000195 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure/tb/soc_tb_top.sv" Line 649
+Memory in use : 16816 KB (peak memory: 16816 KB)     CPU usage : 137421 ms
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:02:20 . Memory (MB): peak = 249.887 ; gain = 17.387
+exit
+INFO: xsimkernel Simulation Memory Usage: 16832 KB (Peak: 16832 KB), Simulation CPU Usage: 137437 ms
+INFO: [Common 17-206] Exiting xsim at Fri Oct  2 19:42:14 2026...

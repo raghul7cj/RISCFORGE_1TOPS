@@ -1,0 +1,1145 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Oct 18, 2026 at 17:49:18 IST
+xrun
+	-64bit
+	-sv
+	-sysv_ext .v,.sv
+	-timescale 1ns/1ps
+	-access +rwc
+	-f /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/results/inputs/xcelium.f
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/apb
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/common_cells
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/axi
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers
+		+incdir+/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/cf_math_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/axi_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/apb/apb_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_reg_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/tb_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/addr_decode_dync.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/addr_decode.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/fifo_v3.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/fall_through_register.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/spill_register.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/spill_register_flushable.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/counter.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/rr_arb_tree.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/lzc.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/onehot_to_bin.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/delta_counter.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/id_queue.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/sync.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/stream_register.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_err_slv.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_atop_filter.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_to_axi.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_demux.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/axi_lite_xbar.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_to_apb/axi_lite_to_apb.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/bus_monitors/apb_timeout_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/bus_monitors/axi_lite_timeout_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/i2c_master_bit_ctrl.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/i2c_master_byte_ctrl.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/apb_i2c.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_timer-master/rtl/timer.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_timer-master/rtl/apb_timer.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_pkg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/apb_to_obi.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_baudgen.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_interrupts.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_modem.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_register.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_rx.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_tx.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/rtl/apb_uart_wrap.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/rtl/apb_uart.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_clkgen.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_fifo.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_rx.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_tx.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_controller.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_apb_if.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/apb_spi_master.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/sram_sp.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/sram_mux.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/axi_lite_sram_if.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/instr_module/Instruction_Memory.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/imem_sram_wrapper.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/boot_rom.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/instr_fetch_demux.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/PC.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/PC_Adder.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Mux2.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Mux_3_by_1.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ALU.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ALU_Decoder.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Main_Decoder.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Control_Unit_Top.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Sign_Extend.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Register_File.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/JB_unit.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/opcode_check.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/booth_enc.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/csa.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/pp_gen.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_div.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_unit.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/irq_gateway.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/irq_arbiter.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/csr_regfile.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/wb_trap_mret_commit_controller.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/hazard_unit.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/imem_controller.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ls_unit.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/fetch_cycle.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/decode_cycle.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/execute_cycle.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/memory_cycle.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/writeback_cycle.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/top.v
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/hybrid_mem_interface.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/bootloader/bootloader.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/reg_intf.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/apb_to_reg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/prim_subreg.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/prim_subreg_ext.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/prim_subreg_arb.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_input_stage_no_clk_gates.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_reg_top.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_apb_wrap.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/riscforge_soc_subsystem.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/uart_pin_vip.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/gpio_pin_vip.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/i2c_eeprom_at24c02.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/spi_flash_s25fs512s.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/rf_monitor_if.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/rf_monitors.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/rf_monitor_env.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/rf_mon_probe.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/fetch_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/retire_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/lsu_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/axi_lite_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/apb_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/irq_monitor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/axi_lite_protocol_sva.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/apb_protocol_sva.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/mmio_path_scoreboard.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/register_predictor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/irq_predictor.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/failure_reporter.sv
+		/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/soc_tb_top.sv
+	-top soc_tb_top
+	-elaborate
+	-xmlibdirname /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/results/work/xcelium.d
+	-l /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/results/logs/elaborate_tool.log
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xmvlog: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/cf_math_pkg.sv
+	package worklib.cf_math_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/axi_pkg.sv
+	package worklib.axi_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/apb/apb_pkg.sv
+	package worklib.apb_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_reg_pkg.sv
+	package worklib.gpio_reg_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/tb_pkg.sv
+	package worklib.tb_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/addr_decode_dync.sv
+	module worklib.addr_decode_dync:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/addr_decode.sv
+	module worklib.addr_decode:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/fifo_v3.sv
+	module worklib.fifo_v3:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/fall_through_register.sv
+	module worklib.fall_through_register:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/spill_register.sv
+	module worklib.spill_register:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/spill_register_flushable.sv
+	module worklib.spill_register_flushable:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/counter.sv
+	module worklib.counter:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/rr_arb_tree.sv
+	module worklib.rr_arb_tree:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/lzc.sv
+	module worklib.lzc:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/onehot_to_bin.sv
+	module worklib.onehot_to_bin:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/delta_counter.sv
+	module worklib.delta_counter:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/id_queue.sv
+	module worklib.id_queue:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/sync.sv
+	module worklib.sync:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/common_cells/stream_register.sv
+	module worklib.stream_register:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_err_slv.sv
+	module worklib.axi_err_slv:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_atop_filter.sv
+	module worklib.axi_atop_filter:sv
+		errors: 0, warnings: 0
+	module worklib.axi_atop_filter_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_to_axi.sv
+	module worklib.axi_lite_to_axi:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_to_axi_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_demux.sv
+	module worklib.axi_lite_demux:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_demux_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv
+	module worklib.axi_lite_mux:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_mux_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/axi_lite_xbar.sv
+	module worklib.axi_lite_xbar:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_xbar_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_to_apb/axi_lite_to_apb.sv
+	module worklib.axi_lite_to_apb:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_to_apb_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/bus_monitors/apb_timeout_monitor.sv
+	module worklib.apb_timeout_monitor:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/bus_monitors/axi_lite_timeout_monitor.sv
+	module worklib.axi_lite_timeout_monitor:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/i2c_master_bit_ctrl.sv
+	module worklib.i2c_master_bit_ctrl:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/i2c_master_byte_ctrl.sv
+	module worklib.i2c_master_byte_ctrl:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/apb_i2c.sv
+	module worklib.apb_i2c:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_timer-master/rtl/timer.sv
+	module worklib.timer:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_timer-master/rtl/apb_timer.sv
+	module worklib.apb_timer:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_pkg.sv
+	package worklib.obi_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_pkg.sv
+	package worklib.obi_uart_pkg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/apb_to_obi.sv
+	module worklib.apb_to_obi:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart.sv
+	module worklib.obi_uart:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_baudgen.sv
+	module worklib.obi_uart_baudgen:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_interrupts.sv
+	module worklib.obi_uart_interrupts:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_modem.sv
+	module worklib.obi_uart_modem:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_register.sv
+	module worklib.obi_uart_register:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_rx.sv
+	module worklib.obi_uart_rx:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/obi/obi_uart_tx.sv
+	module worklib.obi_uart_tx:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/rtl/apb_uart_wrap.sv
+	module worklib.apb_uart_wrap:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/rtl/apb_uart.sv
+	module worklib.apb_uart:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_clkgen.sv
+	module worklib.spi_master_clkgen:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_fifo.sv
+	module worklib.spi_master_fifo:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_rx.sv
+	module worklib.spi_master_rx:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_tx.sv
+	module worklib.spi_master_tx:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_controller.sv
+	module worklib.spi_master_controller:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_apb_if.sv
+`define REG_STATUS 4'b0000 // BASEREG + 0x00
+                                            |
+xmvlog: *W,MACRDF (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/spi_master_apb_if.sv,13|44): text macro 'REG_STATUS' redefined - replaced with new definition, Previous definition was found here ('/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_i2c-master/apb_i2c.sv',6|18 ).
+	module worklib.spi_master_apb_if:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master/apb_spi_master.sv
+	module worklib.apb_spi_master:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/sram_sp.sv
+	module worklib.sram_sp:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/sram_mux.sv
+	module worklib.sram_mux:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/axi_lite_sram_if.sv
+	module worklib.axi_lite_sram_if:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/instr_module/Instruction_Memory.v
+	module worklib.Instruction_Memory_new:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/imem_sram_wrapper.sv
+	module worklib.imem_sram_wrapper:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/boot_rom.sv
+	module worklib.boot_rom:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/instr_fetch_demux.sv
+	module worklib.instr_fetch_demux:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/PC.v
+	module worklib.PC:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/PC_Adder.v
+	module worklib.PC_Adder:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Mux2.v
+	module worklib.Mux2:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Mux_3_by_1.v
+	module worklib.Mux_3_by_1:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ALU.v
+	module worklib.ALU:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ALU_Decoder.v
+	module worklib.ALU_Decoder:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Main_Decoder.v
+	module worklib.Main_Decoder:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Control_Unit_Top.v
+	module worklib.Control_Unit_Top:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Sign_Extend.v
+	module worklib.Sign_Extend:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/Register_File.v
+	module worklib.Register_File:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/JB_unit.v
+	module worklib.JB_unit:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/opcode_check.v
+	module worklib.opcode_check:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/booth_enc.v
+	module worklib.booth_enc:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/csa.v
+	module worklib.csa:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/pp_gen.v
+	module worklib.pp_gen:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v
+	module worklib.rv32m_mul:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_div.v
+	module worklib.rv32m_div:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_unit.v
+	module worklib.rv32m_unit:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/irq_gateway.v
+	module worklib.irq_gateway:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/irq_arbiter.v
+	module worklib.irq_arbiter:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/csr_regfile.v
+	module worklib.csr_regfile:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/wb_trap_mret_commit_controller.v
+	module worklib.wb_trap_mret_commit_controller:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/hazard_unit.v
+	module worklib.hazard_unit:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/imem_controller.v
+	module worklib.imem_controller:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ls_unit.v
+	module worklib.ls_unit:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/fetch_cycle.v
+	module worklib.fetch_cycle:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/decode_cycle.v
+	module worklib.decode_cycle:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/execute_cycle.v
+	module worklib.execute_cycle:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/memory_cycle.v
+	module worklib.memory_cycle:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/writeback_cycle.v
+	module worklib.writeback_cycle:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/top.v
+	module worklib.top:v
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/hybrid_mem_interface.sv
+	module worklib.hybrid_mem_interface:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/bootloader/bootloader.sv
+	module worklib.bootloader:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/reg_intf.sv
+	interface worklib.REG_BUS:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/apb_to_reg.sv
+	module worklib.apb_to_reg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/prim_subreg.sv
+	module worklib.prim_subreg:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/prim_subreg_ext.sv
+	module worklib.prim_subreg_ext:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/register_interface/prim_subreg_arb.sv
+	module worklib.prim_subreg_arb:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_input_stage_no_clk_gates.sv
+	module worklib.gpio_input_stage:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_reg_top.sv
+	module worklib.gpio_reg_top:sv
+		errors: 0, warnings: 0
+	module worklib.gpio_reg_top_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio.sv
+	module worklib.gpio:sv
+		errors: 0, warnings: 0
+	module worklib.gpio_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/gpio-master/gpio_apb_wrap.sv
+	module worklib.gpio_apb_wrap:sv
+		errors: 0, warnings: 0
+	module worklib.gpio_apb_wrap_intf:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/RTL_SOC/riscforge_soc_subsystem.sv
+	module worklib.riscforge_soc_subsystem:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/uart_pin_vip.sv
+	module worklib.uart_pin_vip:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/gpio_pin_vip.sv
+	module worklib.gpio_pin_vip:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/i2c_eeprom_at24c02.sv
+	module worklib.i2c_eeprom_at24c02:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/spi_flash_s25fs512s.sv
+	module worklib.spi_flash_s25fs512s:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/rf_monitor_if.sv
+	interface worklib.rf_timebase_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_fetch_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_retire_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_lsu_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_axil_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_apb_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_irq_if:sv
+		errors: 0, warnings: 0
+	interface worklib.rf_pin_if:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/rf_monitors.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/rf_monitor_env.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/rf_mon_probe.sv
+	module worklib.fetch_monitor:sv
+		errors: 0, warnings: 0
+	module worklib.retire_monitor:sv
+		errors: 0, warnings: 0
+	module worklib.lsu_monitor:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_monitor:sv
+		errors: 0, warnings: 0
+	module worklib.apb_monitor:sv
+		errors: 0, warnings: 0
+	module worklib.irq_monitor:sv
+		errors: 0, warnings: 0
+	module worklib.rf_mon_probe:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/fetch_monitor.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/retire_monitor.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/lsu_monitor.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/axi_lite_monitor.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/apb_monitor.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/irq_monitor.sv
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/axi_lite_protocol_sva.sv
+	module worklib.axi_lite_protocol_sva:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/apb_protocol_sva.sv
+	module worklib.apb_protocol_sva:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/mmio_path_scoreboard.sv
+          int exp_slot = get_expected_apb_slot(paddr);
+                       |
+xmvlog: *W,VARIST (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/mmio_path_scoreboard.sv,46|23): Local static variable with initializer requires 'static' keyword.
+	module worklib.mmio_path_scoreboard:sv
+		errors: 0, warnings: 1
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/register_predictor.sv
+	module worklib.register_predictor:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/irq_predictor.sv
+	module worklib.irq_predictor:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers/failure_reporter.sv
+	module worklib.failure_reporter:sv
+		errors: 0, warnings: 0
+file: /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/soc_tb_top.sv
+	module worklib.soc_tb_top:sv
+		errors: 0, warnings: 0
+xmvlog: *W,SPDUSD: Include directory /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/common_cells given but not used.
+xmvlog: *W,SPDUSD: Include directory /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/apb_uart-main/include/axi given but not used.
+xmvlog: *W,SPDUSD: Include directory /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/spi_master_ip/spi_master given but not used.
+xmvlog: *W,SPDUSD: Include directory /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb given but not used.
+xmvlog: *W,SPDUSD: Include directory /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/checkers given but not used.
+xmvlog: *W,SPDUSD: Include directory /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip given but not used.
+	Total errors/warnings found outside modules and primitives:
+		errors: 0, warnings: 8
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xrun: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xmelab: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+    ) Fetch (
+          |
+xmelab: *W,CUVWSP (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/top.v,295|10): 1 output port was not connected:
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/fetch_cycle.v,83): imem_stall
+
+    ALU alu_inst (
+               |
+xmelab: *W,CUVWSP (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/execute_cycle.v,258|15): 1 output port was not connected:
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/ALU.v,25): Zero
+
+    csr_regfile #(.XLEN(32)) csr_file (
+                                    |
+xmelab: *W,CUVWSP (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/top.v,551|36): 1 output port was not connected:
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/csr_regfile.v,11): csr_valid_o
+
+  fetch_monitor u_fetch_mon (
+                          |
+xmelab: *W,CUVWSI (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/soc_tb_top.sv,194|26): 3 input ports were not connected:
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/fetch_monitor.sv,21): exc_valid_f
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/fetch_monitor.sv,22): exc_cause_f
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/fetch_monitor.sv,23): exc_tval_f
+
+  lsu_monitor u_lsu_mon (
+                      |
+xmelab: *W,CUVWSI (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/tb/soc_tb_top.sv,225|22): 1 input port was not connected:
+xmelab: (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/monitors/lsu_monitor.sv,25): lsunit_m
+
+	Top level design units:
+		tb_pkg
+		$unit_0x3d5180bc
+		gpio_reg_pkg
+		axi_pkg
+		cf_math_pkg
+		apb_pkg
+		obi_pkg
+		obi_uart_pkg
+		soc_tb_top
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[16]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[15]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[14]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[13]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[12]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[11]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[10]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[9]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[8]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[7]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[6]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[5]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[4]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[3]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[2]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[1]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul.gen_booth[0]) .
+    csa u_l1_0(.a(l0[0]), .b(l0[1]),  .c(l0[2]),  .s(l1s0), .co(l1c0));
+                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,174|67): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l1_1(.a(l0[3]), .b(l0[4]),  .c(l0[5]),  .s(l1s1), .co(l1c1));
+                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,175|67): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l1_2(.a(l0[6]), .b(l0[7]),  .c(l0[8]),  .s(l1s2), .co(l1c2));
+                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,176|67): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l1_3(.a(l0[9]), .b(l0[10]), .c(l0[11]), .s(l1s3), .co(l1c3));
+                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,177|67): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l1_4(.a(l0[12]),.b(l0[13]), .c(l0[14]), .s(l1s4), .co(l1c4));
+                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,178|67): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l1_5(.a(l0[15]),.b(l0[16]), .c(l0[17]), .s(l1s5), .co(l1c5));
+                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,179|67): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l2_0(.a(l1s0),        .b(l1s1),        .c({l1c0[64:0],1'b0}), .s(l2s0), .co(l2c0));
+                                                                                         |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,186|89): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l2_1(.a(l1s2),        .b(l1s3),        .c({l1c1[64:0],1'b0}), .s(l2s1), .co(l2c1));
+                                                                                         |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,187|89): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l2_2(.a(l1s4),        .b(l1s5),        .c({l1c2[64:0],1'b0}), .s(l2s2), .co(l2c2));
+                                                                                         |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,188|89): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l2_3(.a({l1c3[64:0],1'b0}),.b({l1c4[64:0],1'b0}),.c({l1c5[64:0],1'b0}), .s(l2s3), .co(l2c3));
+                                                                                                   |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,189|99): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l3_0(.a(l2s0), .b(l2s1), .c({l2c0[64:0],1'b0}), .s(l3s0), .co(l3c0));
+                                                                           |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,195|75): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l3_1(.a(l2s2), .b(l2s3), .c({l2c1[64:0],1'b0}), .s(l3s1), .co(l3c1));
+                                                                           |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,196|75): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l4_0(.a(l3s0), .b(l3s1), .c({l3c0[64:0],1'b0}), .s(l4s0), .co(l4c0));
+                                                                           |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,204|75): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l4_1(.a({l3c1[64:0],1'b0}), .b(l2c2_sh), .c(l2c3_sh), .s(l4s1), .co(l4c1));
+                                                                                 |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,205|81): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l5_0(.a(l4s0), .b(l4s1), .c({l4c0[64:0],1'b0}), .s(l5s0), .co(l5c0));
+                                                                           |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,211|75): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+    csa u_l6(.a(l5s0), .b({l5c0[64:0],1'b0}), .c(l4c1_sh), .s(final_sum), .co(final_cout));
+                                                                                       |
+xmelab: *W,CUVMPW (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/riscv_core/rtl/rv32m_mul.v,218|87): port sizes differ in port connection(65/66) for the instance(soc_tb_top.dut.i_riscv_core.Execute.m_unit.u_mul) .
+      NoPorts:  assert (NoMstPorts > 0) else $fatal("Number of master ports must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_demux.sv,475|95): String literal argument supplied to integer parameter.
+      MaxTnx:   assert (MaxTrans   > 0) else $fatal("Number of transactions must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_demux.sv,476|95): String literal argument supplied to integer parameter.
+      NoPorts:  assert (NoMstPorts > 0) else $fatal("Number of master ports must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_demux.sv,475|95): String literal argument supplied to integer parameter.
+      MaxTnx:   assert (MaxTrans   > 0) else $fatal("Number of transactions must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_demux.sv,476|95): String literal argument supplied to integer parameter.
+      NoPorts:  assert (NoSlvPorts > 0) else $fatal("Number of slave ports must be at least 1!");
+                                                                                              |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv,448|94): String literal argument supplied to integer parameter.
+      MaxTnx:   assert (MaxTrans   > 0) else $fatal("Number of transactions must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv,449|95): String literal argument supplied to integer parameter.
+      NoPorts:  assert (NoSlvPorts > 0) else $fatal("Number of slave ports must be at least 1!");
+                                                                                              |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv,448|94): String literal argument supplied to integer parameter.
+      MaxTnx:   assert (MaxTrans   > 0) else $fatal("Number of transactions must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv,449|95): String literal argument supplied to integer parameter.
+      NoPorts:  assert (NoSlvPorts > 0) else $fatal("Number of slave ports must be at least 1!");
+                                                                                              |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv,448|94): String literal argument supplied to integer parameter.
+      MaxTnx:   assert (MaxTrans   > 0) else $fatal("Number of transactions must be at least 1!");
+                                                                                               |
+xmelab: *W,STRINT (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/axi_lite_xbar/include/axi/axi_lite_mux.sv,449|95): String literal argument supplied to integer parameter.
+	Building instance overlay tables: 
+                        addr <= {shift_in[22:0], si};
+                                        |
+xmelab: *W,BNDWRN (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/spi_flash_s25fs512s.sv,107|40): Bit-select or part-select index out of declared bounds.
+                        shift_out <= flash_mem[{shift_in[22:0], si} % MEM_SIZE_BYTES];
+                                                       |
+xmelab: *W,BNDWRN (/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_04_exec01/snapshot/Verification/infrastructure/vip/spi_flash_s25fs512s.sv,110|55): Bit-select or part-select index out of declared bounds.
+.................... Done
+	Generating native compiled code:
+SOFTINCLUDE $FOUNDRY/cds.lib
+|
+xmvlog_cg: *W,DLCVAR (/home/install/IC618/share/cdssetup/cds.lib,5): cds.lib Invalid environment variable ''.
+		worklib.axi_lite_protocol_sva:sv <0x31231ea3>
+			streams:  25, words: 21152
+		worklib.irq_predictor:sv <0x0186eff7>
+			streams:  15, words: 11528
+		worklib.register_predictor:sv <0x2bf2cf8f>
+			streams:  29, words: 17663
+		worklib.mmio_path_scoreboard:sv <0x14644e78>
+			streams:   3, words:  3031
+		worklib.irq_monitor:sv <0x4a83d436>
+			streams:  14, words: 24180
+		worklib.fetch_monitor:sv <0x018f598f>
+			streams:   9, words: 10861
+		worklib.i2c_eeprom_at24c02:sv <0x22093a7a>
+			streams:  19, words: 10295
+		worklib.uart_pin_vip:sv <0x4ccb679a>
+			streams:   4, words:  3054
+		worklib.axi_lite_timeout_monitor:sv <0x2a3997df>
+			streams:  42, words: 33239
+		worklib.hybrid_mem_interface:sv <0x7009d157>
+			streams:  29, words: 18549
+		worklib.hazard_unit:v <0x2e524c4c>
+			streams:  12, words:  5103
+		worklib.wb_trap_mret_commit_controller:v <0x3effc933>
+			streams:  17, words:  5215
+		worklib.writeback_cycle:v <0x5c144aa2>
+			streams:   1, words:   553
+		worklib.ls_unit:v <0x39593ed7>
+			streams:   8, words:  7824
+		worklib.memory_cycle:v <0x316f7254>
+			streams:  14, words: 13586
+		worklib.rv32m_div:v <0x4e7b8202>
+			streams:  23, words: 10688
+		worklib.csa:v <0x0477f2da>
+			streams:   1, words:  2182
+		worklib.csa:v <0x641af3c7>
+			streams:   1, words:  2182
+		worklib.csa:v <0x3992c6b9>
+			streams:   1, words:  3358
+		worklib.csa:v <0x59ffc7a4>
+			streams:   1, words:  2183
+		worklib.csa:v <0x42a5c7be>
+			streams:   1, words:  1613
+		worklib.pp_gen:v <0x4cc5c3ea>
+			streams:   4, words:  2285
+		worklib.booth_enc:v <0x5ef818be>
+			streams:   0, words:     0
+		worklib.rv32m_unit:v <0x17803297>
+			streams:  11, words:  2901
+		worklib.JB_unit:v <0x172bc8ca>
+			streams:   6, words:  1713
+		worklib.ALU:v <0x4f4eaa0c>
+			streams:   7, words:  2410
+		worklib.Mux2:v <0x3f981462>
+			streams:   1, words:   248
+		worklib.Mux_3_by_1:v <0x76b002a9>
+			streams:   2, words:   513
+		worklib.execute_cycle:v <0x060b65e5>
+			streams:  28, words: 24634
+		worklib.Sign_Extend:v <0x2fa2a26e>
+			streams:   1, words:  2090
+		worklib.Register_File:v <0x7e48f218>
+			streams:   6, words:  3125
+		worklib.ALU_Decoder:v <0x44563dd0>
+			streams:   1, words:  3374
+		worklib.opcode_check:v <0x74b18728>
+			streams:   1, words:  1099
+		worklib.Main_Decoder:v <0x399275f3>
+			streams:   1, words:  5637
+		worklib.Control_Unit_Top:v <0x491ce667>
+			streams:   3, words:  1982
+		worklib.decode_cycle:v <0x024839be>
+			streams:  14, words: 29600
+		worklib.imem_controller:v <0x498eac6e>
+			streams:   5, words:  1626
+		worklib.PC_Adder:v <0x79968c56>
+			streams:   1, words:   176
+		worklib.PC:v <0x58445345>
+			streams:   2, words:   503
+		worklib.irq_arbiter:v <0x2b8bb5b9>
+			streams:  21, words:  7647
+		worklib.spi_master_rx:sv <0x05b03ce8>
+			streams:   9, words:  6678
+		worklib.spi_master_tx:sv <0x56e17655>
+			streams:  10, words:  7288
+		worklib.spi_master_clkgen:sv <0x03b337f8>
+			streams:   6, words:  3171
+		worklib.spi_master_controller:sv <0x58155f84>
+			streams:  38, words: 48076
+		worklib.spi_master_fifo:sv <0x6e3d9a51>
+			streams:  10, words:  5091
+		worklib.spi_master_apb_if:sv <0x422e4e76>
+			streams:  24, words: 18876
+		worklib.apb_spi_master:sv <0x62404554>
+			streams:  92, words: 29878
+		worklib.gpio_input_stage:sv <0x137f786b>
+			streams:   5, words:  1546
+		worklib.prim_subreg_arb:sv <0x1c14d873>
+			streams:   2, words:   677
+		worklib.prim_subreg:sv <0x377908f3>
+			streams:   8, words:  2099
+		worklib.prim_subreg_ext:sv <0x479a74ee>
+			streams:   4, words:   706
+		worklib.prim_subreg_ext:sv <0x4cce19ae>
+			streams:   4, words:   618
+		worklib.prim_subreg_ext:sv <0x4083b3a3>
+			streams:   4, words:   536
+		worklib.prim_subreg_arb:sv <0x6181e68f>
+			streams:   3, words:   665
+		worklib.prim_subreg:sv <0x35ba8947>
+			streams:   8, words:  2045
+		worklib.prim_subreg_arb:sv <0x5d677e52>
+			streams:   3, words:   686
+		worklib.prim_subreg:sv <0x0fd3e20a>
+			streams:   8, words:  2099
+		worklib.prim_subreg_ext:sv <0x79a2c57a>
+			streams:   4, words:   586
+		worklib.gpio_reg_top:sv <0x02f0ce85>
+			streams: 2087, words: 1069401
+		worklib.apb_to_reg:sv <0x41613cfb>
+			streams:   1, words:  1802
+		worklib.gpio_apb_wrap:sv <0x52ac8d2d>
+			streams:  14, words:  6049
+		worklib.obi_uart_interrupts:sv <0x51912984>
+			streams:   5, words:  5769
+		worklib.obi_uart_tx:sv <0x2007c3cf>
+			streams:  18, words: 15310
+		worklib.delta_counter:sv <0x6f1422bd>
+			streams:   4, words:  1593
+		worklib.counter:sv <0x533cfeef>
+			streams:   3, words:   900
+		worklib.obi_uart_rx:sv <0x6e14cd77>
+			streams:  37, words: 32635
+		worklib.delta_counter:sv <0x2c989ed2>
+			streams:   4, words:  1593
+		worklib.counter:sv <0x52505442>
+			streams:   3, words:   991
+		worklib.delta_counter:sv <0x62ec01a1>
+			streams:   4, words:  1644
+		worklib.counter:sv <0x1b8a0c1a>
+			streams:   3, words:   914
+		worklib.obi_uart_baudgen:sv <0x69eb135f>
+			streams:  20, words:  6380
+		worklib.sync:sv <0x02467728>
+			streams:   3, words:   681
+		worklib.obi_uart_modem:sv <0x327c3923>
+			streams:  19, words:  8450
+		worklib.obi_uart_register:sv <0x7575d154>
+			streams:  21, words: 31632
+		worklib.apb_to_obi:sv <0x40992edb>
+			streams:  17, words: 19570
+		worklib.timer:sv <0x4a76294f>
+			streams:  10, words:  6284
+		worklib.i2c_master_bit_ctrl:sv <0x55a74306>
+			streams:  36, words: 22803
+		worklib.i2c_master_byte_ctrl:sv <0x4652c3cf>
+			streams:  31, words: 20008
+		worklib.apb_i2c:sv <0x3d033804>
+			streams:  35, words: 12746
+		worklib.apb_timeout_monitor:sv <0x6239daa0>
+			streams:  11, words:  4448
+		worklib.apb_timeout_monitor:sv <0x05cb2a6c>
+			streams:  11, words:  4430
+		worklib.addr_decode_dync:sv <0x3dfb835e>
+			streams:   4, words: 16815
+		worklib.fifo_v3:sv <0x16d92464>
+			streams:  20, words: 18934
+		worklib.fifo_v3:sv <0x27667842>
+			streams:  20, words: 17472
+		worklib.fifo_v3:sv <0x34840a1c>
+			streams:  20, words: 18972
+		worklib.spill_register_flushable:sv <0x313bc136>
+			streams:   3, words:   680
+		worklib.spill_register_flushable:sv <0x6e6bc8a3>
+			streams:  23, words: 10946
+		worklib.fifo_v3:sv <0x6acc6223>
+			streams:  20, words: 16856
+		worklib.spill_register_flushable:sv <0x4a26a1a5>
+			streams:   3, words:   548
+		worklib.spill_register_flushable:sv <0x7445ca65>
+			streams:   3, words:   680
+		worklib.fifo_v3:sv <0x00cb4111>
+			streams:  20, words: 16856
+		worklib.spill_register_flushable:sv <0x0dd9d525>
+			streams:  23, words: 10946
+		worklib.fifo_v3:sv <0x6aa0504b>
+			streams:  20, words: 16856
+		worklib.delta_counter:sv <0x79e97b8d>
+			streams:   4, words:  1641
+		worklib.counter:sv <0x29415c6d>
+			streams:   3, words:   911
+		worklib.fifo_v3:sv <0x284e55ae>
+			streams:  20, words: 16958
+		worklib.fifo_v3:sv <0x78275fb0>
+			streams:  20, words: 16856
+		worklib.fifo_v3:sv <0x10838c18>
+			streams:  20, words: 17450
+		worklib.axi_lite_to_axi:sv <0x384142ae>
+			streams:   3, words:  4433
+		worklib.spill_register_flushable:sv <0x49b3b99d>
+			streams:   3, words:   680
+		worklib.fifo_v3:sv <0x4ce28ac6>
+			streams:  20, words: 16927
+		worklib.spill_register_flushable:sv <0x638fd773>
+			streams:  23, words: 10946
+		worklib.spill_register_flushable:sv <0x2ec08945>
+			streams:   3, words:   548
+		worklib.fifo_v3:sv <0x5caf617c>
+			streams:  20, words: 16927
+		worklib.spill_register_flushable:sv <0x5a981ddb>
+			streams:   3, words:   680
+		worklib.fifo_v3:sv <0x7bf4ff1f>
+			streams:  20, words: 16927
+		worklib.spill_register_flushable:sv <0x3d9b537a>
+			streams:  23, words: 10946
+		worklib.addr_decode_dync:sv <0x1d21aac3>
+			streams:   4, words: 16542
+		worklib.addr_decode_dync:sv <0x727a9203>
+			streams:   4, words: 16542
+		worklib.axi_lite_sram_if:sv <0x77568cac>
+			streams:  15, words: 17183
+		worklib.imem_sram_wrapper:sv <0x3430e967>
+			streams:   2, words:   554
+		worklib.sram_mux:sv <0x7da790b2>
+			streams:   7, words:  4422
+		worklib.axi_lite_sram_if:sv <0x3d0c02c1>
+			streams:  15, words: 17278
+		worklib.instr_fetch_demux:sv <0x386c9a16>
+			streams:   8, words:  2879
+		worklib.boot_rom:sv <0x2b5e67fc>
+			streams:   4, words:  1398
+		worklib.rr_arb_tree:sv <0x65402102>
+			streams:  76, words: 56473
+		worklib.addr_decode:sv <0x23f354da>
+			streams:   7, words:  2480
+		worklib.obi_uart:sv <0x6b6621dd>
+			streams:  29, words: 10745
+		worklib.apb_uart_wrap:sv <0x380f9636>
+			streams:  12, words:  5262
+		worklib.apb_uart:sv <0x562455ee>
+			streams:  10, words:  4526
+		worklib.obi_pkg:sv <0x5aca016d>
+			streams:   3, words:  3628
+		worklib.obi_uart_pkg:sv <0x409a54b6>
+			streams:   0, words:     0
+		worklib.fifo_v3:sv <0x5cd6a72e>
+			streams:  20, words: 17789
+		worklib.fifo_v3:sv <0x1ed8869a>
+			streams:  20, words: 17615
+		worklib.gpio:sv <0x0d5a5dae>
+			streams:  31, words: 43243
+		worklib.gpio_intf:sv <0x693517b3>
+			streams:   9, words:  4875
+		worklib.addr_decode:sv <0x1f722169>
+			streams:   7, words:  2483
+		worklib.addr_decode:sv <0x314b11da>
+			streams:   7, words:  2483
+		worklib.axi_err_slv:sv <0x659657f8>
+			streams:  43, words: 25077
+		worklib.fall_through_register:sv <0x697cb03f>
+			streams:   8, words:  2579
+		worklib.fall_through_register:sv <0x78f37cb2>
+			streams:   8, words:  2426
+		worklib.fall_through_register:sv <0x1e355e85>
+			streams:   8, words:  2628
+		worklib.axi_lite_to_apb:sv <0x0bc787a4>
+			streams:  39, words: 28050
+		worklib.apb_timer:sv <0x3a42e2be>
+			streams:  13, words:  7203
+		worklib.irq_gateway:v <0x29e34bc0>
+			streams:   8, words:  3257
+		worklib.rv32m_mul:v <0x0bb755fa>
+			streams:  61, words: 30052
+		worklib.gpio_pin_vip:sv <0x70f68b63>
+			streams:   5, words:  3345
+		worklib.apb_protocol_sva:sv <0x39cfbd69>
+			streams:  15, words: 12059
+		worklib.soc_tb_top:sv <0x4c19ec34>
+			streams: 125, words: 93789
+		worklib.top:v <0x4f7b5469>
+			streams:  12, words:  2345
+		worklib.fetch_cycle:v <0x32ada1f6>
+			streams:  14, words:  9091
+		worklib.spill_register:sv <0x534342b7>
+			streams:   5, words:  1963
+		worklib.spill_register:sv <0x002c0ae2>
+			streams:   5, words:  1963
+		worklib.spill_register:sv <0x5cc10197>
+			streams:   5, words:  1761
+		worklib.spill_register:sv <0x40cddd93>
+			streams:   5, words:  1963
+		worklib.spill_register:sv <0x7482d33c>
+			streams:   5, words:  1963
+		worklib.axi_lite_demux:sv <0x46b9948c>
+			streams: 101, words: 62476
+		worklib.rr_arb_tree:sv <0x11e0d6a6>
+			streams:  76, words: 56471
+		worklib.spill_register:sv <0x1a6b978b>
+			streams:   5, words:  1963
+		worklib.spill_register:sv <0x0aa8d358>
+			streams:   5, words:  1963
+		worklib.spill_register:sv <0x43165651>
+			streams:   5, words:  1761
+		worklib.rr_arb_tree:sv <0x2b551906>
+			streams:  76, words: 56471
+		worklib.spill_register:sv <0x58eeb213>
+			streams:   5, words:  1963
+		worklib.spill_register:sv <0x3145d616>
+			streams:   5, words:  1963
+		worklib.axi_lite_mux:sv <0x317fdf50>
+			streams:  86, words: 40255
+		worklib.axi_lite_xbar:sv <0x5641319c>
+			streams:  51, words: 43302
+		worklib.lzc:sv <0x6726369f>
+			streams:   7, words:  3131
+		worklib.lzc:sv <0x39719670>
+			streams:   7, words:  3049
+		worklib.cf_math_pkg:sv <0x705766a9>
+			streams:   3, words:  2840
+		worklib.sram_sp:sv <0x716dd2b6>
+			streams:   3, words:  2335
+		worklib.axi_lite_monitor:sv <0x1a8fe9fa>
+			streams:  21, words: 32541
+		worklib.lsu_monitor:sv <0x7b88248e>
+			streams:   9, words: 14101
+		worklib.retire_monitor:sv <0x1e32de7a>
+			streams:  11, words: 15808
+		worklib.apb_monitor:sv <0x479e5238>
+			streams:  13, words: 17994
+		worklib.failure_reporter:sv <0x46ddd5f4>
+			streams:   2, words: 15042
+		worklib.bootloader:sv <0x471bbbdb>
+			streams:  38, words: 37952
+		worklib.riscforge_soc_subsystem:sv <0x0fd49296>
+			streams: 243, words: 79174
+		worklib.axi_pkg:sv <0x26d55777>
+			streams:  20, words: 16663
+		worklib.Instruction_Memory_new:v <0x5a1e292b>
+			streams:   9, words:  4907
+		worklib.spi_flash_s25fs512s:sv <0x17176f13>
+			streams:  15, words:  8970
+		worklib.csr_regfile:v <0x1b72a327>
+			streams:  41, words: 23791
+		worklib.rf_pin_if:sv <0x27baad22>
+			streams: 417, words: 345250
+		worklib.tb_pkg:sv <0x63cd1bb0>
+			streams: 176, words: 155993
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                        Instances  Unique
+		Modules:                    1,218     108
+		Interfaces:                     9       9
+		Verilog packages:               7       7
+		Primitives:                     2       1
+		Resolved nets:                  4       1
+		Registers:                  9,657   4,030
+		Scalar wires:              10,962       -
+		Expanded wires:             1,570      24
+		Vectored wires:             1,838       -
+		Named events:                 155      32
+		Always blocks:              1,936     372
+		Initial blocks:               272      86
+		Final blocks:                   5       1
+		Clocking blocks:                8       8
+		Clocking items:               152     152
+		Parallel blocks:                2       2
+		Cont. assignments:          3,496   1,818
+		Pseudo assignments:         4,516       -
+		Assertions:                   426      70
+		Compilation units:              1       1
+		SV Class declarations:         18      18
+		SV Class specializations:      23      23
+		Process Clocks:             1,166      42
+		Simulation timescale:         1ps
+	Writing initial simulation snapshot: worklib.soc_tb_top:sv
+TOOL:	xrun(64)	24.09-s001: Exiting on Oct 18, 2026 at 17:49:21 IST  (total: 00:00:03)

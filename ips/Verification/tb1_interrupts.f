@@ -50,6 +50,8 @@
 // =============================================================================
 // Section 4: CSR, Trap, and Hazard Controllers
 // =============================================================================
+../riscv_core/rtl/irq_gateway.v
+../riscv_core/rtl/irq_arbiter.v
 ../riscv_core/rtl/csr_regfile.v
 ../riscv_core/rtl/wb_trap_mret_commit_controller.v
 ../riscv_core/rtl/hazard_unit.v

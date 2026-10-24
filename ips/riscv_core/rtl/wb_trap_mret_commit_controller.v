@@ -11,18 +11,15 @@
 //    - Drive IF-stage redirect (wb_trap_redirect + trap_target)
 //    - Request pipeline flush (flush_pipeline_onehot) to empty younger stages
 //    - Drive CSR regfile trap inputs for trap entry CSR updates
+//    - Generate clear strobe to irq_gateway and commit feedback to irq_arbiter
 //    - Provide commit-qualified mret pulse for CSR regfile mstatus restore
-//
-// Notes:
-//  - This module is purely combinational.
-//  - Interrupts are not handled here yet; trap_is_interrupt is hardwired to 0.
-//
 //////////////////////////////////////////////////////////////////////////////////
 
 module wb_trap_mret_commit_controller (
     input  wire        valid_W,
     input  wire        exc_valid_W,
     input  wire [5:0]  exc_cause_W,
+    input  wire [1:0]  exc_class_W,
     input  wire [31:0] exc_tval_W,
     input  wire [31:0] exc_pc_W,
 
@@ -39,10 +36,15 @@ module wb_trap_mret_commit_controller (
     // CSR regfile trap-entry interface (PORT A)
     output wire        trap_valid_o,
     output wire [30:0] trap_cause_o,
+    output wire [1:0]  trap_class_o,
     output wire [31:0] trap_pc_o,
     output wire [31:0] trap_addr_o,
     output wire        trap_addr_valid_o,
     output wire        trap_is_interrupt_o,
+
+    // Clear strobe to irq_gateway & feedback to irq_arbiter
+    output wire [5:0]  clear_gateway_o,
+    output wire        wb_commit_irq_o,
 
     // CSR regfile PORT C: MRET write interface
     output wire        csr_write_en_mret_o,
@@ -68,9 +70,30 @@ module wb_trap_mret_commit_controller (
     assign trap_valid_o        = trap_commit;
     assign trap_is_interrupt_o = exc_cause_W[5] & exc_valid_W;
     assign trap_cause_o        = {25'b0, exc_cause_W[4:0]};
+    assign trap_class_o        = exc_class_W;
     assign trap_pc_o           = exc_pc_W;
     assign trap_addr_o         = exc_tval_W;
     assign trap_addr_valid_o   = trap_commit & ~exc_cause_W[5]; // mtval only valid for exceptions (bit[5]==0)
+
+    assign wb_commit_irq_o     = trap_commit & trap_is_interrupt_o;
+
+    // Gateway clear strobe generation (one-hot pulse on trap commit of corresponding IRQ)
+    reg [5:0] clear_gateway_r;
+    always @(*) begin
+        clear_gateway_r = 6'b000000;
+        if (trap_commit && trap_is_interrupt_o) begin
+            case (exc_cause_W[4:0])
+                5'd27: clear_gateway_r[5] = 1'b1; // Watchdog
+                5'd7:  clear_gateway_r[4] = 1'b1; // Timer0
+                5'd19: clear_gateway_r[3] = 1'b1; // UART
+                5'd18: clear_gateway_r[2] = 1'b1; // SPI
+                5'd17: clear_gateway_r[1] = 1'b1; // I2C
+                5'd16: clear_gateway_r[0] = 1'b1; // GPIO
+                default: clear_gateway_r = 6'b000000;
+            endcase
+        end
+    end
+    assign clear_gateway_o = clear_gateway_r;
 
     // Trap target resolution:
     // - MRET: mepc
@@ -90,9 +113,9 @@ module wb_trap_mret_commit_controller (
     // PORT C: MRET CSR Write Interface
     // ====================================
     // On MRET commit: update mstatus fields
-    // - mstatus[3] (MIE)        ← mstatus[7] (MPIE)
-    // - mstatus[7] (MPIE)       ← 1
-    // - mstatus[12:11] (MPP)    ← 2'b11 (Machine mode for M-mode only core)
+    // - mstatus[3] (MIE)        <- mstatus[7] (MPIE)
+    // - mstatus[7] (MPIE)       <- 1
+    // - mstatus[12:11] (MPP)    <- 2'b11 (Machine mode for M-mode only core)
     // Preserve reserved bits [10:8] and other non-MSTATUS fields.
     wire [31:0] new_mstatus;
     assign new_mstatus = {

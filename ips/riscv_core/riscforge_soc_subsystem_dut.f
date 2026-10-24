@@ -53,6 +53,8 @@
 ../rv32m_mul.v
 ../rv32m_div.v
 ../rv32m_unit.v
+../irq_gateway.v
+../irq_arbiter.v
 ../csr_regfile.v
 ../wb_trap_mret_commit_controller.v
 ../hazard_unit.v

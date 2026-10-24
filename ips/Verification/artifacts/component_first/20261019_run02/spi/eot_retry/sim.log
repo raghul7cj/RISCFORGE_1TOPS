@@ -1,0 +1,92 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/spi_eot_retry/xsim_script.tcl
+# xsim {spi_eot_retry} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+================================================================
+  RISC-V SPI Instruction Injection — BFM Testbench
+  DUT: apb_spi_master  |  Path: SPI BFM -> RX FIFO -> APB
+================================================================
+
+--- TC1: Single Instruction Inject (NOP) ---
+  [EOT] after 320 cycles
+  FIFO elements=1  buffer[0]=0x00000013
+  [PASS]                          TC1: FIFO fill level  got=0x00000001  exp=0x00000001
+  [PASS]                     TC1: NOP readback via APB  got=0x00000013  exp=0x00000013
+  FIFO elements after read=0
+
+--- TC2: Sequential 4-Instruction Load ---
+  [EOT] after 320 cycles
+  [PASS]                         TC2[0]: addi x1,x0,5   got=0x00500093  exp=0x00500093
+  [EOT] after 320 cycles
+  [PASS]                         TC2[1]: addi x2,x0,10  got=0x00a00113  exp=0x00a00113
+  [EOT] after 320 cycles
+  [PASS]                         TC2[2]: add  x3,x1,x2  got=0x002081b3  exp=0x002081b3
+  [EOT] after 320 cycles
+  [PASS]                         TC2[3]: sw   x3,0(x0)  got=0x00302023  exp=0x00302023
+
+--- TC3: Burst Inject (4x32b, single 128-bit transaction) ---
+  [EOT] after 1280 cycles
+  FIFO elements=4 (expect 4)
+  [PASS]                       TC3: FIFO has 4 entries  got=0x00000004  exp=0x00000004
+  [PASS]                          TC3: Word[0] addi x1  got=0x00500093  exp=0x00500093
+  [PASS]                          TC3: Word[1] addi x2  got=0x00a00113  exp=0x00a00113
+  [PASS]                          TC3: Word[2] add  x3  got=0x002081b3  exp=0x002081b3
+  [PASS]                          TC3: Word[3] sw   x3  got=0x00302023  exp=0x00302023
+  FIFO elements after drain=0
+
+--- TC4: APB Transaction Validation ---
+  [EOT] after 320 cycles
+  REG_RXFIFO=0x020  PRDATA=0xfeedc0de  PREADY=0  PSLVERR=0
+  [PASS]                         TC4: PRDATA integrity  got=0xfeedc0de  exp=0xfeedc0de
+  [PASS]                          TC4: Controller IDLE  got=0x00000001  exp=0x00000001
+
+--- TC5: RX FIFO Overflow / Backpressure Stall ---
+  Sending 16 words into depth-10 FIFO — expect stall at word 10
+  [WARNING] RX FIFO OVERFLOW #1 at 69085000 — word 0xa000000a
+  FIFO pinned at 10 for 500 cycles — stall confirmed
+  FIFO elements at stall=10  overflow events=1
+  [PASS]               TC5: FIFO fills to BUFFER_DEPTH  got=0x0000000a  exp=0x0000000a
+  [PASS]                        TC5: SPI clock stalled  got=0x00000001  exp=0x00000001
+  Draining FIFO to release stall...
+  [PASS]                               TC5: drained[0]  got=0xa0000000  exp=0xa0000000
+  [PASS]                               TC5: drained[1]  got=0xa0000001  exp=0xa0000001
+  [PASS]                               TC5: drained[2]  got=0xa0000002  exp=0xa0000002
+  [PASS]                               TC5: drained[3]  got=0xa0000003  exp=0xa0000003
+  [PASS]                               TC5: drained[4]  got=0xa0000004  exp=0xa0000004
+  [PASS]                               TC5: drained[5]  got=0xa0000005  exp=0xa0000005
+  [PASS]                               TC5: drained[6]  got=0xa0000006  exp=0xa0000006
+  [PASS]                               TC5: drained[7]  got=0xa0000007  exp=0xa0000007
+  [PASS]                               TC5: drained[8]  got=0xa0000008  exp=0xa0000008
+  [PASS]                               TC5: drained[9]  got=0xa0000009  exp=0xa0000009
+  [EOT] after 1580 cycles
+  [FLUSH] residual[0]=0xa000000a (indeterminate post-kill)
+  [FLUSH] residual[1]=0x00000000 (indeterminate post-kill)
+  [FLUSH] residual[2]=0x00000000 (indeterminate post-kill)
+  [FLUSH] residual[3]=0x00000000 (indeterminate post-kill)
+  [FLUSH] residual[4]=0x00000000 (indeterminate post-kill)
+  [FLUSH] residual[5]=0x00000000 (indeterminate post-kill)
+  FIFO clear after flush (6 residual words drained)
+
+--- TC6: Empty FIFO PREADY Stall & Recovery Test ---
+  FIFO empty: elements=0. Initiating SPI transaction...
+  [APB BFM] Initiating early read. Bus should stall...
+  [OBSERVER] Checking bus... PREADY is currently: 0
+  [OBSERVER] SUCCESS: Read is stalled, wait-states are active.
+  [APB BFM] PREADY went high! Read completed with PRDATA=0x00000013
+  [EOT] after 0 cycles
+  [PASS]        TC6: PREADY Recovery Test (Data Match)  got=0x00000013  exp=0x00000013
+
+================================================================
+  Simulation complete
+================================================================
+
+TEST_PASS checks=26 eot_events=9
+$finish called at time : 90665 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/spi/eot_retry/spi_master_m_bfm_tb.sv" Line 491
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 04:47:02 2026...

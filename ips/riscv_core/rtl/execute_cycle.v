@@ -45,7 +45,9 @@ module execute_cycle (
     is_mret_E,
     irq_pending_i,
     irq_id_i,
+    irq_class_i,
     irq_flush_frontend_o,
+    div_abort_o,
     ResultW,
     ForwardA_E,
     ForwardB_E,
@@ -72,6 +74,7 @@ module execute_cycle (
     valid_M,
     exc_valid_M,
     exc_cause_M,
+    exc_class_M,
     exc_tval_M,
     exc_pc_M,
 
@@ -121,7 +124,9 @@ module execute_cycle (
     input is_mret_E;
     input irq_pending_i;
     input [30:0] irq_id_i;
+    input [1:0] irq_class_i;
     output irq_flush_frontend_o;
+    output div_abort_o;
 
     input [31:0] ResultW;
     input [1:0] ForwardA_E;
@@ -158,6 +163,7 @@ module execute_cycle (
     output valid_M;
     output exc_valid_M;
     output [5:0] exc_cause_M;
+    output [1:0] exc_class_M;
     output [31:0] exc_tval_M;
     output [31:0] exc_pc_M;
 
@@ -218,6 +224,7 @@ module execute_cycle (
     reg valid_M_r;
     reg exc_valid_r;
     reg [5:0] exc_cause_r;
+    reg [1:0] exc_class_r;
     reg [31:0] exc_tval_r;
     reg [31:0] exc_pc_r;
     reg is_mret_r;
@@ -287,11 +294,14 @@ module execute_cycle (
 
 
 
+    wire div_abort_internal = irq_accept_E & stallMUL;
+    assign div_abort_o = div_abort_internal;
+
     // M-extension transaction tracker and module instantiation
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             m_started <= 1'b0;
-        end else if (m_valid_out) begin
+        end else if (m_valid_out || div_abort_internal) begin
             m_started <= 1'b0;
         end else if (is_M_instruction_E && !m_started) begin
             m_started <= 1'b1;
@@ -307,6 +317,7 @@ module execute_cycle (
         .funct3(op_E),
         .rd_in(RD_E),
         .valid_in(start_M),
+        .abort_i(div_abort_internal),
         .stall(stallM_internal),
         .result(result_M),
         .rd_out(rd_me),
@@ -329,6 +340,9 @@ module execute_cycle (
                             ((csr_op_E == 2'b10 || csr_op_E == 2'b11) && (csr_rs1_uimm_E != 5'b0)) // CSRRS/CSRRC/CSRRSI/CSRRCI only writes if rs1/uimm != 0
                           );
 
+    wire [1:0] next_exc_class_E = (new_exc_valid_E | exc_valid_E) ? 2'b00 :
+                                  irq_accept_E ? irq_class_i : 2'b00;
+
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             RegWriteE_r <= 1'b0;
@@ -347,6 +361,7 @@ module execute_cycle (
             valid_M_r <= 1'b0;
             exc_valid_r <= 1'b0;
             exc_cause_r <= 6'd0;
+            exc_class_r <= 2'd0;
             exc_tval_r <= 32'h00000000;
             exc_pc_r <= 32'h00000000;
             is_mret_r <= 1'b0;
@@ -367,6 +382,7 @@ module execute_cycle (
             valid_M_r <= 1'b0;
             exc_valid_r <= 1'b0;
             exc_cause_r <= 6'd0;
+            exc_class_r <= 2'd0;
             exc_tval_r <= 32'h00000000;
             exc_pc_r <= 32'h00000000;
             is_mret_r <= 1'b0;
@@ -387,6 +403,7 @@ module execute_cycle (
             valid_M_r <= valid_M_r;
             exc_valid_r <= exc_valid_r;
             exc_cause_r <= exc_cause_r;
+            exc_class_r <= exc_class_r;
             exc_tval_r <= exc_tval_r;
             exc_pc_r <= exc_pc_r;
             is_mret_r <= is_mret_r;
@@ -407,6 +424,7 @@ module execute_cycle (
             valid_M_r <= valid_E;
             exc_valid_r <= next_exc_valid_E;
             exc_cause_r <= next_exc_cause_E;
+            exc_class_r <= next_exc_class_E;
             exc_tval_r <= next_exc_tval_E;
             exc_pc_r <= next_exc_pc_E;
             is_mret_r <= is_mret_E;
@@ -425,6 +443,7 @@ module execute_cycle (
     assign valid_M = valid_M_r;
     assign exc_valid_M = exc_valid_r;
     assign exc_cause_M = exc_cause_r;
+    assign exc_class_M = exc_class_r;
     assign exc_tval_M = exc_tval_r;
     assign exc_pc_M = exc_pc_r;
 
@@ -436,8 +455,8 @@ module execute_cycle (
     assign old_csr_M = old_csr_E_r;
 
 
-    // IRQ acceptance: accept IRQ only on a valid, un-excepted instruction when not stalled by multi-cycle M-unit
-    assign irq_accept_E = valid_E & irq_pending_i & ~new_exc_valid_E & ~exc_valid_E & ~stallMUL;
+    // IRQ acceptance: accept IRQ on a valid, un-excepted instruction (can abort multi-cycle M-unit for sub-4-cycle preemption)
+    assign irq_accept_E = valid_E & irq_pending_i & ~new_exc_valid_E & ~exc_valid_E;
     assign irq_flush_frontend_o = irq_accept_E;
 
     // Three-way priority chain:
@@ -448,15 +467,15 @@ module execute_cycle (
     assign next_exc_cause_E = new_exc_valid_E ? new_exc_cause_E :
                               exc_valid_E     ? exc_cause_E :
                               irq_accept_E    ? {1'b1, irq_id_i[4:0]} :
-                                                6'd0;
+                              6'd0;
     assign next_exc_tval_E  = new_exc_valid_E ? new_exc_tval_E :
                               exc_valid_E     ? exc_tval_E :
                               irq_accept_E    ? 32'h0 :
-                                                32'h0;
+                              32'h0;
     assign next_exc_pc_E    = new_exc_valid_E ? new_exc_pc_E :
                               exc_valid_E     ? exc_pc_E :
                               irq_accept_E    ? PCE :
-                                                PCE;
+                              PCE;
 
     assign new_exc_valid_E = branch_taken_raw & target_misaligned_E;
     assign new_exc_cause_E = 6'b000000;  // cause 0: instruction-address-misaligned (bit[5]=0 exception)

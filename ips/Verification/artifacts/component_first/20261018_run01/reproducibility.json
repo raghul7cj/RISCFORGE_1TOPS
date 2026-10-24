@@ -1,0 +1,153 @@
+{
+  "date": "2026-10-18",
+  "simulator": "Vivado XSim 2022.2",
+  "monitor_run": {
+    "status": "PASS",
+    "command": "xvlog --sv -nolog -i <infrastructure> -f rf_mon_smoke_abs.f; xelab rf_mon_smoke_tb -s rf_mon_smoke_sim; xsim rf_mon_smoke_sim -runall",
+    "top": "rf_mon_smoke_tb",
+    "checks": "All six APB slots: exact payload and response validation passed; class queue payload check passed; monitor smoke banner passed."
+  },
+  "boot_run": {
+    "status": "PASS",
+    "command": "xvlog --sv -nolog -f soc_imem_boot_abs.f; xelab soc_imem_boot_tb -s soc_imem_boot_sim --timescale 1ns/1ps; xsim soc_imem_boot_sim -runall",
+    "top": "soc_imem_boot_tb",
+    "checks": "36/36 checks passed; eight instruction words loaded; warm boot retained ISRAM; no SPI fetch on warm boot.",
+    "input": "Synthetic 8-word ADDI image, initialized by the testbench in spi_flash_bfm.write_word.",
+    "warning": "Existing bootloader readmemh warnings for optional relative bootrom.hex/imem.hex paths; this test loads through the SPI BFM and still passes."
+  },
+  "bridge_test": {
+    "status": "INCOMPLETE",
+    "tool": "Vivado XSim 2022.2",
+    "compile": "PASS",
+    "elaboration": "PASS",
+    "simulation": "Stopped after stall / runaway debug log at TC3 unmapped-address case; initial TC1/TC2 basic accesses passed; rr_arb_tree assertions recorded."
+  },
+  "source_hashes": [
+    {
+      "path": "ips\\RTL_SOC\\soc_imem_boot_tb.sv",
+      "sha256": "3D50102F531B312B3F7755372ED8CA5E1351776EBB0E800E50B367D55C8D54AE"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\tb\\rf_mon_smoke_tb.sv",
+      "sha256": "B39DB990D38830597BF8F5CD7B70801C236BA64A01AFEDE7D000F65C113C61EE"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\tb\\rf_mon_stub_dut.sv",
+      "sha256": "47030770BD3E0C76A4CC82C5D4E57B369EA2756EF93964D80CB1D10C7B06193B"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\tb\\rf_mon_probe.sv",
+      "sha256": "B5DB300AE72BF3AC637ED84479403732EEC83337F737CD8220AF8FEF768E6BEB"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\tb\\rf_monitor_if.sv",
+      "sha256": "A0C07047AAF982DA891CFF75C9A5F49D9169DF797FA6CB42B04DF06037D94624"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\monitors\\rf_monitors.sv",
+      "sha256": "15A0C7C1B07E5B9E137D0C2F7646D385746E28B49DF8CAC1A00D2C03716FDF7A"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\monitors\\apb_monitor.sv",
+      "sha256": "355E17C81B087F18ACF40A18C0127ADD63E9685623D157D58D61B236B56F632C"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\tb\\rf_mon_smoke_tb.sv",
+      "sha256": "B39DB990D38830597BF8F5CD7B70801C236BA64A01AFEDE7D000F65C113C61EE"
+    },
+    {
+      "path": "ips\\Verification\\infrastructure\\tb\\rf_mon_empirical_challenge_tb.sv",
+      "sha256": "991FDB11A8A4F5D3F7C091EBA60BBDCFECEAE164AAA16B998FBB4BEFF7D7F31B"
+    },
+    {
+      "path": "ips\\RTL_SOC\\soc_imem_boot_tb.sv",
+      "sha256": "8C83858EA3EB6D38D39A62D67A3F65908CBF2AFA7C3F924E2A1427A8774B74B3"
+    },
+    {
+      "path": "ips\\gpio-master\\tb_gpio_apb_directed.sv",
+      "sha256": "0820AB07B42436F09362CDBD9733C551189A38CD4577E52A1AF4A6D8F7D66BBE"
+    },
+    {
+      "path": "ips\\apb_i2c-master\\i2c_thorough_tb.sv",
+      "sha256": "85B6256D09E533C9A915D284F9D5CA6BA872DE8A16486F0139D39FAF7A3FE033"
+    },
+    {
+      "path": "ips\\apb_uart-main\\rtl\\tb_apb_uart_thorough.sv",
+      "sha256": "21A7193A36A0F33E75921F8289B9B43114F34113D35D793CA4268FE25215E7D3"
+    },
+    {
+      "path": "ips\\axi_lite_to_apb\\tb_axi_lite_to_apb.sv",
+      "sha256": "61A5EED9524FA74BB19F86DA10B00005E926628D95F4C0F8671A11D66742926C"
+    },
+    {
+      "sha256": "1E2FF83996CFF0FC2BF6E815D319E9B084D76EDA8627DC5C6B3CC8677D49F03E",
+      "path": "ips\\Verification\\infrastructure\\monitors\\irq_monitor.sv"
+    },
+    {
+      "sha256": "5A2E2CEE55515F5E82D409FC4377750BAB7196B0C0B7E97D977AD07B525AE4E6",
+      "path": "ips\\Verification\\infrastructure\\tb\\tb_freeze_buffer_stress.sv"
+    }
+  ],
+  "component_runs": {
+    "monitor_challenge": {
+      "status": "PASS",
+      "checks": "25 adversarial checks passed: monitor state/data observation, ring wrap, freeze broadcast, lockstep and zero timing delta.",
+      "top": "rf_mon_empirical_challenge_tb",
+      "command": "Vivado xvlog --sv -i . -f rf_mon_challenge.f; xelab rf_mon_empirical_challenge_tb; xsim challenge_sim -runall"
+    },
+    "gpio": {
+      "status": "PASS",
+      "checks": "312 passed, 0 failed. The bench labels two direct-wrapper out-of-range observations as suspected issues, but those transactions bypass the SoC APB address decoder and do not demonstrate a SoC path failure.",
+      "top": "tb_gpio_apb_directed",
+      "seed": "1 (testbench default; +SEED not overridden)",
+      "command": "Vivado xvlog --sv -f converted filelist; xelab tb_gpio_apb_directed; xsim gpio_sim -runall",
+      "soc_address_map": "GPIO APB slot is 0x40003000-0x400037FF; offsets 0x800-0xFFF miss the bridge decoder and receive DECERR without asserting GPIO PSEL."
+    },
+    "i2c": {
+      "status": "PASS",
+      "checks": "90 passed, 0 failed; APB register, transfer, reset recovery, boundary address and arbitration-lost sections.",
+      "top": "thorough_tb",
+      "command": "Vivado xvlog -f converted files_thorough_tb.f; xelab thorough_tb; xsim i2c_sim -runall"
+    },
+    "uart": {
+      "status": "INCOMPLETE",
+      "compile": "PASS",
+      "elaboration": "PASS",
+      "simulation": "Stopped by operator after bench remained at reset checks without advancing",
+      "top": "tb_apb_uart_thorough",
+      "command": "Vivado xvlog --sv -f converted uart.f; xelab tb_apb_uart_thorough; xsim uart_sim -runall (stopped by operator after stall)"
+    },
+    "bridge": {
+      "status": "INCOMPLETE",
+      "initial_transactions": "TC1 and TC2 basic read/write checks passed",
+      "compile": "PASS",
+      "elaboration": "PASS",
+      "command": "Vivado xvlog --sv -f converted axilite2apb_file.f; xelab tb_axi_lite_to_apb; xsim bridge_sim -runall (stopped by operator after TC3 stall/runaway logging)",
+      "simulation": "Stopped during TC3 unmapped address case after rr_arb_tree assertions and runaway logging"
+    },
+    "monitor_stress": {
+      "status": "PASS_AFTER_FIX",
+      "compile": "PASS",
+      "elaboration": "PASS",
+      "checks": "165 checks, 0 failures; simultaneous GPIO and UART IRQ edges each recorded once.",
+      "initial_failure": "Before the fix, simultaneous GPIO and UART IRQ edges overwrote one slot because each push used the same head pointer; the test reported IRQ_CONCURRENCY_PRESERVED failure.",
+      "command": "Vivado xvlog --sv -i . -f freeze_stress.f; xelab tb_freeze_buffer_stress; xsim freeze_sim -runall"
+    },
+    "monitor_smoke_after_irqfix": {
+      "status": "PASS",
+      "checks": "All six APB slot payloads and class queue payloads passed after IRQ monitor update.",
+      "command": "Vivado xvlog --sv -nolog -i <infrastructure> -f rf_mon_smoke_abs.f; xelab rf_mon_smoke_tb; xsim smoke_sim -runall"
+    },
+    "monitor_challenge_after_irqfix": {
+      "status": "PASS",
+      "checks": "25 of 25 challenges passed after IRQ monitor update.",
+      "command": "Vivado xvlog --sv -i . -f rf_mon_challenge.f; xelab rf_mon_empirical_challenge_tb; xsim challenge_sim -runall"
+    }
+  },
+  "soc_compile_after_infra_change": {
+    "status": "PASS",
+    "compile": "PASS",
+    "elaboration": "PASS",
+    "command": "Vivado xvlog --sv -nolog -f soc_verification.xsim.f; xelab soc_tb_top -s soc_compile_check --timescale 1ns/1ps"
+  }
+}

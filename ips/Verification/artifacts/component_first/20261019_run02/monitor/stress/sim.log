@@ -1,0 +1,283 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/stress_sim/xsim_script.tcl
+# xsim {stress_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+
+====================================================================
+ STARTING EMPIRICAL CHALLENGER STRESS TESTS ON CIRCULAR FREEZE BUFFERS
+====================================================================
+
+--- [TEST 1] AXI-Lite Modulo 64 Wrap-Around Stress (130 writes) ---
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 0: head_ptr=1 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 1: head_ptr=2 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 2: head_ptr=3 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 3: head_ptr=4 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 4: head_ptr=5 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 5: head_ptr=6 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 6: head_ptr=7 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 7: head_ptr=8 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 8: head_ptr=9 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 9: head_ptr=10 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 10: head_ptr=11 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 11: head_ptr=12 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 12: head_ptr=13 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 13: head_ptr=14 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 14: head_ptr=15 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 15: head_ptr=16 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 16: head_ptr=17 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 17: head_ptr=18 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 18: head_ptr=19 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 19: head_ptr=20 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 20: head_ptr=21 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 21: head_ptr=22 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 22: head_ptr=23 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 23: head_ptr=24 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 24: head_ptr=25 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 25: head_ptr=26 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 26: head_ptr=27 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 27: head_ptr=28 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 28: head_ptr=29 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 29: head_ptr=30 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 30: head_ptr=31 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 31: head_ptr=32 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 32: head_ptr=33 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 33: head_ptr=34 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 34: head_ptr=35 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 35: head_ptr=36 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 36: head_ptr=37 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 37: head_ptr=38 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 38: head_ptr=39 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 39: head_ptr=40 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 40: head_ptr=41 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 41: head_ptr=42 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 42: head_ptr=43 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 43: head_ptr=44 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 44: head_ptr=45 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 45: head_ptr=46 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 46: head_ptr=47 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 47: head_ptr=48 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 48: head_ptr=49 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 49: head_ptr=50 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 50: head_ptr=51 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 51: head_ptr=52 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 52: head_ptr=53 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 53: head_ptr=54 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 54: head_ptr=55 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 55: head_ptr=56 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 56: head_ptr=57 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 57: head_ptr=58 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 58: head_ptr=59 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 59: head_ptr=60 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 60: head_ptr=61 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 61: head_ptr=62 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 62: head_ptr=63 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 63: head_ptr=0 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 64: head_ptr=1 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 65: head_ptr=2 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 66: head_ptr=3 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 67: head_ptr=4 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 68: head_ptr=5 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 69: head_ptr=6 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 70: head_ptr=7 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 71: head_ptr=8 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 72: head_ptr=9 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 73: head_ptr=10 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 74: head_ptr=11 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 75: head_ptr=12 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 76: head_ptr=13 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 77: head_ptr=14 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 78: head_ptr=15 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 79: head_ptr=16 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 80: head_ptr=17 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 81: head_ptr=18 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 82: head_ptr=19 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 83: head_ptr=20 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 84: head_ptr=21 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 85: head_ptr=22 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 86: head_ptr=23 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 87: head_ptr=24 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 88: head_ptr=25 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 89: head_ptr=26 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 90: head_ptr=27 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 91: head_ptr=28 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 92: head_ptr=29 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 93: head_ptr=30 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 94: head_ptr=31 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 95: head_ptr=32 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 96: head_ptr=33 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 97: head_ptr=34 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 98: head_ptr=35 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 99: head_ptr=36 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 100: head_ptr=37 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 101: head_ptr=38 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 102: head_ptr=39 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 103: head_ptr=40 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 104: head_ptr=41 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 105: head_ptr=42 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 106: head_ptr=43 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 107: head_ptr=44 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 108: head_ptr=45 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 109: head_ptr=46 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 110: head_ptr=47 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 111: head_ptr=48 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 112: head_ptr=49 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 113: head_ptr=50 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 114: head_ptr=51 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 115: head_ptr=52 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 116: head_ptr=53 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 117: head_ptr=54 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 118: head_ptr=55 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 119: head_ptr=56 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 120: head_ptr=57 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 121: head_ptr=58 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 122: head_ptr=59 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 123: head_ptr=60 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 124: head_ptr=61 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 125: head_ptr=62 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 126: head_ptr=63 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 127: head_ptr=0 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 128: head_ptr=1 within [0..63]
+[PASS] [AXI_HEAD_PTR_BOUND] Iter 129: head_ptr=2 within [0..63]
+[PASS] [AXI_TOTAL_WRITES] total_axi_writes=130 expected=130
+[PASS] [AXI_FINAL_HEAD_PTR] head_ptr=2 expected=2
+[PASS] [AXI_RING_DATA_INTEGRITY] All 64 retained entries match exactly
+
+--- [TEST 2] Freeze Timing Precision & Frozen State Immunity ---
+[PASS] [FREEZE_CYCLE_T_CAPTURED] Slot 2 contains cycle T write data 0xdeadbeef
+[PASS] [FREEZE_IMMUNITY_NO_NEW_TXN] Zero transactions logged while frozen: head_ptr=3 writes=131 reads=0
+[PASS] [UNFREEZE_RESUME] Slot 3 contains post-unfreeze write data 0xcafebabe
+
+--- [TEST 3] Concurrent AXI Write & Read Completion (Simultaneous B & R) ---
+[PASS] [SIMULT_BR_HEAD_PTR] head_ptr advanced by 2: got 2 expected 2
+[PASS] [SIMULT_BR_WRITES] total_axi_writes=1 expected 1
+[PASS] [SIMULT_BR_READS] total_axi_reads=1 expected 1
+[PASS] [SIMULT_BR_SLOT0_WRITE] Slot 0 contains correct Write transaction
+[PASS] [SIMULT_BR_SLOT1_READ] Slot 1 contains correct Read transaction
+
+--- [TEST 3B] Simultaneous B & R at Wrap Boundary (head_ptr == 62) ---
+[PASS] [ADVANCE_TO_62] head_ptr=62 expected 62
+[PASS] [WRAP_BOUNDARY_62_HEAD_PTR] head_ptr wrapped from 62 (+2) to 0 (expected 0)
+[PASS] [WRAP_BOUNDARY_62_SLOT62_WR] Slot 62 correctly holds Write txn
+[PASS] [WRAP_BOUNDARY_62_SLOT63_RD] Slot 63 correctly holds Read txn
+
+--- [TEST 3C] Simultaneous B & R at Wrap Boundary (head_ptr == 63) ---
+[PASS] [ADVANCE_TO_63] head_ptr=63 expected 63
+[PASS] [WRAP_BOUNDARY_63_HEAD_PTR] head_ptr wrapped from 63 (+2) to 1 (expected 1)
+[PASS] [WRAP_BOUNDARY_63_SLOT63_WR] Slot 63 correctly holds Write txn
+[PASS] [WRAP_BOUNDARY_63_SLOT0_RD] Slot 0 correctly holds Read txn after split-wrap
+
+--- [TEST 3D] Continuous Simultaneous B & R Stream (128 txns) ---
+[PASS] [CONTINUOUS_STREAM_HEAD_PTR] head_ptr after 128 txns: 1 expected 1
+[PASS] [CONTINUOUS_STREAM_WRITES] Writes increased by 64: got 190 expected 190
+[PASS] [CONTINUOUS_STREAM_READS] Reads increased by 64: got 67 expected 67
+
+--- [TEST 4] APB Monitor Modulo 64 Wrap-Around & Wait-States ---
+[PASS] [APB_TOTAL_TRANS] total_apb_trans=100 expected 100
+[PASS] [APB_HEAD_PTR_WRAP] head_ptr=36 expected 36
+
+--- [TEST 5] Multi-Interrupt Concurrency in IRQ Monitor ---
+IRQ Monitor After Dual Simultaneous Assertion:
+  total_irq_asserts = 2
+  head_ptr          = 2
+  ring_buffer[0].src = GPIO_GLOBAL (id=16)
+  ring_buffer[1].src = UART (id=19)
+[PASS] [IRQ_CONCURRENCY_PRESERVED] Both simultaneous IRQ events successfully captured in separate slots
+
+--- [TEST 6] Fetch, Retire, and LSU Wrap-Around & Freeze ---
+[PASS] [FETCH_TOTAL] Fetch total=80 expected 80
+[PASS] [FETCH_HEAD_PTR] Fetch head_ptr=16 expected 16
+[PASS] [RETIRE_TOTAL] Retire total=80 expected 80
+[PASS] [RETIRE_HEAD_PTR] Retire head_ptr=16 expected 16
+[PASS] [LSU_TOTAL] LSU total=80 expected 80
+[PASS] [LSU_HEAD_PTR] LSU head_ptr=16 expected 16
+[PASS] [FROZEN_FETCH_IMMUNITY] Fetch monitor 100% frozen
+[PASS] [FROZEN_RETIRE_IMMUNITY] Retire monitor 100% frozen
+[PASS] [FROZEN_LSU_IMMUNITY] LSU monitor 100% frozen
+
+--- [TEST 7] Post-Mortem Dump Function Boundary Checks ---
+
+=======================================================
+ AXI4-LITE RECENT TRANSACTIONS DUMP (Total WR: 0, RD: 0)
+=======================================================
+ [TIME]     DIR   ADDR         DATA         STRB  RESP
+-------------------------------------------------------
+ [00000000000000439000]  RD    0xa20000e8   0xd200003a   0xf     0x0
+ [00000000000000440000]  WR    0xa10000ec   0xd100003b   0x0     0x0
+ [00000000000000440000]  RD    0xa20000ec   0xd200003b   0xf     0x0
+ [00000000000000441000]  WR    0xa10000f0   0xd100003c   0x0     0x0
+ [00000000000000441000]  RD    0xa20000f0   0xd200003c   0xf     0x0
+ [00000000000000442000]  WR    0xa10000f4   0xd100003d   0x0     0x0
+ [00000000000000442000]  RD    0xa20000f4   0xd200003d   0xf     0x0
+ [00000000000000443000]  WR    0xa10000f8   0xd100003e   0x0     0x0
+ [00000000000000443000]  RD    0xa20000f8   0xd200003e   0xf     0x0
+ [00000000000000444000]  WR    0xa10000fc   0xd100003f   0x0     0x0
+=======================================================
+
+
+=======================================================
+ APB RECENT TRANSACTIONS DUMP (Total APB Transfers: 0)
+=======================================================
+ [TIME]     SLOT  DIR  PADDR        PWDATA       PRDATA       PSLVERR
+---------------------------------------------------------------------
+ [00000000000000221000]  [0]   WR   0x400000d8   0xb0000036   0xc0000036   0
+ [00000000000000225000]  [1]   RD   0x400010dc   0xb0000037   0xc0000037   0
+ [00000000000000229000]  [2]   WR   0x400020e0   0xb0000038   0xc0000038   0
+ [00000000000000233000]  [3]   RD   0x400030e4   0xb0000039   0xc0000039   0
+ [00000000000000237000]  [4]   WR   0x400040e8   0xb000003a   0xc000003a   0
+ [00000000000000241000]  [5]   RD   0x400050ec   0xb000003b   0xc000003b   0
+ [00000000000000245000]  [0]   WR   0x400000f0   0xb000003c   0xc000003c   0
+ [00000000000000249000]  [1]   RD   0x400010f4   0xb000003d   0xc000003d   0
+ [00000000000000253000]  [2]   WR   0x400020f8   0xb000003e   0xc000003e   0
+ [00000000000000257000]  [3]   RD   0x400030fc   0xb000003f   0xc000003f   0
+=======================================================
+
+=== Recent 10 Instruction Fetches ===
+  [73000] PC=0x00010118 Instr=0x00100093          ISRAM
+  [74000] PC=0x0001011c Instr=0x00100093          ISRAM
+  [75000] PC=0x00010120 Instr=0x00100093          ISRAM
+  [76000] PC=0x00010124 Instr=0x00100093          ISRAM
+  [77000] PC=0x00010128 Instr=0x00100093          ISRAM
+  [78000] PC=0x0001012c Instr=0x00100093          ISRAM
+  [79000] PC=0x00010130 Instr=0x00100093          ISRAM
+  [80000] PC=0x00010134 Instr=0x00100093          ISRAM
+  [81000] PC=0x00010138 Instr=0x00100093          ISRAM
+  [82000] PC=0x0001013c Instr=0x00100093          ISRAM
+=== Last 10 Retired Instructions ===
+  [73000] PC=0x00010118 Instr=0x00100093                     (rd=x1, val=0x000000aa)
+  [74000] PC=0x0001011c Instr=0x00100093                     (rd=x1, val=0x000000ab)
+  [75000] PC=0x00010120 Instr=0x00100093                     (rd=x1, val=0x000000ac)
+  [76000] PC=0x00010124 Instr=0x00100093                     (rd=x1, val=0x000000ad)
+  [77000] PC=0x00010128 Instr=0x00100093                     (rd=x1, val=0x000000ae)
+  [78000] PC=0x0001012c Instr=0x00100093                     (rd=x1, val=0x000000af)
+  [79000] PC=0x00010130 Instr=0x00100093                     (rd=x1, val=0x000000b0)
+  [80000] PC=0x00010134 Instr=0x00100093                     (rd=x1, val=0x000000b1)
+  [81000] PC=0x00010138 Instr=0x00100093                     (rd=x1, val=0x000000b2)
+  [82000] PC=0x0001013c Instr=0x00100093                     (rd=x1, val=0x000000b3)
+=== Last 10 LSU Memory Transactions ===
+  [73000] PC=0x00000000 RD Addr=0x00020118 RData=0x00000000 BE=0x0 DSRAM Slot=6
+  [74000] PC=0x00000000 WR Addr=0x0002011c WData=0xf0000047 BE=0x0 DSRAM Slot=6
+  [75000] PC=0x00000000 RD Addr=0x00020120 RData=0x00000000 BE=0x0 DSRAM Slot=6
+  [76000] PC=0x00000000 WR Addr=0x00020124 WData=0xf0000049 BE=0x0 DSRAM Slot=6
+  [77000] PC=0x00000000 RD Addr=0x00020128 RData=0x00000000 BE=0x0 DSRAM Slot=6
+  [78000] PC=0x00000000 WR Addr=0x0002012c WData=0xf000004b BE=0x0 DSRAM Slot=6
+  [79000] PC=0x00000000 RD Addr=0x00020130 RData=0x00000000 BE=0x0 DSRAM Slot=6
+  [80000] PC=0x00000000 WR Addr=0x00020134 WData=0xf000004d BE=0x0 DSRAM Slot=6
+  [81000] PC=0x00000000 RD Addr=0x00020138 RData=0x00000000 BE=0x0 DSRAM Slot=6
+  [82000] PC=0x00000000 WR Addr=0x0002013c WData=0xf000004f BE=0x0 DSRAM Slot=6
+=== Last 10 Interrupt Lifecycle Events ===
+[PASS] [DUMP_TASKS_STABILITY] All monitor dump tasks executed without runtime crash
+
+====================================================================
+ EMPIRICAL STRESS TEST RESULTS: 165 Checks, 0 Failures
+====================================================================
+ >>> ALL CHALLENGE TESTS PASSED PERFECTLY <<< 
+
+$finish called at time : 13836 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/inputs/tb/tb_freeze_buffer_stress.sv" Line 823
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 02:36:05 2026...

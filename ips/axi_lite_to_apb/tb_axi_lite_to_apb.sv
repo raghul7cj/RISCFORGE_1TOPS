@@ -29,6 +29,7 @@ module tb_axi_lite_to_apb;
   localparam int unsigned NO_APB_SLAVES = 2;
   localparam int unsigned NO_RULES      = 2;
   localparam int unsigned CLK_PERIOD    = 10;
+  localparam int unsigned AXI_TIMEOUT_CYC = 500;
 
   localparam int unsigned SEL_IDX_W = (NO_APB_SLAVES > 1) ? $clog2(NO_APB_SLAVES) : 1;
 
@@ -275,6 +276,7 @@ module tb_axi_lite_to_apb;
     input strb_t strb = 4'hF,
     output axi_pkg::resp_t resp
   );
+    int cycles;
     // Drive AW + W at negedge (stable before next posedge)
     @(negedge clk);
     axi_req.aw.addr  = addr;
@@ -283,37 +285,47 @@ module tb_axi_lite_to_apb;
     axi_req.w.data   = data;
     axi_req.w.strb   = strb;
     axi_req.w_valid  = 1'b1;
-    axi_req.b_ready  = 1'b1;
+    // Hold BREADY low until the testbench has sampled the response. A decode
+    // error can complete immediately and otherwise be consumed before the
+    // BFM reaches its response wait.
+    axi_req.b_ready  = 1'b0;
     $display("  [DBG] WR: valid driven at %0t, addr=0x%08X", $time, addr);
 
-    // Wait for handshake at posedge (DUT asserts ready here)
+    // This bridge presents AWREADY and WREADY together after it has accepted
+    // the combined write request. Sample on the active edge, before NBA
+    // updates; keep both VALID signals asserted through that handshake.
+    cycles  = 0;
     forever begin
       @(posedge clk);
-      #1; // let comb settle
-      $display("  [DBG] WR: @posedge+1 %0t aw_ready=%b w_ready=%b b_valid=%b",
-               $time, axi_resp.aw_ready, axi_resp.w_ready, axi_resp.b_valid);
       if (axi_resp.aw_ready && axi_resp.w_ready) break;
+      cycles++;
+      if (cycles >= AXI_TIMEOUT_CYC)
+        $fatal(1, "AXI write handshake timeout: addr=%08h", addr);
     end
-
-    // Deassert valid at next negedge
     @(negedge clk);
     axi_req.aw_valid = 1'b0;
     axi_req.w_valid  = 1'b0;
     $display("  [DBG] WR: valid deasserted at %0t, waiting for b_valid", $time);
 
-    // Wait for B valid
+    // BVALID is also sampled on the active edge, before any update.
+    cycles = 0;
     forever begin
       @(posedge clk);
-      #1; // let comb settle
-      $display("  [DBG] WR: @posedge+1 %0t b_valid=%b b_resp=%2b | raw_resp=0x%0h",
+      $display("  [DBG] WR: @posedge %0t b_valid=%b b_resp=%2b | raw_resp=0x%0h",
                $time, axi_resp.b_valid, axi_resp.b.resp, axi_resp);
       $display("  [DBG] WR:   APB[0] psel=%b pen=%b prdy=%b | APB[1] psel=%b pen=%b prdy=%b",
                apb_req[0].psel, apb_req[0].penable, apb_resp[0].pready,
                apb_req[1].psel, apb_req[1].penable, apb_resp[1].pready);
       if (axi_resp.b_valid) break;
+      cycles++;
+      if (cycles >= AXI_TIMEOUT_CYC)
+        $fatal(1, "AXI B response timeout: addr=%08h", addr);
     end
     resp = axi_resp.b.resp;
-    @(negedge clk); // settle before next transaction
+    @(negedge clk);
+    axi_req.b_ready = 1'b1;
+    @(posedge clk); // consume the held response
+    @(negedge clk);
     $display("  [DBG] WR: done at %0t, resp=%2b", $time, resp);
   endtask
 
@@ -323,21 +335,26 @@ module tb_axi_lite_to_apb;
     output data_t data,
     output axi_pkg::resp_t resp
   );
+    int cycles;
     // Drive AR at negedge
     @(negedge clk);
     axi_req.ar.addr  = addr;
     axi_req.ar.prot  = '0;
     axi_req.ar_valid = 1'b1;
-    axi_req.r_ready  = 1'b1;
+    // Hold RREADY low so even an immediate decode-error response is sampled.
+    axi_req.r_ready  = 1'b0;
     $display("  [DBG] RD: valid driven at %0t, addr=0x%08X", $time, addr);
 
-    // Wait for ar_ready at posedge
+    // AXI handshakes are sampled on the active edge, before NBA updates.
+    cycles = 0;
     forever begin
       @(posedge clk);
-      #1;
-      $display("  [DBG] RD: @posedge+1 %0t ar_ready=%b r_valid=%b",
+      $display("  [DBG] RD: @posedge %0t ar_ready=%b r_valid=%b",
                $time, axi_resp.ar_ready, axi_resp.r_valid);
       if (axi_resp.ar_ready) break;
+      cycles++;
+      if (cycles >= AXI_TIMEOUT_CYC)
+        $fatal(1, "AXI AR handshake timeout: addr=%08h", addr);
     end
 
     // Deassert at negedge
@@ -345,16 +362,22 @@ module tb_axi_lite_to_apb;
     axi_req.ar_valid = 1'b0;
     $display("  [DBG] RD: ar deasserted at %0t, waiting for r_valid", $time);
 
-    // Wait for R valid
+    // Wait for RVALID, sampling on each active edge.
+    cycles = 0;
     forever begin
       @(posedge clk);
-      #1;
-      $display("  [DBG] RD: @posedge+1 %0t r_valid=%b r_data=0x%08X r_resp=%2b",
+      $display("  [DBG] RD: @posedge %0t r_valid=%b r_data=0x%08X r_resp=%2b",
                $time, axi_resp.r_valid, axi_resp.r.data, axi_resp.r.resp);
       if (axi_resp.r_valid) break;
+      cycles++;
+      if (cycles >= AXI_TIMEOUT_CYC)
+        $fatal(1, "AXI R response timeout: addr=%08h", addr);
     end
     data = axi_resp.r.data;
     resp = axi_resp.r.resp;
+    @(negedge clk);
+    axi_req.r_ready = 1'b1;
+    @(posedge clk); // consume the held response
     @(negedge clk);
     $display("  [DBG] RD: done at %0t", $time);
   endtask
@@ -456,6 +479,8 @@ module tb_axi_lite_to_apb;
     begin
       axi_pkg::resp_t wr_resp, rd_resp;
       data_t          rd_val;
+      bit             wr_accepted, rd_accepted, wr_seen, rd_seen;
+      int             cycles;
 
       // Pre-load a known value
       axi_write(32'h1000_0020, 32'h1111_1111, 4'hF, resp);
@@ -469,32 +494,58 @@ module tb_axi_lite_to_apb;
       axi_req.w_valid  = 1'b1;
       axi_req.ar.addr  = 32'h1000_0020;
       axi_req.ar_valid = 1'b1;
-      axi_req.b_ready  = 1'b1;
-      axi_req.r_ready  = 1'b1;
+      // Hold both response-ready signals low until the responses are sampled;
+      // otherwise a fast response may handshake before this BFM observes it.
+      axi_req.b_ready  = 1'b0;
+      axi_req.r_ready  = 1'b0;
 
-      // Wait for both to complete
-      fork
-        begin // Write path
-          @(posedge clk); #1;
-          while (!(axi_resp.aw_ready && axi_resp.w_ready)) begin @(posedge clk); #1; end
-          @(negedge clk);
+      // Present both requests together and preserve each VALID through its
+      // active-edge handshake. The bridge serializes the two APB transfers.
+      wr_accepted = 1'b0;
+      rd_accepted = 1'b0;
+      cycles = 0;
+      while (!(wr_accepted && rd_accepted)) begin
+        @(posedge clk);
+        if (!wr_accepted && axi_resp.aw_ready && axi_resp.w_ready)
+          wr_accepted = 1'b1;
+        if (!rd_accepted && axi_resp.ar_ready)
+          rd_accepted = 1'b1;
+        cycles++;
+        if (cycles >= AXI_TIMEOUT_CYC)
+          $fatal(1, "TC4 simultaneous request handshake timeout");
+        @(negedge clk);
+        if (wr_accepted) begin
           axi_req.aw_valid = 1'b0;
           axi_req.w_valid  = 1'b0;
-          @(posedge clk); #1;
-          while (!axi_resp.b_valid) begin @(posedge clk); #1; end
-          wr_resp = axi_resp.b.resp;
         end
-        begin // Read path
-          @(posedge clk); #1;
-          while (!axi_resp.ar_ready) begin @(posedge clk); #1; end
-          @(negedge clk);
-          axi_req.ar_valid = 1'b0;
-          @(posedge clk); #1;
-          while (!axi_resp.r_valid) begin @(posedge clk); #1; end
+        if (rd_accepted) axi_req.ar_valid = 1'b0;
+      end
+
+      cycles = 0;
+      wr_seen = 1'b0;
+      rd_seen = 1'b0;
+      while (!(wr_seen && rd_seen)) begin
+        @(posedge clk);
+        if (!wr_seen && axi_resp.b_valid) begin
+          wr_resp = axi_resp.b.resp;
+          wr_seen = 1'b1;
+        end
+        if (!rd_seen && axi_resp.r_valid) begin
           rd_val  = axi_resp.r.data;
           rd_resp = axi_resp.r.resp;
+          rd_seen = 1'b1;
         end
-      join
+        cycles++;
+        if (cycles >= AXI_TIMEOUT_CYC)
+          $fatal(1, "TC4 simultaneous response timeout");
+        @(negedge clk);
+        axi_req.b_ready = wr_seen;
+        axi_req.r_ready = rd_seen;
+      end
+      @(negedge clk);
+      axi_req.b_ready = 1'b1;
+      axi_req.r_ready = 1'b1;
+      @(posedge clk);
 
       @(negedge clk);
       check_resp("TC4: Write resp", wr_resp, axi_pkg::RESP_OKAY);

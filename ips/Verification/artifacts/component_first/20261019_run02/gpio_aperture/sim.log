@@ -1,0 +1,57 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/gpio_aperture_final/xsim_script.tcl
+# xsim {gpio_aperture_final} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+[PASS] I2C slot read response
+[PASS] I2C slot read routed data
+[PASS] I2C slot read APB select mask
+[PASS] Timer0 slot read response
+[PASS] Timer0 slot read routed data
+[PASS] Timer0 slot read APB select mask
+[PASS] UART slot read response
+[PASS] UART slot read routed data
+[PASS] UART slot read APB select mask
+[PASS] GPIO slot base read response
+[PASS] GPIO slot base read routed data
+[PASS] GPIO slot base read APB select mask
+[PASS] GPIO last aligned address 0x37FC response
+[PASS] GPIO last aligned address 0x37FC routed data
+[PASS] GPIO last aligned address 0x37FC APB select mask
+[PASS] GPIO first address outside 2KB aperture response
+[PASS] GPIO first address outside 2KB aperture APB select mask
+[PASS] standalone alias case +0x980 is unmapped at SoC bridge response
+[PASS] standalone alias case +0x980 is unmapped at SoC bridge APB select mask
+[PASS] end of unmapped 4KB gap response
+[PASS] end of unmapped 4KB gap APB select mask
+[PASS] SPI slot read response
+[PASS] SPI slot read routed data
+[PASS] SPI slot read APB select mask
+[PASS] Timer1 slot read response
+[PASS] Timer1 slot read routed data
+[PASS] Timer1 slot read APB select mask
+[PASS] out-of-range GPIO write response
+[PASS] out-of-range GPIO write APB select mask
+[PASS] standalone alias write case +0x980 is unmapped at SoC bridge response
+[PASS] standalone alias write case +0x980 is unmapped at SoC bridge APB select mask
+[PASS] I2C slot write response
+[PASS] I2C slot write APB select mask
+[PASS] Timer0 slot write response
+[PASS] Timer0 slot write APB select mask
+[PASS] UART slot write response
+[PASS] UART slot write APB select mask
+[PASS] GPIO base write response
+[PASS] GPIO base write APB select mask
+[PASS] SPI slot write response
+[PASS] SPI slot write APB select mask
+[PASS] Timer1 slot write response
+[PASS] Timer1 slot write APB select mask
+GPIO_APERTURE_SUMMARY pass=43 fail=0
+$finish called at time : 770 ns : File "C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_run02/bridge/axi_lite_to_apb/soc_gpio_aperture_tb.sv" Line 103
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 01:31:58 2026...

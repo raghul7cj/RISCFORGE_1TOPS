@@ -38,7 +38,7 @@ module sram_sp #(
   // -------------------------------------------------------------------------
   // Synchronous read / write (read-first)
   // -------------------------------------------------------------------------
-  always @(posedge clk_i) begin
+  always_ff @(posedge clk_i) begin
     if (cs_i) begin
       // Read: output reflects value BEFORE any write this cycle
       rdata_o <= mem[addr_i];

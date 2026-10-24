@@ -1,0 +1,75 @@
+[
+  {
+    "argv": [
+      "hostname"
+    ],
+    "cwd": "/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot",
+    "log": "host.log",
+    "timeout_seconds": 240,
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "xrun",
+      "-version"
+    ],
+    "cwd": "/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot",
+    "log": "tool_version.log",
+    "timeout_seconds": 240,
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "riscv64-unknown-elf-gcc",
+      "--version"
+    ],
+    "cwd": "/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot",
+    "log": "compiler_version.log",
+    "timeout_seconds": 240,
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "python3",
+      "Verification/infrastructure/gen_filelists.py",
+      "--emit",
+      "--print-cmd"
+    ],
+    "cwd": "/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot",
+    "log": "filelist_preflight.log",
+    "timeout_seconds": 240,
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "riscv64-unknown-elf-gcc",
+      "-march=rv32im_zicsr",
+      "-mabi=ilp32",
+      "-mcmodel=medlow",
+      "-mno-relax",
+      "-O2",
+      "-g",
+      "-ffreestanding",
+      "-nostdlib",
+      "-IVerification/tests/bsp",
+      "-IVerification/tests/drivers",
+      "-T",
+      "Verification/tests/bsp/link.ld",
+      "Verification/tests/bsp/crt0.s",
+      "Verification/tests/bsp/trap_handler.s",
+      "Verification/tests/bsp/isr_dispatch.c",
+      "Verification/tests/drivers/uart_driver.c",
+      "Verification/tests/drivers/timer_driver.c",
+      "Verification/tests/drivers/gpio_driver.c",
+      "Verification/tests/drivers/i2c_driver.c",
+      "Verification/tests/drivers/spi_driver.c",
+      "Verification/tests/suites/stage1_hello/main.c",
+      "-o",
+      "/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/results/inputs/stage1.elf"
+    ],
+    "cwd": "/home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot",
+    "log": "firmware_build.log",
+    "timeout_seconds": 240,
+    "exit_code": 1
+  }
+]

@@ -1,0 +1,9 @@
+../SOC_FILES/include/common_cells/cf_math_pkg.sv
+../SOC_FILES/include/obi/obi_pkg.sv
+../SOC_FILES/include/apb/apb_pkg.sv
+../SOC_FILES/include/obi/apb_to_obi.sv
+rtl/tb_apb_adapter.sv
+-i
+../SOC_FILES/include
+-i
+../SOC_FILES/include/common_cells

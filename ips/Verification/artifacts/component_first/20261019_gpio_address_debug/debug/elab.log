@@ -1,0 +1,31 @@
+Vivado Simulator v2022.2
+Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2022.2/bin/unwrapped/win64.o/xelab.exe tb_gpio_apb_directed -s gpio_sim --timescale 1ns/1ps 
+Multi-threading is on. Using 14 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package work.apb_pkg
+Compiling package work.gpio_reg_pkg
+Compiling module work.REG_BUS(ADDR_WIDTH=32,DATA_WIDTH...
+Compiling module work.apb_to_reg(reg_o=REG_BUS(ADDR_WI...
+Compiling module work.prim_subreg_ext(DW=32'b01010)
+Compiling module work.prim_subreg_arb(DW=1)
+Compiling module work.prim_subreg(DW=1)
+Compiling module work.prim_subreg_arb(DW=2)
+Compiling module work.prim_subreg(DW=2)
+Compiling module work.prim_subreg_ext(DW=32'b01)
+Compiling module work.prim_subreg_arb(DW=1,SWACCESS="W...
+Compiling module work.prim_subreg(DW=1,SWACCESS="W1C")
+Compiling module work.gpio_reg_top(reg_req_t=reg_bus_r...
+Compiling module work.sync(STAGES=32'b010)
+Compiling module work.gpio_input_stage
+Compiling module work.gpio(reg_req_t=reg_bus_req_t_gpi...
+Compiling module work.gpio_intf(ADDR_WIDTH=32'b0100000...
+Compiling module work.gpio_apb_wrap(apb_req_t=apb_req_...
+Compiling module work.tb_gpio_apb_directed
+WARNING: [XSIM 43-3373] "C:/Users/cj/AppData/Local/Temp/riscforge_gpio_aperture_debug_20261019/gpio-master/tb_gpio_apb_directed.sv" Line 1733. System function $value$plusargs is used as system task. This system function should have a LHS e.g. x=$value$plusargs().
+Built simulation snapshot gpio_sim

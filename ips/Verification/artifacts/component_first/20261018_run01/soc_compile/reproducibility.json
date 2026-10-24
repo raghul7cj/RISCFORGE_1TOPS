@@ -1,0 +1,12 @@
+{
+  "run_id": "20261018_run01",
+  "stage": "soc_compile",
+  "simulator": "Vivado XSim 2022.2",
+  "commands": [
+    "xvlog --sv -nolog -f soc_verification.xsim.f",
+    "xelab soc_tb_top -s soc_compile_check --timescale 1ns/1ps"
+  ],
+  "execution_directory": "C:\\Users\\cj\\AppData\\Local\\Temp\\riscforge_component_first_soc_compile_02",
+  "status": "PASS",
+  "note": "Python manifest generator preflight unavailable: Python launcher found no installed Python."
+}

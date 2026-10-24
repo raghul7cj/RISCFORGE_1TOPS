@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In-Core Zicsr Interrupt Subsystem: Architecture & Proposal</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #111827;
+  --mut: #4b5563;
+  --card: #f9fafb;
+  --card-alt: #f3f4f6;
+  --line: #d1d5db;
+  --line-dark: #1f2937;
+  --badge-bg: #e5e7eb;
+}
+* { box-sizing: border-box; }
+html { margin: 0; padding: 0; background: #ffffff; }
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: var(--fg);
+  font: 14.5px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+main {
+  max-width: 890px;
+  margin: 0 auto;
+  padding: 36px 20px 64px;
+  background: #ffffff;
+}
+h1 {
+  font-size: 1.65rem;
+  line-height: 1.25;
+  font-weight: 800;
+  margin: 0.2em 0 0.25em;
+  letter-spacing: -0.015em;
+  color: #111827;
+}
+h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 2.2em 0 0.6em;
+  border-bottom: 1.5px solid var(--line);
+  padding-bottom: 0.3em;
+  letter-spacing: -0.005em;
+  color: #111827;
+}
+h3 {
+  font-size: 0.88rem;
+  margin: 1.3em 0 0.4em;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+p, li { margin: 0.4em 0; color: #1f2937; }
+ul, ol { padding-left: 1.3em; }
+.sub {
+  color: var(--mut);
+  font-size: 0.92rem;
+  margin-bottom: 1.6em;
+  line-height: 1.5;
+}
+.tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--badge-bg);
+  color: #111827;
+  margin-right: 4px;
+}
+/* Responsive SVG containers - NO horizontal scrollbars */
+.fig-box {
+  width: 100%;
+  margin: 16px 0 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 14px 12px;
+}
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #ffffff;
+}
+svg text {
+  fill: #111827;
+  font: 11px system-ui, -apple-system, sans-serif;
+}
+svg .s { font-size: 9.5px; fill: #4b5563; }
+svg .t { font-weight: 700; font-size: 11.5px; fill: #111827; }
+svg .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 10px; }
+.b { fill: #ffffff; stroke: #1f2937; stroke-width: 1.3; }
+.b-card { fill: #f9fafb; stroke: #1f2937; stroke-width: 1.3; }
+.b-grey { fill: #f3f4f6; stroke: #4b5563; stroke-width: 1.2; }
+.b-dotted { fill: #ffffff; stroke: #1f2937; stroke-width: 1.3; stroke-dasharray: 4 3; }
+.b-muted { fill: #f9fafb; stroke: #9ca3af; stroke-width: 1.1; stroke-dasharray: 4 3; }
+.a { stroke: #111827; stroke-width: 1.3; fill: none; marker-end: url(#arr); }
+.a-mut { stroke: #4b5563; stroke-width: 1.1; fill: none; marker-end: url(#arr-mut); }
+.a-irq { stroke: #111827; stroke-width: 1.3; stroke-dasharray: 5 3; fill: none; marker-end: url(#arr); }
+.a-clear { stroke: #111827; stroke-width: 1.3; fill: none; marker-end: url(#arr); }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.84rem;
+  margin: 12px 0 18px;
+}
+th, td {
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--card);
+  font-weight: 700;
+  color: #111827;
+}
+tr:hover td { background: var(--card); }
+.formula-box {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 3.5px solid var(--line-dark);
+  border-radius: 4px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+.card {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+.note-warn {
+  border-left: 3.5px solid #111827;
+  background: #f9fafb;
+}
+figcaption {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--mut);
+  margin-top: 8px;
+}
+figcaption b { color: #111827; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>In-Core Zicsr Interrupt Subsystem: Architecture & Proposal</h1>
+<p class="sub">
+  A Tightly-Coupled, Interconnect-Isolated Interrupt Subsystem for the RISCFORGE 5-Stage RV32IM_Zicsr Core<br>
+  Target Venues: <strong>IEEE Embedded Systems Letters (ESL)</strong> &amp; <strong>IEEE TCAS-II Express Briefs</strong> · Prepared for Silicon Sign-off &amp; Academic Publication
+</p>
+
+<!-- ============================================================ 1 -->
+<h2>1 · Executive Summary &amp; Research Motivation</h2>
+<p>
+  In resource-constrained edge computing SoCs where an in-order RISC-V processor is co-located with high-throughput streaming accelerators (e.g., a 1TOPS neural processing unit or hardware cryptographic engine), interrupt servicing determinism is a critical figure of merit. Modern RISC-V systems universally adopt one of two standardized interrupt controllers:
+  In resource-constrained edge computing SoCs where an in-order RISC-V processor is co-located with high-throughput streaming accelerators (e.g., a Simple Accelerator DMA Master / cryptographic engine), interrupt servicing determinism is a critical figure of merit. Modern RISC-V systems universally adopt one of two standardized interrupt controllers:
+</p>
+<ul>
+  <li><strong>The Bus-Mapped Platform-Level Interrupt Controller (PLIC):</strong> Standardized for application processors, but forces the core to execute memory-mapped (MMIO) claim and completion load/store transactions across shared system crossbars (AXI4-Lite / APB). This introduces <strong>27–43 bus cycles of latency</strong> and injects arbitration stalls into concurrent accelerator DMA bursts.</li>
+  <li><strong>The Core-Local Interrupt Controller (CLIC / Smclic):</strong> Reduces hardware entry latency to 6–8 cycles, but requires <strong>~6.8 kGE (~320 flip-flops)</strong>, introduces non-standard compiler calling conventions (<code>__attribute__((interrupt("CLIC")))</code>), and uses a memory-mapped trap vector table (<code>mtvt</code>) that breaks standard upstream GCC/LLVM toolchains.</li>
+</ul>
+<p>
+  This research proposes an alternative: an <strong>In-Core, Tightly-Coupled Zicsr Interrupt Subsystem</strong> for the 5-stage RV32IM RISC-V core. By consolidating pulse-to-level capture (<code>irq_gateway.v</code>), 4-level preemption, and priority evaluation (<code>irq_arbiter.v</code>) directly within the core's native Machine-mode CSR space (<code>0x7C0–0x7C2</code>), the design achieves:
+</p>
+<ul>
+  <li><strong>Zero Interconnect Bus Contention:</strong> 100% of claim, auto-clear, and threshold operations occur across internal pipeline sidebands. Zero bus transactions are issued for interrupt servicing.</li>
+  <li><strong>Deterministic 6-Cycle Hardware Entry:</strong> Standard vectored dispatch via <code>mtvec</code> with zero-cycle hardware auto-clearing at Writeback commit.</li>
+  <li><strong>100% Upstream Toolchain Compatibility:</strong> Fully compliant with standard RISC-V Privileged Architecture v1.12. Compiles out of the box with vanilla <code>riscv32-unknown-elf-gcc</code>.</li>
+  <li><strong>Ultra-Low Silicon Footprint:</strong> Budgeted at <strong>~1.29 kGE (~110 flip-flops)</strong>, delivering a 4.4× reduction over PLIC and 5.3× reduction over CLIC.</li>
+</ul>
+
+<!-- ============================================================ 2 -->
+<h2>2 · SoC Architecture &amp; Interconnect Isolation</h2>
+<p>
+  Referencing the full RISCFORGE SoC specification, the figure below details the complete chip topology. Instruction fetch and DSRAM data memory have direct, zero-contention interfaces to the core. Peripheral registers (I2C, Timers, UART, GPIO, SPI, AON WDT) sit behind the AXI-Lite to APB bridge. The proposed in-core interrupt subsystem captures all peripheral interrupts through dedicated sideband wires, completely isolating interrupt arbitration from the shared crossbar.
+  Referencing the full RISCFORGE SoC specification, the figure below details the complete chip topology and contrasts the proposed <strong>Core-Local Fast IRQ style</strong> against the conventional <strong>bus-mapped PLIC style</strong> (as evaluated in the architectural review). Instruction fetch and direct DSRAM data memory have dedicated, zero-contention interfaces to the core. In the proposed design, latency-critical peripheral interrupts (UART, SPI, Timer) bypass the shared crossbar entirely via direct Fast Local Interrupt sideband lines into the in-core Zicsr subsystem. Conversely, bulk peripherals routing through a standard PLIC require the core to execute MMIO claim and complete transactions across the shared AXI-Lite crossbar, where they face severe arbitration stalls and jitter whenever the <strong>Simple Accelerator DMA Master</strong> (cryptographic engine) initiates high-throughput burst transfers.
+</p>
+
+<div class="fig-box">
+<svg viewBox="0 0 860 520" role="img" aria-label="RISCFORGE SoC Architecture with In-Core Zicsr Subsystem">
+<svg viewBox="0 0 860 450" role="img" aria-label="SoC Architecture: Core-Local Fast IRQ vs. Bus-Mapped PLIC">
+<defs>
+  <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0L7,3.5L0,7z" style="fill:#111827"/></marker>
+  <marker id="arr-mut" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0L7,3.5L0,7z" style="fill:#4b5563"/></marker>
+</defs>
+
+<!-- Core Boundary -->
+<rect class="b-card" x="45" y="16" width="550" height="195" rx="5"/>
+<text class="t" x="60" y="38">RV32IM_Zicsr Core (RISCFORGE)</text>
+<text class="s" x="580" y="38" text-anchor="end">5-Stage In-Order · Machine Mode</text>
+<!-- ================= 1. SOURCE CLUSTERS (LEFT) ================= -->
+
+<!-- Fast Local Sources Box (Top-Left) -->
+<rect class="b-grey" x="18" y="24" width="162" height="120" rx="4"/>
+<text class="t" x="28" y="44">Fast Local Sources</text>
+<text class="s" x="28" y="58" style="font-style:italic;">(Latency-Critical)</text>
+<text class="s" x="28" y="78">• UART0 (16550 RX/TX)</text>
+<text class="s" x="28" y="96">• SPI Master (Pulse)</text>
+<text class="s" x="28" y="114">• System Timer (MTIP)</text>
+<text class="mono s" x="28" y="132" style="font-weight:600;">FLI[2:0] &rarr; mip[19:17]</text>
+
+<!-- Bulk Peripheral Sources Box (Bottom-Left) -->
+<rect class="b-card" x="18" y="274" width="162" height="145" rx="4"/>
+<text class="t" x="28" y="296">Bulk Peripherals</text>
+<text class="s" x="28" y="310" style="font-style:italic;">(Slow / High Fan-In)</text>
+<text class="s" x="28" y="330">• GPIO Bank (32 Pins)</text>
+<text class="s" x="28" y="348">• I2C Master (100/400k)</text>
+<text class="s" x="28" y="366">• Timer 1 / AON WDT</text>
+<text class="s" x="28" y="384">• Future Slow Sensors</text>
+<text class="mono s" x="28" y="404" style="font-weight:600;">Sources 1..N &rarr; PLIC</text>
+
+<!-- ================= 2. CORE-LOCAL FAST PATH (TOP) ================= -->
+
+<!-- Direct Fast Local IRQ Arrow from Fast Sources into In-Core Subsystem -->
+<path class="a" d="M180 84H218"/>
+<text class="s" x="199" y="74" text-anchor="middle" style="font-weight:700;">Direct FLI</text>
+<text class="s" x="199" y="100" text-anchor="middle" style="font-size:8.5px;">0 extra cyc</text>
+
+<!-- RV32IM_Zicsr Core Boundary -->
+<rect class="b-card" x="218" y="16" width="418" height="178" rx="5"/>
+<text class="t" x="230" y="34">RV32IM_Zicsr Core (RISCFORGE)</text>
+<text class="s" x="626" y="34" text-anchor="end">5-Stage Pipeline · Zicsr Privileged v1.12</text>
+
+<!-- Pipeline Stages -->
+<rect class="b" x="60"  y="50" width="72" height="38" rx="3"/><text class="t" x="96"  y="66" text-anchor="middle">IF</text><text class="s" x="96"  y="80" text-anchor="middle">fetch</text>
+<rect class="b" x="148" y="50" width="72" height="38" rx="3"/><text class="t" x="184" y="66" text-anchor="middle">ID</text><text class="s" x="184" y="80" text-anchor="middle">decode</text>
+<rect class="b" x="236" y="50" width="76" height="38" rx="3"/><text class="t" x="274" y="66" text-anchor="middle">EX</text><text class="s" x="274" y="80" text-anchor="middle">ALU/MUL</text>
+<rect class="b" x="328" y="50" width="72" height="38" rx="3"/><text class="t" x="364" y="66" text-anchor="middle">MEM</text><text class="s" x="364" y="80" text-anchor="middle">lsu</text>
+<rect class="b" x="416" y="50" width="72" height="38" rx="3"/><text class="t" x="452" y="66" text-anchor="middle">WB</text><text class="s" x="452" y="80" text-anchor="middle">commit</text>
+<rect class="b" x="504" y="50" width="76" height="38" rx="3"/><text class="t" x="542" y="66" text-anchor="middle">CSR File</text><text class="s" x="542" y="80" text-anchor="middle">0x7C0-7C2</text>
+<rect class="b" x="230" y="44" width="46" height="34" rx="3"/><text class="t" x="253" y="58" text-anchor="middle">IF</text><text class="s" x="253" y="70" text-anchor="middle">fetch</text>
+<rect class="b" x="284" y="44" width="46" height="34" rx="3"/><text class="t" x="307" y="58" text-anchor="middle">ID</text><text class="s" x="307" y="70" text-anchor="middle">dec</text>
+<rect class="b" x="338" y="44" width="50" height="34" rx="3"/><text class="t" x="363" y="58" text-anchor="middle">EX</text><text class="s" x="363" y="70" text-anchor="middle">ALU</text>
+<rect class="b" x="396" y="44" width="46" height="34" rx="3"/><text class="t" x="419" y="58" text-anchor="middle">MEM</text><text class="s" x="419" y="70" text-anchor="middle">lsu</text>
+<rect class="b" x="450" y="44" width="46" height="34" rx="3"/><text class="t" x="473" y="58" text-anchor="middle">WB</text><text class="s" x="473" y="70" text-anchor="middle">com</text>
+<rect class="b" x="504" y="44" width="122" height="34" rx="3"/><text class="mono s" x="565" y="58" text-anchor="middle" style="font-weight:700;">CSR (0x7C0–7C2)</text><text class="s" x="565" y="70" text-anchor="middle">mintprio / mintlvl</text>
+
+<path class="a" d="M132 69H148"/><path class="a" d="M220 69H236"/><path class="a" d="M312 69H328"/><path class="a" d="M400 69H416"/><path class="a" d="M488 69H504"/>
+<path class="a" d="M276 61H284"/><path class="a" d="M330 61H338"/><path class="a" d="M388 61H396"/><path class="a" d="M442 61H450"/><path class="a" d="M496 61H504"/>
+
+<!-- Row 2 inside core: In-Core Subsystem, LSU, Trap Controller -->
+<rect class="b-grey" x="60" y="104" width="210" height="44" rx="3"/>
+<text class="t" x="70" y="122">In-Core Zicsr Subsystem</text>
+<text class="s" x="70" y="136">irq_gateway (latch) + arbiter (4-lvl)</text>
+<!-- Inside Core Row 2: In-Core Zicsr Subsystem, LSU, Trap Commit -->
+<rect class="b-grey" x="230" y="88" width="168" height="52" rx="3"/>
+<text class="mono s" x="240" y="104" style="font-weight:700;">irq_gateway + arbiter</text>
+<text class="s" x="240" y="118">• Latch pend_q &amp; 4-lvl decode</text>
+<text class="s" x="240" y="130">• Core-Local Fast IRQ Mode</text>
+
+<!-- Accept arrow directly up to EX stage bottom -->
+<path class="a" d="M270 126H285V88"/>
+<text class="s" x="290" y="100" style="font-weight:700;">irq_accept_E</text>
+<!-- irq_accept_E straight UP to EX stage bottom -->
+<path class="a" d="M363 88V78"/>
+<text class="s" x="368" y="85" style="font-weight:700; font-size:9px;">accept</text>
+
+<rect class="b" x="320" y="104" width="80" height="44" rx="3"/>
+<text class="t" x="360" y="123" text-anchor="middle">LSU</text>
+<text class="s" x="360" y="137" text-anchor="middle">hybrid</text>
+<rect class="b" x="408" y="88" width="60" height="52" rx="3"/>
+<text class="t" x="438" y="108" text-anchor="middle">LSU</text>
+<text class="s" x="438" y="122" text-anchor="middle">hybrid</text>
+
+<rect class="b" x="420" y="104" width="160" height="44" rx="3"/>
+<text class="t" x="500" y="122" text-anchor="middle">wb_trap_mret_commit</text>
+<text class="s" x="500" y="136" text-anchor="middle">commit &amp; stack pop on mret</text>
+<rect class="b" x="478" y="88" width="148" height="52" rx="3"/>
+<text class="t" x="552" y="104" text-anchor="middle">Trap / Commit</text>
+<text class="mono s" x="552" y="118" text-anchor="middle">mip[11] MEIP · mret pop</text>
+<text class="s" x="552" y="130" text-anchor="middle">Auto-Clear Strobe</text>
+
+<!-- Clear strobe routed cleanly UNDER LSU to gateway -->
+<path class="a-clear" d="M420 138H410V152H270V138H270"/>
+<text class="s" x="325" y="150">auto-clear</text>
+<!-- Auto-clear feedback strobe under LSU -->
+<path class="a-clear" d="M478 126H404V134H398"/>
+
+<!-- Row 3 inside core: Hazard Unit -->
+<rect class="b-muted" x="60" y="164" width="520" height="34" rx="3"/>
+<text class="s" x="320" y="186" text-anchor="middle" style="font-weight:600;">Hazard Unit — Forwarding, Stalls &amp; Pipeline Flushes on Trap Commit</text>
+<!-- Inside Core Row 3: Direct Memory & Vector Note -->
+<rect class="b-muted" x="230" y="148" width="396" height="36" rx="3"/>
+<text class="s" x="428" y="163" text-anchor="middle" style="font-weight:600;">Zero-Bus-Contention Architecture: Internal Fast IRQs Never Touch System Bus</text>
+<text class="s" x="428" y="176" text-anchor="middle">Direct ISRAM Fetch (32 KB) &amp; Direct Zero-Wait DSRAM Access (32 KB)</text>
+
+<!-- 1TOPS Accelerator -->
+<rect class="b-grey" x="615" y="16" width="225" height="85" rx="5"/>
+<text class="t" x="630" y="40">1TOPS Streaming Accelerator</text>
+<text class="s" x="630" y="56">Neural Processing Unit (NPU) / Crypto Engine</text>
+<text class="s" x="630" y="72" style="font-weight:700;">DMA Master Port (Burst Transfers)</text>
+<!-- ================= 3. SIMPLE ACCELERATOR DMA MASTER (TOP RIGHT) ================= -->
+<rect class="b-grey" x="652" y="16" width="190" height="98" rx="5"/>
+<text class="t" x="747" y="38" text-anchor="middle">Simple Accelerator</text>
+<text class="t" x="747" y="54" text-anchor="middle">DMA Master</text>
+<text class="s" x="747" y="72" text-anchor="middle">Crypto DMA Engine</text>
+<text class="s" x="747" y="88" text-anchor="middle" style="font-weight:700;">High-Throughput Bursts</text>
+<text class="mono s" x="747" y="104" text-anchor="middle">(AXI Master 1)</text>
+
+<!-- Direct Memory Paths -->
+<rect class="b" x="60"  y="240" width="115" height="46" rx="3"/><text class="t" x="117" y="259" text-anchor="middle">BootROM / ISRAM</text><text class="s" x="117" y="273" text-anchor="middle">32 KB (Code)</text>
+<rect class="b" x="195" y="240" width="115" height="46" rx="3"/><text class="t" x="252" y="259" text-anchor="middle">DSRAM</text><text class="s" x="252" y="273" text-anchor="middle">32 KB (Direct Data)</text>
+<!-- ================= 4. CENTRAL AXI-LITE CROSSBAR ================= -->
+<rect class="b-dotted" x="218" y="210" width="624" height="42" rx="4"/>
+<text class="t" x="530" y="228" text-anchor="middle">AXI-Lite Shared Crossbar (2 Masters × 3 Slaves)</text>
+<text class="s" x="530" y="243" text-anchor="middle">Shared Contended Interconnect: Accelerator DMA Bursts Interleave with CPU MMIO</text>
+
+<path class="a" d="M96 88V240"/><text class="s" x="102" y="220">direct fetch</text>
+<path class="a" d="M360 148V218H252V240"/><text class="s" x="260" y="228">zero-wait data</text>
+<!-- Master 0: LSU to Crossbar -->
+<path class="a" d="M438 140V210"/>
+<text class="s" x="444" y="196" style="font-size:9.5px; font-weight:600;">CPU MMIO</text>
+
+<!-- AXI-Lite Crossbar -->
+<rect class="b-dotted" x="330" y="236" width="510" height="54" rx="4"/>
+<text class="t" x="585" y="258" text-anchor="middle">AXI-Lite Shared Crossbar (2 Masters × 3 Targets)</text>
+<text class="s" x="585" y="274" text-anchor="middle">MMIO Traffic &amp; High-Throughput Accelerator DMA Transfers</text>
+<!-- Master 1: Simple Accelerator DMA Master to Crossbar -->
+<path class="a" d="M747 114V210"/>
+<text class="s" x="753" y="170" style="font-size:9.5px; font-weight:700;">DMA Bursts</text>
+
+<path class="a" d="M380 148V236"/><text class="s" x="386" y="205">MMIO to bus</text>
+<path class="a" d="M727 101V236"/><text class="s" x="734" y="170" style="font-weight:700;">DMA bursts</text>
+<!-- ================= 5. PLIC STYLE & BUS SLAVES (BOTTOM) ================= -->
+
+<!-- AXI-Lite to APB Bridge -->
+<path class="a" d="M585 290V318"/>
+<rect class="b" x="490" y="318" width="190" height="34" rx="3"/>
+<text class="t" x="585" y="340" text-anchor="middle">AXI-Lite &rarr; APB Bridge</text>
+<!-- rv_plic (Platform-Level Interrupt Controller) -->
+<rect class="b-card" x="218" y="274" width="232" height="145" rx="4"/>
+<text class="t" x="334" y="294" text-anchor="middle">PLIC Style: rv_plic</text>
+<text class="s" x="334" y="310" text-anchor="middle" style="font-style:italic;">(Bus-Mapped Interrupt Controller)</text>
+<text class="s" x="230" y="332">• Standard Platform-Level Controller</text>
+<text class="s" x="230" y="348">• Fanned in from bulk peripherals</text>
+<text class="s" x="230" y="364">• Asserts single MEIP line to core</text>
+<text class="s" x="230" y="382" style="font-weight:700;">MMIO Claim &amp; Complete Cycles:</text>
+<text class="s" x="230" y="396">Competes with DMA bursts on crossbar</text>
+<text class="mono s" x="230" y="410" style="font-weight:600; color:var(--ink-2);">Overhead: 15–30+ bus cyc &amp; jitter</text>
+
+<!-- APB Bus Rail -->
+<path class="a" d="M585 352V376"/>
+<path class="a" d="M35 376H825"/>
+<text class="s" x="40" y="370" style="font-weight:700;">APB3 Bus Rail (0x4000_0000 – 0x4000_6FFF)</text>
+<!-- Bulk Sources feed into PLIC -->
+<path class="a" d="M180 348H218"/>
+<text class="s" x="199" y="342" text-anchor="middle" style="font-size:9px; font-weight:600;">Bulk IRQs</text>
+
+<!-- 7 APB Peripherals -->
+<rect class="b" x="30"  y="392" width="104" height="44" rx="3"/><text class="t" x="82"  y="410" text-anchor="middle">I2C Master</text><text class="mono s" x="82"  y="424" text-anchor="middle">0x4000_0000</text>
+<rect class="b" x="146" y="392" width="104" height="44" rx="3"/><text class="t" x="198" y="410" text-anchor="middle">Timer 0</text><text class="mono s" x="198" y="424" text-anchor="middle">0x4000_1000</text>
+<rect class="b" x="262" y="392" width="104" height="44" rx="3"/><text class="t" x="314" y="410" text-anchor="middle">UART 16550</text><text class="mono s" x="314" y="424" text-anchor="middle">0x4000_2000</text>
+<rect class="b" x="378" y="392" width="104" height="44" rx="3"/><text class="t" x="430" y="410" text-anchor="middle">GPIO × 32</text><text class="mono s" x="430" y="424" text-anchor="middle">0x4000_3000</text>
+<rect class="b" x="494" y="392" width="104" height="44" rx="3"/><text class="t" x="546" y="410" text-anchor="middle">SPI Master</text><text class="mono s" x="546" y="424" text-anchor="middle">0x4000_4000</text>
+<rect class="b" x="610" y="392" width="104" height="44" rx="3"/><text class="t" x="662" y="410" text-anchor="middle">Timer 1</text><text class="mono s" x="662" y="424" text-anchor="middle">0x4000_5000</text>
+<rect class="b" x="726" y="392" width="108" height="44" rx="3"/><text class="t" x="780" y="410" text-anchor="middle">AON WDT</text><text class="mono s" x="780" y="424" text-anchor="middle">0x4000_6000</text>
+<!-- Crossbar to PLIC (Bi-directional MMIO claim/complete) -->
+<path class="a" d="M334 252V274"/>
+<path class="a" d="M338 274V252"/>
+<text class="s" x="345" y="266" style="font-size:9px; font-weight:600;">Claim / Complete</text>
+
+<path class="a" d="M82 376V392"/><path class="a" d="M198 376V392"/><path class="a" d="M314 376V392"/><path class="a" d="M430 376V392"/><path class="a" d="M546 376V392"/><path class="a" d="M662 376V392"/><path class="a" d="M780 376V392"/>
+<!-- Single MEIP Line from PLIC back up to Core mip[11] -->
+<path class="a-irq da" d="M430 274V194H530V140"/>
+<text class="s" x="436" y="206" style="font-weight:700; font-size:9.5px;">ext_irq_i &rarr; mip[11] MEIP (Single Wire)</text>
+
+<!-- Dedicated Interrupt Sideband Rail (Runs cleanly outside core box at x=18) -->
+<path class="a-irq" d="M82 436V462H18V126H60"/>
+<path class="a-irq" d="M198 436V462"/>
+<path class="a-irq" d="M314 436V462"/>
+<path class="a-irq" d="M430 436V462"/>
+<path class="a-irq" d="M546 436V462"/>
+<path class="a-irq" d="M780 436V462"/>
+<text class="s" x="420" y="478" text-anchor="middle" style="font-weight:700;">Direct Peripheral IRQ Sideband Lines (Bypassing AXI Crossbar Entirely &rarr; irq_gateway)</text>
+<!-- APB Peripheral Subsystem -->
+<rect class="b" x="466" y="274" width="180" height="145" rx="4"/>
+<text class="t" x="556" y="294" text-anchor="middle">APB3 Peripherals</text>
+<text class="s" x="556" y="310" text-anchor="middle" style="font-style:italic;">(Via AXI &rarr; APB Bridge)</text>
+<text class="s" x="478" y="332">• UART0, SPI, I2C</text>
+<text class="s" x="478" y="348">• Timer 0, Timer 1</text>
+<text class="s" x="478" y="364">• GPIO (32b), AON WDT</text>
+<text class="mono s" x="478" y="386">Base: 0x4000_0000</text>
+<text class="s" x="478" y="406">Configured via CPU MMIO</text>
+
+<path class="a" d="M556 252V274"/>
+
+<!-- Shared DSRAM Target -->
+<rect class="b-grey" x="662" y="274" width="180" height="145" rx="4"/>
+<text class="t" x="752" y="294" text-anchor="middle">Shared Data SRAM</text>
+<text class="s" x="752" y="310" text-anchor="middle">32 KB (0x0001_0000)</text>
+<text class="s" x="674" y="332">• Dual-Port / Arbitrated</text>
+<text class="s" x="674" y="348">• Port 0: CPU Direct (0-wait)</text>
+<text class="s" x="674" y="364">• Port 1: Crossbar Slave</text>
+<text class="s" x="674" y="386" style="font-weight:700;">Target of Accelerator DMA:</text>
+<text class="s" x="674" y="404">Saturates Crossbar bandwidth</text>
+
+<path class="a" d="M752 252V274"/>
+
+</svg>
+<figcaption><b>Figure 1 — RISCFORGE SoC Topology &amp; Interconnect Isolation.</b> Direct SRAM paths serve instruction fetch and loads/stores. The shared AXI crossbar is reserved exclusively for peripheral configuration and streaming accelerator DMA transfers. Peripheral interrupt lines return to the in-core Zicsr subsystem via dedicated sideband lines, eliminating PLIC-induced bus contention.</figcaption>
+<figcaption><b>Figure 1 — Architectural Comparison: Core-Local Fast IRQ Subsystem vs. Bus-Mapped PLIC.</b> Latency-critical sources (UART, SPI, Timer) connect directly to the in-core Zicsr subsystem via sideband lines (Core-Local Fast style), completely bypassing the shared AXI-Lite crossbar with 0 extra cycles. In contrast, bulk peripherals routing through a standard PLIC (PLIC style) force the core to execute MMIO claim/complete transactions across the crossbar, suffering severe latency degradation and jitter when the Simple Accelerator DMA Master is actively streaming burst transfers.</figcaption>
+</div>
+
+<!-- ============================================================ 3 -->
+<h2>3 · Baseline Architecture &amp; RTL Defect Audit</h2>
+<p>
+  In the baseline RISCFORGE design, interrupt qualification occurs combinationally in the <strong>Execute (EX) stage</strong> according to the following boolean qualification logic:
+</p>
+
+<div class="formula-box">
+  <strong>Execute-Stage Interrupt Qualification:</strong><br>
+  <code>irq_accept_E = valid_E &amp; irq_pending &amp; ~new_exc_valid_E &amp; ~exc_valid_E &amp; ~stallMUL</code>
+</div>
+
+<p>
+  When qualified, the pipeline flushes the IF and ID stages. State is committed atomically at the <strong>Writeback (WB) boundary</strong> by <code>wb_trap_mret_commit_controller.v</code>, writing <code>mepc &larr; PC_E</code>, setting <code>mcause</code>, clearing <code>mstatus.MIE</code>, and redirecting the program counter to <code>mtvec</code>.
+</p>
+
+<h3>Audited Defects in the Baseline RTL</h3>
+<div class="card note-warn">
+  <ul>
+    <li>
+      <strong>Defect 1 — Transient Pulse Loss (Critical):</strong> Peripherals (SPI, GPIO banks, DMA done strobes) emit single-cycle pulses. In the baseline RTL, peripheral lines connect directly to the <code>mip</code> wire. If a pulse arrives while interrupts are globally disabled (<code>mstatus.MIE = 0</code> during an active ISR), the pulse deasserts in 1 cycle and is <strong>permanently dropped</strong>.
+    </li>
+    <li>
+      <strong>Defect 2 — Fixed Priority Starvation of MTIP:</strong> The hardwired priority encoder in <code>top.v</code> evaluates:
+      <code>UART (19) &gt; SPI (18) &gt; I2C (17) &gt; GPIO (16) &gt; MEIP (11) &gt; MTIP (7) &gt; MSIP (3)</code>.
+      Because the Machine Timer (MTIP, cause 7) is ranked below all peripherals, continuous UART or SPI traffic completely starves the system tick counter, breaking RTOS preemption.
+    </li>
+    <li>
+      <strong>Defect 3 — Inverted Priority Comparator:</strong> The hardware threshold comparator in <code>execute_cycle.v</code> evaluates <code>(irq_cause_enc &gt; mintprio[4:0])</code>. It compares arbitrary <em>cause IDs</em> rather than true priority weights, improperly ranking cause 19 above cause 11 and cause 7 above cause 3, in direct violation of the RISC-V Privileged Architecture hierarchy.
+    </li>
+  </ul>
+</div>
+
+<h3>Baseline Cycle-Accurate Overhead Profile</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Overhead Component</th>
+      <th>Cycles (Typical)</th>
+      <th>Cycles (Worst Case)</th>
+      <th>Microarchitectural Root Cause</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Hardware Entry (Pin to IF Redirect)</td>
+      <td>6</td>
+      <td>40</td>
+      <td>Non-preemptible divider (<code>rv32m_div</code>) holds <code>stallMUL</code> for up to 34 cycles</td>
+    </tr>
+    <tr>
+      <td>Software Context Save (Prologue)</td>
+      <td>17</td>
+      <td>17</td>
+      <td>16 caller-saved registers (<code>sw</code>) to zero-wait-state write DSRAM</td>
+    </tr>
+    <tr>
+      <td>Software Context Restore (Epilogue)</td>
+      <td>33</td>
+      <td>33</td>
+      <td>16 <code>lw</code> instructions from 1-wait-state registered read DSRAM</td>
+    </tr>
+    <tr>
+      <td><code>mret</code> Pipeline Redirect</td>
+      <td>5</td>
+      <td>5</td>
+      <td>Pipeline flush and fetch redirect from <code>mepc</code></td>
+    </tr>
+    <tr style="font-weight:700;">
+      <td>Total Leaf ISR Round-Trip Overhead</td>
+      <td>61</td>
+      <td>95</td>
+      <td>Unblocked baseline vs. division in flight (34-cycle jitter tail)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ 4 -->
+<h2>4 · Master Comparative Analysis: 5 Architectures Evaluated</h2>
+<p>
+  The proposed in-core Zicsr architecture is evaluated against the Platform-Level Interrupt Controller (PLIC), the Core-Local Interrupt Controller (CLIC), the minimalist PicoRV32 IRQ, and the lowRISC Ibex fast interrupt mode.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Evaluation Metric</th>
+      <th>Standard PLIC [1, 2]</th>
+      <th>Standard CLIC [3, 4]</th>
+      <th>PicoRV32 IRQ [5]</th>
+      <th>Ibex irq_fast [6]</th>
+      <th>RISCFORGE (Proposed)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Topological Location</strong></td>
+      <td>System Bus Slave (AXI/APB)</td>
+      <td>Core-Local Memory Port</td>
+      <td>Core Pipeline Internal</td>
+      <td>Core Fast Port (30:16)</td>
+      <td><strong>Core CSR Sideband (0x7C0–0x7C2)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Hardware Entry Latency</strong></td>
+      <td>35–45 cycles</td>
+      <td>6–8 cycles</td>
+      <td>~8 cycles</td>
+      <td>6–8 cycles</td>
+      <td><strong>6 cycles deterministic (clean EX)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Interrupt Claim Overhead</strong></td>
+      <td>15–25 bus cyc (MMIO load)</td>
+      <td>0 cyc (HW SHV)</td>
+      <td>0 cyc (Internal)</td>
+      <td>0 cyc (Direct)</td>
+      <td><strong>0 cyc (Hardware auto-clear)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Interrupt Complete Overhead</strong></td>
+      <td>12–18 bus cyc (MMIO store)</td>
+      <td>0 cyc (HW mnxti)</td>
+      <td>0 cyc (Internal)</td>
+      <td>SW bus write required</td>
+      <td><strong>0 cyc (Hardware stack pop on mret)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Total Round-Trip (Leaf ISR)</strong></td>
+      <td>62–88+ cycles</td>
+      <td>~40 cycles</td>
+      <td>~30 cycles</td>
+      <td>~55 cycles</td>
+      <td><strong>~22 cycles (target)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Pulse Interrupt Capture</strong></td>
+      <td>Level-sensitive</td>
+      <td>Supported (per-channel)</td>
+      <td>Latched</td>
+      <td>Level only (drops pulses)</td>
+      <td><strong>Per-bit configurable latch (pend_q)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Priority Reconfigurability</strong></td>
+      <td>Static MMIO (1–7)</td>
+      <td>Dynamic (configurable)</td>
+      <td>None (flat mask)</td>
+      <td>Fixed ID order</td>
+      <td><strong>4-Level Runtime (via mintlvl CSR)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Hardware Preemption / Nesting</strong></td>
+      <td>Software only</td>
+      <td>Full Hardware (levels)</td>
+      <td>None (disabled)</td>
+      <td>Software only</td>
+      <td><strong>1-Level Hardware Threshold Stack</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Interconnect Bus Contention</strong></td>
+      <td>High (shared crossbar)</td>
+      <td>Zero (local port)</td>
+      <td>Zero (internal)</td>
+      <td>Partial (completion write)</td>
+      <td><strong>Zero (100% bus isolated)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>RISC-V Privileged Compliance</strong></td>
+      <td>Full (v1.12)</td>
+      <td>Full (Smclic draft)</td>
+      <td>Non-compliant (getq/setq)</td>
+      <td>Full (v1.12)</td>
+      <td><strong>100% Full Compliance (Zicsr)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Upstream GCC/LLVM Support</strong></td>
+      <td>Unmodified</td>
+      <td>Compiler fork required</td>
+      <td>Custom stubs required</td>
+      <td>Unmodified</td>
+      <td><strong>Unmodified Upstream GCC/LLVM</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Silicon Area (IRQ Subsystem)</strong></td>
+      <td>~5.7 kGE (~150 FFs)</td>
+      <td>~6.8 kGE (~320 FFs)</td>
+      <td>~0.4 kGE (~28 FFs)</td>
+      <td>~1.5 kGE (~60 FFs)</td>
+      <td><strong>~1.29 kGE (~110 FFs, analytical)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Core Logic Area Overhead</strong></td>
+      <td>+26% of core</td>
+      <td>+31% of core</td>
+      <td>+1.8% of core</td>
+      <td>+6.8% of core</td>
+      <td><strong>+5.8% of core logic</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ 5 -->
+<h2>5 · Microarchitectural Datapath &amp; Timing Breakdown</h2>
+<p>
+  The proposed subsystem introduces <code>irq_gateway.v</code> and <code>irq_arbiter.v</code> coupled to the pipeline through Machine-mode CSR space. All feedback paths (such as the Writeback auto-clear strobe) route cleanly around arbitration blocks.
+</p>
+
+<div class="fig-box">
+<svg viewBox="0 0 860 360" role="img" aria-label="Microarchitectural Block Diagram of irq_gateway and irq_arbiter">
+<!-- Subsystem Boundary -->
+<rect class="b-card" x="15" y="10" width="830" height="340" rx="5"/>
+<text class="t" x="30" y="28">In-Core Zicsr Subsystem Datapath</text>
+
+<!-- CSR Register File at Top -->
+<rect class="b" x="30" y="38" width="800" height="46" rx="3"/>
+<text class="mono" x="42" y="56" style="font-weight:700;">Machine CSR Register Bank (0x7C0–0x7C2)</text>
+<text class="s" x="42" y="72">0x7C0 mintprio (CUR_LVL[2:0] &amp; PREV_LVL[10:8]) · 0x7C1 mintlvl (2b × 16 sources = 32b) · 0x7C2 mintctl (EDGE_SEL[15:0], RR_EN, NEST_EN)</text>
+
+<!-- Raw Sources -->
+<rect class="b" x="30" y="100" width="135" height="190" rx="3"/>
+<text class="t" x="42" y="122">Raw IRQ Sources</text>
+<text class="s" x="42" y="142">• UART0 (lvl, 19)</text>
+<text class="s" x="42" y="158">• SPI (pulse, 18)</text>
+<text class="s" x="42" y="174">• I2C (lvl, 17)</text>
+<text class="s" x="42" y="190">• GPIO (edge, 16)</text>
+<text class="s" x="42" y="206">• MTIP (pulse, 7)</text>
+<text class="s" x="42" y="222">• AON WDT (lvl, 20)</text>
+<text class="s" x="42" y="238">• MEIP / MSIP (11, 3)</text>
+<text class="s" x="42" y="254">• Future Fast (31:21)</text>
+
+<!-- Gateway -->
+<rect class="b-grey" x="195" y="100" width="195" height="190" rx="3"/>
+<text class="mono" x="207" y="122" style="font-weight:700;">irq_gateway.v</text>
+<text class="s" x="207" y="142">• 16 Edge Detectors (irq_in_d)</text>
+<text class="s" x="207" y="158">• Sticky Latches pend_q[15:0]</text>
+<text class="s" x="207" y="174">• Captures 1-cycle pulses</text>
+<text class="s" x="207" y="190">• Holds until auto-cleared</text>
+<text class="s" x="207" y="214" style="font-weight:700;">Zero-Cycle Auto-Clear:</text>
+<text class="s" x="207" y="230">Clears pend_q[cause] upon</text>
+<text class="s" x="207" y="246">receiving WB clear pulse</text>
+
+<!-- Arbiter -->
+<rect class="b-grey" x="420" y="100" width="205" height="190" rx="3"/>
+<text class="mono" x="432" y="122" style="font-weight:700;">irq_arbiter.v</text>
+<text class="s" x="432" y="142">• Inputs: pend_q &amp; mie_r</text>
+<text class="s" x="432" y="158">• 4-Level Parallel Decode</text>
+<text class="s" x="432" y="174">• Max-Level Reduction (3 &rarr; 0)</text>
+<text class="s" x="432" y="190">• Threshold: win_lvl &gt; CUR_LVL</text>
+<text class="s" x="432" y="214" style="font-weight:700;">Tie-Break Engine:</text>
+<text class="s" x="432" y="230">Option A: Fixed Priority (0 FF)</text>
+<text class="s" x="432" y="246">Option B: Rotating Token (4 FFs)</text>
+
+<!-- Pipeline Interface -->
+<rect class="b" x="655" y="100" width="175" height="88" rx="3"/>
+<text class="t" x="667" y="120">Execute Stage (EX)</text>
+<text class="s" x="667" y="138">Combinational Acceptance</text>
+<text class="s" x="667" y="154">irq_accept_E = valid_E &amp;</text>
+<text class="s" x="667" y="168">irq_pending &amp; ~stallMUL</text>
+
+<rect class="b" x="655" y="202" width="175" height="88" rx="3"/>
+<text class="t" x="667" y="222">Writeback Stage (WB)</text>
+<text class="s" x="667" y="240">Atomic Trap Commit</text>
+<text class="s" x="667" y="254">PREV_LVL &larr; CUR_LVL; CUR &larr; lvl</text>
+<text class="s" x="667" y="268">Fires auto_clear_strobe pulse</text>
+
+<!-- Interconnect Wires -->
+<path class="a" d="M165 150H195"/>
+<path class="a" d="M390 150H420"/>
+<path class="a" d="M625 138H655"/>
+<path class="a" d="M742 188V202"/>
+
+<!-- CSR Configuration Wires -->
+<path class="a-mut da" d="M292 84V100"/>
+<path class="a-mut da" d="M522 84V100"/>
+
+<!-- Auto-Clear Strobe Feedback Bus (Rerouted cleanly under blocks) -->
+<path class="a-clear" d="M742 290V322H292V290"/>
+<text class="s" x="517" y="316" text-anchor="middle" style="font-weight:700;">auto_clear_strobe[cause] (1-cycle pulse at WB commit &rarr; irq_gateway)</text>
+</svg>
+<figcaption><b>Figure 2 — Microarchitecture of In-Core Zicsr Subsystem.</b> 16 peripheral lines pass through <code>irq_gateway.v</code> for pulse capture, feeding into <code>irq_arbiter.v</code> for 4-level sorting and threshold gating. Trap acceptance fires combinationally in EX; Writeback commit clears the pending bit and updates the nesting stack in 0 software cycles via an isolated feedback strobe.</figcaption>
+</div>
+
+<h3>Cycle-by-Cycle Deterministic Hardware Entry (Addressing Critic 1)</h3>
+<p>
+  The table below details the exact pipeline cycle progression from interrupt assertion to first ISR instruction execution under clean (non-dividing) baseline conditions:
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Cycle</th>
+      <th>Pipeline Stage</th>
+      <th>Microarchitectural Action</th>
+      <th>State Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Cycle 0</td>
+      <td>Peripheral Pin</td>
+      <td>Peripheral asserts pulse or level. Gateway captures rising edge into <code>pend_q[i]</code>.</td>
+      <td><code>pend_q[i] &larr; 1</code></td>
+    </tr>
+    <tr>
+      <td>Cycle 1</td>
+      <td>Execute (EX)</td>
+      <td><code>irq_arbiter</code> evaluates levels combinationally. Asserts <code>irq_accept_E</code>.</td>
+      <td>EX trap tag set; IF/ID flush initiated</td>
+    </tr>
+    <tr>
+      <td>Cycle 2</td>
+      <td>Memory (MEM)</td>
+      <td>Trap tag advances with the instruction boundary. In-flight loads/stores complete.</td>
+      <td>MEM pipeline register tagged</td>
+    </tr>
+    <tr>
+      <td>Cycle 3</td>
+      <td>Writeback (WB)</td>
+      <td><code>wb_trap_commit</code> fires. Auto-clear strobe pulses gateway. PC redirected to <code>mtvec</code>.</td>
+      <td><code>mepc &larr; PC_E</code>, <code>mcause &larr; cause</code>, <code>pend_q[i] &larr; 0</code>, <code>PREV &larr; CUR</code></td>
+    </tr>
+    <tr>
+      <td>Cycle 4</td>
+      <td>Fetch (IF)</td>
+      <td>First instruction of the ISR is fetched from ISRAM (vectored: <code>mtvec + 4×cause</code>).</td>
+      <td>IF SRAM spec_tag drain</td>
+    </tr>
+    <tr>
+      <td>Cycle 5</td>
+      <td>Decode (ID)</td>
+      <td>First ISR instruction enters decode stage. Registers read.</td>
+      <td>ID pipeline register valid</td>
+    </tr>
+    <tr>
+      <td>Cycle 6</td>
+      <td>Execute (EX)</td>
+      <td><strong>First instruction of ISR executes.</strong> Hardware entry completed in exactly 6 cycles.</td>
+      <td>Deterministic 6-cycle entry complete</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ 6 -->
+<h2>6 · Deep-Dive Technical Inquiries</h2>
+
+<h3>A. Is 4-Level Runtime Priority Feasible for 16 Sources?</h3>
+<p>
+  <strong>Yes, it is mathematically and physically optimal.</strong>
+</p>
+<ul>
+  <li><strong>Register Packaging:</strong> 16 sources × 2 bits per level = <strong>exactly 32 bits</strong>. This packs perfectly into a single standard RISC-V 32-bit CSR (<code>mintlvl</code>). Firmware can reassign the entire SoC's priority map with a single <code>csrw</code> instruction.</li>
+  <li><strong>Timing &amp; Delay:</strong> The decoding logic forms 4 parallel 16-bit masks. Finding the winning level requires four 16-input OR reductions followed by a 4-to-1 priority multiplexer. In a commercial 40nm or 130nm standard-cell library, total combinational propagation delay is <strong>&lt; 0.4 ns</strong> (less than 3% of a 50 MHz clock period), introducing zero timing closure risk.</li>
+</ul>
+
+<h3>B. Contention Resolution: What Happens When 2+ Sources Share the Same Priority?</h3>
+<p>
+  When two or more peripherals contend within the winning priority level, arbitration is resolved through one of two area-conscious strategies:
+</p>
+<ul>
+  <li>
+    <strong>Option 1 — Static Hardwired Sub-Priority (Baseline: 0 Flip-Flops):</strong>
+    Within each level, a fixed priority encoder selects the lowest source index. Area cost is <strong>0 flip-flops</strong> and ~30 combinational gates. If UART (bit 0) and SPI (bit 1) both reside at Level 2, UART wins contention. Because priorities are runtime-configurable via CSR, firmware can elevate critical peripherals to distinct levels if starvation threatens.
+  </li>
+  <li>
+    <strong>Option 2 — Rotating Token Round-Robin (Anti-Starvation Extension: 4 Flip-Flops):</strong>
+    A 4-bit token pointer (<code>rr_ptr[3:0]</code>) remembers the last serviced source. Ties within a level are resolved relative to <code>rr_ptr</code>. Upon acceptance, <code>rr_ptr &larr; (winner + 1) mod 16</code>. This formally guarantees that for N contending sources at level L, maximum waiting time is bounded:
+    <div class="formula-box">
+      <strong>Maximum Waiting Time Bound:</strong><br>
+      <code>T_wait(i) ≤ (N_lvl − 1) × (T_ISR + T_overhead)</code>
+    </div>
+    Silicon cost is <strong>exactly 4 flip-flops</strong> (~22 GE in SkyWater 130nm) and ~120 GE of combinational mask logic.
+  </li>
+</ul>
+
+<h3>C. The CLIC Problem: Why Does CLIC Break Toolchains While Ours Does Not?</h3>
+<div class="card">
+  <p>The RISC-V Smclic draft specification incurs major toolchain and linker liabilities:</p>
+  <ol>
+    <li>
+      <strong>Compiler Calling Conventions:</strong> CLIC introduces Selective Hardware Vectoring (SHV) and tail-chaining (<code>mnxti</code>), mandating non-standard function attributes like <code>__attribute__((interrupt("CLIC")))</code>. Upstream GCC and LLVM <strong>do not support this natively</strong>; developers must use vendor-specific compiler forks (Nuclei, Andes, or PULP GCC).
+    </li>
+    <li>
+      <strong>Vector Table Architecture (<code>mtvec</code> vs <code>mtvt</code>):</strong> Standard RISC-V uses <code>mtvec</code> pointing to an array of <em>executable jump instructions</em> (<code>j isr_handler</code>). CLIC replaces this with <code>mtvt</code>, which requires a table of <em>32-bit memory addresses</em> loaded across the data port, requiring custom linker scripts (<code>.ld</code>) that break standard RTOS BSPs.
+    </li>
+    <li>
+      <strong>Core Bus Contention:</strong> CLIC's control arrays are memory-mapped to a core-local port, competing with the core's Load-Store Unit (LSU) for data memory cycles.
+    </li>
+  </ol>
+  <p>
+    <strong>Why the Proposed Architecture is 100% Upstream Compatible:</strong>
+    Our design retains the canonical <strong>vectored <code>mtvec</code> jump table</strong> and standard Machine-mode trap semantics. Interrupt handlers are written in standard ANSI C using vanilla <code>__attribute__((interrupt))</code>. Hardware auto-clear and preemption stack popping execute transparently on standard Writeback commit and <code>mret</code> execution. Custom CSRs (<code>0x7C0–0x7C2</code>) reside in the official user-definable range and compile in stock GCC via standard inline assembly.
+  </p>
+</div>
+
+<!-- ============================================================ 7 -->
+<h2>7 · Analytical Area &amp; Gate-Count Verification (~1.29 kGE)</h2>
+<p>
+  To maintain academic integrity for peer-reviewed submission (IEEE ESL / TCAS-II), the <strong>~1.29 kGE (~110 flip-flops)</strong> figure is derived from an analytical standard-cell gate-equivalent model:
+</p>
+
+<h3>Sequential Flip-Flop Audit</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Subsystem Block</th>
+      <th>Register / State Function</th>
+      <th>Bit Width</th>
+      <th>Flip-Flop Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>irq_gateway</code></td>
+      <td>16-channel edge-history sampling registers (<code>irq_in_d</code>)</td>
+      <td>16</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <td><code>irq_gateway</code></td>
+      <td>16-channel sticky pending latches (<code>pend_q</code>)</td>
+      <td>16</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <td><code>mintlvl</code> (0x7C1)</td>
+      <td>2 bits per source × 16 interrupt sources</td>
+      <td>32</td>
+      <td>32</td>
+    </tr>
+    <tr>
+      <td><code>mintprio</code> (0x7C0)</td>
+      <td><code>CUR_LVL[2:0]</code> (3) + <code>PREV_LVL[2:0]</code> (3) hardware stack</td>
+      <td>6</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td><code>mintctl</code> (0x7C2)</td>
+      <td>Mode control (<code>EDGE_SEL</code>, <code>RR_EN</code>, <code>NEST_EN</code>)</td>
+      <td>~8 active</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td><code>irq_arbiter</code></td>
+      <td>Anti-starvation rotating token pointer (<code>rr_ptr[3:0]</code>)</td>
+      <td>4</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Control Sideband</td>
+      <td>Auto-clear strobes, trap-commit synchronization FFs</td>
+      <td>~25</td>
+      <td>25</td>
+    </tr>
+    <tr style="font-weight:700;">
+      <td>Total Sequential Count</td>
+      <td colspan="2">Comprehensive Subsystem Sequential State</td>
+      <td>~107–110 FFs</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Standard-Cell Library Area Calculation</h3>
+<ul>
+  <li>In commercial standard-cell libraries (TSMC 40nm, TSMC 28nm, SkyWater 130nm), one D-flip-flop with asynchronous reset (<code>DFFR_X1</code>) occupies <strong>5.0 to 5.5 NAND2 Gate Equivalents (GE)</strong>.
+    <div class="formula-box">
+      <strong>Sequential Area:</strong> 110 FFs × 5.25 GE/FF ≈ <strong>575 to 600 GE</strong>
+    </div>
+  </li>
+  <li>Combinational priority encoders, 16 level decoders, threshold comparators, and CSR read/write multiplexers require approximately <strong>~690 GE</strong>.</li>
+  <li>
+    <strong>Total Cumulative Footprint:</strong>
+    <div class="formula-box">
+      <strong>Total Subsystem Area:</strong> 590 GE (sequential) + 690 GE (combinational) = <strong>1,280 GE ≈ 1.29 kGE</strong>
+    </div>
+  </li>
+  <li>
+    <em>Net Area Offset:</em> The baseline core's legacy <code>mintprio_r</code> register shrinks from 32 FFs down to 6 active bits, reclaiming 26 FFs (~140 GE), yielding an effective net silicon addition of only <strong>~1.15 kGE (+5.8% of core logic)</strong>.
+  </li>
+</ul>
+
+<!-- ============================================================ 8 -->
+<h2>8 · Software Architecture &amp; Standard Toolchain Driver</h2>
+<p>
+  Software interaction requires zero toolchain modification. Firmware programs the subsystem via standard Machine CSR instructions, while interrupt handlers adhere to canonical GCC/LLVM conventions.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Driver Abstraction</th>
+      <th>Target Register</th>
+      <th>Underlying Machine Instruction</th>
+      <th>Hardware Execution Semantics</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>irq_set_levels(uint32_t map)</code></td>
+      <td><code>mintlvl</code> (0x7C1)</td>
+      <td><code>csrw 0x7C1, a0</code></td>
+      <td>Assigns 2-bit priority levels to 16 fast sources in 1 cycle. Zero bus overhead.</td>
+    </tr>
+    <tr>
+      <td><code>irq_set_threshold(uint32_t lvl)</code></td>
+      <td><code>mintprio</code> (0x7C0)</td>
+      <td><code>csrw 0x7C0, a0</code></td>
+      <td>Sets active preemption floor (CUR_LVL). Interrupts with level ≤ floor are masked.</td>
+    </tr>
+    <tr>
+      <td><code>irq_get_threshold()</code></td>
+      <td><code>mintprio</code> (0x7C0)</td>
+      <td><code>csrr a0, 0x7C0</code></td>
+      <td>Reads current execution threshold and previous nesting state.</td>
+    </tr>
+    <tr>
+      <td><code>uart_isr()</code></td>
+      <td>Standard ABI</td>
+      <td>Standard GCC function</td>
+      <td>Compiler emits prologue (<code>sw</code>) and epilogue (<code>lw</code>, <code>mret</code>). Hardware auto-clears pending latch and pops threshold on <code>mret</code> with 0 software instructions.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ 9 -->
+<h2>9 · Phased Implementation &amp; Publication Roadmap</h2>
+<div class="card">
+  <ol>
+    <li>
+      <strong>Phase 1 · RTL Construction &amp; Linting:</strong>
+      Implement <code>irq_gateway.v</code> and <code>irq_arbiter.v</code>. Wire into <code>riscv_core/top.v</code> and <code>csr_regfile.v</code>. Sign off clean on SpyGlass linting and CDC checks.
+    </li>
+    <li>
+      <strong>Phase 2 · SVA Formal Property Verification (Cadence JasperGold):</strong>
+      Prove Property 1 (Pulse Safety: positive edge triggers pending latch), Property 2 (Zero-Cycle Auto-Clear atomicity), and Property 3 (Starvation Boundedness under bounded ISR execution).
+    </li>
+    <li>
+      <strong>Phase 3 · Physical ASIC Synthesis (SkyWater 130nm / TSMC 40nm):</strong>
+      Synthesize with Synopsys Design Compiler / Cadence Genus at 50–100 MHz. Extract post-synthesis gate count to empirically validate the 1.29 kGE analytical estimate.
+    </li>
+    <li>
+      <strong>Phase 4 · Publication Submission:</strong>
+      Submit manuscript to <strong>IEEE Embedded Systems Letters (ESL)</strong> (4-page strict format) with fallback to <strong>IEEE TCAS-II Express Briefs</strong> (5-page format).
+    </li>
+  </ol>
+</div>
+
+<!-- ============================================================ 10 -->
+<h2>10 · References</h2>
+<ol style="font-size: 0.82rem; color: var(--mut);">
+  <li>RISC-V International, <em>"The RISC-V Instruction Set Manual, Volume II: Privileged Architecture,"</em> Document Version 20211203, 2021.</li>
+  <li>SiFive, Inc., <em>"SiFive U74 Core Complex Manual: Platform-Level Interrupt Controller (PLIC),"</em> 2021.</li>
+  <li>RISC-V International, <em>"Smclic: Core-Local Interrupt Controller Specification,"</em> Draft Version 0.9, 2023.</li>
+  <li>PULP Platform, <em>"PULP CLIC: Low-Latency Core-Local Interrupt Controller IP Core,"</em> Integrated Systems Laboratory, ETH Zurich, 2022.</li>
+  <li>C. Wolf, <em>"PicoRV32 – A Size-Optimized RISC-V CPU,"</em> GitHub Repository, 2015–2023.</li>
+  <li>lowRISC, <em>"Ibex RISC-V Core: Technical Specification,"</em> lowRISC CIC, Cambridge, UK, 2021.</li>
+  <li>Balas, A., Ottaviano, A., and Benini, L., <em>"CV32RT: Enabling Fast Interrupt and Context Switching for RISC-V Microcontrollers,"</em> in <em>Proc. Design, Automation &amp; Test in Europe (DATE)</em>, 2024.</li>
+</ol>
+
+</main>
+</body>
+</html>

@@ -1,0 +1,10 @@
+UART XSim delta-cycle replay notes
+
+Backend: Vivado XSim 2022.2, Windows, saved non-project snapshot uart_adapter_only.
+Original complete failure: sim_adapter.log reports FATAL_ERROR at 60 ns, iteration 0, process /tb_apb_adapter/dut/Always111_2 in apb_to_obi.sv. Its XSim runtime summary reports 8,515,556 KB peak memory.
+
+Replay A: xsim uart_adapter_only -maxdeltaid 1000 -stats -tp -tl -log <artifact-log> -R. It repeatedly printed the same-time process set after PSEL and generated an unbounded trace; the XSim process was terminated by the operator. Both redirected trace streams flushed after termination and were preserved in retry_adapter_maxdelta_traces.zip as retry_adapter_maxdelta.log and retry_adapter_maxdelta.stdout.log. The replay transcript ends in the PSEL-edge process trace without a new fatal diagnostic.
+
+Replay B: xsim uart_adapter_only -maxdeltaid 10 -maxlogsize 1 -stats -log <artifact-log> -R. The transcript advanced through “ADAPTER before PSEL 60000” and then stopped advancing despite the delta cap; the XSim process was terminated by the operator. The compact log and stdout are retained as retry_adapter_maxdelta10.log and retry_adapter_maxdelta10.stdout.log, with exit records beside them. No new fatal message was produced.
+
+These replays are diagnostic failures, not PASS results. They do not establish whether the underlying cause is an XSim defect, source construct, or the testbench responder. A controlled second-simulator run is still required. No RTL was changed.

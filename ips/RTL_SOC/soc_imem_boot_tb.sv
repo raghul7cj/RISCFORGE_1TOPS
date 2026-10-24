@@ -139,10 +139,15 @@ module spi_flash_bfm #(
         S_DATA: begin
           bit_cnt = bit_cnt + 1;
           if (bit_cnt == 32) begin
-            // In continuous read mode, flash would auto-increment address.
-            // The bootloader issues one 32-bit transaction per word, then
-            // deasserts CS, so we don't need to handle auto-increment.
             bit_cnt = 0;
+            // Standard Read keeps CS asserted while the bootloader drains
+            // successive 32-bit words. Advance the byte address and prepare
+            // the next word at each word boundary.
+            addr_reg = addr_reg + 24'd4;
+            shift_out_reg = {mem[addr_reg],
+                             mem[addr_reg + 1],
+                             mem[addr_reg + 2],
+                             mem[addr_reg + 3]};
           end
         end
       endcase
@@ -175,9 +180,9 @@ module soc_imem_boot_tb;
   // Reduce flash power-up wait for faster simulation
   localparam int unsigned FLASH_POWERUP_CYCLES = 10;
 
-  // Boot timeout (generous: SRAM clear + SPI fetch)
-  // 2048 clear words × ~2 cyc + 10 flash wait + 8 words × ~300 cyc ≈ 7000 cycles
-  localparam int unsigned BOOT_TIMEOUT_CYCLES = 50_000;
+  // Boot timeout: full SoC clear of 8192 ISRAM + 8192 DSRAM words takes
+  // about 82,000 cycles here, followed by flash setup and the SPI load.
+  localparam int unsigned BOOT_TIMEOUT_CYCLES = 100_000;
 
   localparam time CLK_PERIOD = 10ns;
 
@@ -213,7 +218,8 @@ module soc_imem_boot_tb;
   logic i2c_interrupt_o;
 
   // Timer
-  logic [3:0] timer_irq;
+  logic [3:0] timer0_irq;
+  logic [3:0] timer1_irq;
 
   // UART (unused — tie off)
   logic uart_sin_i, uart_sout_o, uart_int_o;
@@ -271,9 +277,8 @@ module soc_imem_boot_tb;
 
   // ─── DUT: riscforge_soc_subsystem ─────────────────────────────────────
   riscforge_soc_subsystem #(
-    .CLIC_N_SOURCE        ( 256                  ),
-    .CLIC_INTCTLBITS      ( 8                    ),
-    .TIMER_CNT            ( 2                    ),
+    .TIMER0_CNT           ( 2                    ),
+    .TIMER1_CNT           ( 2                    ),
     .SPI_BUFFER_DEPTH     ( 10                   ),
     .NUM_INSTR_WORDS      ( NUM_INSTR_WORDS      ),
     .NUM_DATA_WORDS       ( NUM_DATA_WORDS        ),
@@ -298,21 +303,14 @@ module soc_imem_boot_tb;
     .i2c_sda_oen_o            ( i2c_sda_oen_o     ),
     .i2c_interrupt_o          ( i2c_interrupt_o    ),
 
-    // Timer
-    .timer_irq_o              ( timer_irq          ),
+    // Timers
+    .timer0_irq_o             ( timer0_irq         ),
+    .timer1_irq_o             ( timer1_irq         ),
 
     // UART
     .uart_sin_i               ( uart_sin_i         ),
     .uart_sout_o              ( uart_sout_o        ),
     .uart_int_o               ( uart_int_o         ),
-    .uart_out1n_o             ( uart_out1n_o       ),
-    .uart_out2n_o             ( uart_out2n_o       ),
-    .uart_rtsn_o              ( uart_rtsn_o        ),
-    .uart_dtrn_o              ( uart_dtrn_o        ),
-    .uart_ctsn_i              ( uart_ctsn_i        ),
-    .uart_dsrn_i              ( uart_dsrn_i        ),
-    .uart_dcdn_i              ( uart_dcdn_i        ),
-    .uart_rin_i               ( uart_rin_i         ),
 
     // GPIO
     .gpio_in_i                ( gpio_in_i          ),
@@ -326,27 +324,9 @@ module soc_imem_boot_tb;
     .spi_clk_o                ( spi_clk_o          ),
     .spi_csn0_o               ( spi_csn0_o         ),
     .spi_csn1_o               ( spi_csn1_o         ),
-    .spi_csn2_o               ( spi_csn2_o         ),
-    .spi_csn3_o               ( spi_csn3_o         ),
-    .spi_mode_o               ( spi_mode_o         ),
     .spi_sdo0_o               ( spi_sdo0_o         ),
-    .spi_sdo1_o               ( spi_sdo1_o         ),
-    .spi_sdo2_o               ( spi_sdo2_o         ),
-    .spi_sdo3_o               ( spi_sdo3_o         ),
-    .spi_sdi0_i               ( spi_sdi0_i         ),
     .spi_sdi1_i               ( spi_sdi1_i         ),
-    .spi_sdi2_i               ( spi_sdi2_i         ),
-    .spi_sdi3_i               ( spi_sdi3_i         ),
-    .spi_events_o             ( spi_events_o       ),
-
-    // CLIC
-    .clic_intr_src_i          ( clic_intr_src_i    ),
-    .clic_irq_valid_o         ( clic_irq_valid_o   ),
-    .clic_irq_id_o            ( clic_irq_id_o      ),
-    .clic_irq_level_o         ( clic_irq_level_o   ),
-    .clic_irq_shv_o           ( clic_irq_shv_o     ),
-    .clic_irq_priv_o          ( clic_irq_priv_o    ),
-    .clic_irq_kill_req_o      ( clic_irq_kill_req_o)
+    .spi_events_o             ( spi_events_o       )
   );
 
   // ─── Cycle counter ────────────────────────────────────────────────────

@@ -216,7 +216,8 @@
 // Reset Topology:
 //   hard_rst_ni  → cold boot, resets everything including bootloader
 //   soft_rst_ni  → warm boot, SRAM preserved, bootloader runs clean-slate only
-//   sys_rst_n    = hard_rst_ni & soft_rst_ni → crossbar, bridges, muxes
+//   sys_rst_n    = sync(hard_rst_ni & soft_rst_ni) → crossbar, bridges, muxes
+//                  Async assert (instant), sync de-assert (local 4-FF chain)
 //   core_rst_n   ← bootloader output → RISC-V core
 //   periph_rst_n ← bootloader output → non-boot peripherals (I2C, Timer 0,
 //                                       Timer 1, UART, GPIO)
@@ -239,6 +240,8 @@ module riscforge_soc_subsystem
   parameter int unsigned NUM_INSTR_WORDS   = 64,
   parameter int unsigned NUM_DATA_WORDS    = 0,
   parameter int unsigned FLASH_POWERUP_CYCLES = 30_000,
+  // Number of APB slave ports (also sizes apb_timeout_sticky_o below)
+  parameter int unsigned NUM_APB_SLAVES = 6,
   // Derived — do not override
   localparam int unsigned AXI_STRB_WIDTH   = AXI_DATA_WIDTH / 8,
   localparam int unsigned NR_GPIOS         = GPIOCount,
@@ -285,19 +288,11 @@ module riscforge_soc_subsystem
   output logic [(TIMER1_CNT*2)-1:0]     timer1_irq_o,
 
   // =========================================================================
-  // UART External Interface
+  // UART External Interface (TX/RX only — modem lines tied off internally)
   // =========================================================================
   input  logic                          uart_sin_i,
   output logic                          uart_sout_o,
   output logic                          uart_int_o,
-  output logic                          uart_out1n_o,
-  output logic                          uart_out2n_o,
-  output logic                          uart_rtsn_o,
-  output logic                          uart_dtrn_o,
-  input  logic                          uart_ctsn_i,
-  input  logic                          uart_dsrn_i,
-  input  logic                          uart_dcdn_i,
-  input  logic                          uart_rin_i,
 
   // =========================================================================
   // GPIO External Interface
@@ -310,23 +305,26 @@ module riscforge_soc_subsystem
   output logic [NR_GPIOS-1:0]           gpio_pin_level_interrupts_o,
 
   // =========================================================================
-  // SPI Master External Interface (APB peripheral SPI, not boot SPI)
+  // SPI Master External Interface (standard SPI only — quad lines tied off)
+  //   spi_csn0_o : SPI flash (boot image source)
+  //   spi_csn1_o : SPI slave device
+  //   spi_sdo0_o : MOSI       spi_sdi1_i : MISO
   // =========================================================================
   output logic                          spi_clk_o,
   output logic                          spi_csn0_o,
   output logic                          spi_csn1_o,
-  output logic                          spi_csn2_o,
-  output logic                          spi_csn3_o,
-  output logic [1:0]                    spi_mode_o,
   output logic                          spi_sdo0_o,
-  output logic                          spi_sdo1_o,
-  output logic                          spi_sdo2_o,
-  output logic                          spi_sdo3_o,
-  input  logic                          spi_sdi0_i,
   input  logic                          spi_sdi1_i,
-  input  logic                          spi_sdi2_i,
-  input  logic                          spi_sdi3_i,
-  output logic [1:0]                    spi_events_o
+  output logic [1:0]                    spi_events_o,
+
+  // =========================================================================
+  // Bus Timeout Monitor Status (observation only — the CPU learns about a
+  // timeout through the precise load/store access fault, mcause 5/7, so these
+  // are not wired to any interrupt. Sticky until sys_rst_n.)
+  // =========================================================================
+  output logic [NUM_APB_SLAVES-1:0]     apb_timeout_sticky_o,
+  output logic                          axi_wr_timeout_sticky_o,
+  output logic                          axi_rd_timeout_sticky_o
 );
 
   // ===========================================================================
@@ -444,8 +442,39 @@ module riscforge_soc_subsystem
   //  Section 4 — APB Bridge Configuration
   // ===========================================================================
 
-  localparam int unsigned NUM_APB_SLAVES = 6;
-  localparam int unsigned NUM_APB_RULES  = 6;
+  // NUM_APB_SLAVES is a module parameter (needed by the port list)
+  localparam int unsigned NUM_APB_RULES  = NUM_APB_SLAVES;
+
+  // ---------------------------------------------------------------------------
+  //  Bus timeout thresholds (system clock cycles)
+  // ---------------------------------------------------------------------------
+  // Per APB slot, sized from the longest LEGITIMATE wait that slot can present
+  // in one ACCESS phase, not from the length of a peripheral transfer:
+  //   [0] I2C     PREADY tied 1 (apb_i2c.sv:214)                -> fault detector
+  //   [1] Timer 0 PREADY tied 1 (timer.sv:44)                   -> fault detector
+  //   [2] UART    1 wait state via apb_to_obi                   -> 8x margin
+  //   [3] GPIO    feedthrough, 0 wait states                    -> fault detector
+  //   [4] SPI     one 32-bit word, plus cmd+addr+dummy on the first word of a
+  //               burst: (8+24+0+32) x 2 x (CLKDIV+1). 640 cycles at the
+  //               bootloader's CLKDIV=4, 32768 at the maximum divider of 255.
+  //               65536 keeps ~1.8x margin over the worst divider. An 8192-word
+  //               transfer is 8192 separate APB reads and never approaches it.
+  //   [5] Timer 1 as Timer 0                                    -> fault detector
+  localparam int unsigned APB_TIMEOUT_CYCLES [NUM_APB_SLAVES] = '{
+    16,      // [0] I2C
+    16,      // [1] Timer 0
+    16,      // [2] UART
+    16,      // [3] GPIO
+    65536,   // [4] SPI master (via bootloader passthrough)
+    16       // [5] Timer 1
+  };
+
+  // AXI-Lite backstop at the core's master port, selected by address region.
+  // SRAM is fixed latency (~4 cycles), so a small value catches a crossbar or
+  // wrapper deadlock quickly. The APB region must stay above the largest APB
+  // slot timeout so that apb_timeout_monitor always answers first.
+  localparam int unsigned AXI_TIMEOUT_SRAM = 64;
+  localparam int unsigned AXI_TIMEOUT_APB  = 131072;
 
   // ===========================================================================
   //  Section 5 — SRAM & BootROM Configuration
@@ -461,12 +490,42 @@ module riscforge_soc_subsystem
   // ===========================================================================
 
   // Derived internal resets
-  logic sys_rst_n;             // For crossbar, SRAM bridges, SRAM mux
-  logic core_rst_n;            // For RISC-V core (from bootloader)
-  logic periph_rst_n;          // For non-boot peripherals (from bootloader)
-  logic spi_rst_n;             // For SPI master (from bootloader, independent timing)
+  logic       sys_rst_n_raw;   // Combinational: async assertion on either external reset
+  logic [3:0] sys_rst_sync_q;  // 4-FF chain: async assert, sync de-assert
+  logic [3:0] hard_rst_sync_q; // 4-FF chain: async assert, sync de-assert
+  logic       sys_rst_n;       // Synchronized system reset (crossbar, bridges, muxes)
+  logic       hard_rst_sync_n; // Synchronized hard reset (bootloader)
+  logic       core_rst_n;      // For RISC-V core (from bootloader)
+  logic       periph_rst_n;    // For non-boot peripherals (from bootloader)
+  logic       spi_rst_n;       // For SPI master (from bootloader, independent timing)
 
-  assign sys_rst_n = hard_rst_ni & soft_rst_ni;  // Reset on either external reset
+  // Reset synchronizers -------------------------------------------------------
+  // Assertion is asynchronous (instant when the input pin drops).
+  // De-assertion is synchronized to clk_i through a 4-FF chain, so downstream
+  // flops leave reset on a single clean clock edge instead of during their
+  // recovery/removal window.
+  //
+  // sys_rst_n     : sourced from BOTH external resets ANDed together; feeds
+  //                 the crossbar, AXI bridges, SRAM muxes, SRAM wrappers.
+  // hard_rst_sync_n: sourced from hard_rst_ni only; feeds the bootloader, so
+  //                 it leaves reset on the same edge as sys_rst_n (otherwise
+  //                 the bootloader drives the crossbar while it is still in
+  //                 reset). Warm boot leaves the bootloader clocked and lets
+  //                 its own synchronous soft-reset handling take effect.
+  assign sys_rst_n_raw = hard_rst_ni & soft_rst_ni;
+
+  always_ff @(posedge clk_i or negedge sys_rst_n_raw) begin
+    if (!sys_rst_n_raw) sys_rst_sync_q  <= 4'b0000;
+    else                sys_rst_sync_q  <= {sys_rst_sync_q[2:0], 1'b1};
+  end
+
+  always_ff @(posedge clk_i or negedge hard_rst_ni) begin
+    if (!hard_rst_ni)   hard_rst_sync_q <= 4'b0000;
+    else                hard_rst_sync_q <= {hard_rst_sync_q[2:0], 1'b1};
+  end
+
+  assign sys_rst_n       = sys_rst_sync_q[3];
+  assign hard_rst_sync_n = hard_rst_sync_q[3];
 
   // ===========================================================================
   //  Section 7 — Internal Signals
@@ -483,7 +542,17 @@ module riscforge_soc_subsystem
 
   // APB bridge
   apb_req_t  [NUM_APB_SLAVES-1:0] apb_req;
-  apb_resp_t [NUM_APB_SLAVES-1:0] apb_resp;
+  apb_resp_t [NUM_APB_SLAVES-1:0] apb_resp;      // bridge side (after the monitors)
+  apb_resp_t [NUM_APB_SLAVES-1:0] apb_resp_slv;  // slave side (before the monitors)
+
+  // Bus timeout monitor status
+  logic [NUM_APB_SLAVES-1:0] apb_timeout_pulse;
+  logic                      axi_wr_timeout_pulse;
+  logic                      axi_rd_timeout_pulse;
+
+  // Core AXI-Lite master port, upstream of the AXI timeout monitor
+  axi_req_t  core_axi_req;
+  axi_resp_t core_axi_resp;
 
   // APB address map
   rule_t [NUM_APB_RULES-1:0] apb_addr_map;
@@ -614,7 +683,9 @@ module riscforge_soc_subsystem
   assign apb_addr_map[0] = '{idx: 32'd0, start_addr: 32'h4000_0000, end_addr: 32'h4000_1000}; // I2C
   assign apb_addr_map[1] = '{idx: 32'd1, start_addr: 32'h4000_1000, end_addr: 32'h4000_2000}; // Timer 0
   assign apb_addr_map[2] = '{idx: 32'd2, start_addr: 32'h4000_2000, end_addr: 32'h4000_3000}; // UART
-  assign apb_addr_map[3] = '{idx: 32'd3, start_addr: 32'h4000_3000, end_addr: 32'h4000_4000}; // GPIO
+  // GPIO: 2 KB. The register block decodes only 11 address bits, so mapping the
+  // full 4 KB would alias 0x4000_3800-0x4000_3FFF onto the real registers.
+  assign apb_addr_map[3] = '{idx: 32'd3, start_addr: 32'h4000_3000, end_addr: 32'h4000_3800}; // GPIO
   assign apb_addr_map[4] = '{idx: 32'd4, start_addr: 32'h4000_4000, end_addr: 32'h4000_5000}; // SPI Master (via bootloader)
   assign apb_addr_map[5] = '{idx: 32'd5, start_addr: 32'h4000_5000, end_addr: 32'h4000_6000}; // Timer 1
 
@@ -910,6 +981,35 @@ module riscforge_soc_subsystem
   );
 
   // ===========================================================================
+  //  Section 14b — APB Timeout Monitors (one per slave port)
+  // ===========================================================================
+  //  Interposed on the RESPONSE path only: apb_req goes straight from the
+  //  bridge to each slave, and only the response the bridge sees is muxed.
+  //  A slave that holds PREADY low past its threshold is answered with
+  //  PREADY=1 + PSLVERR=1, which axi_lite_to_apb turns into RESP_SLVERR and
+  //  the core turns into a load/store access fault (mcause 5/7, mtval=addr).
+  //  The slave's own PREADY is never driven, so an aborted SPI RXFIFO read
+  //  pops nothing (spi_master_apb_if.sv:236).
+  // ===========================================================================
+
+  for (genvar i = 0; i < NUM_APB_SLAVES; i++) begin : gen_apb_timeout_mon
+    apb_timeout_monitor #(
+      .apb_req_t     ( apb_req_t              ),
+      .apb_resp_t    ( apb_resp_t             ),
+      .TimeoutCycles ( APB_TIMEOUT_CYCLES[i]  ),
+      .TimeoutData   ( 32'hDEAD_BEEF          )
+    ) i_apb_timeout_monitor (
+      .clk_i            ( clk_i                    ),
+      .rst_ni           ( sys_rst_n                ),
+      .apb_req_i        ( apb_req[i]               ),
+      .apb_resp_slv_i   ( apb_resp_slv[i]          ),
+      .apb_resp_mst_o   ( apb_resp[i]              ),
+      .timeout_pulse_o  ( apb_timeout_pulse[i]     ),
+      .timeout_sticky_o ( apb_timeout_sticky_o[i]  )
+    );
+  end
+
+  // ===========================================================================
   //  Section 15 — APB[0]: I2C Master
   // ===========================================================================
 
@@ -935,7 +1035,7 @@ module riscforge_soc_subsystem
     .sda_padoen_o( i2c_sda_oen_o           )
   );
 
-  assign apb_resp[0] = '{pready: i2c_pready, prdata: i2c_prdata, pslverr: i2c_pslverr};
+  assign apb_resp_slv[0] = '{pready: i2c_pready, prdata: i2c_prdata, pslverr: i2c_pslverr};
 
   // ===========================================================================
   //  Section 16 — APB[1]: Timer 0
@@ -958,7 +1058,7 @@ module riscforge_soc_subsystem
     .irq_o   ( timer0_irq_o             )
   );
 
-  assign apb_resp[1] = '{pready: timer0_pready, prdata: timer0_prdata, pslverr: timer0_pslverr};
+  assign apb_resp_slv[1] = '{pready: timer0_pready, prdata: timer0_prdata, pslverr: timer0_pslverr};
 
   // ===========================================================================
   //  Section 17 — APB[2]: UART
@@ -978,19 +1078,21 @@ module riscforge_soc_subsystem
     .PREADY  ( uart_pready              ),
     .PSLVERR ( uart_pslverr             ),
     .INT     ( uart_int_o               ),
-    .OUT1N   ( uart_out1n_o             ),
-    .OUT2N   ( uart_out2n_o             ),
-    .RTSN    ( uart_rtsn_o              ),
-    .DTRN    ( uart_dtrn_o              ),
-    .CTSN    ( uart_ctsn_i              ),
-    .DSRN    ( uart_dsrn_i              ),
-    .DCDN    ( uart_dcdn_i              ),
-    .RIN     ( uart_rin_i               ),
+    // Modem lines not used: outputs left open, active-low inputs tied
+    // inactive (1) so MSR reads 0x00 and the modem-status IRQ never fires.
+    .OUT1N   (                          ),
+    .OUT2N   (                          ),
+    .RTSN    (                          ),
+    .DTRN    (                          ),
+    .CTSN    ( 1'b1                     ),
+    .DSRN    ( 1'b1                     ),
+    .DCDN    ( 1'b1                     ),
+    .RIN     ( 1'b1                     ),
     .SIN     ( uart_sin_i               ),
     .SOUT    ( uart_sout_o              )
   );
 
-  assign apb_resp[2] = '{pready: uart_pready, prdata: uart_prdata, pslverr: uart_pslverr};
+  assign apb_resp_slv[2] = '{pready: uart_pready, prdata: uart_prdata, pslverr: uart_pslverr};
 
   // ===========================================================================
   //  Section 18 — APB[3]: GPIO
@@ -1012,7 +1114,7 @@ module riscforge_soc_subsystem
     .global_interrupt_o    ( gpio_global_interrupt_o      ),
     .pin_level_interrupts_o( gpio_pin_level_interrupts_o  ),
     .apb_req_i             ( apb_req[3]                  ),
-    .apb_rsp_o             ( apb_resp[3]                 )
+    .apb_rsp_o             ( apb_resp_slv[3]             )
   );
 
   // ===========================================================================
@@ -1040,17 +1142,19 @@ module riscforge_soc_subsystem
     .spi_clk ( spi_clk_o                    ),
     .spi_csn0( spi_csn0_o                   ),
     .spi_csn1( spi_csn1_o                   ),
-    .spi_csn2( spi_csn2_o                   ),
-    .spi_csn3( spi_csn3_o                   ),
-    .spi_mode( spi_mode_o                   ),
+    // Standard SPI only: CS2/CS3, pad-mode and quad data lines unused.
+    // Unused data inputs tied 0 so a quad-mode trigger shifts in 0, not X.
+    .spi_csn2(                              ),
+    .spi_csn3(                              ),
+    .spi_mode(                              ),
     .spi_sdo0( spi_sdo0_o                   ),
-    .spi_sdo1( spi_sdo1_o                   ),
-    .spi_sdo2( spi_sdo2_o                   ),
-    .spi_sdo3( spi_sdo3_o                   ),
-    .spi_sdi0( spi_sdi0_i                   ),
+    .spi_sdo1(                              ),
+    .spi_sdo2(                              ),
+    .spi_sdo3(                              ),
+    .spi_sdi0( 1'b0                         ),
     .spi_sdi1( spi_sdi1_i                   ),
-    .spi_sdi2( spi_sdi2_i                   ),
-    .spi_sdi3( spi_sdi3_i                   )
+    .spi_sdi2( 1'b0                         ),
+    .spi_sdi3( 1'b0                         )
   );
 
   assign spi_apb_resp = '{pready: spi_pready, prdata: spi_prdata, pslverr: spi_pslverr};
@@ -1077,7 +1181,7 @@ module riscforge_soc_subsystem
     .irq_o   ( timer1_irq_o             )
   );
 
-  assign apb_resp[5] = '{pready: timer1_pready, prdata: timer1_prdata, pslverr: timer1_pslverr};
+  assign apb_resp_slv[5] = '{pready: timer1_pready, prdata: timer1_prdata, pslverr: timer1_pslverr};
 
   // ===========================================================================
   //  Section 21 — RISC-V Core (RV32IM, 5-stage) + Data Memory Router
@@ -1123,11 +1227,21 @@ module riscforge_soc_subsystem
     .lsu_mem_stall  ( core_lsu_stall      ),
     .lsu_mem_err    ( core_lsu_err        ),
 
-    // ---- Interrupts ----
-    // Fast local interrupts map to mip[19:16]; see the priority table in top.v
-    // (UART=3, SPI=2, I2C=1, GPIO=0). There is no CLINT in this subsystem, so
-    // MTIP is driven from Timer 0's compare-match and MEIP/MSIP are tied off.
-    .fast_irq_i     ( { 12'b0,
+    // ---- Interrupts (Two-Level Priority Class Architecture) ----
+    // Evaluated via in-core irq_gateway (edge/pulse capture) and irq_arbiter:
+    //   Class 2 (Real-Time, Fixed):  Timer 0 compare (MTIP mip[7]), FLI[11] (mip[27] SPI EOT/WD)
+    //   Class 1 (Stream, RR):        UART (FLI[3] mip[19]) <-> SPI (FLI[2] mip[18])
+    //   Class 0 (Background, RR):    I2C (FLI[1] mip[17])  <-> GPIO (FLI[0] mip[16])
+    // MEIP and MSIP are tied off (no external PLIC / CLINT).
+    .fast_irq_i     ( { 4'b0,
+                        spi_events_o[1],          // FLI[11] → mip[27]  SPI end of transfer
+                        timer1_irq_o[3],          // FLI[10] → mip[26]  Timer 1 ch1 compare
+                        timer1_irq_o[2],          // FLI[9]  → mip[25]  Timer 1 ch1 overflow
+                        timer1_irq_o[1],          // FLI[8]  → mip[24]  Timer 1 ch0 compare
+                        timer1_irq_o[0],          // FLI[7]  → mip[23]  Timer 1 ch0 overflow
+                        timer0_irq_o[3],          // FLI[6]  → mip[22]  Timer 0 ch1 compare
+                        timer0_irq_o[2],          // FLI[5]  → mip[21]  Timer 0 ch1 overflow
+                        timer0_irq_o[0],          // FLI[4]  → mip[20]  Timer 0 ch0 overflow
                         uart_int_o,               // FLI[3] → mip[19]
                         spi_events_o[0],          // FLI[2] → mip[18]
                         i2c_interrupt_o,          // FLI[1] → mip[17]
@@ -1175,8 +1289,44 @@ module riscforge_soc_subsystem
     .sram_rdata  ( core_data_rdata  ),
 
     // ---- MMIO path (→ crossbar SLV[0]) ----
-    .m_axi_req_o ( xbar_slv_req[0]  ),
-    .m_axi_resp_i( xbar_slv_resp[0] )
+    .m_axi_req_o ( core_axi_req  ),
+    .m_axi_resp_i( core_axi_resp )
+  );
+
+  // ===========================================================================
+  //  Section 21b — AXI-Lite Timeout Monitor (core master port)
+  // ===========================================================================
+  //  Backstop for anything the APB monitors cannot see: a crossbar deadlock,
+  //  an SRAM wrapper that stops responding, or a future AXI slave. On a
+  //  timeout it answers the core with SLVERR, keeps driving the stuck request
+  //  downstream until the crossbar accepts it (AXI forbids withdrawing VALID),
+  //  swallows the late response, and errors any new request while draining.
+  //  Thresholds are per region so an SRAM deadlock is caught in 64 cycles
+  //  while the APB region stays above the largest APB slot timeout.
+  //  The bootloader's master port (xbar_slv[1]) is deliberately not monitored:
+  //  it only writes to SRAM during boot, before the watchdog is enabled.
+  // ===========================================================================
+
+  axi_lite_timeout_monitor #(
+    .axi_req_t      ( axi_req_t        ),
+    .axi_resp_t     ( axi_resp_t       ),
+    .AddrWidth      ( AXI_ADDR_WIDTH   ),
+    .ApbBase        ( 32'h4000_0000    ),
+    .ApbEnd         ( 32'h5000_0000    ),
+    .TimeoutApb     ( AXI_TIMEOUT_APB  ),
+    .TimeoutDefault ( AXI_TIMEOUT_SRAM ),
+    .TimeoutData    ( 32'hDEAD_DEAD    )
+  ) i_axi_lite_timeout_monitor (
+    .clk_i               ( clk_i                   ),
+    .rst_ni              ( sys_rst_n               ),
+    .slv_req_i           ( core_axi_req            ),
+    .slv_resp_o          ( core_axi_resp           ),
+    .mst_req_o           ( xbar_slv_req[0]         ),
+    .mst_resp_i          ( xbar_slv_resp[0]        ),
+    .wr_timeout_pulse_o  ( axi_wr_timeout_pulse    ),
+    .rd_timeout_pulse_o  ( axi_rd_timeout_pulse    ),
+    .wr_timeout_sticky_o ( axi_wr_timeout_sticky_o ),
+    .rd_timeout_sticky_o ( axi_rd_timeout_sticky_o )
   );
 
   // ===========================================================================
@@ -1202,14 +1352,14 @@ module riscforge_soc_subsystem
     .FLASH_POWERUP_CYCLES( FLASH_POWERUP_CYCLES)
   ) i_bootloader (
     .clk_i           ( clk_i             ),
-    .hard_rst_ni     ( hard_rst_ni       ),
+    .hard_rst_ni     ( hard_rst_sync_n   ),
     .soft_rst_ni     ( soft_rst_ni       ),
     // AXI-Lite master (struct, not flat wires) — SRAM writes only
     .axi_req_o       ( xbar_slv_req[1]   ),
     .axi_resp_i      ( xbar_slv_resp[1]  ),
     // APB slave (from APB bridge slot 4)
     .apb_slv_req_i   ( apb_req[4]        ),
-    .apb_slv_resp_o  ( apb_resp[4]       ),
+    .apb_slv_resp_o  ( apb_resp_slv[4]   ),
     // APB master (to apb_spi_master)
     .apb_mst_req_o   ( spi_apb_req       ),
     .apb_mst_resp_i  ( spi_apb_resp      ),

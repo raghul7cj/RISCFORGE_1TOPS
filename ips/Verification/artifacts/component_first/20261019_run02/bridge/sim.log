@@ -1,0 +1,320 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/bridge_sim/xsim_script.tcl
+# xsim {bridge_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+
+
+============================================================
+  AXI4-Lite to APB4 Bridge — Verification Testbench
+============================================================
+  Address Map:
+    Slave0: 0x1000_0000 – 0x1000_0FFF
+    Slave1: 0x2000_0000 – 0x2000_0FFF
+============================================================
+
+========== TC1: Single Write to Slave0 + Readback ==========
+  [DBG] WR: valid driven at 80000, addr=0x10000000
+  [DBG] WR: valid deasserted at 90000, waiting for b_valid
+  [DBG] WR: @posedge 95000 b_valid=0 b_resp=00 | raw_resp=0x0
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge 105000 b_valid=1 b_resp=00 | raw_resp=0x1000000000
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 120000, resp=00
+  [PASS] TC1: Write resp OKAY  resp=00 (expected 00)
+  [DBG] RD: valid driven at 130000, addr=0x10000000
+  [DBG] RD: @posedge 135000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 140000, waiting for r_valid
+  [DBG] RD: @posedge 145000 r_valid=0 r_data=0x00000000 r_resp=00
+  [DBG] RD: @posedge 155000 r_valid=1 r_data=0xdeadbeef r_resp=00
+  [DBG] RD: done at 170000
+  [PASS] TC1: Read data matches  got=0xdeadbeef  exp=0xdeadbeef
+  [PASS] TC1: Read resp OKAY  resp=00 (expected 00)
+
+========== TC2: Write+Read Slave1 ==========
+  [DBG] WR: valid driven at 180000, addr=0x20000010
+  [DBG] WR: valid deasserted at 190000, waiting for b_valid
+  [DBG] WR: @posedge 195000 b_valid=0 b_resp=00 | raw_resp=0x6f56df778
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 205000 b_valid=1 b_resp=00 | raw_resp=0x16f56df778
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 220000, resp=00
+  [PASS] TC2: Write resp  resp=00 (expected 00)
+  [DBG] RD: valid driven at 230000, addr=0x20000010
+  [DBG] RD: @posedge 235000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 240000, waiting for r_valid
+  [DBG] RD: @posedge 245000 r_valid=0 r_data=0xdeadbeef r_resp=00
+  [DBG] RD: @posedge 255000 r_valid=1 r_data=0xcafebabe r_resp=00
+  [DBG] RD: done at 270000
+  [PASS] TC2: Read Slave1  got=0xcafebabe  exp=0xcafebabe
+
+========== TC3: Decode Error (Unmapped Address) ==========
+  [DBG] WR: valid driven at 280000, addr=0x30000000
+  [DBG] WR: valid deasserted at 290000, waiting for b_valid
+  [DBG] WR: @posedge 295000 b_valid=1 b_resp=11 | raw_resp=0x7657f5d5f0
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 310000, resp=11
+  [PASS] TC3: Write decode error  resp=11 (expected 11)
+  [DBG] RD: valid driven at 320000, addr=0x30000000
+  [DBG] RD: @posedge 325000 ar_ready=1 r_valid=1
+  [DBG] RD: ar deasserted at 330000, waiting for r_valid
+  [DBG] RD: @posedge 335000 r_valid=1 r_data=0xdea110c8 r_resp=11
+  [DBG] RD: done at 350000
+  [PASS] TC3: Read decode error  resp=11 (expected 11)
+  [NOTE] Read data on decode error: 0xdea110c8 (bridge returns 0xDEA110C8)
+
+========== TC4: Simultaneous Write + Read ==========
+  [DBG] WR: valid driven at 360000, addr=0x10000020
+  [DBG] WR: valid deasserted at 370000, waiting for b_valid
+  [DBG] WR: @posedge 375000 b_valid=0 b_resp=11 | raw_resp=0x66f5088646
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge 385000 b_valid=1 b_resp=00 | raw_resp=0x16f5088646
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 400000, resp=00
+  [PASS] TC4: Write resp  resp=00 (expected 00)
+  [PASS] TC4: Read resp  resp=00 (expected 00)
+  [PASS] TC4: Read data  got=0x11111111  exp=0x11111111
+  [DBG] RD: valid driven at 530000, addr=0x10000024
+  [DBG] RD: @posedge 535000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 540000, waiting for r_valid
+  [DBG] RD: @posedge 545000 r_valid=0 r_data=0x11111111 r_resp=00
+  [DBG] RD: @posedge 555000 r_valid=1 r_data=0x22222222 r_resp=00
+  [DBG] RD: done at 570000
+  [PASS] TC4: Write landed  got=0x22222222  exp=0x22222222
+
+========== TC5: APB Slave Error (pslverr) ==========
+  [DBG] WR: valid driven at 580000, addr=0x10000040
+  [DBG] WR: valid deasserted at 590000, waiting for b_valid
+  [DBG] WR: @posedge 595000 b_valid=0 b_resp=00 | raw_resp=0x111111110
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge 605000 b_valid=1 b_resp=10 | raw_resp=0x5111111110
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 620000, resp=10
+  [PASS] TC5: Write slverr  resp=10 (expected 10)
+  [DBG] RD: valid driven at 630000, addr=0x10000040
+  [DBG] RD: @posedge 635000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 640000, waiting for r_valid
+  [DBG] RD: @posedge 645000 r_valid=0 r_data=0x22222222 r_resp=00
+  [DBG] RD: @posedge 655000 r_valid=1 r_data=0xaaaaaaaa r_resp=10
+  [DBG] RD: done at 670000
+  [PASS] TC5: Read slverr  resp=10 (expected 10)
+
+========== TC6: Write with Zero Strobe ==========
+  [NOTE] Bridge treats strb==0 write as no-op (RESP_OKAY, no APB txn)
+  [DBG] WR: valid driven at 680000, addr=0x10000050
+  [DBG] WR: valid deasserted at 690000, waiting for b_valid
+  [DBG] WR: @posedge 695000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 710000, resp=00
+  [PASS] TC6: Zero-strobe write OKAY  resp=00 (expected 00)
+
+========== TC7: Sequential Burst (8W + 8R) ==========
+  [DBG] WR: valid driven at 720000, addr=0x20000000
+  [DBG] WR: valid deasserted at 730000, waiting for b_valid
+  [DBG] WR: @posedge 735000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 745000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 760000, resp=00
+  [DBG] WR: valid driven at 770000, addr=0x20000004
+  [DBG] WR: valid deasserted at 780000, waiting for b_valid
+  [DBG] WR: @posedge 785000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 795000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 810000, resp=00
+  [DBG] WR: valid driven at 820000, addr=0x20000008
+  [DBG] WR: valid deasserted at 830000, waiting for b_valid
+  [DBG] WR: @posedge 835000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 845000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 860000, resp=00
+  [DBG] WR: valid driven at 870000, addr=0x2000000c
+  [DBG] WR: valid deasserted at 880000, waiting for b_valid
+  [DBG] WR: @posedge 885000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 895000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 910000, resp=00
+  [DBG] WR: valid driven at 920000, addr=0x20000010
+  [DBG] WR: valid deasserted at 930000, waiting for b_valid
+  [DBG] WR: @posedge 935000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 945000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 960000, resp=00
+  [DBG] WR: valid driven at 970000, addr=0x20000014
+  [DBG] WR: valid deasserted at 980000, waiting for b_valid
+  [DBG] WR: @posedge 985000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 995000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 1010000, resp=00
+  [DBG] WR: valid driven at 1020000, addr=0x20000018
+  [DBG] WR: valid deasserted at 1030000, waiting for b_valid
+  [DBG] WR: @posedge 1035000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1045000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 1060000, resp=00
+  [DBG] WR: valid driven at 1070000, addr=0x2000001c
+  [DBG] WR: valid deasserted at 1080000, waiting for b_valid
+  [DBG] WR: @posedge 1085000 b_valid=0 b_resp=00 | raw_resp=0x555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1095000 b_valid=1 b_resp=00 | raw_resp=0x1555555554
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 1110000, resp=00
+  [INFO] 8 writes completed
+  [DBG] RD: valid driven at 1120000, addr=0x20000000
+  [DBG] RD: @posedge 1125000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1130000, waiting for r_valid
+  [DBG] RD: @posedge 1135000 r_valid=0 r_data=0xaaaaaaaa r_resp=10
+  [DBG] RD: @posedge 1145000 r_valid=1 r_data=0xa0000000 r_resp=00
+  [DBG] RD: done at 1160000
+  [PASS] TC7: Burst[0]  got=0xa0000000  exp=0xa0000000
+  [DBG] RD: valid driven at 1170000, addr=0x20000004
+  [DBG] RD: @posedge 1175000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1180000, waiting for r_valid
+  [DBG] RD: @posedge 1185000 r_valid=0 r_data=0xa0000000 r_resp=00
+  [DBG] RD: @posedge 1195000 r_valid=1 r_data=0xa0000001 r_resp=00
+  [DBG] RD: done at 1210000
+  [PASS] TC7: Burst[1]  got=0xa0000001  exp=0xa0000001
+  [DBG] RD: valid driven at 1220000, addr=0x20000008
+  [DBG] RD: @posedge 1225000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1230000, waiting for r_valid
+  [DBG] RD: @posedge 1235000 r_valid=0 r_data=0xa0000001 r_resp=00
+  [DBG] RD: @posedge 1245000 r_valid=1 r_data=0xa0000002 r_resp=00
+  [DBG] RD: done at 1260000
+  [PASS] TC7: Burst[2]  got=0xa0000002  exp=0xa0000002
+  [DBG] RD: valid driven at 1270000, addr=0x2000000c
+  [DBG] RD: @posedge 1275000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1280000, waiting for r_valid
+  [DBG] RD: @posedge 1285000 r_valid=0 r_data=0xa0000002 r_resp=00
+  [DBG] RD: @posedge 1295000 r_valid=1 r_data=0xa0000003 r_resp=00
+  [DBG] RD: done at 1310000
+  [PASS] TC7: Burst[3]  got=0xa0000003  exp=0xa0000003
+  [DBG] RD: valid driven at 1320000, addr=0x20000010
+  [DBG] RD: @posedge 1325000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1330000, waiting for r_valid
+  [DBG] RD: @posedge 1335000 r_valid=0 r_data=0xa0000003 r_resp=00
+  [DBG] RD: @posedge 1345000 r_valid=1 r_data=0xa0000004 r_resp=00
+  [DBG] RD: done at 1360000
+  [PASS] TC7: Burst[4]  got=0xa0000004  exp=0xa0000004
+  [DBG] RD: valid driven at 1370000, addr=0x20000014
+  [DBG] RD: @posedge 1375000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1380000, waiting for r_valid
+  [DBG] RD: @posedge 1385000 r_valid=0 r_data=0xa0000004 r_resp=00
+  [DBG] RD: @posedge 1395000 r_valid=1 r_data=0xa0000005 r_resp=00
+  [DBG] RD: done at 1410000
+  [PASS] TC7: Burst[5]  got=0xa0000005  exp=0xa0000005
+  [DBG] RD: valid driven at 1420000, addr=0x20000018
+  [DBG] RD: @posedge 1425000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1430000, waiting for r_valid
+  [DBG] RD: @posedge 1435000 r_valid=0 r_data=0xa0000005 r_resp=00
+  [DBG] RD: @posedge 1445000 r_valid=1 r_data=0xa0000006 r_resp=00
+  [DBG] RD: done at 1460000
+  [PASS] TC7: Burst[6]  got=0xa0000006  exp=0xa0000006
+  [DBG] RD: valid driven at 1470000, addr=0x2000001c
+  [DBG] RD: @posedge 1475000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1480000, waiting for r_valid
+  [DBG] RD: @posedge 1485000 r_valid=0 r_data=0xa0000006 r_resp=00
+  [DBG] RD: @posedge 1495000 r_valid=1 r_data=0xa0000007 r_resp=00
+  [DBG] RD: done at 1510000
+  [PASS] TC7: Burst[7]  got=0xa0000007  exp=0xa0000007
+
+========== TC8: APB Slave Stall (pready delayed) ==========
+  [INFO] Slave1 will stall pready by 5 cycles
+  [DBG] WR: valid driven at 1520000, addr=0x20000100
+  [DBG] WR: valid deasserted at 1530000, waiting for b_valid
+  [DBG] WR: @posedge 1535000 b_valid=0 b_resp=00 | raw_resp=0x500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1545000 b_valid=0 b_resp=00 | raw_resp=0x500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1555000 b_valid=0 b_resp=00 | raw_resp=0x500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1565000 b_valid=0 b_resp=00 | raw_resp=0x500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1575000 b_valid=0 b_resp=00 | raw_resp=0x500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1585000 b_valid=0 b_resp=00 | raw_resp=0x500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=0
+  [DBG] WR: @posedge 1595000 b_valid=1 b_resp=00 | raw_resp=0x1500000038
+  [DBG] WR:   APB[0] psel=0 pen=0 prdy=0 | APB[1] psel=1 pen=1 prdy=1
+  [DBG] WR: done at 1610000, resp=00
+  [PASS] TC8: Stalled write resp  resp=00 (expected 00)
+  [DBG] RD: valid driven at 1620000, addr=0x20000100
+  [DBG] RD: @posedge 1625000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1630000, waiting for r_valid
+  [DBG] RD: @posedge 1635000 r_valid=0 r_data=0xa0000007 r_resp=00
+  [DBG] RD: @posedge 1645000 r_valid=0 r_data=0xa0000007 r_resp=00
+  [DBG] RD: @posedge 1655000 r_valid=0 r_data=0xa0000007 r_resp=00
+  [DBG] RD: @posedge 1665000 r_valid=0 r_data=0xa0000007 r_resp=00
+  [DBG] RD: @posedge 1675000 r_valid=0 r_data=0xa0000007 r_resp=00
+  [DBG] RD: @posedge 1685000 r_valid=0 r_data=0xa0000007 r_resp=00
+  [DBG] RD: @posedge 1695000 r_valid=1 r_data=0x57a1beef r_resp=00
+  [DBG] RD: done at 1710000
+  [PASS] TC8: Stalled read data  got=0x57a1beef  exp=0x57a1beef
+
+========== TC9: Back-to-back R-W-R ==========
+  [DBG] WR: valid driven at 1720000, addr=0x10000080
+  [DBG] WR: valid deasserted at 1730000, waiting for b_valid
+  [DBG] WR: @posedge 1735000 b_valid=0 b_resp=00 | raw_resp=0x2bd0df778
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge 1745000 b_valid=1 b_resp=00 | raw_resp=0x12bd0df778
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 1760000, resp=00
+  [DBG] RD: valid driven at 1770000, addr=0x10000080
+  [DBG] RD: @posedge 1775000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1780000, waiting for r_valid
+  [DBG] RD: @posedge 1785000 r_valid=0 r_data=0x57a1beef r_resp=00
+  [DBG] RD: @posedge 1795000 r_valid=1 r_data=0x12345678 r_resp=00
+  [DBG] RD: done at 1810000
+  [PASS] TC9: First read  got=0x12345678  exp=0x12345678
+  [DBG] WR: valid driven at 1820000, addr=0x10000080
+  [DBG] WR: valid deasserted at 1830000, waiting for b_valid
+  [DBG] WR: @posedge 1835000 b_valid=0 b_resp=00 | raw_resp=0x91a2b3c0
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge 1845000 b_valid=1 b_resp=00 | raw_resp=0x1091a2b3c0
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 1860000, resp=00
+  [DBG] RD: valid driven at 1870000, addr=0x10000080
+  [DBG] RD: @posedge 1875000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 1880000, waiting for r_valid
+  [DBG] RD: @posedge 1885000 r_valid=0 r_data=0x12345678 r_resp=00
+  [DBG] RD: @posedge 1895000 r_valid=1 r_data=0x87654321 r_resp=00
+  [DBG] RD: done at 1910000
+  [PASS] TC9: Updated read  got=0x87654321  exp=0x87654321
+
+========== TC10: Reset Mid-Transaction ==========
+  [INFO] Reset released, attempting normal transaction...
+  [DBG] WR: valid driven at 2020000, addr=0x100000b0
+  [DBG] WR: valid deasserted at 2030000, waiting for b_valid
+  [DBG] WR: @posedge 2035000 b_valid=0 b_resp=00 | raw_resp=0x0
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=0 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: @posedge 2045000 b_valid=1 b_resp=00 | raw_resp=0x1000000000
+  [DBG] WR:   APB[0] psel=1 pen=1 prdy=1 | APB[1] psel=0 pen=0 prdy=0
+  [DBG] WR: done at 2060000, resp=00
+  [PASS] TC10: Post-reset write  resp=00 (expected 00)
+  [DBG] RD: valid driven at 2070000, addr=0x100000b0
+  [DBG] RD: @posedge 2075000 ar_ready=1 r_valid=0
+  [DBG] RD: ar deasserted at 2080000, waiting for r_valid
+  [DBG] RD: @posedge 2085000 r_valid=0 r_data=0x00000000 r_resp=00
+  [DBG] RD: @posedge 2095000 r_valid=1 r_data=0xaf7ee5e7 r_resp=00
+  [DBG] RD: done at 2110000
+  [PASS] TC10: Post-reset read  got=0xaf7ee5e7  exp=0xaf7ee5e7
+
+============================================================
+  RESULTS:  PASSED = 28  /  FAILED = 0
+============================================================
+  *** ALL TESTS PASSED ***
+============================================================
+
+$finish called at time : 2310 ns : File "C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_run02/bridge/axi_lite_to_apb/tb_axi_lite_to_apb.sv" Line 681
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 01:24:13 2026...

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Option B: Bounded Arbitration and Bank-less Saving</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d24;--mut:#5a6270;--card:#f3f5f9;--line:#c5ccd8;--acc:#1f5fd6;--m1:#0f7b6c;--m2:#b4531a;--bad:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171d;--fg:#e6e9ef;--mut:#9aa3b2;--card:#1d222b;--line:#3a4252;--acc:#7aa7ff;--m1:#4fd1bd;--m2:#ffa066;--bad:#ff7b6b}}
+:root[data-theme="dark"]{--bg:#14171d;--fg:#e6e9ef;--mut:#9aa3b2;--card:#1d222b;--line:#3a4252;--acc:#7aa7ff;--m1:#4fd1bd;--m2:#ffa066;--bad:#ff7b6b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:900px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.5rem;line-height:1.25;margin:.3em 0 .2em}
+h2{font-size:1.15rem;margin:2em 0 .5em;border-bottom:2px solid var(--line);padding-bottom:.25em}
+h3{font-size:.92rem;margin:1.2em 0 .3em;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+p,li{margin:.35em 0}ul,ol{padding-left:1.2em}
+.sub{color:var(--mut);font-size:.9rem}.m1{color:var(--m1);font-weight:600}.m2{color:var(--m2);font-weight:600}
+.w{overflow-x:auto}.w svg{min-width:660px}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:520px}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}th{background:var(--card)}
+code{background:var(--card);padding:0 4px;border-radius:3px;font-size:.88em}
+.card{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:8px 14px;margin:10px 0}
+.key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem;margin:8px 0}.key i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1.5px solid}
+svg{width:100%;height:auto;background:var(--bg);border:1px solid var(--line);border-radius:6px}
+svg text{fill:var(--fg);font:11px system-ui,sans-serif}svg .s{font-size:9.5px;fill:var(--mut)}svg .t{font-weight:700;font-size:11.5px}svg .lh{font-weight:700;font-size:10px;fill:var(--mut);letter-spacing:.05em}
+rect{rx:4}
+.b{fill:var(--bg);stroke:var(--line);stroke-width:1.3}
+.ln{fill:var(--card);stroke:var(--line)}
+.e{fill:var(--card);fill:color-mix(in srgb,var(--acc) 14%,var(--bg));stroke:var(--acc);stroke-width:1.3}
+.n1{fill:var(--card);fill:color-mix(in srgb,var(--m1) 18%,var(--bg));stroke:var(--m1);stroke-width:1.8}
+.n2{fill:var(--card);fill:color-mix(in srgb,var(--m2) 18%,var(--bg));stroke:var(--m2);stroke-width:1.8}
+.hz{fill:var(--card);fill:color-mix(in srgb,var(--bad) 18%,var(--bg));stroke:var(--bad);stroke-width:1.5}
+.mem{fill:var(--card);fill:color-mix(in srgb,var(--mut) 18%,var(--bg));stroke:var(--mut)}
+.a{stroke:var(--mut);stroke-width:1.4;fill:none;marker-end:url(#h)}.da{stroke-dasharray:4 3}
+</style></head><body><main>
+<h1>Option B: Bounded Interrupt Arbitration and Mask-Guided Bank-less Saving</h1>
+<p class="sub">RISCFORGE 5-stage RV32IM_Zicsr core · Stage 1 = what we have · Stage 2 = <span class="m1">M1</span> · Stage 3 = <span class="m2">M2</span>. Numbers marked "target" or "est." are goals or estimates, not results.</p>
+<div class="key"><span><i style="background:color-mix(in srgb,var(--acc) 14%,var(--bg));border-color:var(--acc)"></i>existing</span><span><i style="background:color-mix(in srgb,var(--m1) 18%,var(--bg));border-color:var(--m1)"></i>M1 new</span><span><i style="background:color-mix(in srgb,var(--m2) 18%,var(--bg));border-color:var(--m2)"></i>M2 new</span><span><i style="background:color-mix(in srgb,var(--bad) 18%,var(--bg));border-color:var(--bad)"></i>cost / stall</span><span><i style="background:color-mix(in srgb,var(--mut) 18%,var(--bg));border-color:var(--mut)"></i>memory</span></div>
+
+<h2>Stage 1 · Baseline: what we have</h2>
+<div class="w"><svg viewBox="0 0 680 262" role="img" aria-label="Baseline interrupt flow in four lanes">
+<defs><marker id="h" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" style="fill:var(--mut)"/></marker></defs>
+<rect class="ln" x="4" y="4" width="672" height="52"/><text class="lh" x="12" y="18">SOURCES</text>
+<rect class="e" x="90" y="16" width="62" height="32"/><text x="100" y="36">UART</text><rect class="e" x="160" y="16" width="62" height="32"/><text x="176" y="36">SPI</text><rect class="e" x="230" y="16" width="62" height="32"/><text x="246" y="36">I2C</text><rect class="e" x="300" y="16" width="62" height="32"/><text x="312" y="36">GPIO</text><rect class="e" x="370" y="16" width="62" height="32"/><text x="384" y="36">WDT</text><rect class="e" x="440" y="16" width="62" height="32"/><text x="450" y="36">Timer0</text>
+<rect class="ln" x="4" y="64" width="672" height="60"/><text class="lh" x="12" y="78">ARBITRATION</text>
+<rect class="e" x="90" y="82" width="100" height="34"/><text x="98" y="97">mip ∧ mie</text><text class="s" x="98" y="109">live wires</text>
+<rect class="e" x="205" y="82" width="150" height="34"/><text x="213" y="97">fixed priority</text><text class="s" x="213" y="109">highest cause number wins</text>
+<rect class="e" x="370" y="82" width="100" height="34"/><text x="378" y="97">mintprio</text><text class="s" x="378" y="109">cause &gt; threshold</text>
+<rect class="e" x="485" y="82" width="70" height="34"/><text x="493" y="97">MIE</text><text class="s" x="493" y="109">global</text>
+<rect class="b da" x="565" y="76" width="106" height="44"/><text class="s" x="571" y="92">our CSR round-robin</text><text class="s" x="571" y="104">interface (prototype)</text><text class="s" x="571" y="115">starting point of M1</text>
+<path class="a" d="M190 99H205"/><path class="a" d="M355 99H370"/><path class="a" d="M470 99H485"/><path class="a" d="M250 48V82" style="marker-end:none"/>
+<rect class="ln" x="4" y="132" width="672" height="52"/><text class="lh" x="12" y="146">PIPELINE</text>
+<rect class="e" x="90" y="146" width="150" height="32"/><text x="98" y="160">accept @EX</text><text class="s" x="98" y="172">no multi-cycle op, no exception</text>
+<rect class="e" x="255" y="146" width="110" height="32"/><text x="263" y="160">tag → MEM</text><text class="s" x="263" y="172">older instrs retire</text>
+<rect class="e" x="380" y="146" width="170" height="32"/><text x="388" y="160">commit @WB → redirect</text><text class="s" x="388" y="172">mepc, mcause, mtvec/vector</text>
+<path class="a" d="M240 162H255"/><path class="a" d="M365 162H380"/><path class="a" d="M520 116V146" style="stroke-opacity:.0"/><path class="a" d="M520 116V131"/>
+<rect class="ln" x="4" y="192" width="672" height="60"/><text class="lh" x="12" y="206">HANDLER (SOFTWARE)</text>
+<rect class="hz" x="90" y="212" width="170" height="32"/><text x="98" y="226">save 16 regs: sw × 16</text><text class="s" x="98" y="238">cost S before C code runs</text>
+<rect class="e" x="275" y="212" width="110" height="32"/><text x="283" y="226">C handler</text><text class="s" x="283" y="238">clears source</text>
+<rect class="hz" x="400" y="212" width="130" height="32"/><text x="408" y="226">restore: lw × 16</text><text class="s" x="408" y="238">then mret</text>
+<path class="a" d="M470 178V190H175V212"/><path class="a" d="M260 228H275"/><path class="a" d="M385 228H400"/>
+</svg></div>
+<h3>Approach and corner-case findings</h3>
+<ul>
+<li>Sources feed <code>mip</code> live; a fixed priority picks the highest cause, then <code>mintprio</code> and MIE gate it.</li>
+<li>Two problems to attack: <b>same-priority starvation</b> (a fast source can keep a lower-numbered peer waiting) and <b>software save cost S</b>.</li>
+<li>Corner cases already present: a CSR write to <code>mstatus</code>/<code>mie</code>/<code>mintprio</code> still in MEM/WB while EX accepts (the interrupt could be taken after code disabled it; verify with an assertion); an older exception beats the interrupt; a multi-cycle op blocks acceptance.</li>
+</ul>
+<div class="card"><b>Measure first (week 1):</b> L0 (IRQ → first handler instruction) · S (software save cost) · per-source worst-case wait under a storm of a same-priority peer · baseline flop and GE counts.</div>
+
+<h2>Stage 2 · <span class="m1">M1</span>: bounded hybrid priority / round-robin arbiter</h2>
+<div class="w"><svg viewBox="0 0 680 312" role="img" aria-label="Hybrid arbiter and service order">
+<text class="t" x="10" y="16">A · Arbiter dataflow</text>
+<rect class="e" x="10" y="26" width="100" height="92"/><text class="lh" x="18" y="40">SOURCES</text><text x="18" y="58">S0 · class 2</text><text x="18" y="74">S1 · class 2</text><text x="18" y="90">S2 · class 2</text><text x="18" y="106">S3 · class 1</text>
+<rect class="n1" x="135" y="34" width="120" height="76"/><text x="143" y="52">class select</text><text class="s" x="143" y="66">max class of</text><text class="s" x="143" y="78">pending ∧ en ∧ above</text><text class="s" x="143" y="90">class threshold</text>
+<rect class="n1" x="280" y="34" width="130" height="76"/><text x="288" y="52">round-robin per class</text><text class="s" x="288" y="66">pointer = last granted + 1</text><text class="s" x="288" y="78">first pending at or after</text><text class="s" x="288" y="90">the pointer wins</text>
+<rect class="e" x="435" y="34" width="80" height="34"/><text x="443" y="49">accept @EX</text><text class="s" x="443" y="61">id captured</text>
+<rect class="e" x="435" y="76" width="80" height="34"/><text x="443" y="91">commit @WB</text><text class="s" x="443" y="103">trap taken</text>
+<rect class="b" x="540" y="34" width="130" height="76"/><text x="548" y="52">rotate pointer</text><text class="s" x="548" y="66">only at commit, so an</text><text class="s" x="548" y="78">interrupt cancelled by an</text><text class="s" x="548" y="90">older exception is not lost</text>
+<path class="a" d="M110 72H135"/><path class="a" d="M255 72H280"/><path class="a" d="M410 52H435"/><path class="a" d="M475 68V76"/><path class="a" d="M515 93H540"/><path class="a da" d="M605 110V126H345V110"/>
+<text class="t" x="10" y="156">B · Service order under a storm (each block = one service)</text>
+<text x="10" y="182">Fixed priority</text>
+<rect class="e" x="120" y="168" width="24" height="20"/><rect class="e" x="148" y="168" width="24" height="20"/><rect class="e" x="176" y="168" width="24" height="20"/><rect class="e" x="204" y="168" width="24" height="20"/><rect class="e" x="232" y="168" width="24" height="20"/><text x="126" y="182">S0</text><text x="154" y="182">S0</text><text x="182" y="182">S0</text><text x="210" y="182">S0</text><text x="238" y="182">S0</text>
+<text class="s" x="266" y="182" style="fill:var(--bad)">S1, S2 wait with no bound while S0 keeps re-arriving</text>
+<text x="10" y="222">Hybrid (M1)</text>
+<rect class="e" x="120" y="208" width="24" height="20"/><rect class="n1" x="148" y="208" width="24" height="20"/><rect class="n1" x="176" y="208" width="24" height="20"/><rect class="e" x="204" y="208" width="24" height="20"/><rect class="n1" x="232" y="208" width="24" height="20"/><rect class="n1" x="260" y="208" width="24" height="20"/><text x="126" y="222">S0</text><text x="154" y="222">S1</text><text x="182" y="222">S2</text><text x="210" y="222">S0</text><text x="238" y="222">S1</text><text x="266" y="222">S2</text>
+<text class="s" x="296" y="222" style="fill:var(--m1)">each peer waits for at most (n − 1) services</text>
+<rect class="n1" x="10" y="248" width="660" height="52"/><text class="t" x="18" y="266">Bound to prove (SymbiYosys, arbiter alone)</text><text class="s" x="18" y="282">Between S's pending and its grant: no lower-class grant, and at most (n_class − 1) same-class grants.</text><text class="s" x="18" y="294">Response time: R_s ≤ C_s + B + Σ_higher ⌈R_s / T_h⌉ · C_h + (n_class − 1) · C_peer</text>
+</svg></div>
+<h3>Approach after corner-case analysis</h3>
+<ul>
+<li>Fixed <b>class</b> per source (2 bits in a CSR table); <b>round-robin inside a class</b>. Higher classes still preempt, so urgent sources keep low latency.</li>
+<li>The pointer moves at <b>commit</b>, not at decision or accept, so fairness state only changes when a trap is really taken.</li>
+<li>Grant id is captured at the accept cycle, so <code>mcause</code> always names the interrupt actually taken.</li>
+</ul>
+<h3>Corner cases</h3>
+<div class="w"><table><tr><th>Case</th><th>Rule</th></tr>
+<tr><td>Two same-class sources arrive together</td><td>Pointer picks; the other is next</td></tr>
+<tr><td>Source drops before grant</td><td>Not pending, skipped; pointer unchanged</td></tr>
+<tr><td>Higher class arrives after decision, before accept</td><td>Id re-evaluated each cycle; captured at accept</td></tr>
+<tr><td>Accept cancelled by an older exception</td><td>No commit, so no pointer rotation</td></tr>
+<tr><td>CSR write to enables/thresholds in flight</td><td>Block accept until it retires (adds a bounded term B)</td></tr>
+<tr><td>Level source never cleared</td><td>Peers still served in turn; assumption on minimum inter-arrival stated in the bound</td></tr></table></div>
+<div class="card"><b>Quantifiable outcome (targets):</b><ul>
+<li>Worst-case same-class wait: unbounded under fixed priority → (n − 1) services, proven for n sources.</li>
+<li>Arbiter area per source: est. a few tens of GE, against about 176 GE per source for the CLIC configuration registers reported in [1] (confirm by synthesis).</li>
+<li>Arbitration adds no cycles to entry (combinational in the existing gating path); confirm in timing.</li></ul></div>
+
+<h2>Stage 3 · <span class="m2">M2</span>: how bank-less, mask-guided saving happens</h2>
+<div class="w"><svg viewBox="0 0 680 410" role="img" aria-label="Bank-less save mechanism">
+<rect class="ln" x="4" y="4" width="672" height="52"/><text class="lh" x="12" y="18">BUILD TIME AND BOOT</text>
+<rect class="b" x="90" y="16" width="110" height="32"/><text x="98" y="30">C ISR + callees</text><text class="s" x="98" y="42">call graph</text>
+<rect class="n2" x="225" y="16" width="150" height="32"/><text x="233" y="30">post-link analyzer</text><text class="s" x="233" y="42">regs written (transitive)</text>
+<rect class="n2" x="400" y="16" width="120" height="32"/><text x="408" y="30">mask table</text><text class="s" x="408" y="42">16 bits per source</text>
+<rect class="n2" x="545" y="16" width="120" height="32"/><text x="553" y="30">boot writes CSRs</text><text class="s" x="553" y="42">default = all ones</text>
+<path class="a" d="M200 32H225"/><path class="a" d="M375 32H400"/><path class="a" d="M520 32H545"/>
+<rect class="ln" x="4" y="64" width="672" height="196"/><text class="lh" x="12" y="78">AT TRAP TIME (register file holds the interrupted context)</text>
+<text class="s" x="14" y="94">Caller-saved registers (16)</text>
+<rect class="mem" x="14" y="100" width="34" height="24"/><text x="20" y="116">ra</text><rect class="n2" x="52" y="100" width="34" height="24"/><text x="60" y="116">t0</text><rect class="mem" x="90" y="100" width="34" height="24"/><text x="98" y="116">t1</text><rect class="mem" x="128" y="100" width="34" height="24"/><text x="136" y="116">t2</text><rect class="n1" x="166" y="100" width="34" height="24"/><text x="174" y="116">a0</text><rect class="n1" x="204" y="100" width="34" height="24"/><text x="212" y="116">a1</text><rect class="n2" x="242" y="100" width="34" height="24"/><text x="250" y="116">a2</text><rect class="mem" x="280" y="100" width="34" height="24"/><text x="288" y="116">a3</text>
+<rect class="mem" x="14" y="128" width="34" height="24"/><text x="20" y="144">a4</text><rect class="mem" x="52" y="128" width="34" height="24"/><text x="60" y="144">a5</text><rect class="mem" x="90" y="128" width="34" height="24"/><text x="98" y="144">a6</text><rect class="mem" x="128" y="128" width="34" height="24"/><text x="136" y="144">a7</text><rect class="mem" x="166" y="128" width="34" height="24"/><text x="174" y="144">t3</text><rect class="mem" x="204" y="128" width="34" height="24"/><text x="212" y="144">t4</text><rect class="mem" x="242" y="128" width="34" height="24"/><text x="250" y="144">t5</text><rect class="mem" x="280" y="128" width="34" height="24"/><text x="288" y="144">t6</text>
+<text class="s" x="14" y="168">grey = not in mask (never saved) · green = saved · orange = pending (mask bit set, not yet saved)</text>
+<rect class="n2" x="14" y="182" width="300" height="70"/><text class="t" x="22" y="198">Save engine (new)</text><text class="s" x="22" y="212">pending[15:0] ← mask at commit · sp ← sp − 4N (rounded to 16 B)</text><text class="s" x="22" y="225">picks the demanded register first, else lowest pending index</text><text class="s" x="22" y="238">one register per granted SRAM slot; clears its pending bit</text>
+<path class="a" d="M164 152V182" style="marker-end:none"/><text class="s" x="170" y="172">snapshot read port</text>
+<rect class="n2" x="340" y="102" width="130" height="48"/><text x="348" y="118">SRAM arbiter</text><text class="s" x="348" y="132">LSU first · starvation</text><text class="s" x="348" y="144">counter forces a slot</text>
+<path class="a" d="M314 216H330V126H340"/>
+<rect class="mem" x="500" y="88" width="166" height="164"/><text class="t" x="508" y="104">DSRAM frame</text>
+<rect class="n1" x="508" y="112" width="150" height="22"/><text x="516" y="127">a0   (slot 0)</text><rect class="n1" x="508" y="136" width="150" height="22"/><text x="516" y="151">a1   (slot 1)</text><rect class="n2" x="508" y="160" width="150" height="22"/><text x="516" y="175">t0   (slot 2)</text><rect class="n2" x="508" y="184" width="150" height="22"/><text x="516" y="199">a2   (slot 3, pending)</text><rect class="b da" x="508" y="208" width="150" height="22"/><text class="s" x="516" y="222">padding (16-byte alignment)</text><text class="s" x="508" y="245">sp_new points at slot 0</text>
+<path class="a" d="M470 126H500"/>
+<rect class="ln" x="4" y="268" width="672" height="138"/><text class="lh" x="12" y="282">WHILE THE HANDLER RUNS (only two hazards)</text>
+<rect class="e" x="14" y="292" width="140" height="44"/><text x="22" y="308">handler writes rd</text><text class="s" x="22" y="322">or accesses the frame</text>
+<rect class="n2" x="180" y="292" width="150" height="44"/><text x="188" y="308">pending[rd] = 1 ?</text><text class="s" x="188" y="322">or slot address not written?</text>
+<rect class="hz" x="360" y="292" width="150" height="44"/><text x="368" y="308">stall 1–2 cycles</text><text class="s" x="368" y="322">raise demand → saved next</text>
+<rect class="e" x="540" y="292" width="126" height="44"/><text x="548" y="308">no → proceed</text><text class="s" x="548" y="322">zero cost</text>
+<path class="a" d="M154 314H180"/><path class="a" d="M330 314H360"/><text class="s" x="336" y="308">yes</text><path class="a" d="M330 326H345V352H603V336"/><text class="s" x="440" y="348">no</text>
+<rect class="n2" x="14" y="366" width="652" height="32"/><text class="s" x="22" y="380">Exit (v1): stub restores only masked registers with lw, then mret. mret and frame loads wait for pending = 0. Hardware unstack is a stretch.</text><text class="s" x="22" y="392">Invariant to prove: a register is never overwritten while pending.</text>
+</svg></div>
+<h3>How it happens, step by step</h3>
+<ol>
+<li><b>Commit:</b> at WB every older instruction has retired, so the register file is the exact interrupted state. The idle WB write port lowers <code>sp</code> by 4N (rounded to 16 bytes).</li>
+<li><b>Load the mask:</b> <code>pending ← mask[source]</code>. All-ones is the safe default.</li>
+<li><b>Handler starts immediately</b> at the vector, about the same cycle count as any trap entry.</li>
+<li><b>Background sweep:</b> the engine reads one pending register per granted SRAM slot through an extra read port and stores it to its frame slot.</li>
+<li><b>Demand first:</b> if the handler is about to write a pending register, the writer stalls a cycle or two while that register is saved next.</li>
+<li><b>No bank needed:</b> the register file itself keeps the interrupted values until the handler overwrites them, and the interlock guarantees nothing is overwritten before it is saved.</li>
+<li><b>Exit:</b> software restores the masked registers and executes <code>mret</code>, which waits until pending is empty.</li></ol>
+<div class="w"><svg viewBox="0 0 680 190" role="img" aria-label="Entry timeline comparison">
+<text class="t" x="10" y="16">Entry timeline (cycles, illustrative)</text>
+<text x="10" y="46">Software</text><rect class="n2" x="110" y="32" width="30" height="20"/><text x="115" y="46">trap</text><rect class="hz" x="140" y="32" width="250" height="20"/><text x="148" y="46">sw × 16 (S cycles)</text><rect class="e" x="390" y="32" width="90" height="20"/><text x="398" y="46">C code →</text>
+<text x="10" y="92">Bank-less, all 16</text><rect class="n2" x="110" y="78" width="30" height="20"/><text x="115" y="92">trap</text><rect class="e" x="140" y="78" width="340" height="20"/><text x="148" y="92">C code runs from here →</text><rect class="n1" x="140" y="102" width="130" height="9"/><rect class="hz" x="200" y="78" width="7" height="20"/><rect class="hz" x="252" y="78" width="7" height="20"/><text class="s" x="276" y="110">background sweep, 16 slots</text>
+<text x="10" y="148">Masked (N = 5)</text><rect class="n2" x="110" y="134" width="30" height="20"/><text x="115" y="148">trap</text><rect class="e" x="140" y="134" width="340" height="20"/><text x="148" y="148">C code runs from here →</text><rect class="n1" x="140" y="158" width="45" height="9"/><rect class="hz" x="168" y="134" width="7" height="20"/><text class="s" x="192" y="166">sweep, 5 slots · fewer hazards</text>
+<text class="s" x="500" y="46">entry = L0 + S</text><text class="s" x="500" y="92">entry = L0 + small</text><text class="s" x="500" y="148">entry = L0 + small</text>
+</svg></div>
+<h3>Corner cases</h3>
+<div class="w"><table><tr><th>Case</th><th>Rule</th></tr>
+<tr><td>Handler writes a pending register</td><td>Writer stalls; that register is saved next</td></tr>
+<tr><td>Handler touches an unwritten frame slot</td><td>Address compare stalls the access</td></tr>
+<tr><td>Analyzer misses a write (indirect call, inline asm, libgcc)</td><td>Unknown call graph → all-ones mask; co-sim fuzzing checks the rest</td></tr>
+<tr><td>ISR calls a function: <code>ra</code> is clobbered</td><td><code>ra</code> is in the caller-saved set and counted by the analyzer</td></tr>
+<tr><td>Nested or exception trap before pending = 0</td><td>Wait, bounded by the sweep</td></tr>
+<tr><td><code>sp</code> misaligned or outside DSRAM</td><td>Engine off, status bit set, stub saves in software</td></tr>
+<tr><td>Load-heavy handler starves the saver</td><td>Starvation counter guarantees a slot every N cycles</td></tr>
+<tr><td>Mask table rewritten while pending</td><td>Mask latched at commit; the write applies to the next trap</td></tr></table></div>
+<div class="card"><b>Quantifiable outcome (targets):</b><ul>
+<li>Entry to first C-callable instruction: L0 + S (about 33 cycles for a software baseline in [1]) → L0 + small; at or near the 12-cycle Cortex-M4 reference in [1].</li>
+<li>Stack traffic per entry: 16 words → N words, for example 5 for a short GPIO handler (illustrative), which also shortens the hazard window.</li>
+<li>State: est. 170 flops for 8 sources with masks (about 40 without), against a 512-flop bank; confirm by synthesis.</li>
+<li>Proofs: no register overwritten while pending; each stacked word equals its value at trap entry; save completion within a stated bound; mask soundness by Spike co-simulation.</li></ul></div>
+<p class="sub">[1] Balas, Ottaviano, Benini, CV32RT, IEEE TVLSI 2024.</p>
+</main></body></html>

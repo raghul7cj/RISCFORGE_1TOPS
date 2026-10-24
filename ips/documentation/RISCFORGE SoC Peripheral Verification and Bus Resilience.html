@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>RISCFORGE SoC Peripheral Verification &amp; Bus Resilience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+  <style>
+  :root{
+    color-scheme:light;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --display:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+
+    --ground:#ffffff;
+    --paper:#ffffff;
+    --ink:#18202c;
+    --ink-2:#475063;
+    --ink-3:#626d7f;
+    --rule:#e2e8f0;
+    --rule-2:#cbd5e1;
+    --tint:#f8fafc;
+
+    --core:#2d56c8;  --core-f:rgba(45,86,200,.08);
+    --mem:#0c8577;   --mem-f:rgba(12,133,119,.08);
+    --bus:#7445bd;   --bus-f:rgba(116,69,189,.08);
+    --per:#a8660c;   --per-f:rgba(190,120,20,.09);
+    --irq:#c92c37;   --irq-f:rgba(201,44,55,.08);
+    --mute:#98a0ac;  --mute-f:rgba(152,160,172,.08);
+    --pass:#15803d;  --pass-f:rgba(21,128,61,.08);
+    --warn:#b45309;  --warn-f:rgba(180,83,9,.08);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    padding:0;
+    background:#ffffff;
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.62;
+    padding-inline:16px;
+    padding-block:32px 48px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    max-width:880px;
+    margin-inline:auto;
+    background:#ffffff;
+    border:1px solid var(--rule);
+    border-radius:6px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.04);
+    padding:56px 64px 48px;
+  }
+  @media (max-width:720px){
+    body{padding-block:16px 32px}
+    .sheet{padding:28px 20px 32px; border:none; box-shadow:none;}
+  }
+
+  /* ---------- print & pdf optimization ---------- */
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm 16mm 12mm;
+  }
+  @media print {
+    html, body {
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #ffffff !important;
+      color: #18202c !important;
+      font-size: 13px !important;
+      line-height: 1.5 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .sheet {
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      margin: 0 !important;
+    }
+    section {
+      margin-top: 24px !important;
+      padding-top: 16px !important;
+      page-break-inside: auto !important;
+      break-inside: auto !important;
+    }
+    h1, h2, h3, h4 {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
+    figure, .tbl, .note, pre, tr, .facts, .toc {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    figure {
+      margin: 16px 0 0 !important;
+    }
+    figcaption {
+      margin: 8px 0 0 !important;
+    }
+    .fig-scroll {
+      border: 1px solid var(--rule) !important;
+      border-radius: 4px !important;
+      padding: 8px !important;
+      overflow: visible !important;
+      background: #ffffff !important;
+    }
+    .dg {
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    .split {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 12px !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    .tbl {
+      margin-top: 12px !important;
+      border: 1px solid var(--rule) !important;
+      overflow: visible !important;
+    }
+    table {
+      width: 100% !important;
+      table-layout: fixed !important;
+      font-size: 11.5px !important;
+    }
+    th, td {
+      padding: 5px 7px !important;
+      font-size: 11px !important;
+    }
+    .chip {
+      padding: 2px 4px !important;
+      font-size: 9.5px !important;
+    }
+    pre {
+      background: #f8fafc !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
+      font-size: 11px !important;
+      line-height: 1.45 !important;
+      padding: 8px 12px !important;
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+    }
+    pre code {
+      color: #0f172a !important;
+      white-space: pre-wrap !important;
+    }
+    pre .kw { color: #cf222e !important; font-weight: 600; }
+    pre .fn { color: #8250df !important; }
+    pre .str { color: #0a3069 !important; }
+    pre .num { color: #0550ae !important; }
+    pre .cm { color: #57606a !important; font-style: italic; }
+    pre .hl { background: #e6f6e6 !important; color: #116329 !important; }
+    a {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
+    .scope {
+      margin-top: 16px !important;
+      padding-top: 10px !important;
+      font-size: 11.5px !important;
+    }
+    .toc {
+      margin-top: 18px !important;
+      padding: 12px 16px !important;
+    }
+    footer {
+      margin-top: 24px !important;
+      padding-top: 12px !important;
+      font-size: 11px !important;
+    }
+  }
+
+/* ---------- typography ---------- */
+h1,h2,h3,h4{font-family:var(--display);text-wrap:balance;color:var(--ink);margin:0}
+h1{font-size:clamp(28px,4.5vw,38px);font-weight:750;font-stretch:112%;letter-spacing:-.01em;line-height:1.12}
+h2{font-size:22px;font-weight:680;font-stretch:108%;line-height:1.2;display:flex;gap:14px;align-items:baseline}
+h2 .no{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink-3);min-width:1.6em}
+h3{font-size:12px;font-weight:650;font-stretch:115%;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-2);margin-top:22px}
+p,ul,ol{max-width:72ch;margin:10px 0 0}
+ul,ol{padding-left:1.2em}
+li{margin-top:5px}
+li::marker{color:var(--ink-3)}
+strong{font-weight:600}
+code:not(pre code), .reg{font-family:var(--mono);font-size:.88em;background:var(--tint);border:1px solid var(--rule);border-radius:3px;padding:1px .35em;white-space:nowrap}
+a{color:var(--core);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--core);outline-offset:2px;border-radius:2px}
+
+/* ---------- header ---------- */
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+.lede{font-size:16.5px;line-height:1.55;color:var(--ink-2);margin-top:14px;max-width:68ch}
+.scope{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:22px;padding-top:16px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
+.scope b{font-weight:600;color:var(--ink)}
+
+.toc{margin-top:28px;padding:18px 20px;background:var(--tint);border:1px solid var(--rule);border-radius:4px}
+.toc ol{list-style:none;padding:0;margin:0;max-width:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 20px;counter-reset:t}
+.toc li{margin:0;counter-increment:t;font-size:13.5px}
+.toc li::before{content:counter(t);font-family:var(--mono);font-size:12px;color:var(--ink-3);display:inline-block;width:1.9em}
+.toc a{color:var(--ink);text-decoration:none}
+.toc a:hover{color:var(--core);text-decoration:underline}
+
+section{margin-top:48px;padding-top:28px;border-top:1px solid var(--rule)}
+section > h2 + p{margin-top:14px}
+
+/* ---------- facts ---------- */
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;margin:22px 0 0;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.facts div{padding:12px 14px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-right:-1px;margin-bottom:-1px}
+.facts dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.facts dd{margin:3px 0 0;font-size:13.5px;line-height:1.45;font-weight:500}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+.split p{margin-top:6px;font-size:14px}
+@media (max-width:640px){.split{grid-template-columns:1fr;gap:4px}}
+
+/* ---------- figures ---------- */
+figure{margin:24px 0 0;}
+.fig-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--rule);border-radius:4px;background:var(--paper);padding:14px 12px}
+figcaption{font-size:12.5px;line-height:1.5;color:var(--ink-2);margin:10px 0 0;max-width:82ch}
+figcaption b{color:var(--ink);font-weight:600}
+
+.dg{display:block;width:100%;height:auto;min-width:680px}
+.dg text{font-family:var(--sans);fill:var(--ink);font-size:12px}
+.dg .tt{font-weight:600;font-size:12.5px}
+.dg .ts{font-size:10.5px;fill:var(--ink-2)}
+.dg .tm{font-family:var(--mono);font-size:10.5px;fill:var(--ink-2)}
+.dg .ti{font-family:var(--mono);font-size:10px;fill:var(--irq)}
+.dg .tbus{fill:var(--bus);font-weight:600;font-size:11px;letter-spacing:.05em}
+.dg rect{stroke-width:1.2}
+.n-core{fill:var(--core-f);stroke:var(--core)}
+.n-stage{fill:var(--paper);stroke:var(--core)}
+.n-mem{fill:var(--mem-f);stroke:var(--mem)}
+.n-bus{fill:var(--bus-f);stroke:var(--bus)}
+.n-per{fill:var(--per-f);stroke:var(--per)}
+.n-irq{fill:var(--irq-f);stroke:var(--irq)}
+.n-pass{fill:var(--pass-f);stroke:var(--pass)}
+.n-warn{fill:var(--warn-f);stroke:var(--warn)}
+.n-plain{fill:var(--paper);stroke:var(--rule-2)}
+.n-mute{fill:var(--mute-f);stroke:var(--mute);stroke-dasharray:4 3}
+.e{fill:none;stroke:var(--ink-2);stroke-width:1.4}
+.e-core{fill:none;stroke:var(--core);stroke-width:1.6}
+.e-mem{fill:none;stroke:var(--mem);stroke-width:1.5}
+.e-bus{fill:none;stroke:var(--bus);stroke-width:1.5}
+.e-apb{fill:none;stroke:var(--bus);stroke-width:2.2}
+.e-irq{fill:none;stroke:var(--irq);stroke-width:1.4;stroke-dasharray:5 4}
+.e-pass{fill:none;stroke:var(--pass);stroke-width:1.6}
+.e-warn{fill:none;stroke:var(--warn);stroke-width:1.6}
+.ah{fill:var(--ink-2)} .ah-core{fill:var(--core)} .ah-mem{fill:var(--mem)} .ah-bus{fill:var(--bus)} .ah-irq{fill:var(--irq)} .ah-pass{fill:var(--pass)} .ah-warn{fill:var(--warn)}
+
+/* ---------- tables ---------- */
+.tbl{overflow:hidden;margin-top:18px;border:1px solid var(--rule);border-radius:4px;width:100%}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12.5px;line-height:1.45;font-variant-numeric:tabular-nums}
+th,td{text-align:left;vertical-align:middle;padding:7px 9px;border-bottom:1px solid var(--rule);word-break:break-word;overflow-wrap:break-word}
+tr:last-child td{border-bottom:0}
+thead th{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);background:var(--tint);white-space:normal;vertical-align:bottom}
+td.m,th.m{font-family:var(--mono);font-size:11.5px;white-space:normal}
+td.c,th.c{text-align:center}
+td .sub{display:block;color:var(--ink-3);font-size:11px;margin-top:2px}
+
+.chip{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:600;line-height:1;padding:2.5px 5px;border-radius:3px;border:1px solid;white-space:nowrap}
+.chip.pass{color:var(--pass);background:var(--pass-f);border-color:var(--pass)}
+.chip.warn{color:var(--warn);background:var(--warn-f);border-color:var(--warn)}
+.chip.fail{color:var(--irq);background:var(--irq-f);border-color:var(--irq)}
+.chip.info{color:var(--core);background:var(--core-f);border-color:var(--core)}
+
+.note{margin-top:18px;padding:12px 16px;border-left:3px solid var(--rule-2);background:var(--tint);font-size:13.5px}
+.note p{margin:0;max-width:76ch}
+.note p + p{margin-top:6px}
+.note b{font-weight:600}
+.note.warn{border-left-color:var(--warn);background:var(--warn-f)}
+.note.pass{border-left-color:var(--pass);background:var(--pass-f)}
+
+/* ---------- code snippet & terminal log ---------- */
+pre{background:#0d1117;color:#c9d1d9;padding:14px 16px;border-radius:6px;font-family:var(--mono);font-size:12px;line-height:1.6;overflow-x:auto;margin-top:12px;border:1px solid #30363d;white-space:pre}
+pre code{font-family:inherit;font-size:inherit;background:transparent;border:none;padding:0;white-space:pre;color:inherit;display:block}
+pre .kw{color:#ff7b72} pre .fn{color:#d2a8ff} pre .str{color:#a5d6ff} pre .num{color:#79c0ff} pre .cm{color:#8b949e;font-style:italic} pre .hl{background:#161b22;display:block;margin:-2px -16px;padding:2px 16px;color:#56d364}
+
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+</style>
+
+<main class="sheet">
+
+<header>
+  <p class="eyebrow">RISCFORGE 1TOPS SoC · Verification &amp; Robustness Report</p>
+  <h1>Peripheral Verification &amp; Bus Resilience Architecture</h1>
+  <p class="lede">A deep architectural dive and verification sign-off for the peripheral subsystem, always-on watchdog timer (AON WDT), register access testsuite (RegTest), and hardware bus timeout monitors. This document outlines how peripheral deadlocks are bounded, how register access is validated on bare-metal firmware, and how the system guarantees fault containment under all bus conditions.</p>
+  <div class="scope">
+    <span><b>Target DUT</b> RISCFORGE 1TOPS SoC Subsystem (<code class="reg">riscforge_soc_subsystem.sv</code>)</span>
+    <span><b>Simulator</b> Cadence Xcelium 24.09-s001</span>
+    <span><b>Core</b> RV32IM_Zicsr 5-Stage In-Order</span>
+    <span><b>Memory</b> 32 KB ISRAM · 32 KB DSRAM · 64 B BootROM</span>
+    <span><b>Waveforms</b> Automated <code class="reg">*.shm</code> dumps on all runs</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <ol>
+    <li><a href="#summary">Executive Summary</a></li>
+    <li><a href="#watchdog">Always-On Watchdog Timer (AON WDT)</a></li>
+    <li><a href="#regtest">Peripheral Register Access Test (RegTest)</a></li>
+    <li><a href="#monitors">Bus Timeout Monitors &amp; Fault Resilience</a></li>
+    <li><a href="#simulation">Cadence Xcelium Simulation &amp; Test Flow</a></li>
+    <li><a href="#signoff">Verification Sign-Off &amp; Matrix</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ 1 -->
+<section id="summary">
+  <h2><span class="no">1</span>Executive Summary</h2>
+  <p>In a microcontroller-class SoC, peripherals and interconnects are the primary source of unpredictable timing, bus hangs, and deadlock risks. The RISCFORGE SoC combines high-throughput native SRAM paths with an AXI-Lite and APB peripheral fabric. To guarantee rock-solid runtime execution, the subsystem incorporates three layers of verification and resilience:</p>
+  
+  <div class="split">
+    <div>
+      <h3>1. Active Fault Containment</h3>
+      <p>Independent <strong>APB Timeout Monitors</strong> sit on each of the 6 APB slots, and an <strong>AXI-Lite Timeout Monitor</strong> sits at the CPU master port. If any slave permanently deasserts its ready signal or deadlocks, the monitors abort the stalled transaction with a precise bus error (<code class="reg">SLVERR</code>) and cleanly drain orphan downstream transactions without violating AXI/APB bus protocols.</p>
+    </div>
+    <div>
+      <h3>2. System Recovery &amp; Register Proof</h3>
+      <p>An OpenTitan-derived <strong>Always-On Watchdog Timer (AON Timer)</strong> provides non-maskable bark interrupts and bite system resets. The full peripheral register suite (57 mapped registers across 6 APB peripherals) is tested end-to-end with bare-metal RISC-V firmware (<code class="reg">regtest.c</code>) executing after a genuine SPI-flash cold boot.</p>
+    </div>
+  </div>
+
+  <dl class="facts">
+    <div><dt>SoC Top DUT</dt><dd><code>riscforge_soc_subsystem.sv</code></dd></div>
+    <div><dt>Watchdog IP</dt><dd>OpenTitan AON Timer (TL-UL / CDC)</dd></div>
+    <div><dt>APB Slots</dt><dd>6 (I2C, Timer0, UART, GPIO, SPI, Timer1)</dd></div>
+    <div><dt>Bus Monitors</dt><dd>6 × APB Monitors + 1 × AXI-Lite Master</dd></div>
+    <div><dt>Register Tests</dt><dd>57 Registers · 8 Test Phases · Cold Boot</dd></div>
+    <div><dt>Monitor Tests</dt><dd>168 FW Checks + 153 TB Checks (100% Pass)</dd></div>
+    <div><dt>Watchdog Tests</dt><dd>28 Test Groups · 1,194 Checks (100% Pass)</dd></div>
+    <div><dt>Waveforms</dt><dd><code>soc_regtest_tb.shm</code> / <code>soc_montest_tb.shm</code></dd></div>
+  </dl>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="watchdog">
+  <h2><span class="no">2</span>Always-On Watchdog Timer (AON Timer / WDT)</h2>
+  <p>The RISCFORGE SoC integrates the OpenTitan Always-On (AON) Timer IP (<code>ips/aon_timer/rtl/aon_timer.sv</code>), which runs continuously in the always-on power and clock domain (<code>clk_aon_i</code>). It provides two independent hardware timing facilities:</p>
+  
+  <ul>
+    <li><strong>64-bit Always-On Wakeup Timer:</strong> Driven by a 12-bit programmable prescaler (<code class="reg">WKUP_CTRL.PRESCALER</code>) and compared against a 64-bit threshold (<code class="reg">WKUP_THOLD_HI/LO</code>). Generates a wakeup request (<code class="reg">wkup_req_o</code>) and interrupt (<code class="reg">intr_wkup_timer_expired_o</code>).</li>
+    <li><strong>32-bit Watchdog Timer with 2-Stage Escalation:</strong> Increments continuously while enabled. Generates a first-stage warning <strong>Bark Interrupt</strong> (<code class="reg">intr_wdog_timer_bark_o</code> / <code class="reg">nmi_wdog_timer_bark_o</code>) when reaching <code class="reg">WDOG_BARK_THOLD</code>, followed by an uncatchable <strong>Bite System Reset Request</strong> (<code class="reg">aon_timer_rst_req_o</code>) when reaching <code class="reg">WDOG_BITE_THOLD</code>.</li>
+  </ul>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 800 280" role="img" aria-label="Always On Timer Block Diagram">
+      <defs>
+        <marker id="wa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-core"/></marker>
+        <marker id="wb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-warn"/></marker>
+        <marker id="wr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+      </defs>
+
+      <!-- Main Box -->
+      <rect class="n-plain" x="20" y="16" width="760" height="248" rx="6"/>
+      <text class="tt" x="36" y="40">OpenTitan Always-On Timer (aon_timer.sv)</text>
+      <text class="ts" x="760" y="40" text-anchor="end">Dual-Clock Domain (clk_i / clk_aon_i) · TL-UL Register Interface</text>
+
+      <!-- TL-UL Register Top -->
+      <rect class="n-bus" x="40" y="60" width="210" height="184" rx="4"/>
+      <text class="tt" x="54" y="85">TL-UL &amp; Reg Top</text>
+      <text class="tm" x="54" y="105">aon_timer_reg_top.sv</text>
+      <text class="ts" x="54" y="130">• SECDED Integrity Check</text>
+      <text class="ts" x="54" y="148">• WDOG_REGWEN Lock (W0C)</text>
+      <text class="ts" x="54" y="166">• prim_reg_cdc Crossing</text>
+      <text class="ts" x="54" y="184">• INTR_STATE / INTR_TEST</text>
+      <text class="ts" x="54" y="202">• ALERT_TEST Generator</text>
+
+      <!-- CDC Arrow -->
+      <path d="M250,152 L290,152" class="e-core" marker-end="url(#wa)"/>
+      <text class="tm" x="270" y="142" text-anchor="middle">CDC</text>
+
+      <!-- Core AON -->
+      <rect class="n-core" x="294" y="60" width="260" height="184" rx="4"/>
+      <text class="tt" x="310" y="85">aon_timer_core.sv (clk_aon_i)</text>
+      
+      <!-- Wakeup subblock -->
+      <rect class="n-plain" x="310" y="98" width="228" height="60" rx="3"/>
+      <text class="tt" x="320" y="118" font-size="11">64-bit Wakeup Counter</text>
+      <text class="ts" x="320" y="134">12-bit Prescaler → count &gt;= thold</text>
+      <text class="tm" x="320" y="148">wkup_intr_o / wkup_req_o</text>
+
+      <!-- Watchdog subblock -->
+      <rect class="n-plain" x="310" y="168" width="228" height="64" rx="3"/>
+      <text class="tt" x="320" y="186" font-size="11">32-bit Watchdog Counter</text>
+      <text class="ts" x="320" y="202">count &gt;= bark_thold → Bark NMI</text>
+      <text class="ts" x="320" y="218">count &gt;= bite_thold → Bite Reset</text>
+
+      <!-- Outputs -->
+      <path d="M554,128 L640,128" class="e-core" marker-end="url(#wa)"/>
+      <text class="tm" x="648" y="132">wkup_req_o / intr_wkup</text>
+
+      <path d="M554,186 L640,186" class="e-warn" marker-end="url(#wb)"/>
+      <text class="tm" x="648" y="190">intr_bark / nmi_bark</text>
+
+      <path d="M554,216 L640,216" class="e-irq" marker-end="url(#wr)"/>
+      <text class="tm" x="648" y="220">aon_timer_rst_req_o (Bite)</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 2.1:</b> Always-On Timer architecture showing TL-UL integrity checked register interface on <code class="reg">clk_i</code>, asynchronous CDC synchronization, and the dual-counter wakeup and watchdog stages on <code class="reg">clk_aon_i</code>.</figcaption>
+  </figure>
+
+  <h3>Watchdog IP Operational Architecture</h3>
+  <div class="split">
+    <div>
+      <p><strong>Dual Clock &amp; Reset Domains:</strong> The register interface and SECDED integrity checks operate on the high-speed system bus clock (<code>clk_i</code>, <code>rst_ni</code>). The actual timing counters and comparator logic run continuously in the isolated always-on domain (<code>clk_aon_i</code>, <code>rst_aon_ni</code>), surviving system core resets and low-power sleep modes.</p>
+    </div>
+    <div>
+      <p><strong>Asynchronous CDC &amp; Write-Once Protection:</strong> Register programming is synchronized across domains via OpenTitan's <code>prim_reg_cdc</code> synchronizer. Once locked by writing <code>0</code> to <code class="reg">WDOG_REGWEN</code>, hardware locks <code class="reg">WDOG_CTRL</code> and threshold registers against any subsequent modification until the next full system reset.</p>
+    </div>
+  </div>
+
+  <h3>When Does the Watchdog Kick In? — Operational Failure Scenarios</h3>
+  <p>The watchdog timer evaluates hardware conditions on every cycle of <code>clk_aon_i</code>. It is engineered to detect and contain the following concrete failure modes:</p>
+
+  <div class="split">
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Scenario 1: Firmware Spinlock &amp; Infinite Polling Loops</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">When software enters an un-terminated polling loop (e.g. waiting on a non-responsive peripheral ready flag), the main scheduler fails to execute the watchdog service routine (petting). The counter reaches <code class="reg">WDOG_BARK_THOLD</code> to interrupt the core, and subsequently <code class="reg">WDOG_BITE_THOLD</code> to enforce a hardware system reset.</p>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Scenario 2: Interrupt Flooding &amp; Task Starvation</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">If a peripheral asserts a continuous spurious interrupt storm that starves background tasks or lower-priority threads from executing, the watchdog pet interval is breached. The Bark NMI preempts all standard IRQs, giving firmware a dedicated non-maskable vector to quarantine the offending peripheral.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:12px;">
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Scenario 3: Dynamic Threshold Jump Condition</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">Comparators evaluate <code>count &gt;= threshold</code> rather than equality (<code>==</code>). If software dynamically reduces <code class="reg">WDOG_BARK_THOLD</code> or <code class="reg">WDOG_BITE_THOLD</code> below the active counter value, the trigger condition evaluates true immediately on the next clock edge, avoiding a 2<sup>32</sup>-cycle rollover dead-zone.</p>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Scenario 4: Security Life-Cycle Escalation Override</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">When the hardware security controller asserts <code>lc_escalate_en_i[0] = 1</code>, the watchdog timer bypasses all software disable bits and <code class="reg">WDOG_REGWEN</code> locks, forcing the watchdog counter to run continuously to ensure tamper-resistant system reset escalation.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Hardware Bark vs. Bite Escalation Mechanics</h3>
+  <p>The core counter increment and trigger evaluation logic in <code>aon_timer_core.sv</code> enforce deterministic mathematical escalation:</p>
+  <ul>
+    <li><strong>Stage 1 — Bark NMI Warning:</strong> When <code>wdog_count &gt;= WDOG_BARK_THOLD</code>, hardware asserts <code>intr_wdog_timer_bark_o</code> and <code>nmi_wdog_timer_bark_o</code>, latching <code>INTR_STATE.wdog_timer_bark = 1</code>. Software is provided a deterministic grace window:
+      <div style="font-family:var(--mono); font-size:12.5px; background:var(--tint); border:1px solid var(--rule); border-radius:4px; padding:6px 12px; margin:6px 0; color:var(--core);">
+        &Delta;T<sub>grace</sub> = (WDOG_BITE_THOLD &minus; WDOG_BARK_THOLD) / f<sub>AON</sub>
+      </div>
+      During this window, the CPU can capture diagnostic crash logs, flush buffers to non-volatile storage, or perform an emergency recovery reset.
+    </li>
+    <li><strong>Stage 2 — Bite Hard System Reset:</strong> If the counter increments to <code>wdog_count &gt;= WDOG_BITE_THOLD</code> without being serviced, hardware triggers <code>aon_timer_rst_req_o = 1</code>. This drives an internal <strong>sticky reset latch</strong> (<code>rst_req_d = wdog_reset_req_o || rst_req_q</code>) that holds the system in hard reset until an external power-on reset pulse (<code>rst_aon_ni = 0</code>) is applied.</li>
+    <li><strong>Petting Window Protocol:</strong> To prevent triggers, software must periodically write <code>0x0000_0000</code> to <code class="reg">WDOG_COUNT</code> within interval <code>T<sub>pet</sub> &lt; WDOG_BARK_THOLD / f<sub>AON</sub></code>. Notably, <code class="reg">WDOG_COUNT</code> is <strong>exempt from the REGWEN lock</strong>, allowing normal petting even when configuration registers are permanently locked.</li>
+    <li><strong>Sleep Mode Gating:</strong> If <code>WDOG_CTRL.pause_in_sleep = 1</code> and the SoC power manager asserts <code>sleep_mode_i = 1</code>, watchdog counting pauses during legitimate deep-sleep states and resumes seamlessly upon wakeup.</li>
+  </ul>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 220" role="img" aria-label="Watchdog Timing and Failure Progression">
+      <!-- Timeline Axis -->
+      <line x1="50" y1="120" x2="770" y2="120" stroke="#cbd5e1" stroke-width="3"/>
+      
+      <!-- Phase 1: Normal Petting Zone -->
+      <rect x="50" y="40" width="280" height="70" fill="rgba(21,128,61,0.06)" stroke="#15803d" stroke-dasharray="4 3" rx="4"/>
+      <text class="tt" x="190" y="65" fill="#15803d" text-anchor="middle">Phase 1: Normal Petting Window</text>
+      <text class="ts" x="190" y="85" text-anchor="middle">Firmware writes WDOG_COUNT = 0x0</text>
+      <text class="tm" x="190" y="100" text-anchor="middle">T_pet &lt; T_bark (Nominal Execution)</text>
+      
+      <!-- Phase 2: Bark NMI Window -->
+      <rect x="330" y="40" width="220" height="70" fill="rgba(180,83,9,0.08)" stroke="#b45309" stroke-dasharray="4 3" rx="4"/>
+      <text class="tt" x="440" y="65" fill="#b45309" text-anchor="middle">Phase 2: Bark NMI Grace Window</text>
+      <text class="ts" x="440" y="85" text-anchor="middle">Missed Pet &rarr; NMI Triggered</text>
+      <text class="tm" x="440" y="100" text-anchor="middle">&Delta;T_grace = (BITE - BARK) / f_aon</text>
+      
+      <!-- Phase 3: Bite Hard Reset -->
+      <rect x="550" y="40" width="220" height="70" fill="rgba(201,44,55,0.08)" stroke="#c92c37" stroke-dasharray="4 3" rx="4"/>
+      <text class="tt" x="660" y="65" fill="#c92c37" text-anchor="middle">Phase 3: Bite Hard System Reset</text>
+      <text class="ts" x="660" y="85" text-anchor="middle">Uncatchable Sticky Reset Request</text>
+      <text class="tm" x="660" y="100" text-anchor="middle">aon_timer_rst_req_o Latched HIGH</text>
+
+      <!-- Markers & Threshold Points -->
+      <circle cx="50" cy="120" r="6" fill="#15803d"/>
+      <text class="tm" x="50" y="145" text-anchor="middle">0x0000_0000</text>
+      <text class="ts" x="50" y="160" text-anchor="middle">Reset / Reload</text>
+
+      <circle cx="330" cy="120" r="6" fill="#b45309"/>
+      <text class="tm" x="330" y="145" text-anchor="middle">WDOG_BARK_THOLD</text>
+      <text class="ts" x="330" y="160" text-anchor="middle">Bark NMI Pulse</text>
+
+      <circle cx="550" cy="120" r="6" fill="#c92c37"/>
+      <text class="tm" x="550" y="145" text-anchor="middle">WDOG_BITE_THOLD</text>
+      <text class="ts" x="550" y="160" text-anchor="middle">Bite Reset Asserts</text>
+
+      <circle cx="770" cy="120" r="6" fill="#98a0ac"/>
+      <text class="tm" x="770" y="145" text-anchor="middle">0xFFFF_FFFF</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 2.2:</b> Watchdog timeline showing nominal petting window, Bark NMI escalation window, and uncatchable sticky Bite reset asserting upon failure.</figcaption>
+  </figure>
+
+  <h3>Watchdog Register Interface &amp; Security Protections</h3>
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 22%;">
+        <col style="width: 14%;">
+        <col style="width: 14%;">
+        <col style="width: 14%;">
+        <col style="width: 36%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Register Name</th>
+          <th>Offset</th>
+          <th>Type</th>
+          <th>Reset</th>
+          <th>Description &amp; Protection Semantics</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">WDOG_REGWEN</td><td class="m">0x10</td><td class="m">RW0C</td><td class="m">0x0000_0001</td><td>Configuration lock. Writing 0 permanently disables writes to WDOG_CTRL and thresholds.</td></tr>
+        <tr><td class="m">WDOG_CTRL</td><td class="m">0x14</td><td class="m">RW</td><td class="m">0x0000_0000</td><td>bit 0: <code>enable</code>, bit 1: <code>pause_in_sleep</code>. Protected by WDOG_REGWEN.</td></tr>
+        <tr><td class="m">WDOG_BARK_THOLD</td><td class="m">0x18</td><td class="m">RW</td><td class="m">0x0000_0000</td><td>32-bit threshold for Bark NMI. Protected by WDOG_REGWEN. Fired via <code>&gt;=</code> comparison.</td></tr>
+        <tr><td class="m">WDOG_BITE_THOLD</td><td class="m">0x1C</td><td class="m">RW</td><td class="m">0x0000_0000</td><td>32-bit threshold for Bite Reset. Protected by WDOG_REGWEN. Sticky reset output.</td></tr>
+        <tr><td class="m">WDOG_COUNT</td><td class="m">0x20</td><td class="m">RW</td><td class="m">0x0000_0000</td><td>32-bit free running counter. <strong>Exempt from REGWEN lock</strong> to allow periodic petting.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Comprehensive Verification Walkthrough (<code class="reg">tb_watchdog_full.sv</code>)</h3>
+  <p>The standalone testbench exercises the complete design under synchronous and asynchronous clock ratios (<code class="reg">+define+WDT_AON_DIV=4</code>), with command/data integrity generation (<code class="reg">tlul_cmd_intg_gen</code>) and randomized stress sequences:</p>
+
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 14%;">
+        <col style="width: 22%;">
+        <col style="width: 12%;">
+        <col style="width: 38%;">
+        <col style="width: 14%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th>Suite Name</th>
+          <th>Checks</th>
+          <th>Description &amp; Verified Mechanics</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">A1..A5</td><td>CSR Suite</td><td class="m">757</td><td>Hardware resets, R/W registers, bit-bash patterns, address aliasing, <code class="reg">WDOG_REGWEN</code> locks</td><td><span class="chip pass">100% PASS</span></td></tr>
+        <tr><td class="m">B1..B5</td><td>TL-UL Bus Integrity</td><td class="m">163</td><td>Out-of-bounds addresses, unmapped accesses, sub-word writes, outstanding backpressure, SECDED integrity faults</td><td><span class="chip pass">100% PASS</span></td></tr>
+        <tr><td class="m">C1, D1</td><td>Alerts &amp; Interrupts</td><td class="m">19</td><td>Hardware alert generation (<code class="reg">alert_test</code>) and interrupt set/clear/test bit validations</td><td><span class="chip pass">100% PASS</span></td></tr>
+        <tr><td class="m">E1..E8</td><td>Watchdog Bark &amp; Bite</td><td class="m">50</td><td>Counting, threshold lowering, wrap-around, periodic petting, sleep pause, life-cycle escalation</td><td><span class="chip pass">100% PASS</span></td></tr>
+        <tr><td class="m">F1..F5</td><td>Wakeup Timer</td><td class="m">39</td><td>12-bit prescaler rates, 64-bit threshold carry propagation, threshold jump under count</td><td><span class="chip pass">100% PASS</span></td></tr>
+        <tr><td class="m">H1, G1, G2</td><td>CDC &amp; Stress</td><td class="m">166</td><td>Asynchronous <code class="reg">a_ready</code> backpressure, 20 randomized stress iterations, random mid-flight resets</td><td><span class="chip pass">100% PASS</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note pass">
+    <p><b>Sign-off Result:</b> <code class="reg">tb_watchdog_full.sv</code> completed <strong>1,194 checks with 0 errors</strong> on Cadence Xcelium 24.09-s001 (<code class="reg">xrun_fullv2_1.log</code>).</p>
+  </div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="regtest">
+  <h2><span class="no">3</span>Peripheral Register Access Test (RegTest)</h2>
+  <p>The peripheral register access testbench (<code class="reg">soc_regtest.f</code> / <code class="reg">soc_regtest_tb.sv</code>) executes bare-metal firmware (<code class="reg">regtest.c</code>) running directly on the 5-stage RV32IM core. Unlike unit-level IP tests, every register access traverses the full physical datapath:</p>
+
+  <p class="m" style="text-align:center; font-size:12.5px; margin: 16px 0; color:var(--core);">
+    Core Fetch &rarr; Execute LSU &rarr; hybrid_mem_interface &rarr; axi_lite_xbar &rarr; axi_lite_to_apb Bridge &rarr; APB Slave Registers
+  </p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 800 240" role="img" aria-label="RegTest Execution and Mailbox Flow">
+      <defs>
+        <marker id="ra" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-core"/></marker>
+        <marker id="rm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-mem"/></marker>
+        <marker id="rp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-bus"/></marker>
+      </defs>
+
+      <!-- Flash Preload -->
+      <rect class="n-per" x="20" y="40" width="130" height="150" rx="4"/>
+      <text class="tt" x="85" y="68" text-anchor="middle">SPI Flash Model</text>
+      <text class="ts" x="85" y="86" text-anchor="middle">Infineon S25FS512S</text>
+      <text class="tm" x="85" y="116" text-anchor="middle">regtest_flash.mem</text>
+      <text class="ts" x="85" y="136" text-anchor="middle">1253 ISRAM words</text>
+      <text class="ts" x="85" y="152" text-anchor="middle">643 DSRAM words</text>
+
+      <!-- Bootloader -->
+      <path d="M150,115 L190,115" class="e-bus" marker-end="url(#rp)"/>
+      <rect class="n-bus" x="194" y="40" width="140" height="150" rx="4"/>
+      <text class="tt" x="264" y="68" text-anchor="middle">Bootloader</text>
+      <text class="ts" x="264" y="86" text-anchor="middle">Cold Boot DMA</text>
+      <text class="ts" x="264" y="116" text-anchor="middle">1. S_CLEAR_SRAM</text>
+      <text class="ts" x="264" y="136" text-anchor="middle">2. S_READ_FIFO</text>
+      <text class="ts" x="264" y="156" text-anchor="middle">3. Releases core_rst_n</text>
+
+      <!-- RV32 Core -->
+      <path d="M334,115 L374,115" class="e-core" marker-end="url(#ra)"/>
+      <rect class="n-core" x="378" y="40" width="150" height="150" rx="4"/>
+      <text class="tt" x="453" y="68" text-anchor="middle">5-Stage Core</text>
+      <text class="ts" x="453" y="86" text-anchor="middle">regtest.c Executing</text>
+      <text class="ts" x="453" y="116" text-anchor="middle">trampoline @ 0x00</text>
+      <text class="ts" x="453" y="136" text-anchor="middle">8 Test Phases</text>
+      <text class="ts" x="453" y="156" text-anchor="middle">32-bit MMIO ops</text>
+
+      <!-- APB Peripherals & DSRAM Mailbox -->
+      <path d="M528,85 L590,85" class="e-bus" marker-end="url(#rp)"/>
+      <rect class="n-per" x="594" y="30" width="180" height="85" rx="4"/>
+      <text class="tt" x="684" y="52" text-anchor="middle">6 APB Slaves (57 Regs)</text>
+      <text class="ts" x="684" y="70" text-anchor="middle">I2C · TMR0 · UART · GPIO</text>
+      <text class="ts" x="684" y="88" text-anchor="middle">SPI Master · TMR1</text>
+
+      <path d="M528,155 L590,155" class="e-mem" marker-end="url(#rm)"/>
+      <rect class="n-mem" x="594" y="130" width="180" height="85" rx="4"/>
+      <text class="tt" x="684" y="152" text-anchor="middle">DSRAM Mailbox</text>
+      <text class="tm" x="684" y="170" text-anchor="middle">0x0002_0000</text>
+      <text class="ts" x="684" y="188" text-anchor="middle">TB monitors PASS/FAIL</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 3.1:</b> Peripheral Register Access Test flow from cold boot SPI flash preload to CPU execution and DSRAM mailbox reporting.</figcaption>
+  </figure>
+
+  <h3>Hardware Cold Boot Sequence &amp; Trampoline Redirection</h3>
+  <p>The SoC executes a deterministic hardware boot state machine in <code>bootloader.sv</code> before code execution starts:</p>
+  
+  <div class="split">
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>1. Memory Zeroing &amp; Flash Power-Up</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;"><strong>S_CLEAR_SRAM:</strong> Post-reset hardware zeroing of 16,384 words (64 KB total across ISRAM and DSRAM) to clear residual uninitialized memory state.<br>
+        <strong>S_FLASH_CMD:</strong> Configures internal SPI master (<code>CLKDIV=4</code>) and enforces a 30,000-cycle power-up hold delay (t<sub>PU</sub>) for external flash analog settling.</p>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>2. DMA Preload &amp; Core Release</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;"><strong>S_READ_FIFO:</strong> Executes burst DMA reads from external SPI flash into ISRAM (<code>0x0001_0000</code>) and DSRAM (<code>0x0002_0000</code>).<br>
+        <strong>S_RELEASE_CORE:</strong> Deasserts <code>core_rst_n = 1</code>. CPU fetches from BootROM (<code>0x0000_0000</code>), executing a 1-instruction trampoline (<code>jal x0, 0x00010000</code>) into <code>_start</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>The 8 Systematic Register Test Phases &amp; Fault Coverage</h3>
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 12%;">
+        <col style="width: 22%;">
+        <col style="width: 20%;">
+        <col style="width: 46%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Test Name</th>
+          <th>Target Fault Model</th>
+          <th>Description &amp; Test Vectors Applied</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">Phase 1</td><td>Reset Values</td><td>Reset state corruption</td><td>Reads all 57 registers prior to any write. Verifies against spec default masks: <code>read_val &amp; mask == rst_val &amp; mask</code>.</td></tr>
+        <tr><td class="m">Phase 2</td><td>Read-Only Protection</td><td>Write-enable line short</td><td>Writes <code>0xFFFFFFFF</code> and <code>0x55555555</code> to RO registers (UART LSR/MSR, SPI STATUS). Asserts register value remains unchanged with zero bus faults.</td></tr>
+        <tr><td class="m">Phase 3</td><td>R/W Bit-Bash</td><td>Stuck-at &amp; bit-bridging</td><td>Applies <strong>36 test patterns</strong> (<code>0x00000000</code>, <code>0xFFFFFFFF</code>, <code>0xAAAAAAAA</code>, <code>0x55555555</code>, and 32 walking-one masks <code>1 &lt;&lt; i</code>), checking readback against implemented masks.</td></tr>
+        <tr><td class="m">Phase 4</td><td>Address Uniqueness</td><td>Address decoder alias</td><td>Writes distinct keys (<code>Data<sub>k</sub> = Base + (k &times; 4) ^ 0xA5A5_0000</code>) across all registers in a peripheral window, then reads back all registers to catch decoder bit shorts.</td></tr>
+        <tr><td class="m">Phase 5</td><td>Command / FIFO / W1C</td><td>Functional side-effects</td><td>Exercises operational registers: UART FIFO trigger depth, GPIO set/clear/toggle bitmasks, Timer comparators, and W1C interrupt clears.</td></tr>
+        <tr><td class="m">Phase 6</td><td>Unmapped Holes</td><td>Aperture decode errors</td><td>Probes unmapped address offsets inside peripheral 4KB allocations (e.g. <code>0x4000_0018</code> in I2C). Asserts read returns 0 and write is safely ignored.</td></tr>
+        <tr><td class="m">Phase 7</td><td>Deliberate Bus Faults</td><td>Bus error &amp; CPU trapping</td><td>Accesses out-of-window MMIO regions (<code>0x4000_6000</code>, <code>0x4FFF_FFFC</code>) and invalid sub-word MMIO operations, cross-checking CPU traps (<code>mcause = 5 / 7</code>) and AXI SLVERR.</td></tr>
+        <tr><td class="m">Phase 8</td><td>Trap Reconciliation</td><td>Spurious interrupt detection</td><td>Reconciles total traps taken against deliberate faults (<code>N<sub>traps_taken</sub> == N<sub>expected</sub></code>) and posts completion to the mailbox.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Mailbox Protocol Specification (<code class="reg">DSRAM 0x0002_0000</code>)</h3>
+  <p>The firmware communicates with the testbench via a 7-word memory-mapped mailbox. Stores to fields <code>MB(1)..MB(6)</code> are committed first, followed by a software barrier and a final store to <code>MB(0)</code> (<code>MB_CMD</code>) which strobes the testbench monitor:</p>
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 14%;">
+        <col style="width: 18%;">
+        <col style="width: 22%;">
+        <col style="width: 46%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Offset</th>
+          <th>Field</th>
+          <th>Type / Format</th>
+          <th>Description &amp; Operational Semantics</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">+0x00</td><td class="m">MB_CMD</td><td>uint32_t Opcode</td><td>Command trigger (<code>0x1=PASS</code>, <code>0x2=FAIL</code>, <code>0x3=SECTION</code>, <code>0x4=BUSRESP</code>, <code>0xD0=DONE</code>). Written last.</td></tr>
+        <tr><td class="m">+0x04</td><td class="m">MB_IP</td><td>const char*</td><td>Pointer to IP name string residing in DSRAM <code>.rodata</code>.</td></tr>
+        <tr><td class="m">+0x08</td><td class="m">MB_NAME</td><td>const char*</td><td>Pointer to register name string.</td></tr>
+        <tr><td class="m">+0x0C</td><td class="m">MB_SUB</td><td>const char*</td><td>Pointer to sub-test description string.</td></tr>
+        <tr><td class="m">+0x10</td><td class="m">MB_ADDR</td><td>uint32_t</td><td>Target physical MMIO address under test.</td></tr>
+        <tr><td class="m">+0x14</td><td class="m">MB_EXP</td><td>uint32_t</td><td>Expected register value or expected bus response code (<code>SLVERR/DECERR</code>).</td></tr>
+        <tr><td class="m">+0x18</td><td class="m">MB_GOT</td><td>uint32_t</td><td>Actual register value read or current trap counter.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Root Cause Analysis (RCA) of Discovered Hardware Bugs</h3>
+  <div class="note warn">
+    <p><b>Hardware RTL Bugs Identified &amp; Isolated:</b> Simulation of <code class="reg">soc_regtest_tb</code> with Cadence Xcelium 24.09 uncovered two critical integration bugs:</p>
+    <ul style="margin-top:6px">
+      <li><strong>Timer Comparator Readback Inversion Bug:</strong> In <code>ips/apb_timer/apb_timer/timer.sv</code>, the comparator logic clears the comparator register match state unconditionally when <code>CTRL.EN == 0</code>. As a result, Phase 3 bit-bash and Phase 5 checks failed because <code>T_CMP</code> could not retain programmed values while disabled. <em>Fix: Decouple configuration register storage from counter enable gating.</em></li>
+      <li><strong>Spurious Uninitialized Timer IRQ Flooding (2,311 Traps vs 15 Expected):</strong> During cold reset and pattern writes, <code>timer.sv</code> continuously asserted its IRQ line while <code>CTRL.EN = 0</code>. With global interrupts enabled, the core was flooded with 2,296 spurious interrupts. <em>Fix: Gate interrupt output with <code>CTRL.EN &amp; CTRL.IRQ_EN</code>.</em></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="monitors">
+  <h2><span class="no">4</span>Bus Timeout Monitors &amp; Fault Resilience</h2>
+  <p>In a standard bus fabric without timeouts, a slave peripheral that hangs or leaves <code class="reg">PREADY</code> permanently low freezes the entire SoC pipeline, deadlocking the CPU in an unrecoverable wait state. RISCFORGE implements a comprehensive two-tier timeout monitor architecture (<code>ips/bus_monitors/</code>):</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 300" role="img" aria-label="Bus Timeout Monitor Architecture">
+      <defs>
+        <marker id="mb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-bus"/></marker>
+        <marker id="mp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-pass"/></marker>
+        <marker id="mw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-warn"/></marker>
+      </defs>
+
+      <!-- CPU Core -->
+      <rect class="n-core" x="20" y="30" width="130" height="230" rx="4"/>
+      <text class="tt" x="85" y="60" text-anchor="middle">5-Stage Core</text>
+      <text class="ts" x="85" y="80" text-anchor="middle">LSU / MEM Cycle</text>
+      <text class="ts" x="85" y="120" text-anchor="middle">Precise Trap on</text>
+      <text class="ts" x="85" y="136" text-anchor="middle">SLVERR:</text>
+      <text class="tm" x="85" y="156" text-anchor="middle">mcause 5 / 7</text>
+      <text class="tm" x="85" y="174" text-anchor="middle">mtval = addr</text>
+
+      <!-- AXI-Lite Timeout Monitor -->
+      <path d="M150,145 L180,145" class="e-bus" marker-end="url(#mb)"/>
+      <rect class="n-warn" x="184" y="30" width="160" height="230" rx="4"/>
+      <text class="tt" x="264" y="55" text-anchor="middle">AXI-Lite Master Monitor</text>
+      <text class="tm" x="264" y="73" text-anchor="middle">axi_lite_timeout_monitor</text>
+      <text class="ts" x="194" y="98">Dual Thresholds:</text>
+      <text class="tm" x="194" y="114">• SRAM: 64 cyc</text>
+      <text class="tm" x="194" y="130">• APB: 131,072 cyc</text>
+      <text class="ts" x="194" y="155">3-State Cleanup FSM:</text>
+      <text class="ts" x="194" y="171">• StPass (Forward)</text>
+      <text class="ts" x="194" y="187">• StInject (Err to CPU)</text>
+      <text class="ts" x="194" y="203">• StDrain (Swallow late B/R)</text>
+
+      <!-- AXI Crossbar & Bridge -->
+      <path d="M344,145 L374,145" class="e-bus" marker-end="url(#mb)"/>
+      <rect class="n-bus" x="378" y="30" width="130" height="230" rx="4"/>
+      <text class="tt" x="443" y="60" text-anchor="middle">AXI-to-APB</text>
+      <text class="ts" x="443" y="80" text-anchor="middle">Bridge &amp; Xbar</text>
+      <text class="ts" x="443" y="120" text-anchor="middle">PSLVERR &rarr;</text>
+      <text class="ts" x="443" y="136" text-anchor="middle">RESP_SLVERR</text>
+
+      <!-- APB Timeout Monitors (6 Slots) -->
+      <path d="M508,145 L538,145" class="e-bus" marker-end="url(#mb)"/>
+      <rect class="n-pass" x="542" y="30" width="130" height="230" rx="4"/>
+      <text class="tt" x="607" y="55" text-anchor="middle">6 × APB Monitors</text>
+      <text class="tm" x="607" y="73" text-anchor="middle">apb_timeout_monitor</text>
+      <text class="ts" x="552" y="98">Slot Thresholds:</text>
+      <text class="tm" x="552" y="114">• I2C: 16 cyc</text>
+      <text class="tm" x="552" y="130">• TMR0: 16 cyc</text>
+      <text class="tm" x="552" y="146">• UART: 16 cyc</text>
+      <text class="tm" x="552" y="162">• GPIO: 16 cyc</text>
+      <text class="tm" x="552" y="178">• SPI: 65,536 cyc</text>
+      <text class="tm" x="552" y="194">• TMR1: 16 cyc</text>
+      <text class="ts" x="552" y="220">blocked_q fast-fail</text>
+
+      <!-- APB Slaves -->
+      <path d="M672,145 L702,145" class="e-bus" marker-end="url(#mb)"/>
+      <rect class="n-per" x="706" y="30" width="80" height="230" rx="4"/>
+      <text class="tt" x="746" y="60" text-anchor="middle">Slaves</text>
+      <text class="ts" x="746" y="90" text-anchor="middle">I2C</text>
+      <text class="ts" x="746" y="115" text-anchor="middle">TMR0</text>
+      <text class="ts" x="746" y="140" text-anchor="middle">UART</text>
+      <text class="ts" x="746" y="165" text-anchor="middle">GPIO</text>
+      <text class="ts" x="746" y="190" text-anchor="middle">SPI</text>
+      <text class="ts" x="746" y="215" text-anchor="middle">TMR1</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 4.1:</b> Two-tier Bus Timeout Monitor topology showing APB slot bounds and AXI-Lite master port drain FSM.</figcaption>
+  </figure>
+
+  <h3>When Do the Bus Monitors Kick In? — Failure Taxonomy</h3>
+  <p>The bus monitors continuously track transaction durations across the interconnect. They actively trigger under four distinct failure conditions:</p>
+
+  <div class="split">
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Case A: Defective Slave Permanent Stalls (PREADY Stuck Low)</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">In APB4, a transaction enters the <code>ACCESS</code> phase with <code>PSEL=1, PENABLE=1</code> and remains locked until <code>PREADY=1</code>. If a peripheral's internal FSM deadlocks, its clock gate fails, or its power rail drops, the APB monitor fires after <code>TimeoutCycles</code> (16 cycles for I2C/TMR/UART/GPIO). It injects <code>PREADY=1, PSLVERR=1, PRDATA=0xDEAD_BEEF</code>, unblocking the bridge immediately.</p>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Case B: SPI FIFO Boundary Stalls &amp; Passive Sniffing Protection</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">The PULP SPI Master deasserts <code>PREADY</code> when reading an empty RXFIFO or writing a full TXFIFO. In the SPI RTL, FIFO pop logic is driven by <code>spi_data_rx_ready = rxfifo_rd_access &amp; PREADY</code>. The APB monitor passively sniffs <code>apb_req_i</code> without overriding the peripheral's internal lines. On timeout, only the bridge is answered; when <code>PSEL</code> drops, the slave sees an aborted transfer, preserving all unread FIFO contents without data loss.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:12px;">
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Case C: AXI Crossbar Arbitration &amp; Bridge Routing Lockups</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">If the 2SLV &rarr; 3MST AXI-Lite crossbar encounters an unrecoverable routing conflict or an unmapped aperture freeze, the CPU-side AXI-Lite monitor fires (64 cycles for SRAM, 131,072 cycles for APB). It injects <code>RESP_SLVERR (2'b10)</code> and <code>RDATA=0xDEAD_DEAD</code> back to the CPU master, preventing core LSU pipeline deadlock.</p>
+      </div>
+    </div>
+    <div>
+      <div class="note" style="margin-top:0;">
+        <p><b>Case D: Fast-Fail on Broken Slaves &amp; Auto-Recovery (blocked_q)</b></p>
+        <p style="font-size:13px; color:var(--ink-2); margin-top:4px;">To prevent repeated timeout delays when firmware retries a broken peripheral, the APB monitor latches <code>blocked_q = 1</code> upon firing. Subsequent accesses to the dead slot fail immediately in cycle 0. The latch automatically clears only when the peripheral recovers and presents <code>PREADY=1</code> during an unselected, idle cycle (<code>!PSEL &amp;&amp; PREADY</code>).</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Hierarchical Latency Budgeting Architecture</h3>
+  <p>Timeout budgets are strictly nested to ensure localized fault containment and prevent false triggers:</p>
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 24%;">
+        <col style="width: 18%;">
+        <col style="width: 18%;">
+        <col style="width: 40%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Bus Segment</th>
+          <th>Monitor Module</th>
+          <th>Timeout Budget</th>
+          <th>Design Rationale &amp; Fault Domain</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ISRAM / DSRAM Port</strong></td>
+          <td class="m">axi_lite_timeout_monitor</td>
+          <td class="m">64 cycles</td>
+          <td>Native SRAM accesses complete in 3–4 cycles. 64 cycles catches LSU bus wrapper lockups immediately.</td>
+        </tr>
+        <tr>
+          <td><strong>Standard APB Slots</strong><br><span class="sub">I2C, TMR0, UART, GPIO, TMR1</span></td>
+          <td class="m">apb_timeout_monitor</td>
+          <td class="m">16 cycles</td>
+          <td>Generous headroom for 1-cycle APB registers while bounding peripheral stalls within microseconds.</td>
+        </tr>
+        <tr>
+          <td><strong>SPI Master Slot</strong></td>
+          <td class="m">apb_timeout_monitor</td>
+          <td class="m">65,536 cycles</td>
+          <td>Accommodates long hardware flow-controlled multi-word serial transfers at low baud rate prescalers.</td>
+        </tr>
+        <tr>
+          <td><strong>AXI Master APB Window</strong></td>
+          <td class="m">axi_lite_timeout_monitor</td>
+          <td class="m">131,072 cycles</td>
+          <td>Sized to 2 &times; Timeout<sub>SPI</sub>. Guarantees APB slot monitors fire first, reserving AXI timeout for genuine bridge deadlocks.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>AXI-Lite 3-State Protocol Invariant Cleanup FSM</h3>
+  <p>Under AMBA AXI specifications, a master cannot withdraw <code>VALID</code> once asserted until <code>READY</code> responds. Naively aborting an access by dropping <code>VALID</code> causes permanent crossbar deadlocks. The AXI timeout monitor resolves this through a 3-state cleanup FSM (<code>StPass</code> &rarr; <code>StInject</code> &rarr; <code>StDrain</code>):</p>
+
+  <figure>
+    <div class="fig-scroll">
+    <svg class="dg" viewBox="0 0 820 270" role="img" aria-label="AXI-Lite 3-State Cleanup FSM and APB Fast-Fail Flow">
+      <defs>
+        <marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-bus"/></marker>
+        <marker id="fr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-irq"/></marker>
+        <marker id="fp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,1 L10,5 L0,9 z" class="ah-pass"/></marker>
+      </defs>
+
+      <!-- FSM State: StPass -->
+      <rect class="n-pass" x="30" y="40" width="220" height="190" rx="6"/>
+      <text class="tt" x="140" y="65" text-anchor="middle">StPass (Transparent)</text>
+      <text class="ts" x="45" y="90">• Direct master-to-slave forwarding</text>
+      <text class="ts" x="45" y="110">• Counts cycles while busy &amp; !ready</text>
+      <text class="ts" x="45" y="130">• Normal handshake resets counter</text>
+      <text class="tm" x="45" y="160" fill="var(--warn)">On timeout (wr_fire / rd_fire):</text>
+      <text class="ts" x="45" y="180">1. Capture pending beats (aw/w/ar)</text>
+      <text class="ts" x="45" y="200">2. Set b_swallow_q / r_swallow_q</text>
+
+      <!-- Transition 1 -->
+      <path d="M250,110 L300,110" class="e-warn" marker-end="url(#fa)"/>
+      <text class="tm" x="275" y="102" text-anchor="middle">Timeout</text>
+
+      <!-- FSM State: StInject -->
+      <rect class="n-warn" x="304" y="40" width="230" height="190" rx="6"/>
+      <text class="tt" x="419" y="65" text-anchor="middle">StInject (Decoupled Inject)</text>
+      <text class="ts" x="318" y="90">• CPU Side: Injects RESP_SLVERR</text>
+      <text class="ts" x="318" y="110">• Core unblocks &amp; retires access</text>
+      <text class="ts" x="318" y="130">• Xbar Side: Holds downstream</text>
+      <text class="ts" x="318" y="150">  b_ready=1 / r_ready=1 high</text>
+      <text class="tm" x="318" y="180" fill="var(--core)">When CPU acknowledges beat:</text>
+      <text class="ts" x="318" y="200">Transition to StDrain</text>
+
+      <!-- Transition 2 -->
+      <path d="M534,110 L584,110" class="e-bus" marker-end="url(#fa)"/>
+      <text class="tm" x="559" y="102" text-anchor="middle">slv b/r_ready</text>
+
+      <!-- FSM State: StDrain -->
+      <rect class="n-core" x="588" y="40" width="202" height="190" rx="6"/>
+      <text class="tt" x="689" y="65" text-anchor="middle">StDrain (Orphan Drain)</text>
+      <text class="ts" x="600" y="90">• Drives captured beats to xbar</text>
+      <text class="ts" x="600" y="110">• Swallows late orphan responses</text>
+      <text class="ts" x="600" y="130">• Collision fast-fail: New CPU ops</text>
+      <text class="ts" x="600" y="150">  get immediate SLVERR (err_b/r)</text>
+      <text class="tm" x="600" y="180" fill="var(--pass)">When orphan drain completes:</text>
+      <text class="ts" x="600" y="200">Return to StPass</text>
+
+      <!-- Return Loop -->
+      <path d="M689,230 L689,252 L140,252 L140,230" class="e-pass" marker-end="url(#fp)"/>
+      <text class="tm" x="419" y="247" text-anchor="middle">All pending beats cleared &amp; b/r swallowed</text>
+    </svg>
+    </div>
+    <figcaption><b>Figure 4.2:</b> AXI-Lite 3-State Protocol Invariant Cleanup FSM ensuring zero VALID deassertions and complete orphan response swallowing.</figcaption>
+  </figure>
+
+  <h3>Blocked State Fast-Fail &amp; Auto-Recovery (<code class="reg">blocked_q</code>)</h3>
+  <p>To prevent software retry loops from incurring repeated full timeout delays on a permanently stuck slave, the APB monitor latches <code>blocked_q = 1</code> upon firing. Subsequent accesses to the dead slot fail immediately in cycle 0 of the <code>ACCESS</code> phase. The latch automatically clears only when the peripheral recovers and shows <code>PREADY=1</code> during an idle, unselected bus cycle.</p>
+
+  <h3>Firmware Bus Error Recovery &amp; Trap Decoding</h3>
+  <p>When an APB or AXI monitor injects <code>SLVERR</code>, the RV32IM core executes a precise trap. The firmware trap vector decodes the faulting MMIO address and skips the instruction to resume execution:</p>
+  <pre><code><span class="cm">// Bare-metal RISC-V MMIO Exception Handler (montest.c / crt0.S)</span>
+<span class="kw">void</span> <span class="fn">trap_handler</span>(<span class="kw">void</span>) {
+    <span class="kw">uint32_t</span> mcause, mepc, mtval;
+    __asm__ <span class="kw">volatile</span>(<span class="str">"csrr %0, mcause"</span> : <span class="str">"=r"</span>(mcause));
+    __asm__ <span class="kw">volatile</span>(<span class="str">"csrr %0, mepc"</span>   : <span class="str">"=r"</span>(mepc));
+    __asm__ <span class="kw">volatile</span>(<span class="str">"csrr %0, mtval"</span>  : <span class="str">"=r"</span>(mtval));
+
+    <span class="kw">if</span> (mcause == <span class="num">5</span> || mcause == <span class="num">7</span>) {
+        <span class="cm">// Load (5) or Store (7) Access Fault generated by Bus Monitor SLVERR</span>
+        <span class="cm">// mtval contains the exact 32-bit faulting MMIO register address</span>
+        log_bus_fault(mcause, mtval, mepc);
+
+        <span class="cm">// Advance mepc past the 4-byte faulting instruction to safely continue</span>
+        __asm__ <span class="kw">volatile</span>(<span class="str">"csrw mepc, %0"</span> :: <span class="str">"r"</span>(mepc + <span class="num">4</span>));
+    }
+}</code></pre>
+
+  <h3>Bus Monitor Verification Results (<code class="reg">soc_montest_tb.sv</code> / <code class="reg">montest.c</code>)</h3>
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 25%;">
+        <col style="width: 20%;">
+        <col style="width: 12%;">
+        <col style="width: 13%;">
+        <col style="width: 14%;">
+        <col style="width: 16%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Monitor Channel</th>
+          <th>Threshold</th>
+          <th>Fires</th>
+          <th>Expected</th>
+          <th>Checks</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="m">APB[0] I2C</td><td class="m">16 cycles</td><td class="m">3</td><td class="m">3</td><td class="m">19</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">APB[1] TIMER0</td><td class="m">16 cycles</td><td class="m">3</td><td class="m">3</td><td class="m">19</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">APB[2] UART</td><td class="m">16 cycles</td><td class="m">3</td><td class="m">3</td><td class="m">19</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">APB[3] GPIO</td><td class="m">16 cycles</td><td class="m">3</td><td class="m">3</td><td class="m">19</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">APB[4] SPI Master</td><td class="m">65,536 cycles</td><td class="m">6</td><td class="m">6</td><td class="m">44</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">APB[5] TIMER1</td><td class="m">16 cycles</td><td class="m">3</td><td class="m">3</td><td class="m">19</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">AXI-Lite Core Port</td><td class="m">131,072 cycles</td><td class="m">2 (1 wr, 1 rd)</td><td class="m">2</td><td class="m">23</td><td><span class="chip pass">PASS</span></td></tr>
+        <tr><td class="m">Cross-Peripheral Traffic</td><td class="m">-</td><td class="m">-</td><td class="m">-</td><td class="m">6</td><td><span class="chip pass">PASS</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note pass">
+    <p><b>Verification Sign-off:</b> <strong>168 Firmware Checks PASSED · 153 Testbench Checks PASSED · 0 Errors</strong> (<code class="reg">montest.log</code>). Proved that SPI empty-RX / full-TX aborts lose zero valid data, and AXI orphan drains recover cleanly.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="simulation">
+  <h2><span class="no">5</span>Cadence Xcelium Simulation &amp; Test Flow</h2>
+  <p>All verification suites are compiled and simulated using <strong>Cadence Xcelium 24.09-s001</strong> on CentOS. Both SoC-level testbenches (<code class="reg">soc_regtest_tb</code> and <code class="reg">soc_montest_tb</code>) automatically dump complete hierarchical simulation databases (<code class="reg">*.shm</code>) during execution without requiring additional command-line probe switches.</p>
+
+  <h3>1. Always-On Watchdog Timer Verification (AON WDT)</h3>
+  <p>The standalone directed testbench exercises all 14 registers, TL-UL bus integrity, alert channels, bark/bite thresholds, and CDC crossings under both synchronous and integer-divided clock frequencies:</p>
+  <pre><code><span class="cm"># Navigate to AON Timer IP verification directory</span>
+<span class="fn">cd</span> ips/aon_timer
+
+<span class="cm"># Run standard synchronous test (clk_aon_i = clk_i)</span>
+<span class="fn">xrun</span> -f tb_watchdog_full.f
+
+<span class="cm"># Run asynchronous CDC test with 4x clock divider on clk_aon_i</span>
+<span class="fn">xrun</span> -f tb_watchdog_full.f +define+WDT_AON_DIV=4</code></pre>
+
+  <h3>2. Peripheral Register Access Testbench (RegTest)</h3>
+  <p>The register test runs bare-metal C firmware (<code class="reg">regtest.c</code>) compiled with the GNU RISC-V toolchain (<code class="reg">riscv64-unknown-elf-gcc</code>), linked to ISRAM and DSRAM images, and converted into flash memory files (<code class="reg">regtest_flash.mem</code>). The testbench simulates a cold hardware boot from the Infineon S25FS512S SPI flash model before releasing the CPU:</p>
+  <pre><code><span class="cm"># Step 1: Build firmware binary, header parameters, and SPI flash image</span>
+<span class="fn">cd</span> ips/mem_files/regtest
+<span class="fn">python3</span> build.py
+
+<span class="cm"># Step 2: Execute cold boot and register verification from RTL_SOC</span>
+<span class="fn">cd</span> ../../RTL_SOC
+<span class="fn">xrun</span> -f rtl/soc_regtest.f              <span class="cm"># standard run, writes soc_regtest_tb.shm</span>
+<span class="fn">xrun</span> -f rtl/soc_regtest.f +VERBOSE     <span class="cm"># verbose mode: log all PASS events</span></code></pre>
+
+  <h3>3. Bus Timeout Monitor Verification (MonTest)</h3>
+  <p>The bus monitor test compiles directed firmware (<code class="reg">montest.c</code>) that coordinates with <code class="reg">soc_montest_tb.sv</code> via the DSRAM mailbox (<code class="reg">0x0002_0000</code>). The testbench applies hardware forces to peripheral <code class="reg">PREADY</code> signals and bridge response logic to verify timeout aborts, fast-fail states, and orphan cleanup:</p>
+  <pre><code><span class="cm"># Step 1: Build monitor test firmware and flash memory image</span>
+<span class="fn">cd</span> ips/mem_files/montest
+<span class="fn">python3</span> build.py
+
+<span class="cm"># Step 2: Execute bus timeout monitor verification from RTL_SOC</span>
+<span class="fn">cd</span> ../../RTL_SOC
+<span class="fn">xrun</span> -f rtl/soc_montest.f              <span class="cm"># standard run, writes soc_montest_tb.shm</span>
+<span class="fn">xrun</span> -f rtl/soc_montest.f +VERBOSE     <span class="cm"># verbose mode: log individual monitor fires</span></code></pre>
+
+  <h3>4. Waveform Inspection &amp; Debugging</h3>
+  <p>Simulation snapshots and signal traces are recorded into Cadence SHM format. Traces can be inspected directly in Cadence SimVision or converted for debugging:</p>
+  <pre><code><span class="cm"># Open simulation waveforms in Cadence SimVision</span>
+<span class="fn">simvision</span> soc_regtest_tb.shm &amp;
+<span class="fn">simvision</span> soc_montest_tb.shm &amp;</code></pre>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="signoff">
+  <h2><span class="no">6</span>Verification Sign-Off &amp; Matrix</h2>
+  <div class="tbl">
+    <table>
+      <colgroup>
+        <col style="width: 25%;">
+        <col style="width: 21%;">
+        <col style="width: 19%;">
+        <col style="width: 21%;">
+        <col style="width: 14%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Filelist / TB</th>
+          <th>Environment</th>
+          <th>Checks / Assertions</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>AON Watchdog</strong></td>
+          <td class="m">tb_watchdog_full.f</td>
+          <td>Xcelium 24.09 (CentOS)</td>
+          <td class="m">1,194 checks · 0 err</td>
+          <td><span class="chip pass">100% PASS</span></td>
+        </tr>
+        <tr>
+          <td><strong>Bus Monitors</strong></td>
+          <td class="m">soc_montest.f</td>
+          <td>Xcelium 24.09 (CentOS)</td>
+          <td class="m">321 checks (168 FW, 153 TB)</td>
+          <td><span class="chip pass">100% PASS</span></td>
+        </tr>
+        <tr>
+          <td><strong>Peripheral RegTest</strong></td>
+          <td class="m">soc_regtest.f</td>
+          <td>Xcelium 24.09 (CentOS)</td>
+          <td class="m">57 registers · 8 phases</td>
+          <td><span class="chip warn">DIAGNOSED</span></td>
+        </tr>
+        <tr>
+          <td><strong>AXI &amp; APB Fabric</strong></td>
+          <td class="m">soc_subsystem.f</td>
+          <td>Xcelium / VCS</td>
+          <td class="m">Protocol &amp; CDC clean</td>
+          <td><span class="chip pass">VERIFIED</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p>RISCFORGE 1TOPS SoC Subsystem · Peripheral Verification &amp; Bus Resilience Architecture Report · Generated September 2026</p>
+</footer>
+
+</main>
+</body></html>

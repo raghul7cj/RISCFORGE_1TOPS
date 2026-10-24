@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 316" width="100%" height="auto" role="img" aria-label="SoC block diagram">
+<style>
+svg { background: #ffffff; }
+text { fill: #111111; font-family: system-ui, -apple-system, sans-serif; font-size: 11px; }
+.s { font-size: 9.5px; fill: #555555; }
+.t { font-weight: 700; }
+.b { fill: #ffffff; stroke: #111111; stroke-width: 1.2; }
+.n { fill: #dedede; stroke: #111111; stroke-width: 2.2; }
+.h { fill: url(#hat); stroke: #111111; stroke-width: 1.4; }
+.m { fill: #f4f4f4; stroke: #111111; stroke-width: 1.2; }
+.d { stroke-dasharray: 5 3; }
+.a { stroke: #111111; stroke-width: 1.3; fill: none; marker-end: url(#ar); }
+.l { stroke: #111111; stroke-width: 1.3; fill: none; }
+</style>
+<defs>
+<marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" fill="#111111"/></marker>
+<pattern id="hat" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#9e9e9e" stroke-width="2"/></pattern>
+</defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+
+<!-- Core Boundary & Pipeline -->
+<rect class="b" x="10" y="16" width="250" height="170"/><text class="t" x="18" y="30">RV32IM_Zicsr core, M-mode</text>
+<rect class="b" x="18" y="38" width="40" height="24"/><text x="30" y="54">IF</text>
+<rect class="b" x="62" y="38" width="40" height="24"/><text x="74" y="54">ID</text>
+<rect class="b" x="106" y="38" width="40" height="24"/><text x="118" y="54">EX</text>
+<rect class="b" x="150" y="38" width="40" height="24"/><text x="158" y="54">MEM</text>
+<rect class="b" x="194" y="38" width="40" height="24"/><text x="204" y="54">WB</text>
+
+<!-- CSR File & IRQ Front End -->
+<rect class="b" x="18" y="74" width="110" height="46"/><text x="26" y="92">CSR file</text><text class="s" x="26" y="106">mstatus, mie, mtvec…</text>
+<rect class="n" x="140" y="74" width="112" height="46"/><text class="t" x="148" y="92">IRQ front end</text><text class="s" x="148" y="106">gateway · arbiter · levels</text>
+<rect class="b" x="18" y="130" width="234" height="26"/><text x="26" y="147">Hazard unit · trap / MRET commit at WB</text><text class="s" x="18" y="176">custom CSRs 0x7C0–0x7C2</text>
+
+<!-- Simple Data Memory: DSRAM 32K -->
+<rect class="m" x="20" y="216" width="110" height="36"/>
+<text class="t" x="75" y="238" text-anchor="middle">DSRAM 32K</text>
+
+<!-- Simple Data Bus: from MEM stage to DSRAM 32K and AXI-Lite Crossbar -->
+<path class="l" d="M170 186V234"/>
+<circle cx="170" cy="234" r="2.5" fill="#111111"/>
+<path class="a" d="M170 234H130"/>
+<path class="a" d="M170 234H300"/>
+<text class="s" x="176" y="206">Data bus</text>
+<text class="s" x="215" y="228">MMIO</text>
+
+<!-- AXI-Lite Crossbar & Bridge -->
+<rect class="b" x="300" y="16" width="60" height="280"/><text class="t" x="306" y="150">AXI-Lite</text><text x="306" y="164">crossbar</text><text class="s" x="306" y="178">2 × 3</text>
+<rect class="b" x="384" y="110" width="66" height="60"/><text x="390" y="136">AXI→APB</text><text x="390" y="150">bridge</text><path class="a" d="M360 140H384"/>
+
+<!-- APB Bus Backbone and Peripheral Feed Arrows -->
+<path class="l" d="M450 140H470M470 26V192"/>
+<path class="a" d="M470 29H490"/>
+<path class="a" d="M470 61H490"/>
+<path class="a" d="M470 93H490"/>
+<path class="a" d="M470 125H490"/>
+<path class="a" d="M470 157H490"/>
+<path class="a" d="M470 189H490"/>
+
+<!-- Peripheral Slaves (Timer 1 removed) -->
+<rect class="b" x="490" y="16" width="130" height="26"/><text x="498" y="33">I2C</text><text class="s" x="580" y="33">mip[17]</text>
+<rect class="b" x="490" y="48" width="130" height="26"/><text x="498" y="65">Timer 0</text><text class="s" x="580" y="65">mip[7]</text>
+<rect class="b" x="490" y="80" width="130" height="26"/><text x="498" y="97">UART</text><text class="s" x="580" y="97">mip[19]</text>
+<rect class="b" x="490" y="112" width="130" height="26"/><text x="498" y="129">GPIO</text><text class="s" x="580" y="129">mip[16]</text>
+<rect class="b" x="490" y="144" width="130" height="26"/><text x="498" y="161">SPI</text><text class="s" x="580" y="161">mip[18]</text>
+<rect class="b" x="490" y="176" width="130" height="26"/><text x="498" y="193">AON WDT</text><text class="s" x="580" y="193">mip[20]</text>
+
+<!-- Interrupt Lines (Dashed Sideband Wires to Core-Local Front End) -->
+<path class="l d" d="M620 29H690 M620 61H690 M620 93H690 M620 125H690 M620 157H690 M620 189H690"/>
+<path class="a d" d="M690 189V8H275V97H252"/>
+<text class="s" x="415" y="55" text-anchor="middle" font-size="9px">IRQ wires (dashed)</text>
+<text class="s" x="415" y="68" text-anchor="middle" font-size="9px">core-local</text>
+<text class="s" x="415" y="81" text-anchor="middle" font-size="9px">no bus traffic</text>
+<text class="s" x="490" y="224">No PLIC: MEIP is tied off. Bus is not used for</text>
+<text class="s" x="490" y="237">interrupt claim or completion.</text>
+</svg>

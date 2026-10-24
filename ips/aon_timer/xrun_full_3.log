@@ -1,0 +1,229 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Sep 20, 2026 at 00:43:25 IST
+xrun
+	-f tb_watchdog_full.f
+		-sv
+		-timescale 1ns/1ps
+		-top tb_watchdog_full
+		+incdir+../SOC_FILES/include/watchdog/prim
+		../SOC_FILES/include/watchdog/prim_abstract/prim_pkg.sv
+		../SOC_FILES/include/watchdog/prim/prim_util_pkg.sv
+		../SOC_FILES/include/watchdog/prim/prim_mubi_pkg.sv
+		../SOC_FILES/include/watchdog/prim/prim_secded_pkg.sv
+		../SOC_FILES/include/watchdog/prim/prim_subreg_pkg.sv
+		../SOC_FILES/include/watchdog/prim/prim_alert_pkg.sv
+		../SOC_FILES/include/watchdog/top_pkg/top_pkg.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_pkg.sv
+		../SOC_FILES/include/watchdog/lc_ctrl/lc_ctrl_reg_pkg.sv
+		../SOC_FILES/include/watchdog/lc_ctrl/lc_ctrl_state_pkg.sv
+		../SOC_FILES/include/watchdog/lc_ctrl/lc_ctrl_pkg.sv
+		rtl/aon_timer_reg_pkg.sv
+		../SOC_FILES/include/watchdog/prim_generic/prim_generic_flop.sv
+		../SOC_FILES/include/watchdog/prim_generic/prim_generic_buf.sv
+		../SOC_FILES/include/watchdog/prim_generic/prim_generic_flop_2sync.sv
+		../SOC_FILES/include/watchdog/prim_generic/prim_generic_xnor2.sv
+		../SOC_FILES/include/watchdog/prim_xilinx/prim_xilinx_flop.sv
+		../SOC_FILES/include/watchdog/prim_xilinx/prim_xilinx_buf.sv
+		../SOC_FILES/include/watchdog/prim_xilinx_ultrascale/prim_xilinx_ultrascale_flop.sv
+		../SOC_FILES/include/watchdog/prim_xilinx_ultrascale/prim_xilinx_ultrascale_buf.sv
+		../SOC_FILES/include/watchdog/prim_abstract/prim_flop.sv
+		../SOC_FILES/include/watchdog/prim_abstract/prim_buf.sv
+		../SOC_FILES/include/watchdog/prim_abstract/prim_flop_2sync.sv
+		../SOC_FILES/include/watchdog/prim_abstract/prim_xnor2.sv
+		../SOC_FILES/include/watchdog/prim/prim_cdc_rand_delay.sv
+		../SOC_FILES/include/watchdog/prim/prim_sec_anchor_buf.sv
+		../SOC_FILES/include/watchdog/prim/prim_sec_anchor_flop.sv
+		../SOC_FILES/include/watchdog/prim/prim_diff_decode.sv
+		../SOC_FILES/include/watchdog/prim/prim_alert_sender.sv
+		../SOC_FILES/include/watchdog/prim/prim_lc_sync.sv
+		../SOC_FILES/include/watchdog/prim/prim_edge_detector.sv
+		../SOC_FILES/include/watchdog/prim/prim_intr_hw.sv
+		../SOC_FILES/include/watchdog/prim/prim_pulse_sync.sv
+		../SOC_FILES/include/watchdog/prim/prim_sync_reqack.sv
+		../SOC_FILES/include/watchdog/prim/prim_reg_cdc_arb.sv
+		../SOC_FILES/include/watchdog/prim/prim_reg_cdc.sv
+		../SOC_FILES/include/watchdog/prim/prim_onehot_check.sv
+		../SOC_FILES/include/watchdog/prim/prim_reg_we_check.sv
+		../SOC_FILES/include/watchdog/prim/prim_secded_inv_39_32_dec.sv
+		../SOC_FILES/include/watchdog/prim/prim_secded_inv_39_32_enc.sv
+		../SOC_FILES/include/watchdog/prim/prim_secded_inv_64_57_dec.sv
+		../SOC_FILES/include/watchdog/prim/prim_secded_inv_64_57_enc.sv
+		../SOC_FILES/include/watchdog/prim/watchdog_prim_subreg_arb.sv
+		../SOC_FILES/include/watchdog/prim/watchdog_prim_subreg.sv
+		../SOC_FILES/include/watchdog/prim/watchdog_prim_subreg_ext.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_data_integ_dec.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_data_integ_enc.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_cmd_intg_chk.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_cmd_intg_gen.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_rsp_intg_gen.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_err.sv
+		../SOC_FILES/include/watchdog/tlul/tlul_adapter_reg.sv
+		rtl/aon_timer_reg_top.sv
+		rtl/aon_timer_core.sv
+		rtl/aon_timer.sv
+		tb_files/prim_alert_receiver.sv
+		tb_watchdog_full.sv
+	+define+WDT_AON_ASYNC
+file: tb_watchdog_full.sv
+	module worklib.tb_watchdog_full:sv
+		errors: 0, warnings: 0
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+	Top level design units:
+		prim_mubi_pkg
+		prim_util_pkg
+		lc_ctrl_state_pkg
+		lc_ctrl_reg_pkg
+		lc_ctrl_pkg
+		top_pkg
+		prim_secded_pkg
+		tlul_pkg
+		prim_alert_pkg
+		aon_timer_reg_pkg
+		prim_subreg_pkg
+		prim_pkg
+		tb_watchdog_full
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.tb_watchdog_full:sv <0x199d3eb9>
+			streams:  87, words: 181663
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                   Instances  Unique
+		Modules:                 360      38
+		Verilog packages:         12      12
+		Registers:             3,039   1,749
+		Scalar wires:          1,565       -
+		Expanded wires:          111       3
+		Vectored wires:          404       -
+		Named events:            175      92
+		Always blocks:           975     437
+		Initial blocks:          198     115
+		Cont. assignments:       414     278
+		Pseudo assignments:      699       -
+		Assertions:              191     106
+		Process Clocks:          369      27
+		Simulation timescale:    1ps
+	Writing initial simulation snapshot: worklib.tb_watchdog_full:sv
+Loading snapshot worklib.tb_watchdog_full:sv .................... Done
+SVSEED default: 1
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+==== tb_watchdog_full: aon_timer, WDT_AON_DIV = 1, clk_aon_i asynchronous, 20 stress iterations ====
+[425000] ---- A1 csr_hw_reset
+[1685000]      PASS  A1 csr_hw_reset: 30 checks, 0 errors
+[1685000] ---- A2 csr_rw
+[4085000]      PASS  A2 csr_rw: 18 checks, 0 errors
+[4085000] ---- A3 csr_bit_bash
+[54705000]      PASS  A3 csr_bit_bash: 572 checks, 0 errors
+[54705000] ---- A4 csr_aliasing
+[58325000]      PASS  A4 csr_aliasing: 126 checks, 0 errors
+[58325000] ---- A5 regwen + lockable registers
+[59985000]      PASS  A5 regwen + lockable registers: 11 checks, 0 errors
+[59985000] ---- B1 tl_d_oob_addr_access
+[60985000]      PASS  B1 tl_d_oob_addr_access: 5 checks, 0 errors
+[60985000] ---- B2 tl_d_illegal_access
+[62295000]      PASS  B2 tl_d_illegal_access: 19 checks, 0 errors
+[62295000] ---- B3 tl_d_partial_access
+[65695000]      PASS  B3 tl_d_partial_access: 67 checks, 0 errors
+[65695000] ---- B4 tl_d_outstanding_access
+[67385000]      PASS  B4 tl_d_outstanding_access: 6 checks, 0 errors
+[67385000] ---- B5 tl_intg_err (sec_cm_bus_integrity)
+[137495000]      PASS  B5 tl_intg_err (sec_cm_bus_integrity): 66 checks, 0 errors
+[137495000] ---- C1 alert_test
+[144415000]      PASS  C1 alert_test: 3 checks, 0 errors
+[144415000] ---- D1 intr_test
+[145825000]      PASS  D1 intr_test: 16 checks, 0 errors
+[145825000] ---- E1 watchdog count / enable / disable
+[149595000]      PASS  E1 watchdog count / enable / disable: 3 checks, 0 errors
+[149595000] ---- E2 bark / bite detail
+[153865000]      PASS  E2 bark / bite detail: 14 checks, 0 errors
+[153865000] ---- E3 watchdog jump (thresholds lowered under the count)
+[159515000]      PASS  E3 watchdog jump (thresholds lowered under the count): 6 checks, 0 errors
+[159515000] ---- E4 threshold 0 / 2^32 wrap
+[161695000]      PASS  E4 threshold 0 / 2^32 wrap: 4 checks, 0 errors
+[161695000] ---- E5 petting
+[174305000]      PASS  E5 petting: 8 checks, 0 errors
+[174305000] ---- E6 lock while running
+[178355000]      PASS  E6 lock while running: 4 checks, 0 errors
+[178355000] ---- E7 pause_in_sleep / sleep_mode_i
+[181545000]      PASS  E7 pause_in_sleep / sleep_mode_i: 4 checks, 0 errors
+[181545000] ---- E8 lc_escalate_en_i
+[185705000]      PASS  E8 lc_escalate_en_i: 7 checks, 0 errors
+[185705000] ---- F1 wakeup prescaler rate
+[307585000]      PASS  F1 wakeup prescaler rate: 8 checks, 0 errors
+[307585000] ---- F2 wakeup 64-bit carry
+[309305000]      PASS  F2 wakeup 64-bit carry: 1 checks, 0 errors
+[309305000] ---- F3 wakeup threshold / WKUP_CAUSE
+[315115000]      PASS  F3 wakeup threshold / WKUP_CAUSE: 18 checks, 0 errors
+[315115000] ---- F4 prescaler change while running
+[378695000]      PASS  F4 prescaler change while running: 3 checks, 0 errors
+[378695000] ---- F5 wakeup jump (threshold lowered under the count)
+[384725000]      PASS  F5 wakeup jump (threshold lowered under the count): 4 checks, 0 errors
+[384725000] ---- H1 CDC back-pressure
+     a_ready low: read-after-write 5, write-after-write 4 clk_i cycles
+[385765000]      PASS  H1 CDC back-pressure: 2 checks, 0 errors
+[385765000] ---- G1 stress_all (20 iterations)
+     iter 0: wakeup     prescaler=6 threshold=20
+     iter 1: wdog jump  run=151 bark=18 bite=124
+     iter 2: wkup jump  run=63 threshold=14
+     iter 3: intr_test  value=10
+     iter 4: wkup jump  run=69 threshold=2
+     iter 5: intr_test  value=10
+     iter 6: intr_test  value=01
+     iter 7: wdog jump  run=137 bark=65 bite=72
+     iter 8: wkup jump  run=195 threshold=140
+     iter 9: wdog jump  run=69 bark=17 bite=23
+     iter 10: wdog jump  run=139 bark=91 bite=21
+     iter 11: bark/bite  bark=99 bite=192 pets=1 period=66
+     iter 12: wakeup     prescaler=0 threshold=29
+     iter 13: wakeup     prescaler=4 threshold=35
+     iter 14: wakeup     prescaler=7 threshold=26
+     iter 15: wdog jump  run=129 bark=56 bite=82
+     iter 16: bark/bite  bark=40 bite=45 pets=0 period=11
+     iter 17: wakeup     prescaler=0 threshold=25
+     iter 18: bark/bite  bark=115 bite=166 pets=1 period=54
+     iter 19: intr_test  value=10
+[433115000]      PASS  G1 stress_all (20 iterations): 77 checks, 0 errors
+[433115000] ---- G2 stress_all_with_rand_reset
+[455435000]      PASS  G2 stress_all_with_rand_reset: 75 checks, 0 errors
+[455435000] ---- whole-run monitors
+[455435000]      PASS  whole-run monitors: 4 checks, 0 errors
+
+==== tb_watchdog_full summary (WDT_AON_DIV = 1, clk_aon_i asynchronous) ====
+  PASS  A1 csr_hw_reset: 30 checks, 0 errors
+  PASS  A2 csr_rw: 18 checks, 0 errors
+  PASS  A3 csr_bit_bash: 572 checks, 0 errors
+  PASS  A4 csr_aliasing: 126 checks, 0 errors
+  PASS  A5 regwen + lockable registers: 11 checks, 0 errors
+  PASS  B1 tl_d_oob_addr_access: 5 checks, 0 errors
+  PASS  B2 tl_d_illegal_access: 19 checks, 0 errors
+  PASS  B3 tl_d_partial_access: 67 checks, 0 errors
+  PASS  B4 tl_d_outstanding_access: 6 checks, 0 errors
+  PASS  B5 tl_intg_err (sec_cm_bus_integrity): 66 checks, 0 errors
+  PASS  C1 alert_test: 3 checks, 0 errors
+  PASS  D1 intr_test: 16 checks, 0 errors
+  PASS  E1 watchdog count / enable / disable: 3 checks, 0 errors
+  PASS  E2 bark / bite detail: 14 checks, 0 errors
+  PASS  E3 watchdog jump (thresholds lowered under the count): 6 checks, 0 errors
+  PASS  E4 threshold 0 / 2^32 wrap: 4 checks, 0 errors
+  PASS  E5 petting: 8 checks, 0 errors
+  PASS  E6 lock while running: 4 checks, 0 errors
+  PASS  E7 pause_in_sleep / sleep_mode_i: 4 checks, 0 errors
+  PASS  E8 lc_escalate_en_i: 7 checks, 0 errors
+  PASS  F1 wakeup prescaler rate: 8 checks, 0 errors
+  PASS  F2 wakeup 64-bit carry: 1 checks, 0 errors
+  PASS  F3 wakeup threshold / WKUP_CAUSE: 18 checks, 0 errors
+  PASS  F4 prescaler change while running: 3 checks, 0 errors
+  PASS  F5 wakeup jump (threshold lowered under the count): 4 checks, 0 errors
+  PASS  H1 CDC back-pressure: 2 checks, 0 errors
+  PASS  G1 stress_all (20 iterations): 77 checks, 0 errors
+  PASS  G2 stress_all_with_rand_reset: 75 checks, 0 errors
+  PASS  whole-run monitors: 4 checks, 0 errors
+==== 1181 checks, 0 errors ====
+TEST PASSED
+Simulation complete via $finish(1) at time 455435 NS + 0
+./tb_watchdog_full.sv:1507     $finish;
+xcelium> exit
+TOOL:	xrun(64)	24.09-s001: Exiting on Sep 20, 2026 at 00:43:29 IST  (total: 00:00:04)

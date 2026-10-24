@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>In-Core Zicsr Interrupt Subsystem with Round-Robin Anti-Starvation</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --g1: #f4f4f4;
+  --g2: #dedede;
+  --g3: #9e9e9e;
+  --g4: #555555;
+  color-scheme: light;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #ffffff;
+  color: #111111;
+  color-scheme: light;
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: var(--fg);
+  font: 15px/1.5 Georgia, "Times New Roman", Times, serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Screen toolbar (hidden in print) */
+.no-print {
+  display: block;
+}
+
+.print-toolbar {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.toolbar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar-title {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.85rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #0f172a;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.print-btn:hover {
+  background: #334155;
+  border-color: #334155;
+}
+
+.print-btn svg {
+  width: 14px;
+  height: 14px;
+  border: none;
+  background: transparent;
+  stroke: #ffffff;
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  background: #ffffff;
+}
+
+h1 {
+  font-size: 1.45rem;
+  line-height: 1.25;
+  margin: 0.3em 0;
+  color: var(--fg);
+  font-weight: 700;
+}
+
+h2 {
+  font: 700 1.02rem system-ui, -apple-system, sans-serif;
+  margin: 1.7em 0 0.4em;
+  border-bottom: 2px solid var(--fg);
+  padding-bottom: 0.2em;
+  color: var(--fg);
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+h3 {
+  font: 700 0.95rem system-ui, -apple-system, sans-serif;
+  margin: 1.2em 0 0.3em;
+  color: var(--fg);
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+p, li {
+  margin: 0.4em 0;
+  color: var(--fg);
+}
+
+ul, ol {
+  padding-left: 1.25em;
+}
+
+.sub, .cap {
+  font: 0.84rem system-ui, -apple-system, sans-serif;
+  color: var(--g4);
+}
+
+.sub {
+  margin: 0.25em 0 0.8em;
+}
+
+.cap {
+  margin: 0.4em 0 1.2em;
+  line-height: 1.4;
+}
+
+.w {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.w svg {
+  min-width: 660px;
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font: 0.8rem/1.38 system-ui, -apple-system, sans-serif;
+  min-width: 640px;
+}
+
+th, td {
+  border: 1px solid var(--fg);
+  padding: 5px 7px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--g2);
+  font-weight: 700;
+}
+
+tr.me td {
+  background: var(--g1);
+  font-weight: 600;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.86em;
+  background: var(--g1);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.box {
+  border: 1.5px solid var(--fg);
+  padding: 6px 12px;
+  margin: 10px 0;
+  background: var(--g1);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font: 0.8rem system-ui, -apple-system, sans-serif;
+  margin: 8px 0 12px;
+}
+
+.key i {
+  display: inline-block;
+  width: 14px;
+  height: 12px;
+  border: 1.5px solid var(--fg);
+  margin-right: 5px;
+  vertical-align: -2px;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: var(--bg);
+  border: 1px solid var(--fg);
+}
+
+svg text {
+  fill: var(--fg);
+  font: 11px system-ui, -apple-system, sans-serif;
+}
+
+svg .s {
+  font-size: 9.5px;
+  fill: var(--g4);
+}
+
+svg .t {
+  font-weight: 700;
+}
+
+.b { fill: var(--bg); stroke: var(--fg); stroke-width: 1.2; }
+.n { fill: var(--g2); stroke: var(--fg); stroke-width: 2.2; }
+.h { fill: #e2e5e9; stroke: var(--fg); stroke-width: 1.5; }
+.m { fill: var(--g1); stroke: var(--fg); stroke-width: 1.2; }
+.d { stroke-dasharray: 5 3; }
+.a { stroke: var(--fg); stroke-width: 1.3; fill: none; marker-end: url(#ar); }
+.l { stroke: var(--fg); stroke-width: 1.3; fill: none; }
+.f1 { fill: var(--g2); stroke: var(--fg); }
+.f2 { fill: var(--g3); stroke: var(--fg); }
+.f3 { fill: var(--g4); stroke: var(--fg); }
+
+/* Prevent elements from being awkwardly cut across pages */
+.table-block, .fig-block {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin: 8px 0 14px;
+}
+
+/* ============================================================
+   PRINT AND PDF EXPORT STYLES
+   ============================================================ */
+@page {
+  size: A4 portrait;
+  margin: 13mm 12mm 15mm 12mm;
+}
+
+@media print {
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --g1: #f4f4f4;
+    --g2: #dedede;
+    --g3: #9e9e9e;
+    --g4: #555555;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-size: 9.8pt !important;
+    line-height: 1.42 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  h1 {
+    font-size: 1.4rem !important;
+    margin: 0.15em 0 0.25em !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  h2 {
+    font-size: 1.0rem !important;
+    margin: 1.3em 0 0.35em !important;
+    padding-bottom: 0.15em !important;
+    border-bottom: 1.5px solid #111111 !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 0.92rem !important;
+    margin: 1.0em 0 0.25em !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  p, li {
+    margin: 0.3em 0 !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .box {
+    margin: 6px 0 8px !important;
+    padding: 5px 10px !important;
+    font-size: 0.84rem !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .key {
+    margin: 5px 0 8px !important;
+    font-size: 0.78rem !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Eliminate horizontal overflow & scrollbar artifacts in print */
+  .w {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    width: 100% !important;
+  }
+
+  .w svg {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  table {
+    min-width: 0 !important;
+    width: 100% !important;
+    font-size: 7.4pt !important;
+    line-height: 1.32 !important;
+  }
+
+  th, td {
+    padding: 3.5px 5.5px !important;
+  }
+
+  .cap {
+    margin: 0.3em 0 0.8em !important;
+    font-size: 7.5pt !important;
+    break-before: avoid;
+    page-break-before: avoid;
+  }
+
+  .table-block, .fig-block {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin: 6px 0 10px !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="no-print print-toolbar">
+  <div class="toolbar-inner">
+    <div class="toolbar-title">
+      <strong>In-Core Zicsr Interrupt Subsystem</strong> · Paper Proposal
+    </div>
+    <button type="button" class="print-btn" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Print / Save as PDF
+    </button>
+  </div>
+</header>
+
+<main>
+<h1>In-Core Zicsr Interrupt Subsystem with Round-Robin Anti-Starvation for a 5-Stage RV32IM Core</h1>
+<p class="sub">Paper-style proposal · figures and tables are monochrome · values marked "est." or "target" are not measured results.</p>
+<div class="box"><b>Contents.</b> Table 1 literature comparison · Fig 1 SoC · Fig 2 current fixed-priority IRQ path · Fig 3 proposed round-robin path · Table 2 flop budget · Table 3 configurability.</div>
+<div class="key"><span><i style="background:var(--bg)"></i>existing block</span><span><i style="background:var(--g2);border-width:3px"></i>new block</span><span><i style="background:repeating-linear-gradient(45deg,var(--g3) 0 2px,var(--bg) 2px 6px)"></i>problem area</span><span><i style="border-style:dashed"></i>optional / other milestone</span></div>
+
+<h2>1 · Introduction and motivation</h2>
+<p>The RISCFORGE core takes interrupts straight from peripheral wires into <code>mip</code> and picks a winner with a fixed-priority chain. That is fast but has four weaknesses (Fig. 2): transient pulses can be lost, a busy high-ranked source can starve lower ones and the system tick, the threshold compares cause numbers instead of priorities, and a divide in EX can delay acceptance. We propose a small core-local front end that fixes these in standard CSR space, with no bus traffic and no compiler changes.</p>
+
+<h2>2 · Literature review</h2>
+<div class="table-block">
+<div class="w"><table>
+<tr><th>Design</th><th>Interface</th><th>Priority</th><th>Levels / nesting</th><th>Fairness</th><th>Dispatch</th><th>Cost note</th></tr>
+<tr><td>PicoRV32 IRQ [3]</td><td>Custom instructions (<code>getq</code>, <code>setq</code>, <code>retirq</code>); 4 extra q-registers by default</td><td>Software, from a bitmask of active IRQs</td><td>None</td><td>Software</td><td>Single entry, software decode</td><td>Size-optimised core, CPI 4–5, so cycles are not comparable</td></tr>
+<tr><td>Ibex [2]</td><td>Standard privileged 1.11 CSRs</td><td>Fixed: fast lines first, lowest ID first</td><td>None</td><td>None</td><td>Vectored, base + 4×ID</td><td>15 fast lines + 3 standard + NMI</td></tr>
+<tr><td>PLIC [4]</td><td>Memory-mapped claim / complete</td><td>Per-source priority + threshold</td><td>Threshold only</td><td>None</td><td>Software via claim</td><td>Bus round trip per claim and complete</td></tr>
+<tr><td>PULP CLIC [1, 5]</td><td>CSRs + memory-mapped config</td><td>Level, then priority, then ID</td><td>Yes</td><td>None</td><td>Selective HW vectoring, <code>xnxti</code></td><td>About 176 GE per source in config registers [1]</td></tr>
+<tr><td>CV32RT fastirq [1]</td><td>CLIC + banked registers</td><td>As CLIC</td><td>Yes</td><td>None</td><td>HW vectoring + background save</td><td>+36% register file, +21% ID stage [1]</td></tr>
+<tr class="me"><td>This work</td><td>Standard vectored <code>mtvec</code> + custom CSRs 0x7C0–0x7C2</td><td>4 classes in hardware</td><td>Yes (level stack)</td><td>Round-robin in class, formally bounded</td><td>HW vectoring</td><td>About 110 flops (est., target)</td></tr></table></div>
+<p class="cap">Table 1 — Interrupt front ends compared. PicoRV32 wins on raw area but uses a non-standard interface with software priority, so the claim here is capability per gate, not smallest area. Ibex confirms fixed priority is the norm in small open cores.</p>
+</div>
+
+<h2>3 · System context</h2>
+<div class="fig-block">
+<div class="w"><svg viewBox="0 0 700 316" role="img" aria-label="SoC block diagram">
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" style="fill:var(--fg)"/></marker>
+<pattern id="hat" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" style="fill:var(--bg)"/><line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--g3)" stroke-width="2"/></pattern></defs>
+<rect class="b" x="10" y="16" width="250" height="170"/><text class="t" x="18" y="30">RV32IM_Zicsr core, M-mode</text>
+<rect class="b" x="18" y="38" width="40" height="24"/><text x="30" y="54">IF</text><rect class="b" x="62" y="38" width="40" height="24"/><text x="74" y="54">ID</text><rect class="b" x="106" y="38" width="40" height="24"/><text x="118" y="54">EX</text><rect class="b" x="150" y="38" width="40" height="24"/><text x="158" y="54">MEM</text><rect class="b" x="194" y="38" width="40" height="24"/><text x="204" y="54">WB</text>
+<rect class="b" x="18" y="74" width="110" height="46"/><text x="26" y="92">CSR file</text><text class="s" x="26" y="106">mstatus, mie, mtvec…</text>
+<rect class="n" x="140" y="74" width="112" height="46"/><text class="t" x="148" y="92">IRQ front end</text><text class="s" x="148" y="106">gateway · arbiter · levels</text>
+<rect class="b" x="18" y="130" width="234" height="26"/><text x="26" y="147">Hazard unit · trap / MRET commit at WB</text><text class="s" x="18" y="176">custom CSRs 0x7C0–0x7C2</text>
+<rect class="b" x="10" y="206" width="60" height="30"/><text x="16" y="225">Fetch demux</text><rect class="m" x="78" y="206" width="50" height="30"/><text x="84" y="225">BootROM</text><rect class="m" x="136" y="206" width="64" height="30"/><text x="142" y="225">ISRAM 32K</text>
+<rect class="m" x="10" y="256" width="100" height="30"/><text x="18" y="275">DSRAM 32K</text><rect class="b" x="130" y="256" width="110" height="30"/><text x="138" y="275">Hybrid mem IF</text>
+<path class="a" d="M40 186V206"/><path class="a" d="M70 221H78"/><path class="a" d="M40 206V198H168V206"/><path class="a" d="M232 186V256"/><path class="a" d="M130 271H110"/><path class="a" d="M240 271H300"/>
+<rect class="b" x="300" y="16" width="60" height="280"/><text class="t" x="306" y="150">AXI-Lite</text><text x="306" y="164">crossbar</text><text class="s" x="306" y="178">2 × 3</text>
+<rect class="b" x="384" y="110" width="66" height="60"/><text x="390" y="136">AXI→APB</text><text x="390" y="150">bridge</text><path class="a" d="M360 140H384"/>
+<path class="l" d="M450 140H470M470 26V236"/>
+<rect class="b" x="490" y="16" width="130" height="26"/><text x="498" y="33">I2C</text><text class="s" x="580" y="33">mip[17]</text>
+<rect class="b" x="490" y="48" width="130" height="26"/><text x="498" y="65">Timer 0</text><text class="s" x="580" y="65">mip[7]</text>
+<rect class="b" x="490" y="80" width="130" height="26"/><text x="498" y="97">UART</text><text class="s" x="580" y="97">mip[19]</text>
+<rect class="b" x="490" y="112" width="130" height="26"/><text x="498" y="129">GPIO</text><text class="s" x="580" y="129">mip[16]</text>
+<rect class="b" x="490" y="144" width="130" height="26"/><text x="498" y="161">SPI</text><text class="s" x="580" y="161">mip[18]</text>
+<rect class="m d" x="490" y="176" width="130" height="26"/><text x="498" y="193">Timer 1</text><text class="s" x="570" y="193">not wired</text>
+<rect class="b" x="490" y="208" width="130" height="26"/><text x="498" y="225">AON WDT</text><text class="s" x="580" y="225">mip[20]</text>
+<path class="l" d="M620 29H690M620 61H690M620 93H690M620 125H690M620 157H690M620 221H690"/>
+<path class="a" d="M690 29V8H275V96H252" style="stroke-dasharray:5 3"/><text class="s" x="372" y="20">IRQ wires, core-local, no bus traffic</text>
+<text class="s" x="490" y="256">No PLIC: MEIP is tied off. Bus is not used for</text><text class="s" x="490" y="269">interrupt claim or completion.</text>
+</svg></div>
+<p class="cap">Fig. 1 — RISCFORGE SoC. Instruction fetch and DSRAM data have direct paths; only peripheral registers cross the crossbar and bridge. Interrupt wires (dashed) go from peripherals to the core's IRQ front end. Per the SoC document; confirm the WDT ordering against the RTL.</p>
+</div>
+
+<h2>4 · Current implementation: fixed priority</h2>
+<div class="fig-block">
+<div class="w"><svg viewBox="0 0 680 262" role="img" aria-label="Current fixed-priority IRQ path">
+<defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" style="fill:var(--fg)"/></marker>
+<pattern id="hat" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" style="fill:var(--bg)"/><line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--g3)" stroke-width="2"/></pattern></defs>
+<rect class="b" x="10" y="16" width="110" height="64"/><text class="t" x="18" y="32">Peripherals</text><text class="s" x="18" y="48">UART 19 · SPI 18</text><text class="s" x="18" y="60">I2C 17 · GPIO 16</text><text class="s" x="18" y="72">MTIP 7 · MSIP 3</text>
+<rect class="h" x="140" y="16" width="110" height="64"/><text class="t" x="148" y="34">mip = wires</text><text class="s" x="148" y="50">no latch</text><text class="s" x="148" y="62">D1 pulse lost</text>
+<rect class="b" x="270" y="16" width="80" height="64"/><text x="278" y="44">mip ∧ mie</text>
+<rect class="h" x="370" y="16" width="150" height="64"/><text class="t" x="378" y="34">fixed priority chain</text><text class="s" x="378" y="50">19 &gt; 18 &gt; 17 &gt; 16 &gt; 11</text><text class="s" x="378" y="62">&gt; 7 &gt; 3  ·  D2 starvation</text>
+<rect class="h" x="540" y="16" width="130" height="64"/><text class="t" x="548" y="34">cause &gt; mintprio</text><text class="s" x="548" y="50">compares cause IDs</text><text class="s" x="548" y="62">D3 not priorities</text>
+<path class="a" d="M120 48H140"/><path class="a" d="M250 48H270"/><path class="a" d="M350 48H370"/><path class="a" d="M520 48H540"/>
+<path class="a" d="M605 80V104H55V134"/>
+<rect class="b" x="10" y="134" width="90" height="44"/><text x="18" y="152">mstatus.MIE</text><text class="s" x="18" y="166">global enable</text>
+<rect class="b" x="120" y="134" width="90" height="44"/><text x="128" y="152">irq_pending</text>
+<rect class="h" x="230" y="134" width="150" height="44"/><text class="t" x="238" y="152">accept @EX</text><text class="s" x="238" y="166">needs ¬stallMUL · D4</text>
+<rect class="b" x="400" y="134" width="100" height="44"/><text x="408" y="152">tag → MEM</text><text class="s" x="408" y="166">older instrs retire</text>
+<rect class="b" x="520" y="134" width="150" height="44"/><text x="528" y="152">commit @WB</text><text class="s" x="528" y="166">flush · PC ← mtvec / vector</text>
+<path class="a" d="M100 156H120"/><path class="a" d="M210 156H230"/><path class="a" d="M380 156H400"/><path class="a" d="M500 156H520"/>
+<text class="t" x="10" y="204">Areas of suboptimal implementation (shaded grey):</text>
+<text class="s" x="10" y="220">D1  A single-cycle pulse is dropped if MIE = 0 or another ISR is running.</text>
+<text class="s" x="10" y="233">D2  Fixed order lets UART / SPI traffic starve I2C and the timer tick.</text>
+<text class="s" x="10" y="246">D3  Threshold compares cause numbers; the spec orders only the standard interrupts (verify wording).</text>
+<text class="s" x="350" y="220">D4  A divide in EX blocks acceptance, so worst case is about 40 cycles</text><text class="s" x="350" y="233">against 6 uncontended (both to be measured).</text>
+</svg></div>
+<p class="cap">Fig. 2 — Current path: wires straight into <code>mip</code>, one fixed chain, then EX accept and WB commit. Shaded blocks indicate areas of suboptimal implementation.</p>
+</div>
+
+<h2>5 · Proposed implementation: round-robin with classes</h2>
+<div class="w"><svg viewBox="0 0 680 356" role="img" aria-label="Two-Level Fixed-Priority plus Round-Robin Interrupt Architecture">
+<defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0L8,4L0,8z" style="fill:var(--fg)"/></marker></defs>
+<!-- Row 1: Subsystem Architecture -->
+<rect class="n" x="10" y="16" width="122" height="74"/><text class="t" x="18" y="34">irq_gateway</text><text class="s" x="18" y="50">6 peripheral lines</text><text class="s" x="18" y="64">pend_q pulse latch</text><text class="s" x="18" y="78">auto-clear on WB commit</text>
+<rect class="n" x="144" y="16" width="194" height="74"/><text class="t" x="152" y="32">Functional Priority Classes</text><text class="s" x="152" y="46">Class 3 (Critical): Watchdog / Fault</text><text class="s" x="152" y="58">Class 2 (Real-time): Timer 0 (MTIP)</text><text class="s" x="152" y="70">Class 1 (Normal, RR): UART, SPI</text><text class="s" x="152" y="82">Class 0 (Bkgnd, RR): GPIO, I2C</text>
+<rect class="n" x="350" y="16" width="186" height="74"/><text class="t" x="358" y="32">Two-Level Arbiter</text><text class="s" x="358" y="47">• Inter-Class: Fixed Priority (3 &gt; 2 &gt; 1 &gt; 0)</text><text class="s" x="358" y="60">• Intra-Class: Round-Robin in Cl. 1 &amp; 0</text><text class="s" x="358" y="73">• rr_ptr per class; rotates at commit</text><text class="s" x="358" y="85">• Bounded service: max (n − 1) wait</text>
+<rect class="n" x="548" y="16" width="122" height="74"/><text class="t" x="556" y="34">Dispatch &amp; Trap</text><text class="s" x="556" y="50">mtvec vectored</text><text class="s" x="556" y="64">Base + 4 × ID</text><text class="s" x="556" y="78">Standard mret</text>
+<path class="a" d="M132 53H144"/><path class="a" d="M338 53H350"/><path class="a" d="M536 53H548"/>
+<path class="a" d="M609 90V144"/>
+
+<!-- Row 2: Pipeline Stages (Reversed Flow: Right-to-Left) -->
+<rect class="b" x="552" y="144" width="118" height="44"/><text x="560" y="162">irq_pending</text><text class="s" x="560" y="176">∧ mstatus.MIE</text>
+<rect class="b" x="390" y="144" width="138" height="44"/><text x="398" y="162">accept @EX</text><text class="s" x="398" y="176">source ID captured</text>
+<rect class="b" x="270" y="144" width="96" height="44"/><text x="278" y="162">tag → MEM</text><text class="s" x="278" y="176">older instrs retire</text>
+<rect class="n" x="110" y="144" width="136" height="44"/><text class="t" x="118" y="162">commit @WB</text><text class="s" x="118" y="176">atomic trap redirect</text>
+<rect class="m d" x="10" y="144" width="76" height="44"/><text x="32" y="162">mret</text><text class="s" x="18" y="176">resume PC</text>
+<path class="a" d="M552 166H528"/><path class="a" d="M390 166H366"/><path class="a" d="M270 166H246"/><path class="a d" d="M110 166H86"/>
+
+<!-- Feedback paths from commit @WB -->
+<path class="a d" d="M145 144V116H71V90"/><text class="s" x="78" y="111">auto-clear pend_q[id]</text>
+<path class="a d" d="M210 144V116H443V90"/><text class="s" x="245" y="111">rotate rr_ptr[class]</text>
+
+<!-- Row 3: Service Order Comparison Under Storm -->
+<text class="t" x="10" y="244">Service order under burst storm (equal-class peripherals contending)</text>
+<text x="10" y="268">Fixed (pure)</text>
+<rect class="f1" x="110" y="254" width="24" height="20"/><rect class="f1" x="138" y="254" width="24" height="20"/><rect class="f1" x="166" y="254" width="24" height="20"/><rect class="f1" x="194" y="254" width="24" height="20"/><rect class="f1" x="222" y="254" width="24" height="20"/>
+<text x="117" y="268">A</text><text x="145" y="268">A</text><text x="173" y="268">A</text><text x="201" y="268">A</text><text x="229" y="268">A</text><text class="s" x="256" y="268">B and C starve indefinitely while A keeps arriving</text>
+<text x="10" y="302">Two-Level RR</text>
+<rect class="f1" x="110" y="288" width="24" height="20"/><rect class="f2" x="138" y="288" width="24" height="20"/><rect class="f3" x="166" y="288" width="24" height="20"/><rect class="f1" x="194" y="288" width="24" height="20"/><rect class="f2" x="222" y="288" width="24" height="20"/><rect class="f3" x="250" y="288" width="24" height="20"/>
+<text x="117" y="302">A</text><text x="145" y="302">B</text><text x="173" y="302" style="fill:#ffffff">C</text><text x="201" y="302">A</text><text x="229" y="302">B</text><text x="257" y="302" style="fill:#ffffff">C</text><text class="s" x="284" y="302">A, B, C share normal class; each waits at most (n − 1) services</text>
+<text class="s" x="10" y="336">Bounded Response Time: R_s ≤ C_s + B + Σ_higher ⌈R_s / T_h⌉ · C_h + (n_class − 1) · C_peer</text>
+<text class="s" x="10" y="349" style="font-style:italic;">Hardware guarantees: critical events preempt immediately; normal traffic cannot starve peers.</text>
+</svg></div>
+<p class="cap">Fig. 3 — Proposed path. Solid blocks in the top row are new; dashed arrows are commit-time feedback (auto-clear and pointer rotation). The pointer moves at commit so a cancelled accept never disturbs fairness.</p>
+</div>
+
+<h3 style="font:700 .95rem system-ui,-apple-system,sans-serif;margin:1.2em 0 .3em">How the solution works</h3>
+<ul>
+<li><b>Gateway:</b> a rising edge sets <code>pend_q</code>, so a pulse survives while MIE is clear or another ISR runs. Commit clears the bit for the captured id, and a new pulse in the same cycle wins over the clear.</li>
+<li><b>Classes and round-robin:</b> urgent sources sit in a higher class and still win. Inside a class the pointer moves past the last served source, so no peer is starved.</li>
+<li><b>Levels:</b> an interrupt preempts only if its class is above the current level; hardware pushes on entry and pops on <code>mret</code>. Depth is levels − 1 backups, so 4 classes need 3.</li>
+<li><b>Toolchain:</b> the standard vectored <code>mtvec</code> and <code>mret</code> are unchanged. Handlers still save <code>mepc</code> before re-enabling MIE for nesting.</li></ul>
+
+<h2>6 · Area and configurability</h2>
+<div class="table-block">
+<div class="w"><table>
+<tr><th>Feature added (cumulative)</th><th>State</th><th>Flops (est.)</th></tr>
+<tr><td>P0: mask + pending only (PicoRV32-style baseline)</td><td>existing <code>mie</code>, wires</td><td>0 new</td></tr>
+<tr><td>+ Edge / level gateway</td><td>16 pend_q + 16 mode bits</td><td>32</td></tr>
+<tr><td>+ Priority classes</td><td>2 bits × 16 sources</td><td>32</td></tr>
+<tr><td>+ Round-robin pointers</td><td>4 classes × 4 bits</td><td>16</td></tr>
+<tr><td>+ Level stack</td><td>CUR 2 bits + 3 backups × 2 bits</td><td>8</td></tr>
+<tr class="me"><td>Total state (plus about 20 control flops)</td><td></td><td>88 → about 110</td></tr></table></div>
+<p class="cap">Table 2 — Flop budget per feature, built up from a PicoRV32-like minimum. Gate equivalents come from synthesis (Yosys on an open PDK) and will be reported per feature. The CLIC comparison is a 16-source PULP CLIC synthesized in the same flow.</p>
+</div>
+
+<div class="table-block">
+<div class="w"><table>
+<tr><th>Parameter</th><th>Range</th><th>Set at</th><th>Effect</th></tr>
+<tr><td>Number of sources N</td><td>8, 16, 32</td><td>Elaboration</td><td>About 4 flops per source plus arbiter logic</td></tr>
+<tr><td>Number of classes L</td><td>2–8</td><td>Elaboration</td><td>Stack depth L − 1; pointer count L</td></tr>
+<tr><td>Class of each source</td><td>0–(L − 1)</td><td>Runtime CSR 0x7C1</td><td>Firmware sets urgency</td></tr>
+<tr><td>Edge or level per source</td><td>1 bit</td><td>Runtime CSR 0x7C2</td><td>Level sources still need handler clear</td></tr>
+<tr><td>Round-robin on or off</td><td>1 bit</td><td>Elaboration</td><td>Off gives fixed priority inside a class</td></tr></table></div>
+<p class="cap">Table 3 — Configuration. Unlike a CLIC, there is no per-source memory-mapped register, so area grows by a few flops per source instead of a 32-bit register (about 176 GE per source in [1]).</p>
+</div>
+
+<h2>7 · Evaluation and validation</h2>
+<ul>
+<li><b>Formal (SymbiYosys):</b> pulse never lost, no lower class granted before a waiting higher class, same-class wait at most n − 1 services, auto-clear only for the taken id. Baseline gives a counterexample; the new design proves it.</li>
+<li><b>Metrics:</b> flops and GE per feature, worst-case wait per source, acceptance latency (with the abortable divider: about 40 → 6, to confirm), RISCOF still passing.</li>
+<li><b>Venues:</b> 4–5 page letter or conference first; TCAS-II only with the divider bound.</li></ul>
+
+<h2>References</h2>
+<ol style="font-size:.85rem">
+<li>R. Balas, A. Ottaviano, L. Benini, "CV32RT: Enabling Fast Interrupt and Context Switching for RISC-V Microcontrollers," IEEE TVLSI, 2024.</li>
+<li>lowRISC, Ibex documentation, "Exceptions and Interrupts," ibex-core.readthedocs.io.</li>
+<li>YosysHQ, PicoRV32 README, "Custom Instructions for IRQ Handling," github.com/YosysHQ/picorv32.</li>
+<li>RISC-V International, Privileged Architecture and PLIC specifications.</li>
+<li>RISC-V, Smclic CLIC draft, github.com/riscv/riscv-fast-interrupt; PULP CLIC, github.com/pulp-platform/clic.</li></ol>
+</main></body></html>

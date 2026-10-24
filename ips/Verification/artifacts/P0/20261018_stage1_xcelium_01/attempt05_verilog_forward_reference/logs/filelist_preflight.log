@@ -1,0 +1,16 @@
+[preflight] ok -- 15 INCDIR, 2 OPT, 122 SRC, 1 VSRC
+[gen_filelists] wrote /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot/Verification/infrastructure/soc_verification.xsim.f
+[gen_filelists] wrote /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot/Verification/infrastructure/soc_verification.esi.f
+[gen_filelists] wrote /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot/Verification/infrastructure/soc_verification.prj
+
+--- tool invocations (top=soc_tb_top, 123 sources) ---
+  local  : xvlog --sv -d FSDB -f /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot/Verification/infrastructure/soc_verification.xsim.f
+           xelab soc_tb_top -s soc_sim_snap --timescale 1ns/1ps
+           xsim  soc_sim_snap -runall \
+                +BOOT_MODE=WARM +IMEM_HEX=imem.hex +DMEM_HEX=dmem.hex
+  remote : vcs -sverilog -full64 -timescale=1ns/1ps \
+             -debug_access+all -kdb +define+FSDB \
+             -f /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot/Verification/infrastructure/soc_verification.esi.f -top soc_tb_top -o simv
+           ./simv +BOOT_MODE=WARM +IMEM_HEX=imem.hex +DMEM_HEX=dmem.hex
+  xcelium: xrun -sv -timescale 1ns/1ps +define+FSDB \
+             -f /home/iiita/Documents/raghulcj/p0_runs/20261018_stage1_xcelium_01/snapshot/Verification/infrastructure/soc_verification.esi.f -top soc_tb_top

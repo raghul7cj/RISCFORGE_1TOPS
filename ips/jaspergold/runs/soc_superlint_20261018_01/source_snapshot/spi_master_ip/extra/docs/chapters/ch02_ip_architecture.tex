@@ -1,0 +1,273 @@
+% =============================================================================
+% Chapter 2: IP Architecture
+% =============================================================================
+\chapter{IP Architecture}
+\label{ch:ip_arch}
+
+\section{Top-Level Module: \texttt{apb\_spi\_master}}
+
+The top-level module \texttt{apb\_spi\_master} is parameterized by:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{BUFFER\_DEPTH} (default 10): Depth of both TX and RX FIFOs.
+  \item \texttt{APB\_ADDR\_WIDTH} (default 12): Width of the APB address bus, defining a 4\,KB
+        address space per the APB specification.
+\end{itemize}
+
+The top-level module instantiates and interconnects five sub-modules plus top-level interrupt logic.
+
+\section{Block Diagram and Module Hierarchy}
+
+The internal hierarchy is as follows:
+
+\begin{verbatim}
+apb_spi_master (top)
+├── u_axiregs    : spi_master_apb_if    (APB register interface)
+├── u_txfifo     : spi_master_fifo      (TX FIFO, 32-bit × BUFFER_DEPTH)
+├── u_rxfifo     : spi_master_fifo      (RX FIFO, 32-bit × BUFFER_DEPTH)
+└── u_spictrl    : spi_master_controller (SPI controller FSM)
+    ├── u_clkgen : spi_master_clkgen    (SPI clock generator)
+    ├── u_txreg  : spi_master_tx        (TX shift register)
+    └── u_rxreg  : spi_master_rx        (RX shift register)
+\end{verbatim}
+
+\section{APB Register Interface (\texttt{spi\_master\_apb\_if})}
+
+This module translates APB bus transactions into register reads and writes. It implements a
+standard APB3 slave with \texttt{PREADY} permanently tied high and \texttt{PSLVERR} permanently
+tied low, meaning the slave never inserts wait states and never signals errors.
+
+\subsection{Register Map}
+
+Table~\ref{tab:regmap} lists all registers. Addresses are computed as
+\texttt{BASE + (reg\_index $\times$ 4)}, where \texttt{reg\_index} is the 4-bit value shown.
+
+\begin{table}[H]
+\centering
+\caption{APB SPI Master Register Map}
+\label{tab:regmap}
+\small
+\begin{tabularx}{\textwidth}{@{}clcX@{}}
+\toprule
+\textbf{Index} & \textbf{Name} & \textbf{Offset} & \textbf{Description} \\
+\midrule
+\texttt{4'b0000} & STATUS  & 0x00 & Status register. Read: returns controller status, TX/RX FIFO element counts. Write: triggers SPI operations (rd/wr/qrd/qwr), software reset, and chip-select selection. \\
+\texttt{4'b0001} & CLKDIV  & 0x04 & SPI clock divider. Bits [7:0] set the divider value. SPI clock period = $2 \times (\text{CLKDIV}+1)$ system clock cycles. \\
+\texttt{4'b0010} & SPICMD  & 0x08 & Command value register (32 bits). Holds the command word sent during the CMD phase. \\
+\texttt{4'b0011} & SPIADR  & 0x0C & Address value register (32 bits). Holds the address word sent during the ADDR phase. \\
+\texttt{4'b0100} & SPILEN  & 0x10 & Length register. Bits [5:0] = cmd\_len, [13:8] = addr\_len, [31:16] = data\_len (all in bits). \\
+\texttt{4'b0101} & SPIDUM  & 0x14 & Dummy cycles register. Bits [15:0] = dummy\_rd (read dummy cycles), [31:16] = dummy\_wr (write dummy cycles). \\
+\texttt{4'b0110} & TXFIFO  & 0x18 & TX FIFO write port. Writing pushes a 32-bit word into the TX FIFO. \\
+\texttt{4'b1000} & RXFIFO  & 0x20 & RX FIFO read port. Reading pops a 32-bit word from the RX FIFO. \\
+\texttt{4'b1001} & INTCFG  & 0x24 & Interrupt configuration. TX/RX thresholds, counter values, counter enable (bit 30), interrupt global enable (bit 31). \\
+\texttt{4'b1010} & INTSTA  & 0x28 & Interrupt status. Reading this register re-arms the interrupt state machine. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{STATUS Register Bit Fields}
+
+\begin{table}[H]
+\centering
+\caption{STATUS Register Bit Fields (Write)}
+\label{tab:status_write}
+\small
+\begin{tabularx}{\textwidth}{@{}clX@{}}
+\toprule
+\textbf{Bits} & \textbf{Field} & \textbf{Description} \\
+\midrule
+{[0]}     & spi\_rd    & Set to 1 to start a standard SPI read transaction. \\
+{[1]}     & spi\_wr    & Set to 1 to start a standard SPI write transaction. \\
+{[2]}     & spi\_qrd   & Set to 1 to start a quad SPI read transaction. \\
+{[3]}     & spi\_qwr   & Set to 1 to start a quad SPI write transaction. \\
+{[4]}     & spi\_swrst & Set to 1 to issue a software reset (clears FIFOs). \\
+{[11:8]}  & spi\_csreg & Chip-select register. Each bit corresponds to one CS line. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{FIFO Access Mechanism}
+
+The TX FIFO write port and RX FIFO read port are mapped to specific register addresses. The APB
+interface generates \texttt{spi\_data\_tx\_valid} when a write to \texttt{REG\_TXFIFO} completes
+its access phase (\texttt{PSEL \& PENABLE \& PWRITE}). Similarly, \texttt{spi\_data\_rx\_ready}
+is asserted when a read from \texttt{REG\_RXFIFO} is executed. These are single-cycle pulses that
+push/pop the FIFOs.
+
+\textbf{Critical note for testbench developers:} The RX FIFO read-side uses a non-blocking
+\texttt{pointer\_out} increment. When reading RXFIFO via APB, the data must be sampled at the
+\texttt{posedge HCLK} during the access phase, \emph{before} the \texttt{\#1} delay, to capture
+the correct value before the pointer advances. This timing subtlety caused data-integrity issues
+during testbench development (see Chapter~\ref{ch:debugging}).
+
+\section{SPI Master Controller (\texttt{spi\_master\_controller})}
+
+The controller is the central FSM that orchestrates all SPI transactions. It manages the clock
+generator, TX/RX shift registers, chip-select outputs, and data multiplexing.
+
+\subsection{Controller FSM States}
+
+The FSM has eight states encoded in a 5-bit \texttt{enum}:
+
+\begin{table}[H]
+\centering
+\caption{Controller FSM States}
+\label{tab:fsm_states}
+\small
+\begin{tabularx}{\textwidth}{@{}clcX@{}}
+\toprule
+\textbf{Encoding} & \textbf{State} & \textbf{Status Bit} & \textbf{Purpose} \\
+\midrule
+0 & IDLE       & [0] & Idle, waiting for a transaction trigger. CS deasserted. \\
+1 & CMD        & [1] & Transmitting command phase. \\
+2 & ADDR       & [2] & Transmitting address phase. \\
+3 & MODE       & [3] & Mode phase (reserved, not used in current testcases). \\
+4 & DUMMY      & [4] & Transmitting dummy cycles (clock without meaningful data). \\
+5 & DATA\_TX   & [5] & Transmitting data from TX FIFO to SPI bus. \\
+6 & DATA\_RX   & [6] & Receiving data from SPI bus into RX FIFO. \\
+7 & WAIT\_EDGE & [6] & Wait for final falling edge before asserting EOT. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Transaction Flow}
+
+A typical transaction follows this sequence:
+\begin{enumerate}[leftmargin=2em]
+  \item Software writes configuration registers (CLKDIV, SPICMD, SPIADR, SPILEN, SPIDUM).
+  \item Software loads TX data into TXFIFO (for write transactions).
+  \item Software writes STATUS to trigger the operation (rd/wr/qrd/qwr) and select chip-select.
+  \item The FSM transitions: IDLE $\rightarrow$ CMD $\rightarrow$ ADDR $\rightarrow$ DUMMY $\rightarrow$
+        DATA\_TX or DATA\_RX $\rightarrow$ WAIT\_EDGE $\rightarrow$ IDLE.
+  \item Phases with zero-length configuration are skipped automatically.
+  \item EOT pulse is asserted for exactly one system clock cycle when the FSM returns to IDLE.
+  \item For RX transactions, the controller enters WAIT\_EDGE after DATA\_RX to synchronize the
+        EOT with a falling SPI clock edge.
+\end{enumerate}
+
+\subsection{Chip-Select Logic}
+
+The four chip-select outputs use a simple gate:
+\begin{lstlisting}
+assign spi_csn0 = ~spi_csreg[0] | spi_cs;
+assign spi_csn1 = ~spi_csreg[1] | spi_cs;
+assign spi_csn2 = ~spi_csreg[2] | spi_cs;
+assign spi_csn3 = ~spi_csreg[3] | spi_cs;
+\end{lstlisting}
+Here, \texttt{spi\_cs} is the internal ``chip-select inactive'' signal (1 = deasserted, 0 = asserted).
+When a transaction begins, \texttt{spi\_cs} goes low. The \texttt{spi\_csreg} bits select which
+CSN line(s) go low. For example, writing \texttt{spi\_csreg = 4'b0010} activates CSN1 while
+leaving CSN0, CSN2, CSN3 high.
+
+\subsection{Data Multiplexer}
+
+The controller uses a 5-state data mux (\texttt{ctrl\_data\_mux}) to select TX data sources:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{DATA\_NULL}: No data, TX disabled.
+  \item \texttt{DATA\_EMPTY}: Zeros with valid=1 (used during dummy cycles).
+  \item \texttt{DATA\_CMD}: Routes the SPICMD register to the TX shift register.
+  \item \texttt{DATA\_ADDR}: Routes the SPIADR register to the TX shift register.
+  \item \texttt{DATA\_FIFO}: Routes TX FIFO output to the TX shift register.
+\end{itemize}
+
+\section{SPI Clock Generator (\texttt{spi\_master\_clkgen})}
+
+The clock generator divides the system clock to produce \texttt{spi\_clk}. It uses an 8-bit
+counter that toggles \texttt{spi\_clk} each time the counter reaches \texttt{counter\_trgt}
+(loaded from CLKDIV register).
+
+Key outputs:
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{spi\_clk}: The divided SPI clock output.
+  \item \texttt{spi\_rise}: Single-cycle pulse on rising edge of SPI clock (used by RX).
+  \item \texttt{spi\_fall}: Single-cycle pulse on falling edge of SPI clock (used by TX).
+\end{itemize}
+
+\textbf{Important timing note:} \texttt{spi\_rise} and \texttt{spi\_fall} are combinational outputs
+that precede the registered \texttt{spi\_clk} output by one system clock cycle. This means the
+external \texttt{spi\_clk} pin lags the internal edge events. This has implications for testbench
+SPI slave BFMs (see Section~\ref{sec:slave_bfm}).
+
+\section{TX Shift Register (\texttt{spi\_master\_tx})}
+
+The TX module serializes 32-bit words onto the SPI bus. Key behaviors:
+\begin{itemize}[leftmargin=2em]
+  \item Data is shifted MSB-first on each \texttt{spi\_fall} event.
+  \item In standard mode, \texttt{sdo0} carries 1 bit per clock cycle (bit 31 of shift register).
+  \item In quad mode, \texttt{sdo0--sdo3} carry 4 bits per clock (bits 28--31 of shift register).
+  \item The \texttt{reg\_done} signal fires every 32 bits (standard) or 8 bits (quad) to request
+        the next 32-bit word from the FIFO.
+  \item \texttt{tx\_done} fires when the programmed number of bits has been transmitted.
+  \item \texttt{clk\_en\_o} controls the SPI clock generator---it is deasserted if the FIFO
+        underflows, stalling the SPI clock until new data arrives.
+\end{itemize}
+
+\section{RX Shift Register (\texttt{spi\_master\_rx})}
+
+The RX module deserializes data from the SPI bus into 32-bit words. Key behaviors:
+\begin{itemize}[leftmargin=2em]
+  \item Data is sampled on each \texttt{spi\_rise} event.
+  \item In standard mode, \texttt{sdi1} is sampled (1 bit per clock). Note: it is \texttt{sdi1},
+        not \texttt{sdi0}---this is a design choice of the PULP IP.
+  \item In quad mode, \texttt{sdi0--sdi3} are sampled (4 bits per clock).
+  \item Every 32 bits (standard) or 8 bits (quad), \texttt{data\_valid} is asserted to push the
+        word into the RX FIFO.
+  \item If the RX FIFO is full (\texttt{data\_ready} = 0), the RX FSM enters \texttt{WAIT\_FIFO}
+        and stalls the SPI clock via \texttt{clk\_en\_o} until space becomes available.
+  \item The \texttt{WAIT\_FIFO\_DONE} state handles the case where \texttt{rx\_done} and
+        FIFO-full coincide.
+\end{itemize}
+
+\textbf{Critical design detail:} In standard SPI mode, the RX shift register samples
+\texttt{sdi1}, not \texttt{sdi0}. This is because in standard mode, the master drives
+\texttt{sdo0} (MOSI) and the slave responds on \texttt{sdi1} (MISO). Testbench developers
+must drive \texttt{sdi1} to inject read data, not \texttt{sdi0}. This caused significant
+debugging effort (see TC4 in Chapter~\ref{ch:debugging}).
+
+\section{FIFO Module (\texttt{spi\_master\_fifo})}
+
+Both TX and RX paths use identical FIFO instances parameterized by \texttt{DATA\_WIDTH} (32) and
+\texttt{BUFFER\_DEPTH} (default 10). The FIFO uses circular buffer pointers:
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{pointer\_in}: Write pointer, advances when \texttt{valid\_i \& !full}.
+  \item \texttt{pointer\_out}: Read pointer, advances when \texttt{ready\_i \& valid\_o}.
+  \item \texttt{elements}: Tracks occupancy, used for interrupt threshold comparison.
+  \item \texttt{clr\_i}: Synchronous clear input connected to \texttt{spi\_swrst}.
+  \item \texttt{data\_o = buffer[pointer\_out]}: Combinational read output.
+  \item \texttt{valid\_o = (elements != 0)}: Asserted when FIFO is non-empty.
+\end{itemize}
+
+\section{Interrupt Logic}
+
+The top-level module implements a three-state interrupt FSM for both TX and RX paths independently:
+\begin{enumerate}[leftmargin=2em]
+  \item \texttt{INT\_xx\_INACTIVE}: Initial state after reset. No interrupts generated. Transitions
+        to ACTIVE when the interrupt status register is read (non-counter mode) or when the
+        counter reaches its target (counter mode).
+  \item \texttt{INT\_xx\_ACTIVE}: Monitoring state. Transitions to GEN\_INT when the threshold
+        condition is met and interrupts are globally enabled.
+  \item \texttt{GEN\_INT\_xx}: Asserts the interrupt for one cycle, then transitions to INACTIVE.
+\end{enumerate}
+
+The combined interrupt output is: \texttt{events\_o[0] = s\_int\_tx | s\_int\_rx}.
+
+\textbf{Key design behavior:} After reset, both FSMs start in \texttt{INT\_xx\_INACTIVE}.
+This means that even if the threshold condition is immediately true (e.g., TX FIFO empty $\leq$
+threshold), no interrupt fires until the FSM transitions to ACTIVE by reading \texttt{REG\_INTSTA}.
+This design prevents spurious interrupts on reset, which TC14 explicitly verifies.
+
+\section{Event Outputs}
+
+\begin{table}[H]
+\centering
+\caption{Event Output Signals}
+\label{tab:events}
+\begin{tabularx}{\textwidth}{@{}clX@{}}
+\toprule
+\textbf{Signal} & \textbf{Bit} & \textbf{Description} \\
+\midrule
+\texttt{events\_o[0]} & INT & Combined TX/RX interrupt. \\
+\texttt{events\_o[1]} & EOT & End-of-transfer pulse (1 system clock cycle wide). \\
+\bottomrule
+\end{tabularx}
+\end{table}

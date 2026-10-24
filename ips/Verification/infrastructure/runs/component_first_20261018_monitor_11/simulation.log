@@ -1,0 +1,188 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/rf_mon_smoke_sim/xsim_script.tcl
+# xsim {rf_mon_smoke_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+[APB-DBG] cyc=449 sel=000001 en=000001 wr=000000 strb=00000f rd=00000000000000000000000000000000000000005a000000
+[APB-DBG] cyc=450 sel=000001 en=000001 wr=000010 strb=0000e0 rd=000000000000000000000000000000005a00000100000000
+[APB-DBG] cyc=451 sel=000010 en=000000 wr=000010 strb=0000e0 rd=000000000000000000000000000000005a00000100000000
+[APB-DBG] cyc=452 sel=000010 en=000010 wr=000010 strb=0000e0 rd=000000000000000000000000000000005a00000100000000
+[APB-DBG] cyc=453 sel=000010 en=000010 wr=000010 strb=0000e0 rd=000000000000000000000000000000005a00000100000000
+[APB-DBG] cyc=454 sel=000010 en=000010 wr=000000 strb=000d00 rd=0000000000000000000000005a0000020000000000000000
+[APB-DBG] cyc=455 sel=000100 en=000000 wr=000000 strb=000d00 rd=0000000000000000000000005a0000020000000000000000
+[APB-DBG] cyc=456 sel=000100 en=000100 wr=000000 strb=000d00 rd=0000000000000000000000005a0000020000000000000000
+[APB-DBG] cyc=457 sel=000100 en=000100 wr=000000 strb=000d00 rd=0000000000000000000000005a0000020000000000000000
+[APB-DBG] cyc=458 sel=000100 en=000100 wr=001000 strb=00c000 rd=00000000000000005a000003000000000000000000000000
+[APB-DBG] cyc=459 sel=001000 en=000000 wr=001000 strb=00c000 rd=00000000000000005a000003000000000000000000000000
+[APB-DBG] cyc=460 sel=001000 en=001000 wr=001000 strb=00c000 rd=00000000000000005a000003000000000000000000000000
+[APB-DBG] cyc=461 sel=001000 en=001000 wr=001000 strb=00c000 rd=00000000000000005a000003000000000000000000000000
+[APB-DBG] cyc=462 sel=001000 en=001000 wr=000000 strb=0b0000 rd=000000005a00000400000000000000000000000000000000
+[APB-DBG] cyc=463 sel=010000 en=000000 wr=000000 strb=0b0000 rd=000000005a00000400000000000000000000000000000000
+[APB-DBG] cyc=464 sel=010000 en=010000 wr=000000 strb=0b0000 rd=000000005a00000400000000000000000000000000000000
+[APB-DBG] cyc=465 sel=010000 en=010000 wr=000000 strb=0b0000 rd=000000005a00000400000000000000000000000000000000
+[APB-DBG] cyc=466 sel=010000 en=010000 wr=100000 strb=a00000 rd=5a0000050000000000000000000000000000000000000000
+[APB-DBG] cyc=467 sel=100000 en=000000 wr=100000 strb=a00000 rd=5a0000050000000000000000000000000000000000000000
+[APB-DBG] cyc=468 sel=100000 en=100000 wr=100000 strb=a00000 rd=5a0000050000000000000000000000000000000000000000
+[APB-DBG] cyc=469 sel=100000 en=100000 wr=100000 strb=a00000 rd=5a0000050000000000000000000000000000000000000000
+[APB-DBG] cyc=470 sel=100000 en=100000 wr=000000 strb=000000 rd=000000000000000000000000000000000000000000000000
+[APB-DBG] cyc=471 sel=000000 en=000000 wr=000000 strb=000000 rd=000000000000000000000000000000000000000000000000
+[APB-DBG] cyc=472 sel=000000 en=000000 wr=000000 strb=000000 rd=000000000000000000000000000000000000000000000000
+[APB-DBG] cyc=473 sel=000000 en=000000 wr=000000 strb=000000 rd=000000000000000000000000000000000000000000000000
+[APB-DBG] cyc=474 sel=000000 en=000000 wr=000000 strb=000000 rd=000000000000000000000000000000000000000000000000
+
+================ MONITOR LAYER SELF-TEST ================
+[SMOKE] pass                M1.fetch fetch events=396
+[SMOKE] pass               M2.retire retire events=412
+[SMOKE] pass                  M3.lsu lsu events=2
+[SMOKE] pass                 M4.axil axil events=14
+[SMOKE] pass                  M5.apb apb events=8
+[SMOKE] pass                  M6.irq irq events=4
+[SMOKE] pass                   A1.aw AW handshake logged
+[SMOKE] pass                    A2.w W  handshake logged
+[SMOKE] pass                    A3.b B  handshake logged
+[SMOKE] pass                   A4.ar AR handshake logged
+[SMOKE] pass                    A5.r R  handshake logged
+[SMOKE] pass                 P.slot0 slot=0 transfers=1
+[SMOKE] pass                 P.slot1 slot=1 transfers=2
+[SMOKE] pass                 P.slot2 slot=2 transfers=2
+[SMOKE] pass                 P.slot3 slot=3 transfers=1
+[SMOKE] pass                 P.slot4 slot=4 transfers=1
+[SMOKE] pass                 P.slot5 slot=5 transfers=1
+[SMOKE] pass              P.payloads slot mask=111111 payload errors=0
+[SMOKE] APB class slot 0 captured: addr=40000024 w=a5000000 r=00000000 wr=0 strb=0 ws=2 err=0
+[SMOKE] APB class slot 1 captured: addr=40001024 w=a5000001 r=00000000 wr=0 strb=0 ws=2 err=0
+[SMOKE] APB class slot 2 captured: addr=40002024 w=a5000002 r=00000000 wr=0 strb=0 ws=2 err=0
+[SMOKE] APB class slot 3 captured: addr=40003024 w=a5000003 r=00000000 wr=0 strb=0 ws=2 err=0
+[SMOKE] APB class slot 4 captured: addr=40004024 w=a5000004 r=00000000 wr=0 strb=0 ws=2 err=1
+[SMOKE] APB class slot 5 captured: addr=40005024 w=a5000005 r=00000000 wr=0 strb=0 ws=2 err=0
+[SMOKE] FAIL        P.class_payloads slot mask=111111 payload errors=6
+[SMOKE] pass            T1.monotonic lsu.last=30 fetch.first=1
+[SMOKE] pass             T2.tb_cycle lsu cyc=1995 axil cyc=1995
+[SMOKE] pass             R1.ring_lsu lsu ring=2
+[SMOKE] pass             R2.ring_apb apb ring=8
+[SMOKE] pass             R3.ring_ret retire ring=256
+[SMOKE] pass             J1.mmio_cnt lsu stream=2
+[SMOKE] pass              J2.axil_wr axi stream=4
+[SMOKE] pass        J3.no_wrong_slot no MMIO access decoded onto the wrong APB slot
+[SMOKE] pass                I1.grant grants=1
+[SMOKE] pass                  I2.ack acks=1
+[SMOKE] pass                 I3.mret mrets=1
+[SMOKE] pass                  D1.i2c 0x4000_0000 -> I2C
+[SMOKE] pass                   D2.t0 0x4000_1FFF -> TIMER0
+[SMOKE] pass                 D3.uart 0x4000_2000 -> UART
+[SMOKE] pass                 D4.gpio 0x4000_37FF -> GPIO (2KB)
+[SMOKE] pass                  D5.gap 0x4000_3FFF -> unmapped
+[SMOKE] pass                  D6.spi 0x4000_4000 -> SPI
+[SMOKE] pass                   D7.t1 0x4000_5000 -> TIMER1
+[SMOKE] pass                D8.isram ISRAM region
+[SMOKE] pass                D9.dsram DSRAM region
+[SMOKE] pass                D10.mmio MMIO region
+[SMOKE] pass               M1.report report length=5668
+[SMOKE] pass               F1.frozen freeze asserted
+[SMOKE] pass                F2.cycle freeze cycle recorded
+==========================================================
+SMOKE TEST FAILED with 1 error(s)
+==========================================================
+
+
+================================================================================
+            RISCFORGE SoC POST-MORTEM MONITOR DUMP
+================================================================================
+  FIRST FATAL : SMOKE-99   layer=          2(Path)  cycle=12345  pc=0x00000100
+  DETAIL      : self-test injected fatal
+
+---- MONITOR TOTALS ------------------------------------------------
+==      FETCH layer=          2(Path) events=396 suppressed=0 span=[1..396]
+==     RETIRE layer=          2(Path) events=412 suppressed=0 span=[5..416]
+==        LSU layer=          2(Path) events=2 suppressed=0 span=[23..30]
+==    AXILITE layer=          1(Protocol) events=14 suppressed=0 span=[22..94]
+==        APB layer=          1(Protocol) events=8 suppressed=0 span=[27..470]
+==        IRQ layer=          5(IRQ) events=4 suppressed=0 span=[237..317]
+==        PIN layer=          4(Pin) events=2 suppressed=0 span=[147..179]
+
+---- CYCLIC HISTORY (newest first) ----------------------------------
+----        FETCH 256/256 retained ----
+stall_cycles=0 branches=49
+  cyc      141  rel      141  PC=0x00000240  I=0x00100093  BR UNMAPPED
+  cyc      142  rel      142  PC=0x00000244  I=0x00100093     UNMAPPED
+  cyc      143  rel      143  PC=0x00000248  I=0x00100093     UNMAPPED
+  cyc      144  rel      144  PC=0x0000024c  I=0x00100093     UNMAPPED
+  cyc      145  rel      145  PC=0x00000250  I=0x00100093     UNMAPPED
+  cyc      146  rel      146  PC=0x00000254  I=0x00100093     UNMAPPED
+  cyc      147  rel      147  PC=0x00000258  I=0x00100093     UNMAPPED
+  cyc      148  rel      148  PC=0x0000025c  I=0x00100093     UNMAPPED
+  cyc      149  rel      149  PC=0x00000260  I=0x00100093  BR UNMAPPED
+  cyc      150  rel      150  PC=0x00000264  I=0x00100093     UNMAPPED
+  cyc      151  rel      151  PC=0x00000268  I=0x00100093     UNMAPPED
+  cyc      152  rel      152  PC=0x0000026c  I=0x00100093     UNMAPPED
+
+----       RETIRE 256/256 retained ----
+commit=412 regwe=412 trap=1 irq=1 mret=1 csr=0
+  cyc      161  rel      161  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      162  rel      162  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      163  rel      163  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      164  rel      164  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      165  rel      165  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      166  rel      166  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      167  rel      167  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      168  rel      168  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      169  rel      169  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      170  rel      170  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      171  rel      171  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      172  rel      172  PC=0x00000100  x00100093  rd x1=0x00000001               
+
+----          LSU 2/256 retained ----
+req=2 load=0 store=2 mmio=2 err=0
+  cyc       23  PC=0x00000100  --  WR slot=2  addr=0x40002000  w=0x00000055  be=0000  wait=1  MMIO     
+  cyc       30  PC=0x00000100  --  WR slot=2  addr=0x40002000  w=0x00000055  be=0000  wait=1  MMIO     
+
+----      AXILITE 4/256 retained ----
+AW=2 W=2 B=2 AR=2 R=2 stalls(AW/W/B/AR/R)=0/0/0/0/0
+  cyc       27  WR addr=0x40002000  w=0x00000055  be=1111  resp=OKAY  aw_wait=5 w_wait=4 b_wait=0  MMIO
+  cyc       34  WR addr=0x40002000  w=0x00000055  be=1111  resp=OKAY  aw_wait=5 w_wait=4 b_wait=0  MMIO
+  cyc       87  RD addr=0x40001000  r=0x00001234  be=1111  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+  cyc       94  RD addr=0x40001000  r=0x00001234  be=1111  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+
+  slot           0    I2C xfer=1 wr=0 rd=1 slverr=0 max_ws=2
+  slot           1 TIMER0 xfer=2 wr=0 rd=2 slverr=0 max_ws=2
+  slot           2   UART xfer=2 wr=0 rd=2 slverr=0 max_ws=2
+  slot           3   GPIO xfer=1 wr=0 rd=1 slverr=0 max_ws=2
+  slot           4    SPI xfer=1 wr=0 rd=1 slverr=1 max_ws=2
+  slot           5 TIMER1 xfer=1 wr=0 rd=1 slverr=0 max_ws=2
+----          APB 8/256 retained ----
+  cyc       27  [2]  UART RD  paddr=0x40002000  pw=0x00000055 pr=0x00000000 pstrb=0000  ws=2        
+  cyc       86  [1]TIMER0 RD  paddr=0x40001000  pw=0x00000000 pr=0x00000000 pstrb=0000  ws=1        
+  cyc      450  [0]   I2C RD  paddr=0x40000024  pw=0xa5000000 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      454  [1]TIMER0 RD  paddr=0x40001024  pw=0xa5000001 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      458  [2]  UART RD  paddr=0x40002024  pw=0xa5000002 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      462  [3]  GPIO RD  paddr=0x40003024  pw=0xa5000003 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      466  [4]   SPI RD  paddr=0x40004024  pw=0xa5000004 pr=0x00000000 pstrb=0000  ws=2  SLVERR
+  cyc      470  [5]TIMER1 RD  paddr=0x40005024  pw=0xa5000005 pr=0x00000000 pstrb=0000  ws=2        
+
+----          IRQ 4/256 retained ----
+assert=1 grant=1 ack=1 mret=1
+  cyc      237  id=19           UART assert=1 grant=0 ack=0  cause=0x00000013  mip=00000000000010000000000000000000 mie=00000000000010000000000000000000  lat=0 depth=0       
+  cyc      247  id=19           UART assert=1 grant=1 ack=0  cause=0x00000013  mip=00000000000010000000000000000000 mie=00000000000010000000000000000000  lat=0 depth=0       
+  cyc      257  id=19           UART assert=1 grant=1 ack=1  cause=0x00000013  mip=00000000000010000000000000000000 mie=00000000000010000000000000000000  lat=10 depth=0       
+  cyc      317  id=0           NONE assert=0 grant=0 ack=0  cause=0x00000000  mip=00000000000000000000000000000000 mie=00000000000000000000000000000000  lat=0 depth=0 [MRET]
+
+
+---- CROSS-LAYER JOIN (newest MMIO accesses) -----------------------
+  PC=0x00000100  ST  addr=0x40002000  slot=2(UART)
+      LSU  : t=30 be=0000 wdata=0x00000055
+      AXIL : t=34 WR be=1111 data=0x00000055 resp=OKAY latency=5
+      APB  : t=27 slot=2 RD paddr=0x40002000 pstrb=0000 prdata=0x00000000 ws=2       
+  PC=0x00000100  ST  addr=0x40002000  slot=2(UART)
+      LSU  : t=23 be=0000 wdata=0x00000055
+      AXIL : t=34 WR be=1111 data=0x00000055 resp=OKAY latency=5
+      APB  : t=27 slot=2 RD paddr=0x40002000 pstrb=0000 prdata=0x00000000 ws=2       
+
+[MON] post-mortem written to monitor_postmortem.txt
+$finish called at time : 20 us : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure/tb/rf_mon_smoke_tb.sv" Line 231
+exit
+INFO: [Common 17-206] Exiting xsim at Sun Oct 18 21:22:45 2026...

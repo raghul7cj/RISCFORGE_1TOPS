@@ -1,0 +1,216 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Sep 15, 2026 at 22:27:57 IST
+xrun
+	-f bootloader.f
+		-access +rwc
+		../SOC_FILES/include/common_cells/axi_pkg.sv
+		rtl/bootloader_tb_all_testcases_32KB_sram.sv
+		rtl/bootloader.sv
+		../spi/spi_master/spi_master_clkgen.sv
+		../spi/spi_master/spi_master_fifo.sv
+		../spi/spi_master/spi_master_rx.sv
+		../spi/spi_master/spi_master_tx.sv
+		../spi/spi_master/spi_master_controller.sv
+		../spi/spi_master/spi_master_apb_if.sv
+		../spi/spi_master/apb_spi_master.sv
+		../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
+file: ../SOC_FILES/include/common_cells/axi_pkg.sv
+	package worklib.axi_pkg:sv
+		errors: 0, warnings: 0
+file: rtl/bootloader_tb_all_testcases_32KB_sram.sv
+	package worklib.tb_bus_pkg:sv
+		errors: 0, warnings: 0
+	module worklib.axi_lite_mem:sv
+		errors: 0, warnings: 0
+	module worklib.bootloader_spi_32KB_sram_tb:sv
+		errors: 0, warnings: 0
+file: rtl/bootloader.sv
+	module worklib.bootloader:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_clkgen.sv
+	module worklib.spi_master_clkgen:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_fifo.sv
+	module worklib.spi_master_fifo:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_rx.sv
+	module worklib.spi_master_rx:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_tx.sv
+	module worklib.spi_master_tx:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_controller.sv
+	module worklib.spi_master_controller:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/spi_master_apb_if.sv
+	module worklib.spi_master_apb_if:sv
+		errors: 0, warnings: 0
+file: ../spi/spi_master/apb_spi_master.sv
+	module worklib.apb_spi_master:sv
+		errors: 0, warnings: 0
+file: ../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
+	module worklib.s25fs512s:sv
+		errors: 0, warnings: 0
+	module worklib.BUFFER:sv
+		errors: 0, warnings: 0
+	module worklib.memory_features:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		tb_bus_pkg
+		axi_pkg
+		bootloader_spi_32KB_sram_tb
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+		worklib.s25fs512s:sv <0x7981adc8>
+			streams: 275, words: 831598
+		worklib.spi_master_rx:sv <0x53ff571c>
+			streams:   9, words:  6678
+		worklib.spi_master_tx:sv <0x091c5525>
+			streams:  10, words:  7288
+		worklib.spi_master_clkgen:sv <0x083fbf96>
+			streams:   6, words:  3171
+		worklib.spi_master_controller:sv <0x7eb2045a>
+			streams:  38, words: 48076
+		worklib.spi_master_fifo:sv <0x0b652b6e>
+			streams:  10, words:  5091
+		worklib.spi_master_apb_if:sv <0x3f6c9690>
+			streams:  24, words: 18876
+		worklib.bootloader:sv <0x678fe80a>
+			streams:  90, words: 190322
+		worklib.memory_features:sv <0x602856bc>
+			streams:  32, words: 20085
+		worklib.axi_pkg:sv <0x4cbc4bb9>
+			streams:  20, words: 16663
+		worklib.axi_lite_mem:sv <0x1941017b>
+			streams:  15, words:  7840
+		worklib.apb_spi_master:sv <0x7fcfd18b>
+			streams:  92, words: 30338
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                     Instances  Unique
+		Modules:                    15      13
+		Verilog packages:            2       2
+		Primitives:                 12       2
+		Timing outputs:              4       4
+		Registers:                 739     734
+		Scalar wires:              269       -
+		Vectored wires:             96       -
+		Named events:                5       5
+		Always blocks:             112     109
+		Initial blocks:            135     135
+		Cont. assignments:          64     120
+		Pseudo assignments:        132       -
+		Timing checks:              44      20
+		Assertions:                  7       7
+		SV Class declarations:       3       3
+		SV Class specializations:    3       3
+		Process Clocks:             24      12
+		Simulation timescale:      1ps
+	Writing initial simulation snapshot: worklib.bootloader_spi_32KB_sram_tb:sv
+Loading snapshot worklib.bootloader_spi_32KB_sram_tb:sv .................... Done
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+[TB] Loading firmware image from: ../spi_slave_infinion/S25fs512s/model/ebreak_combined.mem
+xmsim: *W,LMTMSG: packed array at "bootloader_spi_32KB_sram_tb.u_flash.SFDP_array_tmp" of 35008 elements exceeds limit of 4096 - not probed
+ Use 'probe -create -packed 35008' to adjust limit.
+xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
+            File: ./rtl/bootloader_tb_all_testcases_32KB_sram.sv, line = 850, pos = 13
+           Scope: bootloader_spi_32KB_sram_tb
+            Time: 0 FS + 0
+
+xmsim: *W,LMTMSG: unpacked array at "bootloader_spi_32KB_sram_tb.u_axi_mem.mem" of 32768 elements exceeds limit of 16384 - not probed
+ Use 'probe -create -unpacked 32768' to adjust limit.
+xmsim: *W,LMTMSG: packed array at "bootloader_spi_32KB_sram_tb.u_flash.SFDP_array_tmp" of 35008 elements exceeds limit of 4096 - not probed
+ Use 'probe -create -packed 35008' to adjust limit.
+xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
+            File: ./rtl/bootloader_tb_all_testcases_32KB_sram.sv, line = 861, pos = 13
+           Scope: bootloader_spi_32KB_sram_tb
+            Time: 0 FS + 0
+
+[TB] Preloaded 6156 bytes into flash from ebreak_combined.mem
+
+===== TC1: Cold Boot (32 KB ISRAM + 32 KB DSRAM) =====
+[TB] Cold boot: hard_rst_ni released @cycle 6
+[TC8] SPI word 0 data OK (00000097)
+[TC8] SPI word 1 data OK (13408093)
+[TC8] SPI word 2 data OK (000080e7)
+[TC8] SPI word 3 data OK (feedc0b7)
+[TC8] SPI word 4 data OK (ead08093)
+[TC8] burst 1 complete: 1024 words (32768 data bits)
+[TC8] burst 2 complete: 515 words (16480 data bits)
+[TC1] PASS: all 1539 words (ISRAM+DSRAM) match golden image
+[TC1] PASS: 2 SPI burst(s) as expected for 1539 words @ 1024 words/burst
+[TC1] Total boot cycles: 555917  (5559174000)
+
+---------------- [TC1] BOOT PHASE PROFILE ----------------
+  Config      : ISRAM=8192 words  DSRAM=8192 words  clear=16384 words
+  Firmware    : 1539 words (375 instr + 1164 data), 6156 bytes
+  Burst       : MAX_CHUNK_WORDS=1024  -> 2 SPI burst(s)
+  Clock       : 10.0 ns  (SPI_CLK_DIV=4)
+
+  PHASE                        CYCLES     TIME(us)        %
+  ---------------------- ------------ ------------ --------
+  S_RESET entry                     6         0.06    0.00%
+  SRAM clear                    32768       327.68    5.89%
+  Flash power-up                30000       300.00    5.40%
+  SPI config (once)                 6         0.06    0.00%
+  Burst setup (/chunk)             12         0.12    0.00%
+  Fetch drain (/word)          493118      4931.18   88.70%
+  Clean-slate reset                 6         0.06    0.00%
+  ---------------------- ------------ ------------ --------
+  TOTAL BOOT                   555917      5559.17  100.00%
+
+  Per-state breakdown:
+    S_RESET                       6  (  0.00%)
+    S_CLEAR_SRAM              32768  (  5.89%)
+    S_FLASH_WAIT              30000  (  5.40%)
+    S_INIT_CLKDIV                 2  (  0.00%)
+    S_INIT_SPICMD                 2  (  0.00%)
+    S_INIT_SPILEN                 4  (  0.00%)
+    S_INIT_SPIDUM                 2  (  0.00%)
+    S_CFG_SPIADR                  4  (  0.00%)
+    S_TRIGGER                     4  (  0.00%)
+    S_READ_FIFO              488501  ( 87.87%)
+    S_WRITE_SRAM               3078  (  0.55%)
+    S_CHECK_DONE               1539  (  0.28%)
+    S_CLEAN_ASSERT                1  (  0.00%)
+    S_CLEAN_HOLD                  4  (  0.00%)
+    S_CLEAN_RELEASE               1  (  0.00%)
+
+  SPI / AXI concurrency:
+    SPI burst in flight (CSN low) : 493119 cycles (4931.19 us, 88.70% of boot)
+    AXI write (S_WRITE_SRAM)      : 3078 cycles (30.78 us)
+    ... overlapped with SPI       : 3078 cycles (100.00% of AXI, hidden)
+    ... NOT overlapped (tail)     : 0 cycles (0.00 us, 0.00% of boot)
+    Cost per firmware word        : 320.4 cycles (fetch phase / word)
+--------------------------------------------------------
+
+
+===== TC3: Determinism (repeat cold boot) =====
+[TB] Cold boot: hard_rst_ni released @cycle 555923
+[TC8] SPI word 0 data OK (00000097)
+[TC8] SPI word 1 data OK (13408093)
+[TC8] SPI word 2 data OK (000080e7)
+[TC8] SPI word 3 data OK (feedc0b7)
+[TC8] SPI word 4 data OK (ead08093)
+[TC8] burst 1 complete: 1024 words (32768 data bits)
+[TC8] burst 2 complete: 515 words (16480 data bits)
+[TC3] PASS: all 1539 words (ISRAM+DSRAM) match golden image
+[TC3] PASS: boot cycle count deterministic (555917 cycles both runs)
+
+===== TC2: Warm Boot =====
+[TB] Warm boot: soft_rst_ni released @cycle 1111840
+[TC2] PASS: all 1539 words (ISRAM+DSRAM) match golden image
+[TC2] boot_done asserted, SRAM preserved check complete
+
+===== TC6: APB Passthrough (post boot_done) =====
+[TC6] Passthrough read STATUS = 00000001
+
+===== All testcases complete =====
+Simulation complete via $finish(1) at time 11118515 NS + 0
+./rtl/bootloader_tb_all_testcases_32KB_sram.sv:831     $finish;
+xcelium> exit
+TOOL:	xrun(64)	24.09-s001: Exiting on Sep 15, 2026 at 22:28:14 IST  (total: 00:00:17)

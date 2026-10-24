@@ -166,31 +166,40 @@ module tb_apb_uart_thorough;
   // Protocol note (AMBA APB): PRDATA is valid in the same cycle PREADY is high;
   // the transfer completes at the following rising edge.
   //
-  // Two problems with the previous version:
-  //  1. It sampled PRDATA one cycle AFTER the PREADY window. That only worked by
-  //     accident: obi_uart_register drives rsp_data combinationally while
-  //     req_q is set, and req_q was still high because PSEL had not yet dropped.
-  //     Any change to the slave's response timing would have broken it silently.
-  //  2. The wait loop tested PREADY in the active region immediately after
-  //     @(posedge CLK), racing the DUT's own edge-aligned update of that signal.
+  // This slave answers with ZERO wait states (see apb_await_ready below), so the
+  // PREADY window is the very first access-phase cycle. PREADY must therefore be
+  // tested before waiting on any edge, and PRDATA taken from that same window.
   //
-  // Both are fixed by settling #1 past each edge before sampling, and by taking
-  // PRDATA inside the PREADY window. Drive and sample both happen at
-  // (posedge + 1ns), so neither races the DUT.
+  // The original BFM sampled with "@(posedge CLK); data = PRDATA;" and no #1.
+  // That was deliberate, not sloppy: reading in the Active region returns
+  // pre-NBA values, i.e. the data as of the completing cycle. It is preserved in
+  // effect here by sampling inside the PREADY window instead.
   //
-  // Note PREADY is 0 once the access completes and PSEL drops — that is correct
-  // APB behaviour, and it is what TC2/TC27 were unintentionally measuring.
+  // Note PREADY reads 0 once the access completes and PSEL drops — that is
+  // correct APB behaviour, and it is what TC2/TC27 were unintentionally
+  // measuring before.
   // ---------------------------------------------------------------------------
 
   // Total slave wait-states observed, so tests can measure real stalls.
   int apb_wait_cycles = 0;
 
+  // CRITICAL: test PREADY *before* consuming a clock edge.
+  //
+  // apb_to_obi asserts req from psel alone, i.e. during the APB SETUP phase, and
+  // obi_uart_register registers the response one cycle later (valid_d = req). So
+  // PREADY and valid PRDATA are already asserted in the FIRST access-phase cycle
+  // — this slave answers with zero wait states.
+  //
+  // Waiting on an edge first steps over that window entirely. Worse, psel is
+  // still high, so apb_to_obi returns to ADDR and issues a SECOND OBI
+  // transaction. Non-destructive registers return the same value twice and look
+  // fine, but RHR is cleared by its own read (obi_uart_rx.sv obi_read_rhr), so
+  // the second access returns 0 and every RBR check fails.
   task automatic apb_await_ready(input string op, input logic [2:0] addr);
     int t;
     t = 0;
-    forever begin
+    while (!PREADY) begin
       @(posedge CLK); #1;
-      if (PREADY) break;
       t++;
       apb_wait_cycles++;
       if (t >= TIMEOUT_CYC) begin

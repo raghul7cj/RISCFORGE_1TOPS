@@ -1,0 +1,125 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+ISRAM            0x00010000         0x00008000         xr
+DSRAM            0x00020000         0x00008000         rw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+LOAD C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+LOAD D:/riscv-toolchain/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/rv32i/ilp32\libgcc.a
+
+.text           0x00010000     0x1bac
+ *(.text.init)
+ .text.init     0x00010000       0x3c C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+                0x00010000                _start
+ *(.text .text.*)
+ .text          0x0001003c       0x74 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+                0x0001003c                trap_entry
+ .text          0x000100b0      0x698 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+ .text.startup  0x00010748     0x1464 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                0x00010748                main
+
+.results        0x00020000       0x40
+                0x00020040                        . = (. + 0x40)
+ *fill*         0x00020000       0x40 
+
+.rodata         0x00020040     0x1274
+ *(.rodata .rodata.* .srodata .srodata.*)
+ .rodata.str1.4
+                0x00020040      0xd84 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                                0xda0 (size before relaxing)
+ .rodata        0x00020dc4      0x4f0 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.rela.dyn       0x000212b4        0x0
+ .rela.text.init
+                0x000212b4        0x0 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+
+.data           0x000212b4        0x0
+ *(.data .data.* .sdata .sdata.*)
+ .data          0x000212b4        0x0 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .data          0x000212b4        0x0 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.bss            0x000212b4       0x20
+                0x000212b4                        _bss_start = .
+ *(.bss .bss.* .sbss .sbss.* COMMON)
+ .bss           0x000212b4        0x0 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .bss           0x000212b4       0x14 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                0x000212b4                g_trap
+ .sbss          0x000212c8        0xc C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                0x000212d4                        . = ALIGN (0x4)
+                0x000212d4                        _bss_end = .
+                0x00028000                        _stack_top = (ORIGIN (DSRAM) + LENGTH (DSRAM))
+                0x00000001                        ASSERT ((ADDR (.text) == 0x10000), _start must be at the ISRAM base (BootROM jump target))
+                0x00000001                        ASSERT ((ADDR (.results) == 0x20000), result words must sit at the DSRAM base (soc_regtest_tb.sv))
+                0x00000001                        ASSERT ((_bss_end <= (_stack_top - 0x800)), less than 2 KB left for the stack)
+OUTPUT(regtest.elf elf32-littleriscv)
+
+.riscv.attributes
+                0x00000000       0x29
+ .riscv.attributes
+                0x00000000       0x27 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .riscv.attributes
+                0x00000027       0x25 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.comment        0x00000000       0x33
+ .comment       0x00000000       0x33 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                                 0x34 (size before relaxing)
+
+.note.GNU-stack
+                0x00000000        0x0
+ .note.GNU-stack
+                0x00000000        0x0 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_line     0x00000000     0x36f9
+ .debug_line    0x00000000      0x152 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .debug_line    0x00000152     0x35a7 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_line_str
+                0x00000000       0xbc
+ .debug_line_str
+                0x00000000       0xbc C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+                                 0x4a (size before relaxing)
+ .debug_line_str
+                0x000000bc        0x0 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                                 0xb2 (size before relaxing)
+
+.debug_info     0x00000000     0x4652
+ .debug_info    0x00000000       0x23 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .debug_info    0x00000023     0x462f C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_abbrev   0x00000000      0x482
+ .debug_abbrev  0x00000000       0x12 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .debug_abbrev  0x00000012      0x470 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_aranges  0x00000000       0x50
+ .debug_aranges
+                0x00000000       0x28 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .debug_aranges
+                0x00000028       0x28 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_str      0x00000000      0x420
+ .debug_str     0x00000000      0x420 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+                                 0x56 (size before relaxing)
+ .debug_str     0x00000420        0x0 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+                                0x414 (size before relaxing)
+
+.debug_rnglists
+                0x00000000      0x711
+ .debug_rnglists
+                0x00000000       0x19 C:\Users\chaotic\AppData\Local\Temp\ccIklcgD.o
+ .debug_rnglists
+                0x00000019      0x6f8 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_loclists
+                0x00000000     0x1c87
+ .debug_loclists
+                0x00000000     0x1c87 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o
+
+.debug_frame    0x00000000      0x1b0
+ .debug_frame   0x00000000      0x1b0 C:\Users\chaotic\AppData\Local\Temp\cc9zHqje.o

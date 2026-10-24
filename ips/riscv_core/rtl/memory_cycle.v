@@ -50,6 +50,7 @@ module memory_cycle #(
     input valid_M,
     input exc_valid_M,
     input [5:0] exc_cause_M,
+    input [1:0] exc_class_M,
     input [31:0] exc_tval_M,
     input [31:0] exc_pc_M,
     input is_mret_M,
@@ -86,6 +87,7 @@ module memory_cycle #(
     output valid_W,
     output exc_valid_W,
     output [5:0] exc_cause_W,
+    output [1:0] exc_class_W,
     output [31:0] exc_tval_W,
     output [31:0] exc_pc_W,
     output is_mret_W,
@@ -204,6 +206,7 @@ module memory_cycle #(
     reg valid_W_r;
     reg exc_valid_r;
     reg [5:0] exc_cause_r;
+    reg [1:0] exc_class_r;
     reg [31:0] exc_tval_r;
     reg [31:0] exc_pc_r;
     reg is_mret_r;
@@ -225,6 +228,7 @@ module memory_cycle #(
             valid_W_r        <= 1'b0;
             exc_valid_r      <= 1'b0;
             exc_cause_r      <= 6'd0;
+            exc_class_r      <= 2'd0;
             exc_tval_r       <= 32'd0;
             exc_pc_r         <= 32'd0;
             is_mret_r        <= 1'b0;
@@ -244,6 +248,7 @@ module memory_cycle #(
             valid_W_r        <= 1'b0;
             exc_valid_r      <= 1'b0;
             exc_cause_r      <= 6'd0;
+            exc_class_r      <= 2'd0;
             exc_tval_r       <= 32'd0;
             exc_pc_r         <= 32'd0;
             is_mret_r        <= 1'b0;
@@ -270,6 +275,7 @@ module memory_cycle #(
             valid_W_r        <= valid_M;
             exc_valid_r      <= exc_valid_mem_final;
             exc_cause_r      <= exc_cause_mem_final;
+            exc_class_r      <= exc_valid_mem_local ? 2'd0 : exc_class_M;
             exc_tval_r       <= exc_tval_mem_final;
             exc_pc_r         <= exc_pc_mem_final;
             is_mret_r        <= is_mret_M;
@@ -294,6 +300,7 @@ module memory_cycle #(
     assign valid_W        = valid_W_r;
     assign exc_valid_W    = exc_valid_r;
     assign exc_cause_W    = exc_cause_r;
+    assign exc_class_W    = exc_class_r;
     assign exc_tval_W     = exc_tval_r;
     assign exc_pc_W       = exc_pc_r;
     assign is_mret_W      = is_mret_r;

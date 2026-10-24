@@ -1,0 +1,60 @@
+
+================================================================================
+            RISCFORGE SoC POST-MORTEM MONITOR DUMP
+================================================================================
+  FIRST FATAL : none
+
+---- MONITOR TOTALS ------------------------------------------------
+==      FETCH layer=          2(Path) events=215 suppressed=0 span=[6..440]
+==     RETIRE layer=          2(Path) events=191 suppressed=0 span=[10..440]
+==        LSU layer=          2(Path) events=0 suppressed=0 span=[0..0]
+==    AXILITE layer=          1(Protocol) events=252 suppressed=0 span=[266..390]
+==        APB layer=          1(Protocol) events=64 suppressed=0 span=[266..396]
+==        IRQ layer=          5(IRQ) events=1 suppressed=0 span=[236..236]
+==        PIN layer=          4(Pin) events=0 suppressed=0 span=[0..0]
+
+---- CYCLIC HISTORY (newest first) ----------------------------------
+----        FETCH 175/256 retained  FROZEN@cyc401 ----
+stall_cycles=5 branches=0
+  cyc        6  rel        6  PC=0x00001000  I=0x00100093     UNMAPPED
+  cyc        7  rel        7  PC=0x00001004  I=0x00200113     UNMAPPED
+  cyc        8  rel        8  PC=0x00001008  I=0x002081b3     UNMAPPED
+  cyc        9  rel        9  PC=0x0000100c  I=0x00018237     UNMAPPED
+
+----       RETIRE 151/256 retained  FROZEN@cyc401 ----
+commit=191 regwe=188 trap=1 irq=0 mret=1 csr=0
+  cyc       10  rel       10  PC=0x00001000  x00100093  rd x1=0x00000001               
+  cyc       11  rel       11  PC=0x00001004  x00200113  rd x2=0x00000002               
+  cyc       12  rel       12  PC=0x00001008  x002081b3  rd x3=0x00000003               
+  cyc       13  rel       13  PC=0x0000100c  x00018237  rd x4=0x00018000               
+
+----          LSU 0/256 retained ----
+req=0 load=0 store=0 mmio=0 err=0
+
+----      AXILITE 63/256 retained ----
+AW=63 W=63 B=63 AR=0 R=0 stalls(AW/W/B/AR/R)=0/0/0/0/0
+  cyc      266  WR addr=0x40002000  w=0x0000010e  be=xxxx  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+  cyc      268  WR addr=0x40002000  w=0x00000110  be=xxxx  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+  cyc      270  WR addr=0x40002000  w=0x00000112  be=xxxx  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+  cyc      272  WR addr=0x40002000  w=0x00000114  be=xxxx  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+
+  slot           0    I2C xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           1 TIMER0 xfer=1 wr=0 rd=1 slverr=0 max_ws=0
+  slot           2   UART xfer=63 wr=0 rd=63 slverr=0 max_ws=0
+  slot           3   GPIO xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           4    SPI xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+  slot           5 TIMER1 xfer=0 wr=0 rd=0 slverr=0 max_ws=0
+----          APB 64/256 retained ----
+  cyc      266  [2]  UART RD  paddr=0x40002000  pw=0x0000010e pr=0x00000000 pstrb=0000  ws=0        
+  cyc      268  [2]  UART RD  paddr=0x40002000  pw=0x00000110 pr=0x00000000 pstrb=0000  ws=0        
+  cyc      270  [2]  UART RD  paddr=0x40002000  pw=0x00000112 pr=0x00000000 pstrb=0000  ws=0        
+  cyc      272  [2]  UART RD  paddr=0x40002000  pw=0x00000114 pr=0x00000000 pstrb=0000  ws=0        
+
+----          IRQ 1/256 retained ----
+assert=0 grant=0 ack=0 mret=1
+  cyc      236  id=0           NONE assert=0 grant=0 ack=0  cause=0x00000000  mip=00000000000000000000000000000000 mie=00000000000000000000000000000000  lat=0 depth=0 [MRET]
+
+
+---- CROSS-LAYER JOIN (newest MMIO accesses) -----------------------
+  (no MMIO accesses observed - scoreboard would be VACUOUS)
+

@@ -1,0 +1,553 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>RISCFORGE Interrupt Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  :root {
+    --ground: #EBEFF2;
+    --sheet: #FFFFFF;
+    --ink: #16212B;
+    --muted: #5A6874;
+    --rule: #D5DCE2;
+    --faint: #F4F6F8;
+    --accent: #0E6C8A;
+    --accent-soft: rgba(14, 108, 138, 0.12);
+    --warn: #A86B12;
+    --warn-soft: rgba(196, 128, 26, 0.15);
+    --crit: #B03A2E;
+    --crit-soft: rgba(176, 58, 46, 0.12);
+    --ok: #2E7A4E;
+    --ok-soft: rgba(46, 122, 78, 0.14);
+    --neutral-soft: rgba(90, 104, 116, 0.12);
+    --badge-text: #FFFFFF;
+    --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", "Consolas", "Menlo", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #0E1419;
+      --sheet: #161F27;
+      --ink: #E3E9EE;
+      --muted: #98A6B2;
+      --rule: #2B3844;
+      --faint: #1C2731;
+      --accent: #56B6D4;
+      --accent-soft: rgba(86, 182, 212, 0.16);
+      --warn: #E2A94E;
+      --warn-soft: rgba(226, 169, 78, 0.16);
+      --crit: #E57467;
+      --crit-soft: rgba(229, 116, 103, 0.16);
+      --ok: #62C28F;
+      --ok-soft: rgba(98, 194, 143, 0.16);
+      --neutral-soft: rgba(152, 166, 178, 0.14);
+      --badge-text: #10171D;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #0E1419;
+    --sheet: #161F27;
+    --ink: #E3E9EE;
+    --muted: #98A6B2;
+    --rule: #2B3844;
+    --faint: #1C2731;
+    --accent: #56B6D4;
+    --accent-soft: rgba(86, 182, 212, 0.16);
+    --warn: #E2A94E;
+    --warn-soft: rgba(226, 169, 78, 0.16);
+    --crit: #E57467;
+    --crit-soft: rgba(229, 116, 103, 0.16);
+    --ok: #62C28F;
+    --ok-soft: rgba(98, 194, 143, 0.16);
+    --neutral-soft: rgba(152, 166, 178, 0.14);
+    --badge-text: #10171D;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.5;
+    padding-inline: 16px;
+    padding-block: 28px;
+  }
+  .doc { display: grid; gap: 28px; justify-items: center; }
+  .sheet {
+    width: 100%;
+    max-width: 860px;
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 34px 48px 40px;
+    display: grid;
+    gap: 22px;
+  }
+  .sheet-head {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    letter-spacing: 0.02em;
+    padding-bottom: 10px; border-bottom: 2px solid var(--ink);
+  }
+  .eyebrow {
+    margin: 0 0 6px; font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  h1 {
+    margin: 0; font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.15;
+    letter-spacing: -0.01em; text-wrap: balance; font-stretch: 90%;
+  }
+  .lede { margin: 10px 0 0; max-width: 68ch; color: var(--muted); font-size: 15px; }
+  .meta {
+    margin: 16px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0; border: 1px solid var(--rule); border-radius: 2px;
+  }
+  .meta div { padding: 7px 12px; border-right: 1px solid var(--rule); }
+  .meta div:last-child { border-right: 0; }
+  .meta dt { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .meta dd { margin: 1px 0 0; font-weight: 500; font-size: 13.5px; }
+  .fill { color: var(--muted); border-bottom: 1px dashed var(--muted); font-weight: 400; }
+
+  section { display: grid; gap: 10px; }
+  h2 {
+    margin: 0; font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: 0;
+    display: flex; align-items: baseline; gap: 10px; text-wrap: balance;
+  }
+  h2 .num { font-family: var(--mono); font-weight: 500; font-size: 12px; color: var(--accent); }
+  p { margin: 0; max-width: 72ch; }
+  .muted { color: var(--muted); }
+  code, .mono { font-family: var(--mono); font-size: 0.9em; }
+
+  .status { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px; padding: 3px 10px 3px 8px;
+    border: 1px solid var(--rule); border-radius: 999px; font-size: 12.5px; background: var(--faint);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.idle { background: transparent; border: 1.5px solid var(--muted); }
+
+  figure { margin: 0; display: grid; gap: 6px; }
+  .fig-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 2px; background: var(--faint); }
+  .fig-scroll svg { display: block; width: 100%; min-width: 660px; height: auto; }
+  figcaption { font-size: 12.5px; color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th {
+    text-align: left; font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); padding: 6px 10px; border-bottom: 1.5px solid var(--ink);
+  }
+  td { padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  td.id { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
+  .sev { display: inline-block; font-family: var(--mono); font-size: 10.5px; padding: 1px 7px; border-radius: 2px; white-space: nowrap; }
+  .sev.crit { background: var(--crit-soft); color: var(--crit); }
+  .sev.high { background: var(--warn-soft); color: var(--warn); }
+  .sev.tim { background: var(--accent-soft); color: var(--accent); }
+  .est { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-left: 3px; }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .panel { border: 1px solid var(--rule); border-radius: 2px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+  .panel h3 { margin: 0; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+  .panel.gap { border-color: var(--accent); background: var(--accent-soft); }
+  .panel.gap h3 { color: var(--accent); }
+  ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+  li { padding-left: 2px; }
+
+  .question {
+    border-left: 3px solid var(--accent); padding: 10px 14px; background: var(--accent-soft);
+    font-family: var(--display); font-weight: 600; font-size: 16px; line-height: 1.35; text-wrap: balance;
+  }
+  .hyp { display: grid; gap: 8px; }
+  .hyp div { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: baseline; }
+  .hyp b { font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+  .sw { display: inline-block; width: 18px; height: 9px; border-radius: 1px; margin-right: 6px; vertical-align: middle; }
+  .sw.build { background: var(--accent); } .sw.measure { background: var(--warn); } .sw.write { background: var(--muted); }
+
+  .asks { counter-reset: q; display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .asks li { counter-increment: q; display: grid; grid-template-columns: 26px 1fr; gap: 6px; padding: 0; }
+  .asks li::before { content: "Q" counter(q); font-family: var(--mono); font-size: 12px; color: var(--accent); padding-top: 1px; }
+
+  .refs { font-size: 12px; color: var(--muted); display: grid; gap: 2px; margin: 0; padding-left: 22px; }
+  .refs a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .refs a:hover, .refs a:focus-visible { border-bottom-color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* SVG diagram tokens */
+  .d-box { fill: var(--sheet); stroke: var(--rule); stroke-width: 1.2; }
+  .d-lvl { fill: var(--neutral-soft); stroke: var(--muted); stroke-width: 1; }
+  .d-pulse { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.2; }
+  .d-new { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; }
+  .d-chg { fill: var(--sheet); stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 5 3; }
+  .d-alt { fill: var(--sheet); stroke: var(--muted); stroke-width: 1.1; stroke-dasharray: 4 3; }
+  .d-ln { stroke: var(--muted); stroke-width: 1.3; fill: none; }
+  .d-ln-acc { stroke: var(--accent); stroke-width: 1.5; fill: none; }
+  .d-ln-dash { stroke: var(--muted); stroke-width: 1.1; fill: none; stroke-dasharray: 4 3; }
+  .d-ah { fill: var(--muted); }
+  .d-ah-acc { fill: var(--accent); }
+  .d-t { fill: var(--ink); font-family: var(--body); font-size: 12px; }
+  .d-tb { fill: var(--ink); font-family: var(--body); font-size: 12.5px; font-weight: 600; }
+  .d-tm { fill: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+  .d-tacc { fill: var(--accent); font-family: var(--mono); font-size: 10.5px; font-weight: 500; }
+  .d-badge-c { fill: var(--crit); }
+  .d-badge-w { fill: var(--warn); }
+  .d-badge-t { fill: var(--badge-text); font-family: var(--mono); font-size: 9.5px; font-weight: 500; }
+  .d-grid { stroke: var(--rule); stroke-width: 1; }
+  .d-bar-b { fill: var(--accent); }
+  .d-bar-m { fill: var(--warn); }
+  .d-bar-w { fill: var(--muted); }
+  .d-gate { fill: var(--crit); }
+  .d-mid { stroke: var(--ink); stroke-width: 1.3; stroke-dasharray: 5 3; }
+
+  @media (max-width: 640px) {
+    .sheet { padding: 22px 18px 28px; }
+    h1 { font-size: 24px; }
+    .two { grid-template-columns: 1fr; }
+    .meta div { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .meta div:last-child { border-bottom: 0; }
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .sheet { border: 0; max-width: none; break-after: page; }
+    .fig-scroll svg { min-width: 0; }
+  }
+  @page { size: A4; margin: 14mm; }
+</style>
+
+<div class="doc">
+
+<!-- ============================== PAGE 1 ============================== -->
+<article class="sheet" aria-label="Page 1">
+  <header class="sheet-head">
+    <span>RISCFORGE · SONIC-MCU · 1TOPS tape-out program</span>
+    <span>Doc RF-IRQ-01 · Rev A · Page 1 / 2</span>
+  </header>
+
+  <div>
+    <p class="eyebrow">Research proposal · B.Tech 7th semester · 4 credits</p>
+    <h1>Right-sizing interrupt control for small RISC-V MCUs</h1>
+    <p class="lede">A same-core comparison of a lightweight level arbiter, a PLIC and a minimal CLIC in area, timing and latency, built on interrupt bugs found during RISCFORGE pre-silicon review.</p>
+    <dl class="meta">
+      <div><dt>Student</dt><dd><span class="fill">[ name ]</span></dd></div>
+      <div><dt>Guide</dt><dd><span class="fill">[ name ]</span></dd></div>
+      <div><dt>Institute</dt><dd>IIIT Allahabad</dd></div>
+      <div><dt>Date</dt><dd>25 Sep 2026</dd></div>
+    </dl>
+  </div>
+
+  <section>
+    <h2><span class="num">1</span>Where the project stands</h2>
+    <p>RISCFORGE is the RV32IM_Zicsr 5-stage core in the SONIC-MCU SoC, headed for tape-out under the 1TOPS program. UART, SPI, I2C and GPIO enter as fast local interrupts (<code>mip[19:16]</code>) and Timer0 drives MTIP. A fixed if/else chain picks one interrupt. There is no PLIC and no CLINT. A design review on 24 Sep 2026 produced a phased fix plan. No RTL has changed yet.</p>
+    <div class="status" aria-label="Status">
+      <span class="pill"><span class="dot ok"></span>Interrupt review: done</span>
+      <span class="pill"><span class="dot warn"></span>Fix plan: proposed</span>
+      <span class="pill"><span class="dot idle"></span>RTL changes: not started</span>
+      <span class="pill"><span class="dot idle"></span>Research study: planning</span>
+    </div>
+
+    <figure>
+      <div class="fig-scroll">
+        <svg viewBox="0 0 800 272" role="img" aria-label="Current interrupt path with the defects marked">
+          <defs>
+            <marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-ah"/></marker>
+          </defs>
+          <!-- sources -->
+          <rect x="12" y="14" width="150" height="26" rx="3" class="d-lvl"/><text x="22" y="31" class="d-t">UART0 <tspan class="d-tm">level</tspan></text>
+          <rect x="12" y="46" width="150" height="26" rx="3" class="d-pulse"/><text x="22" y="63" class="d-t">SPI <tspan class="d-tm">1-cycle pulse</tspan></text>
+          <rect x="12" y="78" width="150" height="26" rx="3" class="d-lvl"/><text x="22" y="95" class="d-t">I2C <tspan class="d-tm">level</tspan></text>
+          <rect x="12" y="110" width="150" height="26" rx="3" class="d-pulse"/><text x="22" y="127" class="d-t">GPIO <tspan class="d-tm">pulse</tspan></text>
+          <rect x="12" y="142" width="150" height="26" rx="3" class="d-pulse"/><text x="22" y="159" class="d-t">Timer0 <tspan class="d-tm">pulse → MTIP</tspan></text>
+          <line x1="162" y1="27" x2="188" y2="27" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="162" y1="59" x2="188" y2="59" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="162" y1="91" x2="188" y2="91" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="162" y1="123" x2="188" y2="123" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="162" y1="155" x2="188" y2="155" class="d-ln" marker-end="url(#ah1)"/>
+          <!-- mip -->
+          <rect x="190" y="14" width="100" height="154" rx="3" class="d-box"/>
+          <text x="232" y="76" class="d-tb" text-anchor="middle">mip</text>
+          <text x="232" y="94" class="d-tm" text-anchor="middle">combinational</text>
+          <text x="232" y="108" class="d-tm" text-anchor="middle">no latch</text>
+          <circle cx="278" cy="28" r="10" class="d-badge-c"/><text x="278" y="31.5" class="d-badge-t" text-anchor="middle">F1</text>
+          <circle cx="278" cy="52" r="10" class="d-badge-w"/><text x="278" y="55.5" class="d-badge-t" text-anchor="middle">G2</text>
+          <line x1="290" y1="91" x2="308" y2="91" class="d-ln" marker-end="url(#ah1)"/>
+          <!-- chain -->
+          <rect x="310" y="40" width="130" height="102" rx="3" class="d-box"/>
+          <text x="370" y="80" class="d-tb" text-anchor="middle">Fixed chain</text>
+          <text x="370" y="98" class="d-tm" text-anchor="middle">top.v:232–256</text>
+          <text x="370" y="114" class="d-tm" text-anchor="middle">order = cause no.</text>
+          <circle cx="428" cy="54" r="10" class="d-badge-w"/><text x="428" y="57.5" class="d-badge-t" text-anchor="middle">F2</text>
+          <line x1="440" y1="91" x2="458" y2="91" class="d-ln" marker-end="url(#ah1)"/>
+          <!-- gate -->
+          <rect x="460" y="40" width="180" height="102" rx="3" class="d-box"/>
+          <text x="545" y="76" class="d-tb" text-anchor="middle">irq_pending</text>
+          <text x="545" y="94" class="d-tm" text-anchor="middle">MIE ∧ active ∧ &gt; mintprio</text>
+          <text x="545" y="110" class="d-tm" text-anchor="middle">reads committed MIE</text>
+          <circle cx="628" cy="54" r="10" class="d-badge-w"/><text x="628" y="57.5" class="d-badge-t" text-anchor="middle">G1</text>
+          <!-- tied off -->
+          <rect x="660" y="40" width="128" height="102" rx="3" class="d-alt"/>
+          <text x="672" y="64" class="d-tm">tied to 0</text>
+          <text x="672" y="86" class="d-t">MEIP · no PLIC</text>
+          <text x="672" y="106" class="d-t">MSIP · no CLINT</text>
+          <!-- pipeline -->
+          <line x1="550" y1="142" x2="550" y2="194" class="d-ln" marker-end="url(#ah1)"/>
+          <text x="558" y="172" class="d-tm">accept in EX</text>
+          <rect x="330" y="196" width="70" height="40" rx="3" class="d-box"/><text x="365" y="221" class="d-tb" text-anchor="middle">IF</text>
+          <rect x="415" y="196" width="70" height="40" rx="3" class="d-box"/><text x="450" y="221" class="d-tb" text-anchor="middle">ID</text>
+          <rect x="500" y="196" width="100" height="40" rx="3" class="d-box"/><text x="545" y="213" class="d-tb" text-anchor="middle">EX</text><text x="545" y="228" class="d-tm" text-anchor="middle">irq packet</text>
+          <circle cx="588" cy="207" r="9" class="d-badge-w"/><text x="588" y="210.5" class="d-badge-t" text-anchor="middle">G3</text>
+          <rect x="615" y="196" width="70" height="40" rx="3" class="d-box"/><text x="650" y="221" class="d-tb" text-anchor="middle">MEM</text>
+          <rect x="700" y="196" width="88" height="40" rx="3" class="d-box"/><text x="744" y="213" class="d-tb" text-anchor="middle">WB</text><text x="744" y="228" class="d-tm" text-anchor="middle">commit trap</text>
+          <line x1="400" y1="216" x2="413" y2="216" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="485" y1="216" x2="498" y2="216" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="600" y1="216" x2="613" y2="216" class="d-ln" marker-end="url(#ah1)"/>
+          <line x1="685" y1="216" x2="698" y2="216" class="d-ln" marker-end="url(#ah1)"/>
+          <path d="M744,236 V258 H365 V238" class="d-ln" marker-end="url(#ah1)"/>
+          <text x="555" y="251" class="d-tm" text-anchor="middle">redirect to mtvec, flush younger stages</text>
+          <!-- legend -->
+          <rect x="12" y="202" width="18" height="10" rx="1" class="d-pulse"/><text x="38" y="211" class="d-tm">pulse source</text>
+          <rect x="12" y="220" width="18" height="10" rx="1" class="d-lvl"/><text x="38" y="229" class="d-tm">level source</text>
+          <circle cx="21" cy="246" r="8" class="d-badge-w"/><text x="21" y="249.5" class="d-badge-t" text-anchor="middle">G</text>
+          <text x="38" y="249" class="d-tm">finding, see table</text>
+        </svg>
+      </div>
+      <figcaption><b>Figure 1.</b> The interrupt path as implemented today. Accepted in EX, committed at WB. Badges mark the review findings.</figcaption>
+    </figure>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Finding (verified against RTL)</th><th>Severity</th></tr></thead>
+        <tbody>
+          <tr><td class="id">F1</td><td>SPI, Timer0 and GPIO pulses are lost unless EX accepts them in that exact cycle, e.g. inside another ISR</td><td><span class="sev crit">critical</span></td></tr>
+          <tr><td class="id">F2</td><td>MTI is checked before MSI; the privileged spec requires MEI &gt; MSI &gt; MTI</td><td><span class="sev high">high</span></td></tr>
+          <tr><td class="id">G1</td><td>An interrupt is still accepted while a write clearing MIE is in MEM/WB</td><td><span class="sev high">high</span></td></tr>
+          <tr><td class="id">G2</td><td>Proposed <code>mip</code> clear logic wipes edges that arrive between CSR read and write</td><td><span class="sev high">high</span></td></tr>
+          <tr><td class="id">G3</td><td>A completed divide is turned into the interrupt packet and re-run after <code>mret</code></td><td><span class="sev high">high</span></td></tr>
+          <tr><td class="id">G5</td><td>Proposed zero-latency gateway puts the timer's 32-bit compare on the PC-redirect path</td><td><span class="sev tim">timing</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">2</span>Reference work</h2>
+    <p><strong>Base paper:</strong> R. Balas et al., <em>CV32RT: Enabling Fast Interrupt and Context Switching for RISC-V Microcontrollers</em>, IEEE TVLSI 2024 [1]. The CLIC it integrates is the same PULP IP already in our repository.</p>
+    <div class="two">
+      <div class="panel">
+        <h3>What they did</h3>
+        <ul>
+          <li>Integrated the PULP CLIC into CV32E40P: levels, preemption, hardware vectoring</li>
+          <li><em>fastirq</em>: second register bank, saved in the background; 6-cycle entry vs ≈33 with CLIC alone (Cortex-M4: 12)</li>
+          <li>CLIC area ≈176 GE per source, linear in source count; fastirq +10 % (GF 12 nm)</li>
+        </ul>
+      </div>
+      <div class="panel gap">
+        <h3>What they left open (our gap)</h3>
+        <ul>
+          <li>No PLIC in the comparison</li>
+          <li>Only large CLIC configurations, not ≤16-source MCUs</li>
+          <li>Best-case latency only: zero-wait memory, no dependence on the interrupted instruction</li>
+          <li>No area or timing sweep over design choices</li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted">Figures quoted from the arXiv version; to be checked against the published paper.</p>
+  </section>
+</article>
+
+<!-- ============================== PAGE 2 ============================== -->
+<article class="sheet" aria-label="Page 2">
+  <header class="sheet-head">
+    <span>RISCFORGE · SONIC-MCU · 1TOPS tape-out program</span>
+    <span>Doc RF-IRQ-01 · Rev A · Page 2 / 2</span>
+  </header>
+
+  <section>
+    <h2><span class="num">3</span>Goal and hypotheses</h2>
+    <p class="question">For a single-core, machine-mode MCU with 16 or fewer interrupt sources, what do a level arbiter, a PLIC and a minimal CLIC each cost in area, timing and latency on the same core?</p>
+    <div class="hyp">
+      <div><b>H1</b><span>The PLIC has the highest entry latency, because the handler must read a claim register and write a complete register over the bus.</span></div>
+      <div><b>H2</b><span>At ≤16 sources, a level arbiter matches minimal-CLIC latency at lower area.</span></div>
+      <div><b>H3</b><span>Every option is a small fraction of core area, so latency and verification risk should decide, not gate count.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">4</span>Proposed architecture and comparison points</h2>
+    <figure>
+      <div class="fig-scroll">
+        <svg viewBox="0 0 800 250" role="img" aria-label="Proposed interrupt path and the controllers swapped in for comparison">
+          <defs>
+            <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="d-ah-acc"/></marker>
+          </defs>
+          <text x="392" y="16" class="d-tacc" text-anchor="middle">K1 · ours</text>
+          <!-- sources -->
+          <rect x="12" y="24" width="116" height="26" rx="3" class="d-lvl"/><text x="20" y="41" class="d-t">Level: UART, I2C</text>
+          <rect x="12" y="61" width="116" height="26" rx="3" class="d-pulse"/><text x="20" y="78" class="d-t">Pulse: SPI, GPIO</text>
+          <rect x="12" y="98" width="116" height="26" rx="3" class="d-pulse"/><text x="20" y="115" class="d-t">Pulse: Timer0</text>
+          <line x1="128" y1="37" x2="148" y2="37" class="d-ln-acc" marker-end="url(#ah2)"/>
+          <line x1="128" y1="74" x2="148" y2="74" class="d-ln-acc" marker-end="url(#ah2)"/>
+          <line x1="128" y1="111" x2="148" y2="111" class="d-ln-acc" marker-end="url(#ah2)"/>
+          <!-- gateway -->
+          <rect x="150" y="24" width="140" height="100" rx="3" class="d-new"/>
+          <text x="220" y="50" class="d-tb" text-anchor="middle">Gateway</text>
+          <text x="220" y="70" class="d-tm" text-anchor="middle">registered inputs</text>
+          <text x="220" y="86" class="d-tm" text-anchor="middle">edge → sticky pend</text>
+          <text x="220" y="102" class="d-tm" text-anchor="middle">clear at WB commit</text>
+          <line x1="290" y1="74" x2="310" y2="74" class="d-ln-acc" marker-end="url(#ah2)"/>
+          <!-- arbiter -->
+          <rect x="312" y="24" width="160" height="100" rx="3" class="d-new"/>
+          <text x="392" y="50" class="d-tb" text-anchor="middle">Level arbiter</text>
+          <text x="392" y="70" class="d-tm" text-anchor="middle">2-bit level / source</text>
+          <text x="392" y="86" class="d-tm" text-anchor="middle">round-robin on ties</text>
+          <text x="392" y="102" class="d-tm" text-anchor="middle">NUM_FLI parameter</text>
+          <line x1="472" y1="74" x2="492" y2="74" class="d-ln-acc" marker-end="url(#ah2)"/>
+          <!-- EX -->
+          <rect x="494" y="24" width="140" height="100" rx="3" class="d-chg"/>
+          <text x="564" y="50" class="d-tb" text-anchor="middle">EX accept</text>
+          <text x="564" y="70" class="d-tm" text-anchor="middle">+ CSR-write guard</text>
+          <text x="564" y="86" class="d-tm" text-anchor="middle">+ divide guard</text>
+          <text x="564" y="102" class="d-tm" text-anchor="middle">packet carries level</text>
+          <line x1="634" y1="74" x2="654" y2="74" class="d-ln-acc" marker-end="url(#ah2)"/>
+          <!-- WB -->
+          <rect x="656" y="24" width="132" height="100" rx="3" class="d-chg"/>
+          <text x="722" y="50" class="d-tb" text-anchor="middle">WB commit</text>
+          <text x="722" y="70" class="d-tm" text-anchor="middle">save / restore level</text>
+          <text x="722" y="86" class="d-tm" text-anchor="middle">on trap and mret</text>
+          <text x="722" y="102" class="d-tm" text-anchor="middle">vectored redirect</text>
+          <!-- comparison row -->
+          <text x="12" y="158" class="d-tm">swapped in for K1, one at a time</text>
+          <path d="M245,170 L372,126" class="d-ln-dash"/>
+          <path d="M460,170 L400,126" class="d-ln-dash"/>
+          <path d="M684,170 L420,126" class="d-ln-dash"/>
+          <rect x="150" y="170" width="190" height="66" rx="3" class="d-alt"/>
+          <text x="162" y="192" class="d-tb">K0 · Fixed chain</text>
+          <text x="162" y="210" class="d-tm">today + Phase A fixes</text>
+          <text x="162" y="226" class="d-tm">baseline</text>
+          <rect x="360" y="170" width="200" height="66" rx="3" class="d-alt"/>
+          <text x="372" y="192" class="d-tb">K2 · PLIC on MEIP</text>
+          <text x="372" y="210" class="d-tm">pulp rv_plic</text>
+          <text x="372" y="226" class="d-tm">claim/complete over APB</text>
+          <rect x="580" y="170" width="208" height="66" rx="3" class="d-alt"/>
+          <text x="592" y="192" class="d-tb">K3 · Minimal CLIC</text>
+          <text x="592" y="210" class="d-tm">pulp clic, APB slot 5</text>
+          <text x="592" y="226" class="d-tm">+ mintthresh, mintstatus</text>
+          <!-- legend -->
+          <rect x="12" y="176" width="18" height="10" rx="1" class="d-new"/><text x="38" y="185" class="d-tm">new block</text>
+          <rect x="12" y="196" width="18" height="10" rx="1" class="d-chg"/><text x="38" y="205" class="d-tm">changed</text>
+          <rect x="12" y="216" width="18" height="10" rx="1" class="d-alt"/><text x="38" y="225" class="d-tm">compared</text>
+        </svg>
+      </div>
+      <figcaption><b>Figure 2.</b> K1 fixes F1–G5 and adds levels and nesting. K0, K2 and K3 replace the arbiter one at a time; everything else stays fixed.</figcaption>
+    </figure>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Config</th><th>What it is</th><th>Area at 16 sources</th><th>Entry latency</th></tr></thead>
+        <tbody>
+          <tr><td class="id">K0</td><td>Fixed chain with Phase A fixes</td><td>0.1–0.3 kGE<span class="est">est.</span></td><td>lowest<span class="est">est.</span></td></tr>
+          <tr><td class="id">K1</td><td>Level arbiter, round-robin, nesting (ours)</td><td>0.8–1.2 kGE<span class="est">est.</span></td><td>+1 cycle, registered inputs<span class="est">est.</span></td></tr>
+          <tr><td class="id">K2</td><td>PLIC on MEIP (PULP <code>rv_plic</code>)</td><td>3–5 kGE with bus<span class="est">est.</span></td><td>+15–30 cycles, claim/complete<span class="est">est.</span></td></tr>
+          <tr><td class="id">K3</td><td>Minimal CLIC (PULP <code>clic</code>)</td><td>2–3 kGE + core CSRs<span class="est">est.</span></td><td>≈ K1; +≈3 with SHV<span class="est">est.</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted"><strong>Method.</strong> Same core, testbench, Genus library and constraints for all four. Area in NAND2 gate equivalents; slack and fmax on the interrupt path; entry latency best, worst and jitter; handler entry/exit instruction count. Sweep 4, 8 and 16 sources. The flow is checked by reproducing CV32RT's per-source CLIC slope. Every <span class="mono">est.</span> value above is a hypothesis to be replaced by measurement.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">5</span>Path</h2>
+    <figure>
+      <div class="fig-scroll">
+        <svg viewBox="0 0 800 232" role="img" aria-label="Twelve-week plan with the midsem evaluation and a go or no-go gate">
+          <!-- week grid -->
+          <g class="d-grid">
+            <line x1="170" y1="28" x2="170" y2="200"/><line x1="221.7" y1="28" x2="221.7" y2="200"/><line x1="273.3" y1="28" x2="273.3" y2="200"/>
+            <line x1="325" y1="28" x2="325" y2="200"/><line x1="376.7" y1="28" x2="376.7" y2="200"/><line x1="428.3" y1="28" x2="428.3" y2="200"/>
+            <line x1="480" y1="28" x2="480" y2="200"/><line x1="531.7" y1="28" x2="531.7" y2="200"/><line x1="583.3" y1="28" x2="583.3" y2="200"/>
+            <line x1="635" y1="28" x2="635" y2="200"/><line x1="686.7" y1="28" x2="686.7" y2="200"/><line x1="738.3" y1="28" x2="738.3" y2="200"/>
+            <line x1="790" y1="28" x2="790" y2="200"/>
+          </g>
+          <text x="195.8" y="20" class="d-tm" text-anchor="middle">W1</text><text x="247.5" y="20" class="d-tm" text-anchor="middle">W2</text>
+          <text x="299.2" y="20" class="d-tm" text-anchor="middle">W3</text><text x="350.8" y="20" class="d-tm" text-anchor="middle">W4</text>
+          <text x="402.5" y="20" class="d-tm" text-anchor="middle">W5</text><text x="454.2" y="20" class="d-tm" text-anchor="middle">W6</text>
+          <text x="505.8" y="20" class="d-tm" text-anchor="middle">W7</text><text x="557.5" y="20" class="d-tm" text-anchor="middle">W8</text>
+          <text x="609.2" y="20" class="d-tm" text-anchor="middle">W9</text><text x="660.8" y="20" class="d-tm" text-anchor="middle">W10</text>
+          <text x="712.5" y="20" class="d-tm" text-anchor="middle">W11</text><text x="764.2" y="20" class="d-tm" text-anchor="middle">W12</text>
+          <!-- rows -->
+          <text x="12" y="46" class="d-t">Frame + bug demo</text>
+          <rect x="172" y="34" width="99.3" height="16" rx="2" class="d-bar-w"/>
+          <text x="12" y="70" class="d-t">Phase A + G1–G4 fixes</text>
+          <rect x="275.3" y="58" width="151" height="16" rx="2" class="d-bar-b"/>
+          <text x="12" y="94" class="d-t">Standalone synthesis</text>
+          <rect x="327" y="82" width="151" height="16" rx="2" class="d-bar-m"/>
+          <text x="12" y="118" class="d-t">Go / no-go gate</text>
+          <path d="M480,104 L489,114 L480,124 L471,114 Z" class="d-gate"/>
+          <text x="496" y="118" class="d-tm">area ≥ 2 % of core → area story; else latency</text>
+          <text x="12" y="142" class="d-t">Phase B1 / B2</text>
+          <rect x="430.3" y="130" width="151" height="16" rx="2" class="d-bar-b"/>
+          <text x="12" y="166" class="d-t">Same-core sweep</text>
+          <rect x="533.7" y="154" width="151" height="16" rx="2" class="d-bar-m"/>
+          <text x="12" y="190" class="d-t">Report + paper draft</text>
+          <rect x="637" y="178" width="151" height="16" rx="2" class="d-bar-w"/>
+          <!-- midsem -->
+          <line x1="273.3" y1="26" x2="273.3" y2="210" class="d-mid"/>
+          <text x="273.3" y="224" class="d-tb" text-anchor="middle">Midsem evaluation</text>
+        </svg>
+      </div>
+      <figcaption><b>Figure 3.</b> Twelve weeks from 28 Sep 2026. Planning and presenting before midsem; tape-out fixes come first after it.</figcaption>
+    </figure>
+    <div class="legend"><span><i class="sw build"></i>build</span><span><i class="sw measure"></i>measure</span><span><i class="sw write"></i>plan / write</span></div>
+  </section>
+
+  <div class="two">
+    <section class="panel">
+      <h3>Deliverables</h3>
+      <ul>
+        <li>Fixed interrupt RTL for tape-out with directed tests; RISCOF stays at 100 %</li>
+        <li>Parametric arbiter (K1) and scripted synthesis for K0–K3</li>
+        <li>Comparison tables and figures, report</li>
+        <li>Student-track paper: VLSID research forum, VDAT or a RISC-V Summit poster</li>
+      </ul>
+    </section>
+    <section class="panel">
+      <h3>Risks and responses</h3>
+      <ul>
+        <li>CLIC/PLIC need extra SV packages → close dependencies first, synthesise standalone</li>
+        <li>Differences turn out tiny → still a design guideline (H3)</li>
+        <li>Clash with tape-out → tape-out fixes always come first</li>
+      </ul>
+    </section>
+  </div>
+
+  <section>
+    <h2><span class="num">6</span>Questions for reviewers</h2>
+    <ol class="asks">
+      <li>In production MCUs, does interrupt-controller area ever drive the choice, or do latency and software support decide?</li>
+      <li>For ≤16 sources, would you ship a CLIC subset or custom CSR arbitration?</li>
+      <li>Is registering interrupt inputs at the core boundary (+1 cycle) standard practice?</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><span class="num">7</span>References</h2>
+    <ol class="refs">
+      <li>R. Balas et al., “CV32RT: Enabling Fast Interrupt and Context Switching for RISC-V Microcontrollers,” IEEE TVLSI, 2024. <a href="https://arxiv.org/abs/2311.08320">arXiv:2311.08320</a></li>
+      <li>RISC-V Privileged Architecture, machine interrupt registers and priority. <a href="https://github.com/riscv/riscv-isa-manual">riscv-isa-manual</a></li>
+      <li>RISC-V Core-Local Interrupt Controller (CLIC), draft specification. <a href="https://github.com/riscv/riscv-fast-interrupt">riscv-fast-interrupt</a></li>
+      <li>RISC-V Advanced Interrupt Architecture (AIA). <a href="https://github.com/riscv/riscv-aia">riscv-aia</a></li>
+      <li>PULP platform IP: <a href="https://github.com/pulp-platform/clic">clic</a>, <a href="https://github.com/pulp-platform/rv_plic">rv_plic</a></li>
+      <li>J. Van Bulck et al., “Nemesis: Studying Microarchitectural Timing Leaks in Rudimentary CPU Interrupt Logic,” ACM CCS, 2018. <a href="https://dl.acm.org/doi/10.1145/3243734.3243822">doi</a></li>
+      <li>Renesas R9A02G021, RISC-V MCU with CLIC and context-save register bank. <a href="https://www.renesas.com/us/en/products/microcontrollers-microprocessors/risc-v/r9a02g021-ultra-low-power-48mhz-mcu-renesas-risc-v-cpu-core">product page</a></li>
+    </ol>
+  </section>
+</article>
+
+</div>
+
+</body></html>

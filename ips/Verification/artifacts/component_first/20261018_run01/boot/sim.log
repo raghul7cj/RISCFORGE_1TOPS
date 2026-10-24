@@ -1,0 +1,141 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/soc_imem_boot_sim/xsim_script.tcl
+# xsim {soc_imem_boot_sim} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+WARNING: File ../mem_files/riscforge_bootrom.hex referenced on C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/bootloader/bootloader.sv at line 829 cannot be opened for reading. Please ensure that this file is available in the current working directory.
+WARNING: File imem.hex referenced on C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/bootloader/bootloader.sv at line 829 cannot be opened for reading. Please ensure that this file is available in the current working directory.
+[TB] Preloaded 8 instruction words into SPI flash BFM
+[TB] @0 (cycle 0) Bootloader FSM → S_RESET
+[TB] ═══════════════════════════════════════════════════════
+[TB]  RISCFORGE SoC — Boot & Reset-Sequence Testbench
+[TB] ═══════════════════════════════════════════════════════
+[TB]  TEST 1: COLD BOOT
+[TB] ═══════════════════════════════════════════════════════
+[TB]   PASS: cold: core_rst_n asserted LOW during hard reset
+[TB]   PASS: cold: periph_rst_n asserted LOW during hard reset
+[TB]   PASS: cold: spi_rst_n asserted LOW during hard reset
+[TB] Releasing hard_rst_ni (cold boot) @cycle 9
+[TB] @135000 (cycle 14) Bootloader FSM → S_CLEAR_SRAM
+[TB] Heartbeat @cycle 5000: state=S_CLEAR_SRAM clear_cnt=997 word_cnt=0
+[TB] Heartbeat @cycle 10000: state=S_CLEAR_SRAM clear_cnt=1997 word_cnt=0
+[TB] Heartbeat @cycle 15000: state=S_CLEAR_SRAM clear_cnt=2997 word_cnt=0
+[TB] Heartbeat @cycle 20000: state=S_CLEAR_SRAM clear_cnt=3997 word_cnt=0
+[TB] Heartbeat @cycle 25000: state=S_CLEAR_SRAM clear_cnt=4997 word_cnt=0
+[TB] Heartbeat @cycle 30000: state=S_CLEAR_SRAM clear_cnt=5997 word_cnt=0
+[TB] Heartbeat @cycle 35000: state=S_CLEAR_SRAM clear_cnt=6997 word_cnt=0
+[TB] Heartbeat @cycle 40000: state=S_CLEAR_SRAM clear_cnt=7997 word_cnt=0
+[TB] Heartbeat @cycle 45000: state=S_CLEAR_SRAM clear_cnt=8997 word_cnt=0
+[TB] Heartbeat @cycle 50000: state=S_CLEAR_SRAM clear_cnt=9997 word_cnt=0
+[TB] Heartbeat @cycle 55000: state=S_CLEAR_SRAM clear_cnt=10997 word_cnt=0
+[TB] Heartbeat @cycle 60000: state=S_CLEAR_SRAM clear_cnt=11997 word_cnt=0
+[TB] Heartbeat @cycle 65000: state=S_CLEAR_SRAM clear_cnt=12997 word_cnt=0
+[TB] Heartbeat @cycle 70000: state=S_CLEAR_SRAM clear_cnt=13997 word_cnt=0
+[TB] Heartbeat @cycle 75000: state=S_CLEAR_SRAM clear_cnt=14997 word_cnt=0
+[TB] Heartbeat @cycle 80000: state=S_CLEAR_SRAM clear_cnt=15997 word_cnt=0
+[TB] @819335000 (cycle 81934) Bootloader FSM → S_FLASH_WAIT
+[TB] @819435000 (cycle 81944) Bootloader FSM → S_INIT_CLKDIV
+[TB] @819455000 (cycle 81946) Bootloader FSM → S_INIT_SPICMD
+[TB] @819475000 (cycle 81948) Bootloader FSM → S_INIT_SPIDUM
+[TB] @819495000 (cycle 81950) Bootloader FSM → S_INIT_SPILEN
+[TB] @819515000 (cycle 81952) Bootloader FSM → S_CFG_SPIADR
+[TB] @819535000 (cycle 81954) Bootloader FSM → S_TRIGGER
+[TB] @819555000 (cycle 81956) Bootloader FSM → S_READ_FIFO
+[TB] @825915000 (cycle 82592) Bootloader FSM → S_WRITE_SRAM
+[TB] @825965000 (cycle 82597) Bootloader FSM → S_CHECK_DONE
+[TB] @825975000 (cycle 82598) Bootloader FSM → S_READ_FIFO
+[TB] @829115000 (cycle 82912) Bootloader FSM → S_WRITE_SRAM
+[TB] @829165000 (cycle 82917) Bootloader FSM → S_CHECK_DONE
+[TB] @829175000 (cycle 82918) Bootloader FSM → S_READ_FIFO
+[TB] @832315000 (cycle 83232) Bootloader FSM → S_WRITE_SRAM
+[TB] @832365000 (cycle 83237) Bootloader FSM → S_CHECK_DONE
+[TB] @832375000 (cycle 83238) Bootloader FSM → S_READ_FIFO
+[TB] @835515000 (cycle 83552) Bootloader FSM → S_WRITE_SRAM
+[TB] @835565000 (cycle 83557) Bootloader FSM → S_CHECK_DONE
+[TB] @835575000 (cycle 83558) Bootloader FSM → S_READ_FIFO
+[TB] @838715000 (cycle 83872) Bootloader FSM → S_WRITE_SRAM
+[TB] @838765000 (cycle 83877) Bootloader FSM → S_CHECK_DONE
+[TB] @838775000 (cycle 83878) Bootloader FSM → S_READ_FIFO
+[TB] @841915000 (cycle 84192) Bootloader FSM → S_WRITE_SRAM
+[TB] @841965000 (cycle 84197) Bootloader FSM → S_CHECK_DONE
+[TB] @841975000 (cycle 84198) Bootloader FSM → S_READ_FIFO
+[TB] @845115000 (cycle 84512) Bootloader FSM → S_WRITE_SRAM
+[TB] @845165000 (cycle 84517) Bootloader FSM → S_CHECK_DONE
+[TB] @845175000 (cycle 84518) Bootloader FSM → S_READ_FIFO
+[TB] @848315000 (cycle 84832) Bootloader FSM → S_WRITE_SRAM
+[TB] @848365000 (cycle 84837) Bootloader FSM → S_CHECK_DONE
+[TB] @848375000 (cycle 84838) Bootloader FSM → S_CLEAN_ASSERT
+[TB] @848385000 (cycle 84839) Bootloader FSM → S_CLEAN_HOLD
+[TB] @848425000 (cycle 84843) Bootloader FSM → S_CLEAN_RELEASE
+[TB] @848435000 (cycle 84844) Bootloader FSM → S_DONE
+[TB] ✓ Boot completed at cycle 84844
+[TB] ───────────────────────────────────────────────────────
+[TB]  Verifying ISRAM contents (Instruction_Memory_new)
+[TB] ───────────────────────────────────────────────────────
+[TB]   ISRAM[0] = 0x00100093 — MATCH
+[TB]   ISRAM[1] = 0x00200113 — MATCH
+[TB]   ISRAM[2] = 0x00300193 — MATCH
+[TB]   ISRAM[3] = 0x00400213 — MATCH
+[TB]   ISRAM[4] = 0x00500293 — MATCH
+[TB]   ISRAM[5] = 0x00600313 — MATCH
+[TB]   ISRAM[6] = 0x00700393 — MATCH
+[TB]   ISRAM[7] = 0x00800413 — MATCH
+[TB] ───────────────────────────────────────────────────────
+[TB]  Verifying ISRAM cleared locations (spot check)
+[TB] ───────────────────────────────────────────────────────
+[TB]   ISRAM[8] = 0x00000000 — CLEARED OK
+[TB]   ISRAM[9] = 0x00000000 — CLEARED OK
+[TB]   ISRAM[10] = 0x00000000 — CLEARED OK
+[TB]   ISRAM[11] = 0x00000000 — CLEARED OK
+[TB] ───────────────────────────────────────────────────────
+[TB]  Cold-boot reset sequence
+[TB] ───────────────────────────────────────────────────────
+[TB]   PASS: cold: spi_rst_n was released HIGH during boot
+[TB]   PASS: cold: core_rst_n was released HIGH by end of boot
+[TB]   PASS: cold: periph_rst_n was released HIGH by end of boot
+[TB]   PASS: cold: spi_rst_n released BEFORE core_rst_n (SPI needed for fetch)
+[TB]   PASS: cold: core & periph released together (clean-slate pulse)
+[TB]   PASS: cold: SPI activity occurred during cold boot (CS0 asserted)
+[TB]   PASS: cold: all three resets HIGH at boot_done
+[TB]   PASS: cold: FSM parked in S_DONE
+[TB]   (spi release @cyc 14, core release @cyc 84843, periph release @cyc 84843)
+[TB] ═══════════════════════════════════════════════════════
+[TB]  TEST 2: WARM BOOT (soft_rst_ni pulse)
+[TB] ═══════════════════════════════════════════════════════
+[TB] Flash BFM overwritten with 0xDEADBEEF as poison pattern
+[TB] @848565000 (cycle 84857) Bootloader FSM → S_RESET
+[TB] Released soft_rst_ni @cycle 84859 — awaiting warm boot_done
+[TB] @848615000 (cycle 84862) Bootloader FSM → S_CLEAN_ASSERT
+[TB] @848625000 (cycle 84863) Bootloader FSM → S_CLEAN_HOLD
+[TB] @848665000 (cycle 84867) Bootloader FSM → S_CLEAN_RELEASE
+[TB] @848675000 (cycle 84868) Bootloader FSM → S_DONE
+[TB] warm boot loop exited after 8 cycles (boot_done=1)
+[TB]   PASS: warm: boot_done reasserted after soft reset
+[TB]   PASS: warm: no SPI activity during warm boot (SPI fetch skipped)
+[TB]   PASS: warm: warm_boot_q flag was set by soft reset
+[TB]   PASS: warm: FSM parked in S_DONE
+[TB]   PASS: warm: all three resets HIGH after warm boot completes
+[TB] ───────────────────────────────────────────────────────
+[TB]  Warm-boot SRAM retention (must equal pre-warm snapshot)
+[TB] ───────────────────────────────────────────────────────
+[TB]   ISRAM[0] = 0x00100093 — RETAINED
+[TB]   ISRAM[1] = 0x00200113 — RETAINED
+[TB]   ISRAM[2] = 0x00300193 — RETAINED
+[TB]   ISRAM[3] = 0x00400213 — RETAINED
+[TB]   ISRAM[4] = 0x00500293 — RETAINED
+[TB]   ISRAM[5] = 0x00600313 — RETAINED
+[TB]   ISRAM[6] = 0x00700393 — RETAINED
+[TB]   ISRAM[7] = 0x00800413 — RETAINED
+[TB] ═══════════════════════════════════════════════════════
+[TB]  ✓✓✓ ALL 36 CHECKS PASSED — TEST PASSED ✓✓✓
+[TB] ═══════════════════════════════════════════════════════
+$finish called at time : 848885 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/RTL_SOC/soc_imem_boot_tb.sv" Line 635
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:42 . Memory (MB): peak = 279.648 ; gain = 0.000
+exit
+INFO: xsimkernel Simulation Memory Usage: 23020 KB (Peak: 23020 KB), Simulation CPU Usage: 41827 ms
+INFO: [Common 17-206] Exiting xsim at Sun Oct 18 21:36:14 2026...

@@ -1,0 +1,208 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/timer0_snap2/xsim_script.tcl
+# xsim {timer0_snap2} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+WARNING: File imem.hex referenced on C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/bootloader/bootloader.sv at line 829 cannot be opened for reading. Please ensure that this file is available in the current working directory.
+[TB] @0 (cyc 0) Bootloader -> S_RESET
+[TB] ============================================================
+[TB]  RISCFORGE SoC���� full boot-to-runtime test (Timer 0 program)
+[TB] ============================================================
+[TB]  Flash image : ../mem_files/riscforge_timer0_flash.mem
+[TB]  Instr words : 11 -> ISRAM 0x00010000
+[TB]  Data  words : 4 -> DSRAM 0x00020000
+[TB] ============================================================
+[TB]  PHASE 0: FLASH IMAGE PRELOAD (mem_file_name backdoor readback)
+[TB] ============================================================
+[TB]   PASS: flash[0] (instr) = 0x400010b7
+[TB]   PASS: flash[1] (instr) = 0x00900113
+[TB]   PASS: flash[2] (instr) = 0x0020a223
+[TB]   PASS: flash[3] (instr) = 0x0040a183
+[TB]   PASS: flash[4] (instr) = 0x00020237
+[TB]   PASS: flash[5] (instr) = 0x00310663
+[TB]   PASS: flash[6] (instr) = 0x00000293
+[TB]   PASS: flash[7] (instr) = 0x0080006f
+[TB]   PASS: flash[8] (instr) = 0x00100293
+[TB]   PASS: flash[9] (instr) = 0x00522023
+[TB]   PASS: flash[10] (instr) = 0x00000063
+[TB]   PASS: flash[11] (data) = 0xdeadbeef
+[TB]   PASS: flash[12] (data) = 0xcafebabe
+[TB]   PASS: flash[13] (data) = 0x12345678
+[TB]   PASS: flash[14] (data) = 0xa5a5a5a5
+[TB] ============================================================
+[TB]  PHASE 1: COLD BOOT (vendor flash, tPU = 300 us)
+[TB] ============================================================
+[TB]   PASS: all resets LOW while hard_rst_ni asserted
+[TB] Releasing hard_rst_ni @cyc 9
+[TB] @135000 (cyc 14) Bootloader -> S_CLEAR_SRAM
+[ISRAM-AW] #1 @cyc 16 addr=0x00010000 prot=3'b001        (privileged - passes gate)
+[ISRAM-WR] #1 @cyc 17 addr=0x0000 data=0x00000000 mask=0xf
+[ISRAM-AW] #2 @cyc 21 addr=0x00010004 prot=3'b001        (privileged - passes gate)
+[ISRAM-WR] #2 @cyc 22 addr=0x0001 data=0x00000000 mask=0xf
+[ISRAM-AW] #3 @cyc 26 addr=0x00010008 prot=3'b001        (privileged - passes gate)
+[ISRAM-WR] #3 @cyc 27 addr=0x0002 data=0x00000000 mask=0xf
+[TB] ... boot in progress @cyc 25000: state=S_CLEAR_SRAM clear_cnt=4997 word_cnt=0
+[TB] ... boot in progress @cyc 50000: state=S_CLEAR_SRAM clear_cnt=9997 word_cnt=0
+[TB] ... boot in progress @cyc 75000: state=S_CLEAR_SRAM clear_cnt=14997 word_cnt=0
+[TB] @819335000 (cyc 81934) Bootloader -> S_FLASH_WAIT
+[TB] ... boot in progress @cyc 100000: state=S_FLASH_WAIT clear_cnt=16384 word_cnt=0
+[TB] @1119335000 (cyc 111934) Bootloader -> S_INIT_CLKDIV
+[TB] @1119355000 (cyc 111936) Bootloader -> S_INIT_SPICMD
+[TB] @1119375000 (cyc 111938) Bootloader -> S_INIT_SPIDUM
+[TB] @1119395000 (cyc 111940) Bootloader -> S_INIT_SPILEN
+[TB] @1119415000 (cyc 111942) Bootloader -> S_CFG_SPIADR
+[TB] @1119435000 (cyc 111944) Bootloader -> S_TRIGGER
+[TB] @1119455000 (cyc 111946) Bootloader -> S_READ_FIFO
+Device is selected during Power Up
+[TB] @1125815000 (cyc 112582) Bootloader -> S_WRITE_SRAM
+[TB] @1125865000 (cyc 112587) Bootloader -> S_CHECK_DONE
+[TB] @1125875000 (cyc 112588) Bootloader -> S_READ_FIFO
+[TB] @1129015000 (cyc 112902) Bootloader -> S_WRITE_SRAM
+[TB] @1129065000 (cyc 112907) Bootloader -> S_CHECK_DONE
+[TB] @1129075000 (cyc 112908) Bootloader -> S_READ_FIFO
+[TB] @1132215000 (cyc 113222) Bootloader -> S_WRITE_SRAM
+[TB] @1132265000 (cyc 113227) Bootloader -> S_CHECK_DONE
+[TB] @1132275000 (cyc 113228) Bootloader -> S_READ_FIFO
+[TB] @1135415000 (cyc 113542) Bootloader -> S_WRITE_SRAM
+[TB] @1135465000 (cyc 113547) Bootloader -> S_CHECK_DONE
+[TB] @1135475000 (cyc 113548) Bootloader -> S_READ_FIFO
+[TB] @1138615000 (cyc 113862) Bootloader -> S_WRITE_SRAM
+[TB] @1138665000 (cyc 113867) Bootloader -> S_CHECK_DONE
+[TB] @1138675000 (cyc 113868) Bootloader -> S_READ_FIFO
+[TB] @1141815000 (cyc 114182) Bootloader -> S_WRITE_SRAM
+[TB] @1141865000 (cyc 114187) Bootloader -> S_CHECK_DONE
+[TB] @1141875000 (cyc 114188) Bootloader -> S_READ_FIFO
+[TB] @1145015000 (cyc 114502) Bootloader -> S_WRITE_SRAM
+[TB] @1145065000 (cyc 114507) Bootloader -> S_CHECK_DONE
+[TB] @1145075000 (cyc 114508) Bootloader -> S_READ_FIFO
+[TB] @1148215000 (cyc 114822) Bootloader -> S_WRITE_SRAM
+[TB] @1148265000 (cyc 114827) Bootloader -> S_CHECK_DONE
+[TB] @1148275000 (cyc 114828) Bootloader -> S_READ_FIFO
+[TB] @1151415000 (cyc 115142) Bootloader -> S_WRITE_SRAM
+[TB] @1151465000 (cyc 115147) Bootloader -> S_CHECK_DONE
+[TB] @1151475000 (cyc 115148) Bootloader -> S_READ_FIFO
+[TB] @1154615000 (cyc 115462) Bootloader -> S_WRITE_SRAM
+[TB] @1154665000 (cyc 115467) Bootloader -> S_CHECK_DONE
+[TB] @1154675000 (cyc 115468) Bootloader -> S_READ_FIFO
+[TB] @1157815000 (cyc 115782) Bootloader -> S_WRITE_SRAM
+[TB] @1157865000 (cyc 115787) Bootloader -> S_CHECK_DONE
+[TB] @1157875000 (cyc 115788) Bootloader -> S_READ_FIFO
+[TB] @1161015000 (cyc 116102) Bootloader -> S_WRITE_SRAM
+[TB] @1161065000 (cyc 116107) Bootloader -> S_CHECK_DONE
+[TB] @1161075000 (cyc 116108) Bootloader -> S_READ_FIFO
+[TB] @1164215000 (cyc 116422) Bootloader -> S_WRITE_SRAM
+[TB] @1164265000 (cyc 116427) Bootloader -> S_CHECK_DONE
+[TB] @1164275000 (cyc 116428) Bootloader -> S_READ_FIFO
+[TB] @1167415000 (cyc 116742) Bootloader -> S_WRITE_SRAM
+[TB] @1167465000 (cyc 116747) Bootloader -> S_CHECK_DONE
+[TB] @1167475000 (cyc 116748) Bootloader -> S_READ_FIFO
+[TB] @1170615000 (cyc 117062) Bootloader -> S_WRITE_SRAM
+[TB] @1170665000 (cyc 117067) Bootloader -> S_CHECK_DONE
+[TB] @1170675000 (cyc 117068) Bootloader -> S_CLEAN_ASSERT
+[TB] @1170685000 (cyc 117069) Bootloader -> S_CLEAN_HOLD
+[TB] @1170725000 (cyc 117073) Bootloader -> S_CLEAN_RELEASE
+[TB] @1170735000 (cyc 117074) Bootloader -> S_DONE
+[TB]   PASS: SPI activity occurred during boot
+[TB]   PASS: bootloader parked in S_DONE
+[TB] ============================================================
+[TB]  PHASE 2: RESET SEQUENCE
+[TB] ============================================================
+[TB]   PASS: spi_rst_n released
+[TB]   PASS: core_rst_n released
+[TB]   PASS: periph_rst_n released
+[TB]   PASS: spi_rst_n released BEFORE core_rst_n
+[TB]   PASS: core & periph released together
+[TB]   (spi @cyc 14, core @cyc 117073, periph @cyc 117073)
+[TB] ============================================================
+[TB]  PHASE 3: IMAGE PLACEMENT (SPI -> ISRAM / DSRAM)
+[TB] ============================================================
+[TB] -- Boot write-path counters --
+[TB]   ISRAM writes reaching the macro : 8203  (expected 8203)
+[TB]   DSRAM writes reaching the macro : 8196  (expected 8196)
+[TB]   ISRAM AW handshakes at bridge   : 8203
+[TB]   ISRAM error responses (SLVERR)  : 0
+[TB]   last aw.prot seen by the gate   : 3'b001                                              
+[TB]   >> ISRAM write path OK: every write reached the macro, no errors.
+[TB] -- ISRAM (instruction words) --
+Error: [TB]   FAIL: ISRAM[0] = 0xzzzzzzzz (expected 0x400010b7)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[1] = 0xzzzzzzzz (expected 0x00900113)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[2] = 0xzzzzzzzz (expected 0x0020a223)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[3] = 0xzzzzzzzz (expected 0x0040a183)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[4] = 0xzzzzzzzz (expected 0x00020237)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[5] = 0xzzzzzzzz (expected 0x00310663)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[6] = 0xzzzzzzzz (expected 0x00000293)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[7] = 0xzzzzzzzz (expected 0x0080006f)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[8] = 0xzzzzzzzz (expected 0x00100293)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[9] = 0xzzzzzzzz (expected 0x00522023)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: ISRAM[10] = 0xzzzzzzzz (expected 0x00000063)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+[TB]   PASS: ISRAM[11] cleared beyond image = 0x00000000
+[TB] -- DSRAM (data words) --
+Error: [TB]   FAIL: DSRAM[0] = 0xzzzzzzzz (expected 0xdeadbeef)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: DSRAM[1] = 0xzzzzzzzz (expected 0xcafebabe)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: DSRAM[2] = 0xzzzzzzzz (expected 0x12345678)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: DSRAM[3] = 0xzzzzzzzz (expected 0xa5a5a5a5)
+Time: 1170746 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+[TB] ============================================================
+[TB]  PHASE 4: RUNTIME (BootROM -> ISRAM program)
+[TB] ============================================================
+[TB] Program stored its result @cyc 117075 (0 cycles after boot)
+[TB] First write to x2 @cyc 117077: 0x00028000  (BootROM lui should give 0x00028000)
+[TB] -- BootROM preamble --
+[TB]   PASS: x2 (sp) from BootROM l������ first write, before the program reused it = 0x00028000
+[TB]   (first x2 write @cyc 117077; x2 written 1 times total; x2 now = 0x00028000)
+[TB]   PASS: PC left BootROM and reached ISRAM
+[TB] -- Program register state --
+Error: [TB]   FAIL: x1 = Timer 0 base = 0x00000000 (expected 0x40001000)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: x3 = TIMER_CTRL readback = 0x00000000 (expected 0x00000009)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: x4 = DSRAM base = 0x00000000 (expected 0x00020000)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: x5 = PASS code = 0x00000000 (expected 0x00000001)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+[TB] -- MMIO path (core -> AXI -> APB -> Timer 0) --
+Error: [TB]   FAIL: Timer 0 TIMER_CTRL register = 0x00000000 (expected 0x00000009)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: Timer 0 is counting (TIMER_VAL non-zero)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check  Scope: soc_timer0_boot_run_tb.check  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 405
+[TB]   Timer 0 TIMER_VAL = 0x00000000
+[TB] -- Direct DSRAM store --
+Error: [TB]   FAIL: DSRAM[0] = program result = 0xzzzzzzzz (expected 0x00000001)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+[TB] -- Data image survived runtime --
+Error: [TB]   FAIL: DSRAM[1] sentinel intact = 0xzzzzzzzz (expected 0xcafebabe)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: DSRAM[2] sentinel intact = 0xzzzzzzzz (expected 0x12345678)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+Error: [TB]   FAIL: DSRAM[3] sentinel intact = 0xzzzzzzzz (expected 0xa5a5a5a5)
+Time: 1170945 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check_word  Scope: soc_timer0_boot_run_tb.check_word  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 417
+[TB] -- Core parked in its final loop --
+Error: [TB]   FAIL: PC parked at the final self-branch (stable AND at the right address)
+Time: 1171145 ns  Iteration: 0  Process: /soc_timer0_boot_run_tb/check  Scope: soc_timer0_boot_run_tb.check  File: C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv Line: 405
+[TB]   final PC = 0x00010008 (expected 0x00010028)   <-- frozen, not parked: pipeline is stalled
+[TB] ============================================================
+[TB]  *** 26 PASSED, 26 FAILED ***
+[TB] ============================================================
+$finish called at time : 1171245 ns : File "C:/Users/cj/AppData/Local/Temp/riscforge_xsim_20261019_timer0/RTL_SOC/soc_timer0_boot_run_tb.sv" Line 687
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:09 . Memory (MB): peak = 280.070 ; gain = 0.000
+exit
+INFO: [Common 17-206] Exiting xsim at Mon Oct 19 01:40:16 2026...

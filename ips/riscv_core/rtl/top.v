@@ -3,30 +3,27 @@
 // Module Name : top
 //
 // Description:
-//  Top-level integration of a 5-stage pipelined RISC-V processor.
+//  Top-level integration of a 5-stage pipelined RISC-V processor with Two-Level
+//  Priority Class Interrupt Architecture, Multi-Cycle Divider Abortion, and
+//  2-Deep Hardware Shadow Stack Preemption.
 //
 //  Pipeline stages:
-//      IF  → fetch_cycle
-//      ID  → decode_cycle
-//      EX  → execute_cycle
-//      MEM → memory_cycle
-//      WB  → writeback_cycle
+//      IF  -> fetch_cycle
+//      ID  -> decode_cycle
+//      EX  -> execute_cycle
+//      MEM -> memory_cycle
+//      WB  -> writeback_cycle
 //
-//  Also integrates:
-//      - Hazard unit (forwarding + stall logic)
-//
-//  Notes:
-//      - Active-low reset
-//      - All stage interconnections handled here
+//  Interrupt Subsystem:
+//      irq_gateway -> Registered pulse-capture with pulse-wins latch
+//      irq_arbiter -> Two-Level Priority Class arbiter (Real-Time > Stream > Background)
 //
 //////////////////////////////////////////////////////////////////////////////////
 
 module top #(
-    // First instruction address fetched out of reset. The RISCFORGE SoC boots
-    // from the BootROM, so it overrides this to 32'h0000_0000.
+    // First instruction address fetched out of reset.
     parameter [31:0] RESET_PC = 32'h80000000
 )(
-
     input clk,
     input rst,
 
@@ -58,7 +55,7 @@ module top #(
     // ==================================================
     // Interrupt Inputs (from SoC peripherals & CLINT)
     // ==================================================
-    input  [15:0] fast_irq_i,  // Fast local interrupts for mip[31:16] (FLI: UART=3, SPI=2, I2C=1, GPIO=0)
+    input  [15:0] fast_irq_i,  // Fast local interrupts for mip[31:16] (WD=11, UART=3, SPI=2, I2C=1, GPIO=0)
     input         timer_irq_i, // Timer interrupt for mip[7] (MTIP)
     input         ext_irq_i,   // Platform external interrupt for mip[11] (MEIP)
     input         sw_irq_i     // Software interrupt for mip[3] (MSIP)
@@ -144,13 +141,13 @@ module top #(
     wire csr_write_en_M;
     wire [11:0] csr_addr_M;
     wire [31:0] new_csr_M;
-    wire [31:0] old_csr_M;  // ✅ OLD_CSR read value from EX/MEM register
+    wire [31:0] old_csr_M;
 
     // CSR Port B write signals (after MEM/WB pipeline register)
     wire csr_write_en_W;
     wire [11:0] csr_addr_W;
     wire [31:0] new_csr_W;
-    wire [31:0] old_csr_W;  // ✅ OLD_CSR read value from MEM/WB register
+    wire [31:0] old_csr_W;
 
     wire StallF;
     wire StallD;
@@ -174,11 +171,13 @@ module top #(
 
     wire exc_valid_E;
     wire [5:0] exc_cause_E;
+    wire [1:0] exc_class_M;
     wire [31:0] exc_tval_E;
     wire [31:0] exc_pc_E;
 
     wire exc_valid_M;
     wire [5:0] exc_cause_M;
+    wire [1:0] exc_class_W;
     wire [31:0] exc_tval_M;
     wire [31:0] exc_pc_M;
 
@@ -195,103 +194,90 @@ module top #(
 
     wire [31:0] csr_mtvec_sb;
     wire [31:0] csr_mepc_sb;
-    wire [31:0] csr_mstatus_sb;  // ✅ MRET: expose mstatus for wb_trap_mret_commit_controller
+    wire [31:0] csr_mstatus_sb;
     wire [31:0] csr_mie_sb;
     wire [31:0] csr_mip_sb;
     wire        csr_mstatus_mie_sb;
-    wire [31:0] csr_mintprio_sb;
+    wire [1:0]  cur_class_sb;
+    wire [1:0]  nest_depth_sb;
 
     // =========================================================================
-    // IRQ Qualification & 16-wide Priority Encoder
+    // Two-Level Priority Class Interrupt Gateway & Arbiter
     // =========================================================================
-    // Computes active interrupts: active_irqs = mip & mie
-    // Global Machine Interrupt Enable: mstatus.MIE
-    wire [31:0] active_irqs;
-    wire        irq_valid;
+    wire [5:0]  irq_raw = {fast_irq_i[11], timer_irq_i, fast_irq_i[3:0]};
+    wire [5:0]  edge_mode = 6'b110101; // WD, Timer0, SPI, GPIO are edge-mode; UART, I2C are level-mode
+    wire [5:0]  pend_gateway;
+    wire [5:0]  clear_gateway;
+    wire        wb_commit_irq;
+
+    irq_gateway u_irq_gateway (
+        .clk_i       (clk),
+        .rst_ni      (rst),
+        .irq_raw_i   (irq_raw),
+        .edge_mode_i (edge_mode),
+        .clear_i     (clear_gateway),
+        .pend_o      (pend_gateway)
+    );
+
     wire        irq_pending;
+    wire [4:0]  irq_winner_id;
+    wire [1:0]  irq_winner_class;
     wire [30:0] irq_id;
-    reg  [4:0]  irq_cause_enc;
+    wire [30:0] trap_commit_cause;
 
-    assign active_irqs = csr_mip_sb & csr_mie_sb;
-    assign irq_valid   = |active_irqs;
-    // Hardware Priority Threshold Gate:
-    // irq_cause_enc must be strictly greater than csr_mintprio_sb (CSR 0x7C0)
-    assign irq_pending = csr_mstatus_mie_sb & irq_valid & (irq_cause_enc > csr_mintprio_sb[4:0]);
+    irq_arbiter u_irq_arbiter (
+        .clk_i           (clk),
+        .rst_ni          (rst),
+        .pend_i          (pend_gateway),
+        .mie_i           (csr_mie_sb),
+        .mstatus_mie_i   (csr_mstatus_mie_sb),
+        .cur_class_i     (cur_class_sb),
+        .nest_depth_i    (nest_depth_sb),
+        .wb_commit_i     (wb_commit_irq),
+        .wb_trap_cause_i (trap_commit_cause[4:0]),
+        .irq_pending_o   (irq_pending),
+        .irq_id_o        (irq_winner_id),
+        .irq_class_o     (irq_winner_class)
+    );
 
-    // Priority Hierarchy (16-wide Fast Local Interrupts + standard interrupts):
-    // mcause ID  Natural Priority Rank
-    // Bit 19:    UART                  (mcause 19, Rank 1 - Highest Peripheral)
-    // Bit 18:    SPI                   (mcause 18, Rank 2)
-    // Bit 17:    I2C                   (mcause 17, Rank 3)
-    // Bit 16:    GPIO                  (mcause 16, Rank 4 - Lowest Peripheral)
-    // Bit 11:    MEIP (Platform Ext)   (mcause 11)
-    // Bit 7:     MTIP (CLINT Timer)    (mcause 7,  Rank 5)
-    // Bit 3:     MSIP (CLINT Software) (mcause 3,  Rank 6 - Lowest Overall)
-    // NOTE: For future extension, custom local interrupts in bits [31:20] can be
-    // prioritized here once additional SoC peripherals are finalized.
-    always @(*) begin
-        // Reserved/Future expansion for FLI bits [31:20]:
-        if      (active_irqs[31]) irq_cause_enc = 5'd31;
-        else if (active_irqs[30]) irq_cause_enc = 5'd30;
-        else if (active_irqs[29]) irq_cause_enc = 5'd29;
-        else if (active_irqs[28]) irq_cause_enc = 5'd28;
-        else if (active_irqs[27]) irq_cause_enc = 5'd27;
-        else if (active_irqs[26]) irq_cause_enc = 5'd26;
-        else if (active_irqs[25]) irq_cause_enc = 5'd25;
-        else if (active_irqs[24]) irq_cause_enc = 5'd24;
-        else if (active_irqs[23]) irq_cause_enc = 5'd23;
-        else if (active_irqs[22]) irq_cause_enc = 5'd22;
-        else if (active_irqs[21]) irq_cause_enc = 5'd21;
-        else if (active_irqs[20]) irq_cause_enc = 5'd20;
-        // Current SoC peripherals (UART > SPI > I2C > GPIO):
-        else if (active_irqs[19]) irq_cause_enc = 5'd19; // Rank 1: UART
-        else if (active_irqs[18]) irq_cause_enc = 5'd18; // Rank 2: SPI
-        else if (active_irqs[17]) irq_cause_enc = 5'd17; // Rank 3: I2C
-        else if (active_irqs[16]) irq_cause_enc = 5'd16; // Rank 4: GPIO
-        // Standard Machine-mode interrupts:
-        else if (active_irqs[11]) irq_cause_enc = 5'd11; // MEIP (Platform External)
-        else if (active_irqs[7])  irq_cause_enc = 5'd7;  // Rank 5: MTIP (CLINT Timer)
-        else if (active_irqs[3])  irq_cause_enc = 5'd3;  // Rank 6: MSIP (CLINT Software)
-        else                      irq_cause_enc = 5'd0;
-    end
-
-    assign irq_id = {26'b0, irq_cause_enc};
+    assign irq_id = {26'b0, irq_winner_id};
 
     wire irq_flush_frontend;
 
     wire trap_commit_valid;
-    wire [30:0] trap_commit_cause;
+    wire [1:0]  trap_commit_class;
     wire [31:0] trap_commit_pc;
     wire [31:0] trap_commit_addr;
     wire trap_commit_addr_valid;
     wire trap_commit_is_interrupt;
     wire mret_commit;
 
-    // ✅ PORT C: MRET write signals (from wb_trap_mret_commit_controller)
+    // PORT C: MRET write signals
     wire csr_write_en_mret;
     wire [11:0] csr_waddr_mret;
     wire [31:0] csr_wdata_mret;
 
     wire is_M_instruction_E;
     wire [2:0] op_E;
-    wire stallMUL;        // M-extension (multiply/divide) multi-cycle stall
-    wire mem_stall_out;   // LSU / memory-bridge stall (AXI multi-cycle, SRAM wait-state)
+    wire stallMUL;        // M-extension multi-cycle stall
+    wire div_abort;       // Divider abort strobe for sub-4-cycle preemption
+    wire mem_stall_out;   // LSU memory-bridge stall
 
     wire RegWriteW_gated;
     wire csr_write_en_W_gated;
 
     wire LUISrcE;
     wire isLUIE;
-    wire illegal_instr;  // ✅ Explicit wire declaration
+    wire illegal_instr;
 
     // CSR decode-side set signal (in ID stage)
     assign csr_valid_D = (InstrD[6:0] == 7'b1110011);
     assign csr_raddr_D = InstrD[31:20];
 
-    // Detect instructions ahead of the Decode stage
-    assign pipe_busy =  RegWriteE | MemWriteE | // Indicators for EX
-                        RegWriteM | MemWriteM | // Indicators for MEM
-                        RegWriteW;              // Indicator for WB
+    // Detect instructions ahead of Decode stage
+    assign pipe_busy =  RegWriteE | MemWriteE |
+                        RegWriteM | MemWriteM |
+                        RegWriteW;
 
     // Gate architectural retirement side-effects
     assign RegWriteW_gated = RegWriteW & valid_W & ~exc_valid_W & ~mret_commit;
@@ -324,7 +310,6 @@ module top #(
         .exc_cause_D(exc_cause_D),
         .exc_tval_D(exc_tval_D),
         .exc_pc_D(exc_pc_D),
-        .imem_stall(),
         .imem_sram_en(imem_sram_en),
         .imem_sram_we(imem_sram_we),
         .imem_sram_wmask(imem_sram_wmask),
@@ -337,14 +322,10 @@ module top #(
     decode_cycle Decode (
         .clk(clk),
         .rst(rst),
+        .FlushE(FlushE | irq_flush_frontend),
         .InstrD(InstrD),
         .PCD(PCD),
         .PCPlus4D(PCPlus4D),
-        .valid_D(valid_D),
-        .exc_valid_D(exc_valid_D),
-        .exc_cause_D(exc_cause_D),
-        .exc_tval_D(exc_tval_D),
-        .exc_pc_D(exc_pc_D),
         .RegWriteW(RegWriteW_gated),
         .RDW(RDW),
         .ResultW(ResultW),
@@ -362,12 +343,10 @@ module top #(
         .PCPlus4E(PCPlus4E),
         .RS1_E(RS1_E),
         .RS2_E(RS2_E),
-        .JumpE(JumpE),
-        .lsunitE(lsunitE),
         .RS1_D(RS1_D),
         .RS2_D(RS2_D),
-        .FlushE(FlushE),
-        .StallE(StallE),
+        .lsunitE(lsunitE),
+        .JumpE(JumpE),
         .LUISrcE(LUISrcE),
         .isLUIE(isLUIE),
         .illegal_instr(illegal_instr),
@@ -377,6 +356,12 @@ module top #(
         .csr_raddr_E(csr_raddr_E),
         .rd_index_E(rd_index_E),
         .is_mret_E(is_mret_E),
+        .StallE(StallE),
+        .valid_D(valid_D),
+        .exc_valid_D(exc_valid_D),
+        .exc_cause_D(exc_cause_D),
+        .exc_tval_D(exc_tval_D),
+        .exc_pc_D(exc_pc_D),
         .valid_E(valid_E),
         .exc_valid_E(exc_valid_E),
         .exc_cause_E(exc_cause_E),
@@ -413,7 +398,9 @@ module top #(
         .is_mret_E(is_mret_E),
         .irq_pending_i(irq_pending),
         .irq_id_i(irq_id),
+        .irq_class_i(irq_winner_class),
         .irq_flush_frontend_o(irq_flush_frontend),
+        .div_abort_o(div_abort),
         .PCSrcE(PCSrcE),
         .PCTargetE(PCTargetE),
         .RegWriteM(RegWriteM),
@@ -433,6 +420,7 @@ module top #(
         .valid_M(valid_M),
         .exc_valid_M(exc_valid_M),
         .exc_cause_M(exc_cause_M),
+        .exc_class_M(exc_class_M),
         .exc_tval_M(exc_tval_M),
         .exc_pc_M(exc_pc_M),
         .is_mret_M(is_mret_M),
@@ -469,6 +457,7 @@ module top #(
         .valid_M(valid_M),
         .exc_valid_M(exc_valid_M),
         .exc_cause_M(exc_cause_M),
+        .exc_class_M(exc_class_M),
         .exc_tval_M(exc_tval_M),
         .exc_pc_M(exc_pc_M),
         .is_mret_M(is_mret_M),
@@ -478,7 +467,7 @@ module top #(
         .csr_addr_M(csr_addr_M),
         .new_csr_M(new_csr_M),
         .old_csr_M(old_csr_M),
-        // LSU stall — routed to hazard unit to freeze IF/ID/EX and MEM→WB register
+        // LSU stall
         .mem_stall_out(mem_stall_out),
         // LSU Memory Interface
         .lsu_mem_req(lsu_mem_req),
@@ -500,6 +489,7 @@ module top #(
         .valid_W(valid_W),
         .exc_valid_W(exc_valid_W),
         .exc_cause_W(exc_cause_W),
+        .exc_class_W(exc_class_W),
         .exc_tval_W(exc_tval_W),
         .exc_pc_W(exc_pc_W),
         .is_mret_W(is_mret_W),
@@ -526,6 +516,7 @@ module top #(
         .valid_W(valid_W),
         .exc_valid_W(exc_valid_W),
         .exc_cause_W(exc_cause_W),
+        .exc_class_W(exc_class_W),
         .exc_tval_W(exc_tval_W),
         .exc_pc_W(exc_pc_W),
         .is_mret_W(is_mret_W),
@@ -538,10 +529,13 @@ module top #(
         .flush_pipeline_onehot_o(flush_pipeline_onehot),
         .trap_valid_o(trap_commit_valid),
         .trap_cause_o(trap_commit_cause),
+        .trap_class_o(trap_commit_class),
         .trap_pc_o(trap_commit_pc),
         .trap_addr_o(trap_commit_addr),
         .trap_addr_valid_o(trap_commit_addr_valid),
         .trap_is_interrupt_o(trap_commit_is_interrupt),
+        .clear_gateway_o(clear_gateway),
+        .wb_commit_irq_o(wb_commit_irq),
         .csr_write_en_mret_o(csr_write_en_mret),
         .csr_waddr_mret_o(csr_waddr_mret),
         .csr_wdata_mret_o(csr_wdata_mret),
@@ -549,8 +543,11 @@ module top #(
     );
 
     // ====================================
-    // CSR Regfile (Performance Counters + Interrupts)
+    // CSR Regfile (Performance Counters + Interrupts + Shadow Stack)
     // ====================================
+    wire [15:0] fast_intr_core = {4'b0, pend_gateway[5], 7'b0, pend_gateway[3:0]};
+    wire        timer_intr_core = pend_gateway[4];
+
     csr_regfile #(.XLEN(32)) csr_file (
         .clk_i(clk),
         .rst_n_i(rst),
@@ -562,26 +559,30 @@ module top #(
         .csr_waddr_mret_i(csr_waddr_mret),
         .csr_wdata_mret_i(csr_wdata_mret),
         .csr_write_en_mret_i(csr_write_en_mret),
+        .mret_commit_i(mret_commit),
         .trap_valid_i(trap_commit_valid),
         .trap_cause_i(trap_commit_cause),
+        .trap_class_i(trap_commit_class),
         .trap_pc_i(trap_commit_pc),
         .trap_addr_i(trap_commit_addr),
         .trap_addr_valid_i(trap_commit_addr_valid),
         .trap_is_interrupt_i(trap_commit_is_interrupt),
         
-        .instr_retired_i(valid_W & ~exc_valid_W), // Increment minstret on retirement
+        .instr_retired_i(valid_W & ~exc_valid_W),
         
-        .timer_intr_i(timer_irq_i),
+        .timer_intr_i(timer_intr_core),
         .ext_intr_i(ext_irq_i),
         .msft_intr_i(sw_irq_i),
-        .fast_intr_i(fast_irq_i),
+        .fast_intr_i(fast_intr_core),
         .mtvec_out_o(csr_mtvec_sb),
         .mie_out_o(csr_mie_sb),
         .mip_out_o(csr_mip_sb),
         .mstatus_mie_out_o(csr_mstatus_mie_sb),
         .mepc_out_o(csr_mepc_sb),
+        .mcause_out_o(),
         .mstatus_out_o(csr_mstatus_sb),
-        .mintprio_out_o(csr_mintprio_sb)
+        .cur_class_o(cur_class_sb),
+        .nest_depth_o(nest_depth_sb)
     );
 
     // ---------------- Hazard ----------------

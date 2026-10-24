@@ -1,0 +1,377 @@
+% =============================================================================
+% Chapter 10: APB Peripheral Testbench Guide
+% =============================================================================
+\chapter{APB Peripheral Testbench Guide}
+\label{ch:apb_guide}
+
+This chapter extends the SPI master verification methodology to other APB peripherals in the same
+design family, including APB Timer, APB GPIO, APB UART, and similar blocks. The goal is to provide
+a reusable framework that minimizes testbench development time for each new peripheral.
+
+\section{APB Protocol Fundamentals}
+
+All peripherals in this SoC use the AMBA 3 APB (Advanced Peripheral Bus) protocol. Understanding
+the protocol is essential for building correct testbenches.
+
+\subsection{APB Signal Definitions}
+
+\begin{table}[H]
+\centering
+\caption{APB Signal Definitions (Common to All APB Peripherals)}
+\label{tab:apb_signals_def}
+\begin{tabularx}{\textwidth}{@{}lclX@{}}
+\toprule
+\textbf{Signal} & \textbf{Direction} & \textbf{Width} & \textbf{Description} \\
+\midrule
+\texttt{PCLK / HCLK}  & Input  & 1  & APB clock (system clock). All transfers are synchronous to this. \\
+\texttt{PRESETn / HRESETn} & Input & 1 & Active-low reset. All registers clear on assertion. \\
+\texttt{PADDR}   & Input  & N  & Byte address of the target register. Width varies by peripheral (typically 8--12 bits). \\
+\texttt{PSEL}    & Input  & 1  & Peripheral select. Asserted for 2 clock cycles per transfer. \\
+\texttt{PENABLE} & Input  & 1  & Access phase enable. Low during setup phase, high during access phase. \\
+\texttt{PWRITE}  & Input  & 1  & Transfer direction: 1 = write, 0 = read. \\
+\texttt{PWDATA}  & Input  & 32 & Write data from master to slave. \\
+\texttt{PRDATA}  & Output & 32 & Read data from slave to master. \\
+\texttt{PREADY}  & Output & 1  & Slave ready. 1 = transfer completes this cycle. \\
+\texttt{PSLVERR} & Output & 1  & Slave error. 1 = transfer error (rarely used). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{APB Transfer Timing}
+
+Every APB transfer takes exactly two phases:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Setup Phase} (1 clock cycle): Master asserts \texttt{PSEL=1}, \texttt{PENABLE=0},
+        drives \texttt{PADDR}, \texttt{PWRITE}, and \texttt{PWDATA} (for writes).
+  \item \textbf{Access Phase} (1 clock cycle): Master asserts \texttt{PENABLE=1}. The slave
+        samples write data or provides read data. If \texttt{PREADY=1}, the transfer completes.
+        If \texttt{PREADY=0}, the access phase extends until \texttt{PREADY} goes high.
+\end{enumerate}
+
+\begin{verbatim}
+PCLK:    _/‾\_/‾\_/‾\_/‾\
+PSEL:    ____/‾‾‾‾‾‾‾\____
+PENABLE: ________/‾‾‾\____
+PADDR:   ----<ADDR>--------
+PWDATA:  ----<DATA>--------   (write)
+PRDATA:  --------<DATA>----   (read, valid when PENABLE & PREADY)
+PREADY:  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾   (always 1 for simple peripherals)
+\end{verbatim}
+
+\subsection{APB Read Timing Considerations}
+
+For peripherals with FIFO read ports (SPI, UART, etc.), the read data must be sampled at the
+clock edge during the access phase, \emph{before} any simulation delay (\texttt{\#1}). This is
+because the FIFO read pointer advances on the same edge via non-blocking assignment.
+
+For peripherals with simple register reads (Timer, GPIO), this timing is less critical because
+the register value does not change as a side effect of reading.
+
+\section{Reusable Testbench Template}
+
+The following template shows the common structure for any APB peripheral testbench. Only the
+peripheral-specific sections (marked with comments) need to change between peripherals.
+
+\begin{lstlisting}[caption={Reusable APB Peripheral Testbench Template},label={lst:template}]
+`timescale 1ns/1ps
+module tb_apb_<peripheral>;
+
+    parameter APB_ADDR_WIDTH = 12;
+    parameter CLK_PERIOD = 10;
+
+    // === APB signals (COMMON - same for all peripherals) ===
+    logic                      HCLK, HRESETn;
+    logic [APB_ADDR_WIDTH-1:0] PADDR;
+    logic               [31:0] PWDATA, PRDATA;
+    logic                      PWRITE, PSEL, PENABLE;
+    logic                      PREADY, PSLVERR;
+
+    // === Peripheral-specific signals (CHANGE PER IP) ===
+    // For Timer: logic [31:0] timer_val; logic timer_irq;
+    // For GPIO:  logic [31:0] gpio_in, gpio_out, gpio_dir;
+    // For UART:  logic uart_tx, uart_rx;
+    // For SPI:   logic spi_clk, spi_csn*, spi_sdo*, spi_sdi*;
+
+    // === DUT instantiation (CHANGE PER IP) ===
+    apb_<peripheral> #(...) dut (...);
+
+    // === Clock generation (COMMON) ===
+    initial HCLK = 0;
+    always #(CLK_PERIOD/2) HCLK = ~HCLK;
+
+    // === Pass/fail counters (COMMON) ===
+    int pass_cnt = 0, fail_cnt = 0;
+
+    // === APB BFM tasks (COMMON - reuse without changes) ===
+    function automatic logic [APB_ADDR_WIDTH-1:0]
+        reg_addr(input logic [3:0] idx);
+        return {6'h0, idx, 2'b00};
+    endfunction
+
+    task automatic apb_write(...);  // Same as SPI testbench
+    task automatic apb_read(...);   // Same as SPI testbench
+    task automatic check(...);      // Same as SPI testbench
+
+    // === Peripheral-specific BFM (CHANGE PER IP) ===
+    // For Timer: no BFM needed, just wait for interrupts
+    // For GPIO:  drive gpio_in, monitor gpio_out
+    // For UART:  serial TX/RX BFM tasks
+    // For SPI:   slave BFM (see Chapter 3)
+
+    // === Test sequence (CHANGE PER IP) ===
+    initial begin
+        // Reset
+        PADDR = '0; PWDATA = '0; PWRITE = 0; PSEL = 0; PENABLE = 0;
+        HRESETn = 0;
+        repeat(5) @(posedge HCLK);
+        HRESETn = 1;
+        repeat(3) @(posedge HCLK);
+
+        // TC1: Reset check (COMMON pattern)
+        // TC2: Register read-back (COMMON pattern)
+        // TC3+: Functional tests (PERIPHERAL SPECIFIC)
+
+        // Summary (COMMON)
+        $display("PASSED: %0d / FAILED: %0d", pass_cnt, fail_cnt);
+        $finish;
+    end
+
+    // === Watchdog (COMMON) ===
+    initial begin #10_000_000; $display("TIMEOUT!"); $finish; end
+
+    // === Waveform dump (COMMON) ===
+    initial begin $recordfile("waves.trn"); $recordvars(); end
+endmodule
+\end{lstlisting}
+
+\section{Applying the Template to APB Timer}
+
+An APB Timer peripheral typically has:
+\begin{itemize}[leftmargin=2em]
+  \item A control register (enable, mode, prescaler).
+  \item A compare/match register.
+  \item A counter register (read-only or read/write).
+  \item An interrupt status/clear register.
+  \item An interrupt output signal.
+\end{itemize}
+
+\subsection{Timer Testcase Structure}
+
+\begin{table}[H]
+\centering
+\caption{Example Testcases for APB Timer}
+\label{tab:timer_tc}
+\begin{tabularx}{\textwidth}{@{}clX@{}}
+\toprule
+\textbf{TC} & \textbf{Name} & \textbf{What to Verify} \\
+\midrule
+TC1 & Reset & Counter = 0, control = 0, interrupt = 0 after reset. \\
+TC2 & Register R/W & Write prescaler, compare value; read back and verify. \\
+TC3 & Basic count & Enable timer, wait N cycles, read counter, verify it incremented. \\
+TC4 & Compare match & Set compare value, enable timer, wait for interrupt, verify timing. \\
+TC5 & Prescaler & Set prescaler, verify counter increments at divided rate. \\
+TC6 & Interrupt clear & After match interrupt, write clear register, verify interrupt deasserts. \\
+TC7 & Reload/wrap & Verify counter wraps or reloads after reaching compare value. \\
+TC8 & Disable & Disable timer mid-count, verify counter stops. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Timer Signal Observation}
+
+Monitor the same APB bus signals as SPI, plus:
+\begin{itemize}[leftmargin=2em]
+  \item Timer counter value (hierarchical access to internal counter register).
+  \item Compare match flag.
+  \item Interrupt output.
+  \item Prescaler counter (to verify divided clock).
+\end{itemize}
+
+\section{Applying the Template to APB GPIO}
+
+An APB GPIO peripheral typically has:
+\begin{itemize}[leftmargin=2em]
+  \item Direction register (input/output per pin).
+  \item Output data register.
+  \item Input data register (read-only).
+  \item Interrupt enable, edge-select, and status registers.
+\end{itemize}
+
+\subsection{GPIO Testcase Structure}
+
+\begin{table}[H]
+\centering
+\caption{Example Testcases for APB GPIO}
+\label{tab:gpio_tc}
+\begin{tabularx}{\textwidth}{@{}clX@{}}
+\toprule
+\textbf{TC} & \textbf{Name} & \textbf{What to Verify} \\
+\midrule
+TC1 & Reset & All outputs tri-stated or low, direction = input. \\
+TC2 & Register R/W & Write direction and output registers; read back. \\
+TC3 & Output drive & Set pin as output, write value, verify on gpio\_out port. \\
+TC4 & Input read & Drive gpio\_in externally, read input register, verify match. \\
+TC5 & Direction switch & Change pin from input to output and back; verify behavior. \\
+TC6 & Edge interrupt & Enable rising-edge interrupt, toggle gpio\_in, verify interrupt fires. \\
+TC7 & Interrupt clear & After interrupt, write clear, verify interrupt deasserts. \\
+TC8 & Multiple pins & Verify independent operation of multiple GPIO pins simultaneously. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{GPIO BFM}
+
+The GPIO BFM is simpler than the SPI slave BFM---it just drives the \texttt{gpio\_in} bus:
+\begin{lstlisting}
+logic [31:0] gpio_in_drive = '0;
+assign gpio_in = gpio_in_drive;
+// In testcase: gpio_in_drive = 32'h0000_00A5;
+\end{lstlisting}
+
+\section{Applying the Template to APB UART}
+
+An APB UART peripheral typically has:
+\begin{itemize}[leftmargin=2em]
+  \item TX data register (write to transmit).
+  \item RX data register (read to receive).
+  \item Baud rate divisor register.
+  \item Status register (TX empty, RX full, overrun, etc.).
+  \item Control register (enable, parity, stop bits).
+  \item TX/RX FIFOs.
+\end{itemize}
+
+\subsection{UART Testcase Structure}
+
+\begin{table}[H]
+\centering
+\caption{Example Testcases for APB UART}
+\label{tab:uart_tc}
+\begin{tabularx}{\textwidth}{@{}clX@{}}
+\toprule
+\textbf{TC} & \textbf{Name} & \textbf{What to Verify} \\
+\midrule
+TC1 & Reset & TX idle (high), status shows empty, no errors. \\
+TC2 & Register R/W & Write baud divisor, control register; read back. \\
+TC3 & TX single byte & Write byte to TXFIFO, verify serial output matches. \\
+TC4 & RX single byte & Drive serial input with known byte, read RXFIFO, verify. \\
+TC5 & Loopback & Connect TX to RX, send byte, verify receive. \\
+TC6 & Baud rate & Verify bit timing matches baud rate divisor setting. \\
+TC7 & FIFO depth & Fill TX FIFO, verify backpressure behavior. \\
+TC8 & RX interrupt & Enable RX interrupt, receive byte, verify interrupt fires. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{UART BFM}
+
+A UART serial BFM is needed to drive \texttt{uart\_rx} with properly timed serial data:
+\begin{lstlisting}
+task uart_send_byte(input logic [7:0] data);
+    integer i;
+    uart_rx = 1'b0;  // Start bit
+    #(baud_period);
+    for (i = 0; i < 8; i++) begin
+        uart_rx = data[i];  // LSB first
+        #(baud_period);
+    end
+    uart_rx = 1'b1;  // Stop bit
+    #(baud_period);
+endtask
+\end{lstlisting}
+
+\section{Common Testcase Patterns Across All APB Peripherals}
+
+The following testcase patterns are universal and should be included in every APB peripheral
+testbench:
+
+\subsection{Pattern 1: Reset Verification}
+
+After releasing reset, verify:
+\begin{itemize}[leftmargin=2em]
+  \item All control registers are at their default values.
+  \item All status registers show idle/safe state.
+  \item All output ports are in their default (safe) state.
+  \item No interrupts are asserted.
+  \item \texttt{PSLVERR} is 0.
+\end{itemize}
+
+\subsection{Pattern 2: Register Read-Back}
+
+For every read/write register:
+\begin{itemize}[leftmargin=2em]
+  \item Write a known pattern (e.g., 0xA5A5A5A5, 0x5A5A5A5A, 0xFFFFFFFF, 0x00000000).
+  \item Read back and verify each bit field.
+  \item Check that read-only fields are not affected by writes.
+  \item Check that reserved fields read as zero.
+\end{itemize}
+
+\subsection{Pattern 3: Basic Functional Operation}
+
+Perform the simplest possible functional operation:
+\begin{itemize}[leftmargin=2em]
+  \item Timer: Enable, wait, check counter > 0.
+  \item GPIO: Set output, check pin.
+  \item UART: Send byte, check serial output.
+  \item SPI: Write data, check EOT.
+\end{itemize}
+
+\subsection{Pattern 4: Interrupt Verification}
+
+For every interrupt source:
+\begin{enumerate}[leftmargin=2em]
+  \item Verify no interrupt before enabling.
+  \item Enable the interrupt.
+  \item Create the trigger condition.
+  \item Verify interrupt asserts.
+  \item Clear the interrupt.
+  \item Verify interrupt deasserts.
+  \item Verify no spurious re-assertion.
+\end{enumerate}
+
+\subsection{Pattern 5: Software Reset}
+
+If the peripheral supports software reset:
+\begin{itemize}[leftmargin=2em]
+  \item Configure the peripheral.
+  \item Load FIFOs or start an operation.
+  \item Issue software reset.
+  \item Verify the peripheral returns to the post-reset state.
+\end{itemize}
+
+\section{Signal Observation Method (Common to All APB Peripherals)}
+
+The same signal-observation methodology used for the SPI master applies to all APB peripherals:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{APB bus signals:} PADDR, PWDATA, PRDATA, PWRITE, PSEL, PENABLE---always monitor
+        these to verify correct register addressing and data transfer.
+  \item \textbf{Control registers:} Use hierarchical access to monitor internal register values
+        and verify they match APB writes.
+  \item \textbf{Status flags:} Monitor status register bits to track peripheral state transitions.
+  \item \textbf{Output ports:} Verify that physical outputs (SPI clock, GPIO pins, UART TX)
+        match expected behavior.
+  \item \textbf{Interrupt outputs:} Monitor for correct assertion, deassertion, and absence of
+        spurious pulses.
+  \item \textbf{Internal counters:} Use analog waveform display for counters to quickly verify
+        counting behavior.
+  \item \textbf{FIFO levels:} Monitor element counts to verify push/pop operations.
+\end{enumerate}
+
+\section{Reusability Checklist}
+
+When creating a testbench for a new APB peripheral, follow this checklist:
+
+\begin{enumerate}[leftmargin=2em]
+  \item[$\square$] Copy the template from Section~10.2.
+  \item[$\square$] Update the DUT instantiation and peripheral-specific signals.
+  \item[$\square$] Update the register address defines.
+  \item[$\square$] Implement TC1 (reset check) using the common pattern.
+  \item[$\square$] Implement TC2 (register read-back) for all registers.
+  \item[$\square$] Implement functional testcases specific to the peripheral.
+  \item[$\square$] Implement interrupt testcases using the common pattern.
+  \item[$\square$] Add hierarchical probes for key internal signals.
+  \item[$\square$] Run with waveform dump enabled.
+  \item[$\square$] Verify all checks pass.
+  \item[$\square$] Document results in a report following this template.
+\end{enumerate}

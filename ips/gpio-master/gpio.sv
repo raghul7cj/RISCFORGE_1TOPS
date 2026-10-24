@@ -116,11 +116,18 @@ module gpio #(
   assign s_hw2reg.info.version.d = HW_VERSION;
   assign s_hw2reg.info.gpio_cnt.d = NrGPIOs[9:0];
 
+  // Per-GPIO sampling enable (GPIO_EN register)
+  logic [NrGPIOs-1:0]        s_gpio_en;
+
   // Mask interrupts
   assign s_gpio_rise_intrpt = s_gpio_rise_edge & s_gpio_rise_intrpt_mask;
   assign s_gpio_fall_intrpt = s_gpio_fall_edge & s_gpio_fall_intrpt_mask;
-  assign s_gpio_high_intrpt = s_gpio_in_sync & s_gpio_high_intrpt_mask;
-  assign s_gpio_low_intrpt = ~s_gpio_in_sync & s_gpio_low_intrpt_mask;
+  // The level sensitive interrupts are additionally qualified with s_gpio_en.
+  // A disabled GPIO freezes s_gpio_in_sync at its reset value 0, which would
+  // otherwise raise a level-low interrupt on a disabled pin that is driven
+  // high. The edge interrupts are already qualified inside gpio_input_stage.
+  assign s_gpio_high_intrpt = s_gpio_in_sync & s_gpio_high_intrpt_mask & s_gpio_en;
+  assign s_gpio_low_intrpt = ~s_gpio_in_sync & s_gpio_low_intrpt_mask & s_gpio_en;
 
   // Generate combined interrupt signal that combines all enabled interrupts for
   // each GPIO
@@ -138,6 +145,9 @@ module gpio #(
 
   // Instantiate logic for individual gpios in blocks of DATA_WIDTH
   for (genvar gpio_idx = 0; gpio_idx < NrGPIOs; gpio_idx++) begin : gen_gpios
+      // Wire the per-GPIO sampling enable used to mask the level interrupts
+      assign s_gpio_en[gpio_idx] = s_reg2hw.gpio_en[gpio_idx].q;
+
       // Instantiate synchronizer to synchronize input to sampling clock
       gpio_input_stage #(
         .NrSyncStages(2)
@@ -208,15 +218,24 @@ module gpio #(
     always_comb begin
       `assert_condition({s_reg2hw.intrpt_status[gpio_idx].qe && s_reg2hw.intrpt_status[gpio_idx].q}, rst_ni);
       //If we clear the aggregated, clear all individual interrupt status registers for the corresponding block of
-      //GPIOs
+      //GPIOs.
+      //
+      //An interrupt arriving on the same clock edge as the clear is kept rather
+      //than discarded: each status bit is written with the incoming event instead
+      //of '0. Previously the clear branch never looked at the new event, so an
+      //edge coincident with an INTRPT_STATUS write was lost. This is the
+      //aggregated-clear counterpart of the hardware-set-wins change in
+      //prim_subreg_arb.sv (gen_w1c), which covers the per-type status
+      //registers; that change cannot help here because this path reaches the
+      //status registers as a hardware write (de=1), not a software W1C.
       if (s_reg2hw.intrpt_status[gpio_idx].qe & (s_reg2hw.intrpt_status[gpio_idx].q == 1)) begin
-        s_hw2reg.intrpt_rise_status[gpio_idx].d      = '0;
+        s_hw2reg.intrpt_rise_status[gpio_idx].d      = s_gpio_rise_intrpt[gpio_idx];
         s_hw2reg.intrpt_rise_status[gpio_idx].de     = 1'b1;
-        s_hw2reg.intrpt_fall_status[gpio_idx].d      = '0;
+        s_hw2reg.intrpt_fall_status[gpio_idx].d      = s_gpio_fall_intrpt[gpio_idx];
         s_hw2reg.intrpt_fall_status[gpio_idx].de     = 1'b1;
-        s_hw2reg.intrpt_lvl_high_status[gpio_idx].d  = '0;
+        s_hw2reg.intrpt_lvl_high_status[gpio_idx].d  = s_gpio_high_intrpt[gpio_idx];
         s_hw2reg.intrpt_lvl_high_status[gpio_idx].de = 1'b1;
-        s_hw2reg.intrpt_lvl_low_status[gpio_idx].d   = '0;
+        s_hw2reg.intrpt_lvl_low_status[gpio_idx].d   = s_gpio_low_intrpt[gpio_idx];
         s_hw2reg.intrpt_lvl_low_status[gpio_idx].de  = 1'b1;
       end else begin
         // Set new bits of the the individual status registers when an interrupt

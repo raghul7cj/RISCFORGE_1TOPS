@@ -1,0 +1,63 @@
+Vivado Simulator v2022.2
+Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2022.2/bin/unwrapped/win64.o/xelab.exe tb_smoke_irq -s sim_smoke -timescale 1ns/1ps -debug typical 
+Multi-threading is on. Using 14 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:174]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:175]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:176]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:177]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:178]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:179]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:186]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:187]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:188]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:189]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:195]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:196]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:204]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:205]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:211]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:218]
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 6 for port 'shift' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/rv32m_mul.v:80]
+WARNING: [VRFC 10-3645] port 'imem_stall' remains unconnected for this instance [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/top.v:293]
+WARNING: [VRFC 10-3645] port 'csr_valid_o' remains unconnected for this instance [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/top.v:551]
+WARNING: [VRFC 10-3645] port 'Zero' remains unconnected for this instance [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/draft_irq/rtl/execute_cycle.v:258]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module work.irq_gateway
+Compiling module work.irq_arbiter
+Compiling module work.rv32m_div
+Compiling module work.PC(RESET_PC=32'b0)
+Compiling module work.PC_Adder
+Compiling module work.imem_controller
+Compiling module work.fetch_cycle(RESET_PC=32'b0)
+Compiling module work.opcode_check
+Compiling module work.Main_Decoder
+Compiling module work.ALU_Decoder
+Compiling module work.Control_Unit_Top
+Compiling module work.Register_File
+Compiling module work.Sign_Extend
+Compiling module work.decode_cycle
+Compiling module work.Mux_3_by_1
+Compiling module work.Mux2
+Compiling module work.ALU
+Compiling module work.JB_unit
+Compiling module work.booth_enc
+Compiling module work.pp_gen
+Compiling module work.csa
+Compiling module work.rv32m_mul_default
+Compiling module work.rv32m_unit
+Compiling module work.execute_cycle
+Compiling module work.ls_unit
+Compiling module work.memory_cycle
+Compiling module work.writeback_cycle
+Compiling module work.wb_trap_mret_commit_controller
+Compiling module work.csr_regfile
+Compiling module work.hazard_unit
+Compiling module work.top(RESET_PC=32'b0)
+Compiling module work.tb_smoke_irq
+Built simulation snapshot sim_smoke

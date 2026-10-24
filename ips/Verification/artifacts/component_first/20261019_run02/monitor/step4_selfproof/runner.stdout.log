@@ -1,0 +1,189 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_pkg.sv" into library work
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_disasm.sv" into library work
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_hub.sv" into library work
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_reporter.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_reporter
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_axi_sva
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_apb_sva
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_path_scoreboard.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_path_scoreboard
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_fault_inject.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_fault_inject
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_disasm_tb.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_disasm_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_smoke_tb.sv" into library work
+INFO: [VRFC 10-311] analyzing module step4_smoke_tb
+INFO: [VRFC 10-311] analyzing module step4_apb_bridge_model
+INFO: [VRFC 10-311] analyzing module step4_apb_slave
+Vivado Simulator v2022.2
+Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2022.2/bin/unwrapped/win64.o/xelab.exe step4_disasm_tb -s dec_tb 
+Multi-threading is on. Using 14 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package work.step4_disasm_pkg
+Compiling module work.step4_disasm_tb
+Built simulation snapshot dec_tb
+step4_disasm_tb -- failure-report disassembler
+31 passed, 0 failed
+RESULT : PASS
+Vivado Simulator v2022.2
+Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2022.2/bin/unwrapped/win64.o/xelab.exe step4_smoke_tb -s step4_sim --debug typical 
+Multi-threading is on. Using 14 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 1 differs from formal bit length 32 for port 'pwrite_i' [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_smoke_tb.sv:105]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:139]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:154]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:170]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:186]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:205]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:215]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:230]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:245]
+WARNING: [VRFC 10-8864] concatenation with an unsized literal will be treated as 32 bits [C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv:256]
+Completed static elaboration
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 206 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 220 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 234 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 262 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 314 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 355 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 376 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 391 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 427 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_axi_sva.sv" Line 442 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 141 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 141 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 141 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 141 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 141 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 141 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 156 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 156 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 156 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 156 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 156 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 156 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 176 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 192 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 176 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 192 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 176 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 192 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 176 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 192 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 176 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 192 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 176 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 192 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 207 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 217 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 207 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 217 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 207 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 217 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 207 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 217 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 207 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 217 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 207 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 217 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 232 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 232 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 232 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 232 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 232 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 232 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 259 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 259 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 259 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 259 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 259 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 248 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 259 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 272 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 273 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+WARNING: [XSIM 43-4127] File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_apb_sva.sv" Line 295 : The "System Verilog Cover" is not supported yet for simulation. The statement will be ignored.
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package work.step4_bus_pkg
+Compiling package work.step4_pkg
+Compiling package work.step4_fault_inject_pkg
+Compiling package work.step4_disasm_pkg
+Compiling module work.step4_hub_default
+Compiling module work.step4_apb_bridge_model_default
+Compiling module work.step4_apb_slave
+Compiling module work.step4_apb_slave(SLOT=1)
+Compiling module work.step4_apb_slave(SLOT=2)
+Compiling module work.step4_apb_slave(SLOT=3)
+Compiling module work.step4_apb_slave(SLOT=4)
+Compiling module work.step4_apb_slave(SLOT=5)
+Compiling module work.step4_reporter(hub=step4_hub_def...
+WARNING: [XSIM 43-3373] "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/step4_reporter.sv" Line 68. System function $value$plusargs is used as system task. This system function should have a LHS e.g. x=$value$plusargs().
+Compiling module work.step4_fault_inject
+Compiling module work.step4_axi_sva(PORT_NAME="bridge-...
+Compiling module work.step4_apb_sva(hub=step4_hub_defa...
+Compiling module work.step4_path_scoreboard(hub=step4_...
+Compiling module work.step4_smoke_tb
+Built simulation snapshot step4_sim
+RISCFORGE Step 4 -- checker self-proof
+[STEP4] PHASE 1 traffic: lsu=17 awr=8 ard=9 apb=14
+[STEP4] PHASE 1 PASS : 0 findings on clean traffic
+[STEP4] FI             strobe/apb ->    PATH-3007 OK
+[STEP4] FI             strobe/axi ->    PATH-3007 OK
+[STEP4] FI             wait-state ->     APB-2004 OK
+[STEP4] FI         parity-trigger ->    PATH-3009 OK
+[STEP4] FI        timeout-trigger ->    PATH-3008 OK
+[STEP4] FI        paddr-corruptor ->    PATH-3005 OK
+[STEP4] FI               axi-addr ->    PATH-3001 OK
+[STEP4] FI        pwrite-data/apb ->    PATH-3006 OK
+[STEP4] FI        pwrite-data/axi ->    PATH-3006 OK
+[STEP4] FI         pread-data/apb ->    PATH-3008 OK
+[STEP4] FI          resp/unmapped ->    PATH-3014 OK
+STEP 4 SELF-PROOF : phase1_findings=0  fi_pass=11  fi_fail=0
+RESULT : PASS  -- every injected fault was named by the right check
+================================================================================
+  test            : resp/unmapped
+  time / cycle    : 8135000 ps   /  810
+  VERDICT         : *** BLAME = PATH  (check PATH-3014) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : an unmapped MMIO address (0x40006000) returns RESP_DECERR
+  actual          : returned OKAY
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   801  LSU  R addr=0x40006000 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   801  AXI  R addr=0x40006000 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   803  AXR  R addr=0x40006000 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (0 of 16 retained)
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
