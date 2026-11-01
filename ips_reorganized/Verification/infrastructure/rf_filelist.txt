@@ -1,0 +1,341 @@
+# =============================================================================
+# RISCFORGE 1TOPS -- SoC-Level Verification Compile Manifest
+# =============================================================================
+#
+# SINGLE SOURCE OF TRUTH for the compile list of the SoC-level testbench.
+# Consumed by gen_filelists.py, which emits the tool-specific lists:
+#
+#   Verification/build/xsim/soc_verification.f   -> xvlog -f   (local Windows)
+#                                                    also vcs -f / xrun -f
+#   Verification/build/xsim/soc_verification.prj -> xelab -prj (Vivado IDE project)
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# The two hand-written lists that used to drive this flow (RTL_SOC/soc_subsystem.f
+# and Verification/infrastructure/soc_verification.f) were both authored against
+# the REMOTE VLSI tree at /home/iiita/MALAY_SOC/rtl/, whose directory layout does
+# not match this repository:
+#
+#   remote MALAY_SOC/rtl/          this repo (rtl/ips/)      remap
+#   ------------------------       ---------------------     ---------------------------
+#   RTL_SOC/rtl/<f>.sv             RTL_SOC/<f>.sv            drop the rtl/ level
+#   SOC_FILES/include/apb          apb_uart-main/include/apb
+#   SOC_FILES/include/obi          apb_uart-main/include/obi
+#   SOC_FILES/include/common_cells apb_uart-main/include/common_cells
+#   SOC_FILES/include/axi          apb_uart-main/include/axi
+#   SOC_FILES/include/register_interface  *** ABSENT ***
+#   uart/rtl/apb_uart.sv           apb_uart-main/rtl/apb_uart.sv
+#   spi/spi_master/                spi_master_ip/spi_master/
+#   apb_timer/apb_timer/           apb_timer-master/rtl/
+#   apb_i2c-master/rtl/            apb_i2c-master/
+#   axi_lite_to_apb/rtl/           axi_lite_to_apb/
+#   bootloader/rtl/bootloader.sv   bootloader/bootloader.sv
+#   axi_lite_xbar/                 axi_lite_xbar/            (unchanged)
+#   riscv_core/rtl/                riscv_core/rtl/           (unchanged)
+#   gpio-master/                   gpio-master/              (unchanged)
+#   bus_monitors/                  bus_monitors/             (unchanged)
+#   instr_module/                  instr_module/             (unchanged)
+#
+# That drift is the sole cause of the elaboration failures: every source path in
+# the old lists resolved nowhere. Both remaps above and the dead-OBI-UART removal
+# below are validated by a clean 85-file compile in AMD Vivado XSim 2022.2.
+#
+# The `include directives inside the IP sources name their containing directory
+# (e.g. "apb/typedef.svh", "axi/assign.svh", "common_cells/registers.svh"), so
+# BOTH the leaf directories and their PARENT must appear as INCDIR entries.
+#
+# ALL PATHS ARE RELATIVE TO THE REPOSITORY ROOT -- the directory that contains
+# Verification/, RTL_SOC/, riscv_core/, axi_lite_xbar/, apb_uart-main/, ...
+# (two levels above this file). gen_filelists.py resolves them to absolute paths
+# before emitting, so the emitted lists behave identically under Windows XSim and
+# Linux VCS/Xcelium regardless of the tool's working directory.
+#
+# DIRECTIVES
+#   INCDIR  <path>       include search directory
+#   SRC     <path>       required SystemVerilog source, in compile order
+#   VSRC    <path>       required Verilog (non-SystemVerilog) source
+#   OPT     <path>       optional source: compiled if present, skipped if absent
+#   TOP     <name>       elaboration top module
+#   DEFINE  <name>[=val] compile define passed to every tool
+# =============================================================================
+
+TOP     soc_tb_top
+
+DEFINE  FSDB
+
+# -----------------------------------------------------------------------------
+# Include paths
+# -----------------------------------------------------------------------------
+# OpenCores axi_lite_xbar common cells + AXI infrastructure
+INCDIR  axi_lite_xbar/include
+INCDIR  axi_lite_xbar/include/axi
+INCDIR  axi_lite_xbar/include/common_cells
+
+# PULP register_interface / APB / OBI typedef bundle (remote SOC_FILES/include)
+INCDIR  apb_uart-main/include
+INCDIR  apb_uart-main/include/apb
+INCDIR  apb_uart-main/include/obi
+INCDIR  apb_uart-main/include/common_cells
+INCDIR  apb_uart-main/include/axi
+
+# Peripheral-local includes
+INCDIR  apb_i2c-master
+INCDIR  spi_master_ip/spi_master
+
+# Verification infrastructure
+# Verification/infrastructure itself is required on the include path because
+# tb/rf_mon_probe.sv `include "monitors/<name>.sv" with a path RELATIVE to this
+# directory. Without it xelab/xvlog reports VRFC 10-3195 "cannot open include
+# file 'monitors/fetch_monitor.sv'" and then drops rf_mon_probe entirely.
+INCDIR  Verification/infrastructure
+INCDIR  Verification/infrastructure/tb
+INCDIR  Verification/infrastructure/monitors
+INCDIR  Verification/infrastructure/checkers
+INCDIR  Verification/infrastructure/vip
+
+# -----------------------------------------------------------------------------
+# Packages (must precede the modules that import them)
+# -----------------------------------------------------------------------------
+SRC     axi_lite_xbar/include/common_cells/cf_math_pkg.sv
+SRC     axi_lite_xbar/include/common_cells/axi_pkg.sv
+SRC     apb_uart-main/include/apb/apb_pkg.sv
+SRC     gpio-master/gpio_reg_pkg.sv
+
+# -----------------------------------------------------------------------------
+# Verification package first: tb_pkg defines the shared types/typesets that the
+# probe interface and the class-based monitors bind against.
+# -----------------------------------------------------------------------------
+SRC     Verification/infrastructure/tb/tb_pkg.sv
+
+# -----------------------------------------------------------------------------
+# Common cells
+# -----------------------------------------------------------------------------
+SRC     axi_lite_xbar/include/common_cells/addr_decode_dync.sv
+SRC     axi_lite_xbar/include/common_cells/addr_decode.sv
+SRC     axi_lite_xbar/include/common_cells/fifo_v3.sv
+SRC     axi_lite_xbar/include/common_cells/fall_through_register.sv
+SRC     axi_lite_xbar/include/common_cells/spill_register.sv
+SRC     axi_lite_xbar/include/common_cells/spill_register_flushable.sv
+SRC     axi_lite_xbar/include/common_cells/counter.sv
+SRC     axi_lite_xbar/include/common_cells/rr_arb_tree.sv
+SRC     axi_lite_xbar/include/common_cells/lzc.sv
+SRC     axi_lite_xbar/include/common_cells/onehot_to_bin.sv
+SRC     axi_lite_xbar/include/common_cells/delta_counter.sv
+SRC     axi_lite_xbar/include/common_cells/id_queue.sv
+SRC     axi_lite_xbar/include/common_cells/sync.sv
+SRC     axi_lite_xbar/include/common_cells/stream_register.sv
+
+# -----------------------------------------------------------------------------
+# AXI infrastructure
+# -----------------------------------------------------------------------------
+SRC     axi_lite_xbar/include/axi/axi_err_slv.sv
+SRC     axi_lite_xbar/include/axi/axi_atop_filter.sv
+SRC     axi_lite_xbar/include/axi/axi_lite_to_axi.sv
+SRC     axi_lite_xbar/include/axi/axi_lite_demux.sv
+SRC     axi_lite_xbar/include/axi/axi_lite_mux.sv
+
+# -----------------------------------------------------------------------------
+# AXI-Lite crossbar and APB bridge
+# -----------------------------------------------------------------------------
+SRC     axi_lite_xbar/axi_lite_xbar.sv
+SRC     axi_lite_to_apb/axi_lite_to_apb.sv
+
+# -----------------------------------------------------------------------------
+# Bus timeout monitors (interposed on the APB response path and the core's
+# AXI-Lite master port respectively)
+# -----------------------------------------------------------------------------
+SRC     bus_monitors/apb_timeout_monitor.sv
+SRC     bus_monitors/axi_lite_timeout_monitor.sv
+
+# -----------------------------------------------------------------------------
+# APB[0] I2C master
+# i2c_master_defines.sv is `included, resolved via INCDIR apb_i2c-master
+# -----------------------------------------------------------------------------
+SRC     apb_i2c-master/i2c_master_bit_ctrl.sv
+SRC     apb_i2c-master/i2c_master_byte_ctrl.sv
+SRC     apb_i2c-master/apb_i2c.sv
+
+# -----------------------------------------------------------------------------
+# APB[1] / APB[5] Timer 0 and Timer 1 (one source, two instances)
+# -----------------------------------------------------------------------------
+SRC     apb_timer-master/rtl/timer.sv
+SRC     apb_timer-master/rtl/apb_timer.sv
+
+# -----------------------------------------------------------------------------
+# APB[2] UART
+# apb_uart.sv is NOT self-contained. apb_uart.sv:52 instantiates `apb_uart_wrap`
+# (instance i_apb_uart_wrap), which instantiates `apb_to_obi` + `obi_uart`, which
+# in turn instantiate obi_uart_register/_modem/_baudgen/_interrupts/_rx/_tx.
+# The previous revision of this file asserted the opposite ("self-contained, no
+# sub-instantiations, OBI chain is dead code") and omitted the whole chain; that
+# assertion is false and xelab proved it with
+#   ERROR: [VRFC 10-2063] Module <apb_uart_wrap> not found while processing
+#   module instance <i_apb_uart_wrap> [apb_uart.sv:52]
+# The OBI sources are present on disk under apb_uart-main/include/obi and are
+# compiled here in dependency order (packages first).
+# -----------------------------------------------------------------------------
+SRC     apb_uart-main/include/obi/obi_pkg.sv
+SRC     apb_uart-main/include/obi/obi_uart_pkg.sv
+SRC     apb_uart-main/include/obi/apb_to_obi.sv
+SRC     apb_uart-main/include/obi/obi_uart.sv
+SRC     apb_uart-main/include/obi/obi_uart_baudgen.sv
+SRC     apb_uart-main/include/obi/obi_uart_interrupts.sv
+SRC     apb_uart-main/include/obi/obi_uart_modem.sv
+SRC     apb_uart-main/include/obi/obi_uart_register.sv
+SRC     apb_uart-main/include/obi/obi_uart_rx.sv
+SRC     apb_uart-main/include/obi/obi_uart_tx.sv
+SRC     apb_uart-main/rtl/apb_uart_wrap.sv
+SRC     apb_uart-main/rtl/apb_uart.sv
+
+# -----------------------------------------------------------------------------
+# APB[4] SPI master
+# NOTE: spi_master_apb_if.sv redefines the REG_STATUS macro that apb_i2c.sv also
+#       defines, producing a benign *W,MACRDF warning under XSim. Each file uses
+#       its own value within its own scope.
+# -----------------------------------------------------------------------------
+SRC     spi_master_ip/spi_master/spi_master_clkgen.sv
+SRC     spi_master_ip/spi_master/spi_master_fifo.sv
+SRC     spi_master_ip/spi_master/spi_master_rx.sv
+SRC     spi_master_ip/spi_master/spi_master_tx.sv
+SRC     spi_master_ip/spi_master/spi_master_controller.sv
+SRC     spi_master_ip/spi_master/spi_master_apb_if.sv
+SRC     spi_master_ip/spi_master/apb_spi_master.sv
+
+# -----------------------------------------------------------------------------
+# SoC internal memories
+# -----------------------------------------------------------------------------
+SRC     RTL_SOC/sram_sp.sv
+SRC     RTL_SOC/sram_mux.sv
+SRC     RTL_SOC/axi_lite_sram_if.sv
+VSRC    instr_module/Instruction_Memory.v
+SRC     RTL_SOC/imem_sram_wrapper.sv
+SRC     RTL_SOC/boot_rom.sv
+SRC     RTL_SOC/instr_fetch_demux.sv
+
+# -----------------------------------------------------------------------------
+# RISC-V core (RV32IM_Zicsr, 5-stage)
+# riscv_core/rtl/axi_pkg.sv is deliberately NOT listed: it declares the same
+# package name as the common_cells axi_pkg compiled above, and compiling both is
+# a duplicate-package error. It exists only for standalone core simulation.
+# -----------------------------------------------------------------------------
+SRC     riscv_core/rtl/PC.v
+SRC     riscv_core/rtl/PC_Adder.v
+SRC     riscv_core/rtl/Mux2.v
+SRC     riscv_core/rtl/Mux_3_by_1.v
+SRC     riscv_core/rtl/ALU.v
+SRC     riscv_core/rtl/ALU_Decoder.v
+SRC     riscv_core/rtl/Main_Decoder.v
+SRC     riscv_core/rtl/Control_Unit_Top.v
+SRC     riscv_core/rtl/Sign_Extend.v
+SRC     riscv_core/rtl/Register_File.v
+SRC     riscv_core/rtl/JB_unit.v
+SRC     riscv_core/rtl/opcode_check.v
+SRC     riscv_core/rtl/booth_enc.v
+SRC     riscv_core/rtl/csa.v
+SRC     riscv_core/rtl/pp_gen.v
+SRC     riscv_core/rtl/rv32m_mul.v
+SRC     riscv_core/rtl/rv32m_div.v
+SRC     riscv_core/rtl/rv32m_unit.v
+SRC     riscv_core/rtl/irq_gateway.v
+SRC     riscv_core/rtl/irq_arbiter.v
+SRC     riscv_core/rtl/csr_regfile.v
+SRC     riscv_core/rtl/wb_trap_mret_commit_controller.v
+SRC     riscv_core/rtl/hazard_unit.v
+SRC     riscv_core/rtl/imem_controller.v
+SRC     riscv_core/rtl/ls_unit.v
+SRC     riscv_core/rtl/fetch_cycle.v
+SRC     riscv_core/rtl/decode_cycle.v
+SRC     riscv_core/rtl/execute_cycle.v
+SRC     riscv_core/rtl/memory_cycle.v
+SRC     riscv_core/rtl/writeback_cycle.v
+SRC     riscv_core/rtl/top.v
+SRC     riscv_core/rtl/hybrid_mem_interface.sv
+
+# -----------------------------------------------------------------------------
+# Bootloader (APB mux between the bridge and the SPI master)
+# -----------------------------------------------------------------------------
+SRC     bootloader/bootloader.sv
+
+# -----------------------------------------------------------------------------
+# PULP register_interface -- APB[3] GPIO dependency
+# -----------------------------------------------------------------------------
+# These sources ARE present on disk under apb_uart-main/include/register_interface/.
+# The previous revision of this file carried the comment "*** BLOCKER: these six
+# sources are NOT PRESENT in this repository ***" and listed them as OPT. Both
+# halves were wrong, and the OPT marking was actively harmful: gen_filelists.py
+# emits only SRC/VSRC entries (gen_filelists.py:217/259/285), so OPT entries were
+# silently dropped from every generated list. That left four modules undefined
+# and xelab proved it:
+#   ERROR: [VRFC 10-2063] Module <REG_BUS>         not found  [gpio_apb_wrap.sv:82]
+#   ERROR: [VRFC 10-2063] Module <apb_to_reg>      not found  [gpio_apb_wrap.sv:83]
+#   ERROR: [VRFC 10-2063] Module <prim_subreg_ext> not found  [gpio_reg_top.sv:1526]
+#   ERROR: [VRFC 10-2063] Module <prim_subreg>     not found  [gpio_reg_top.sv:1558]
+# They are promoted to SRC below, ahead of the GPIO block that consumes them.
+# typedef.svh / assign.svh stay OPT: they are `include-d, not compiled, and are
+# reachable through INCDIR apb_uart-main/include.
+OPT     apb_uart-main/include/register_interface/typedef.svh
+OPT     apb_uart-main/include/register_interface/assign.svh
+SRC     apb_uart-main/include/register_interface/reg_intf.sv
+SRC     apb_uart-main/include/register_interface/apb_to_reg.sv
+SRC     apb_uart-main/include/register_interface/prim_subreg.sv
+SRC     apb_uart-main/include/register_interface/prim_subreg_ext.sv
+SRC     apb_uart-main/include/register_interface/prim_subreg_arb.sv
+
+# -----------------------------------------------------------------------------
+# APB[3] GPIO
+# The _no_clk_gates variant declares the SAME module name (gpio_input_stage) as
+# gpio_input_stage.sv but drops the tc_clk_gating dependency, for which no
+# technology cell library is bound in this flow. Only one of the two may be
+# compiled; this is the variant the SoC uses.
+# -----------------------------------------------------------------------------
+SRC     gpio-master/gpio_input_stage_no_clk_gates.sv
+SRC     gpio-master/gpio_reg_top.sv
+SRC     gpio-master/gpio.sv
+SRC     gpio-master/gpio_apb_wrap.sv
+
+# -----------------------------------------------------------------------------
+# SoC subsystem top
+# -----------------------------------------------------------------------------
+SRC     RTL_SOC/riscforge_soc_subsystem.sv
+
+# -----------------------------------------------------------------------------
+# Verification BFMs (behaviours, attached at the SoC pin boundary)
+# -----------------------------------------------------------------------------
+SRC     Verification/infrastructure/vip/uart_pin_vip.sv
+SRC     Verification/infrastructure/vip/gpio_pin_vip.sv
+SRC     Verification/infrastructure/vip/i2c_eeprom_at24c02.sv
+SRC     Verification/infrastructure/vip/spi_flash_s25fs512s.sv
+
+# -----------------------------------------------------------------------------
+# Passive monitor layer (class-based)
+# Order matters: interface -> package -> monitor classes -> env -> probe.
+# -----------------------------------------------------------------------------
+SRC     Verification/infrastructure/tb/rf_monitor_if.sv
+SRC     Verification/infrastructure/monitors/rf_monitors.sv
+SRC     Verification/infrastructure/monitors/rf_monitor_env.sv
+SRC     Verification/infrastructure/tb/rf_mon_probe.sv
+
+# -----------------------------------------------------------------------------
+# Legacy module monitors (kept for the non-class SVA checkers)
+# -----------------------------------------------------------------------------
+SRC     Verification/infrastructure/monitors/fetch_monitor.sv
+SRC     Verification/infrastructure/monitors/retire_monitor.sv
+SRC     Verification/infrastructure/monitors/lsu_monitor.sv
+SRC     Verification/infrastructure/monitors/axi_lite_monitor.sv
+SRC     Verification/infrastructure/monitors/apb_monitor.sv
+SRC     Verification/infrastructure/monitors/irq_monitor.sv
+
+# -----------------------------------------------------------------------------
+# Checkers and predictor reference models
+# -----------------------------------------------------------------------------
+SRC     Verification/infrastructure/checkers/axi_lite_protocol_sva.sv
+SRC     Verification/infrastructure/checkers/apb_protocol_sva.sv
+SRC     Verification/infrastructure/checkers/mmio_path_scoreboard.sv
+SRC     Verification/infrastructure/checkers/register_predictor.sv
+SRC     Verification/infrastructure/checkers/irq_predictor.sv
+SRC     Verification/infrastructure/checkers/failure_reporter.sv
+
+# -----------------------------------------------------------------------------
+# Testbench top
+# -----------------------------------------------------------------------------
+SRC     Verification/infrastructure/tb/soc_tb_top.sv

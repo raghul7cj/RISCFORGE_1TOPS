@@ -1,0 +1,41 @@
+{
+  "run_id": "component_first_20261018_monitor_06",
+  "simulator": "AMD Vivado XSim 2022.2",
+  "execution_directory": "C:\\Users\\cj\\AppData\\Local\\Temp\\riscforge_component_first_monitor_06",
+  "commands": [
+    "C:\\Xilinx\\Vivado\\2022.2\\bin\\xvlog.bat --sv -nolog -i C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure -f C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\runs\\component_first_20261018_monitor_06\\rf_mon_smoke_abs.f",
+    "C:\\Xilinx\\Vivado\\2022.2\\bin\\xelab.bat rf_mon_smoke_tb -s rf_mon_smoke_sim",
+    "C:\\Xilinx\\Vivado\\2022.2\\bin\\xsim.bat rf_mon_smoke_sim -runall"
+  ],
+  "source_hashes": [
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\tb\\rf_monitor_if.sv",
+      "sha256": "95C1A209D2A80D3C161909E6F5187C83E7DF062EF1717EE4BF48F24C784469B2"
+    },
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\tb\\tb_pkg.sv",
+      "sha256": "EBB98C448A7761D7DB1BDABE27CFEDDBAF1614E19C5EA9476B56740C4FE0C6FA"
+    },
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\monitors\\rf_monitors.sv",
+      "sha256": "8CF5C750604D8664129BEADCA82EEE949A2FF64E250895634D8407ECE67587D9"
+    },
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\monitors\\rf_monitor_env.sv",
+      "sha256": "4D2362D0752090C372F140A2CB1BACC26F34BF886D573A965559E7B97AD09F4C"
+    },
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\tb\\rf_mon_probe.sv",
+      "sha256": "621111F58046CA48E80ABBEED9319D216CD54164A5078894E4EB3F681730052C"
+    },
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\tb\\rf_mon_stub_dut.sv",
+      "sha256": "47030770BD3E0C76A4CC82C5D4E57B369EA2756EF93964D80CB1D10C7B06193B"
+    },
+    {
+      "path": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\infrastructure\\tb\\rf_mon_smoke_tb.sv",
+      "sha256": "7794AD0A39BE18FCBC7CA7D8C8872F3BE30D2CD240509B36D5E74EB3FBDF435D"
+    }
+  ],
+  "status": "PASS"
+}

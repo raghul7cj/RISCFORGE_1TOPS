@@ -1,0 +1,32 @@
+
+build/datapath_asm.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010000 <_start>:
+  .global _start
+  .type _start, @function
+
+_start:
+  /* Write signature into x10 and x11 */
+  lui x10, 0xCAFEB
+   10000:	cafeb537          	lui	a0,0xcafeb
+  addi x10, x10, -1346  /* 0xCAFE_BABE */
+   10004:	abe50513          	addi	a0,a0,-1346 # cafeaabe <_stack_top+0xcafc2abe>
+  li  x11, 1
+   10008:	00100593          	li	a1,1
+
+  /* Store to DSRAM base */
+  lui x12, 0x00020
+   1000c:	00020637          	lui	a2,0x20
+  sw  x10, 0(x12)
+   10010:	00a62023          	sw	a0,0(a2) # 20000 <_ebss>
+  sw  x11, 4(x12)
+   10014:	00b62223          	sw	a1,4(a2)
+
+.Ldone:
+  wfi
+   10018:	10500073          	wfi
+  j .Ldone
+   1001c:	ffdff06f          	j	10018 <_start+0x18>

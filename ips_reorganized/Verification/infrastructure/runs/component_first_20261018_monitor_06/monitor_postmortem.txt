@@ -1,0 +1,117 @@
+
+================================================================================
+            RISCFORGE SoC POST-MORTEM MONITOR DUMP
+================================================================================
+  FIRST FATAL : SMOKE-99   layer=          2(Path)  cycle=12345  pc=0x00000100
+  DETAIL      : self-test injected fatal
+
+---- MONITOR TOTALS ------------------------------------------------
+==      FETCH layer=          2(Path) events=396 suppressed=0 span=[1..396]
+==     RETIRE layer=          2(Path) events=412 suppressed=0 span=[5..416]
+==        LSU layer=          2(Path) events=2 suppressed=0 span=[23..30]
+==    AXILITE layer=          1(Protocol) events=14 suppressed=0 span=[22..94]
+==        APB layer=          1(Protocol) events=8 suppressed=0 span=[27..470]
+==        IRQ layer=          5(IRQ) events=4 suppressed=0 span=[237..317]
+==        PIN layer=          4(Pin) events=2 suppressed=0 span=[147..179]
+
+---- CYCLIC HISTORY (newest first) ----------------------------------
+----        FETCH 256/256 retained ----
+stall_cycles=0 branches=49
+  cyc      141  rel      141  PC=0x00000240  I=0x00100093  BR UNMAPPED
+  cyc      142  rel      142  PC=0x00000244  I=0x00100093     UNMAPPED
+  cyc      143  rel      143  PC=0x00000248  I=0x00100093     UNMAPPED
+  cyc      144  rel      144  PC=0x0000024c  I=0x00100093     UNMAPPED
+  cyc      145  rel      145  PC=0x00000250  I=0x00100093     UNMAPPED
+  cyc      146  rel      146  PC=0x00000254  I=0x00100093     UNMAPPED
+  cyc      147  rel      147  PC=0x00000258  I=0x00100093     UNMAPPED
+  cyc      148  rel      148  PC=0x0000025c  I=0x00100093     UNMAPPED
+  cyc      149  rel      149  PC=0x00000260  I=0x00100093  BR UNMAPPED
+  cyc      150  rel      150  PC=0x00000264  I=0x00100093     UNMAPPED
+  cyc      151  rel      151  PC=0x00000268  I=0x00100093     UNMAPPED
+  cyc      152  rel      152  PC=0x0000026c  I=0x00100093     UNMAPPED
+  cyc      153  rel      153  PC=0x00000270  I=0x00100093     UNMAPPED
+  cyc      154  rel      154  PC=0x00000274  I=0x00100093     UNMAPPED
+  cyc      155  rel      155  PC=0x00000278  I=0x00100093     UNMAPPED
+  cyc      156  rel      156  PC=0x0000027c  I=0x00100093     UNMAPPED
+  cyc      157  rel      157  PC=0x00000280  I=0x00100093  BR UNMAPPED
+  cyc      158  rel      158  PC=0x00000284  I=0x00100093     UNMAPPED
+  cyc      159  rel      159  PC=0x00000288  I=0x00100093     UNMAPPED
+  cyc      160  rel      160  PC=0x0000028c  I=0x00100093     UNMAPPED
+  cyc      161  rel      161  PC=0x00000290  I=0x00100093     UNMAPPED
+  cyc      162  rel      162  PC=0x00000294  I=0x00100093     UNMAPPED
+  cyc      163  rel      163  PC=0x00000298  I=0x00100093     UNMAPPED
+  cyc      164  rel      164  PC=0x0000029c  I=0x00100093     UNMAPPED
+
+----       RETIRE 256/256 retained ----
+commit=412 regwe=412 trap=1 irq=1 mret=1 csr=0
+  cyc      161  rel      161  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      162  rel      162  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      163  rel      163  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      164  rel      164  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      165  rel      165  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      166  rel      166  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      167  rel      167  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      168  rel      168  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      169  rel      169  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      170  rel      170  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      171  rel      171  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      172  rel      172  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      173  rel      173  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      174  rel      174  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      175  rel      175  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      176  rel      176  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      177  rel      177  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      178  rel      178  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      179  rel      179  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      180  rel      180  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      181  rel      181  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      182  rel      182  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      183  rel      183  PC=0x00000100  x00100093  rd x1=0x00000001               
+  cyc      184  rel      184  PC=0x00000100  x00100093  rd x1=0x00000001               
+
+----          LSU 2/256 retained ----
+req=2 load=0 store=2 mmio=2 err=0
+  cyc       23  PC=0x00000100  --  WR slot=2  addr=0x40002000  w=0x00000055  be=0000  wait=1  MMIO     
+  cyc       30  PC=0x00000100  --  WR slot=2  addr=0x40002000  w=0x00000055  be=0000  wait=1  MMIO     
+
+----      AXILITE 4/256 retained ----
+AW=2 W=2 B=2 AR=2 R=2 stalls(AW/W/B/AR/R)=0/0/0/0/0
+  cyc       27  WR addr=0x40002000  w=0x00000055  be=1111  resp=OKAY  aw_wait=5 w_wait=4 b_wait=0  MMIO
+  cyc       34  WR addr=0x40002000  w=0x00000055  be=1111  resp=OKAY  aw_wait=5 w_wait=4 b_wait=0  MMIO
+  cyc       87  RD addr=0x40001000  r=0x00001234  be=1111  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+  cyc       94  RD addr=0x40001000  r=0x00001234  be=1111  resp=OKAY  aw_wait=0 w_wait=0 b_wait=0  MMIO
+
+  slot           0    I2C xfer=1 wr=0 rd=1 slverr=0 max_ws=2
+  slot           1 TIMER0 xfer=2 wr=0 rd=2 slverr=0 max_ws=2
+  slot           2   UART xfer=2 wr=0 rd=2 slverr=0 max_ws=2
+  slot           3   GPIO xfer=1 wr=0 rd=1 slverr=0 max_ws=2
+  slot           4    SPI xfer=1 wr=0 rd=1 slverr=1 max_ws=2
+  slot           5 TIMER1 xfer=1 wr=0 rd=1 slverr=0 max_ws=2
+----          APB 8/256 retained ----
+  cyc       27  [2]  UART RD  paddr=0x40002000  pw=0x00000055 pr=0x00000000 pstrb=0000  ws=2        
+  cyc       86  [1]TIMER0 RD  paddr=0x40001000  pw=0x00000000 pr=0x00000000 pstrb=0000  ws=1        
+  cyc      450  [0]   I2C RD  paddr=0x40000024  pw=0xa5000000 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      454  [1]TIMER0 RD  paddr=0x40001024  pw=0xa5000001 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      458  [2]  UART RD  paddr=0x40002024  pw=0xa5000002 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      462  [3]  GPIO RD  paddr=0x40003024  pw=0xa5000003 pr=0x00000000 pstrb=0000  ws=2        
+  cyc      466  [4]   SPI RD  paddr=0x40004024  pw=0xa5000004 pr=0x00000000 pstrb=0000  ws=2  SLVERR
+  cyc      470  [5]TIMER1 RD  paddr=0x40005024  pw=0xa5000005 pr=0x1a000000 pstrb=0000  ws=2        
+
+----          IRQ 4/256 retained ----
+assert=1 grant=1 ack=1 mret=1
+  cyc      237  id=19           UART assert=1 grant=0 ack=0  cause=0x00000013  mip=00000000000010000000000000000000 mie=00000000000010000000000000000000  lat=0 depth=0       
+  cyc      247  id=19           UART assert=1 grant=1 ack=0  cause=0x00000013  mip=00000000000010000000000000000000 mie=00000000000010000000000000000000  lat=0 depth=0       
+  cyc      257  id=19           UART assert=1 grant=1 ack=1  cause=0x00000013  mip=00000000000010000000000000000000 mie=00000000000010000000000000000000  lat=10 depth=0       
+  cyc      317  id=0           NONE assert=0 grant=0 ack=0  cause=0x00000000  mip=00000000000000000000000000000000 mie=00000000000000000000000000000000  lat=0 depth=0 [MRET]
+
+
+---- CROSS-LAYER JOIN (newest MMIO accesses) -----------------------
+  PC=0x00000100  ST  addr=0x40002000  slot=2(UART)
+      LSU  : t=30 be=0000 wdata=0x00000055
+      AXIL : t=34 WR be=1111 data=0x00000055 resp=OKAY latency=5
+      APB  : t=27 slot=2 RD paddr=0x40002000 pstrb=0000 prdata=0x00000000 ws=2       
+  PC=0x00000100  ST  addr=0x40002000  slot=2(UART)
+      LSU  : t=23 be=0000 wdata=0x00000055
+      AXIL : t=34 WR be=1111 data=0x00000055 resp=OKAY latency=5
+      APB  : t=27 slot=2 RD paddr=0x40002000 pstrb=0000 prdata=0x00000000 ws=2       
+

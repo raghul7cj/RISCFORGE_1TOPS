@@ -1,0 +1,867 @@
+
+build/timer_irq.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010000 <_start>:
+  .global _start
+  .type _start, @function
+
+_start:
+  /* 1. Disable interrupts globally during boot sequence */
+  csrci mstatus, 0x8
+   10000:	30047073          	csrci	mstatus,8
+
+  /* 2. Initialize Global Pointer (gp) with relaxation explicitly disabled */
+  .option push
+  .option norelax
+  la gp, __global_pointer$
+   10004:	00011197          	auipc	gp,0x11
+   10008:	83418193          	addi	gp,gp,-1996 # 20838 <__global_pointer$>
+  .option pop
+
+  /* 3. Initialize Stack Pointer (sp) to 16-byte aligned DSRAM top */
+  la sp, _stack_top
+   1000c:	00018117          	auipc	sp,0x18
+   10010:	ff410113          	addi	sp,sp,-12 # 28000 <_stack_top>
+
+  /* 4. Zero General-Purpose Registers */
+  li x1,  0
+   10014:	00000093          	li	ra,0
+  li x4,  0
+   10018:	00000213          	li	tp,0
+  li x5,  0
+   1001c:	00000293          	li	t0,0
+  li x6,  0
+   10020:	00000313          	li	t1,0
+  li x7,  0
+   10024:	00000393          	li	t2,0
+  li x8,  0
+   10028:	00000413          	li	s0,0
+  li x9,  0
+   1002c:	00000493          	li	s1,0
+  li x10, 0
+   10030:	00000513          	li	a0,0
+  li x11, 0
+   10034:	00000593          	li	a1,0
+  li x12, 0
+   10038:	00000613          	li	a2,0
+  li x13, 0
+   1003c:	00000693          	li	a3,0
+  li x14, 0
+   10040:	00000713          	li	a4,0
+  li x15, 0
+   10044:	00000793          	li	a5,0
+  li x16, 0
+   10048:	00000813          	li	a6,0
+  li x17, 0
+   1004c:	00000893          	li	a7,0
+  li x18, 0
+   10050:	00000913          	li	s2,0
+  li x19, 0
+   10054:	00000993          	li	s3,0
+  li x20, 0
+   10058:	00000a13          	li	s4,0
+  li x21, 0
+   1005c:	00000a93          	li	s5,0
+  li x22, 0
+   10060:	00000b13          	li	s6,0
+  li x23, 0
+   10064:	00000b93          	li	s7,0
+  li x24, 0
+   10068:	00000c13          	li	s8,0
+  li x25, 0
+   1006c:	00000c93          	li	s9,0
+  li x26, 0
+   10070:	00000d13          	li	s10,0
+  li x27, 0
+   10074:	00000d93          	li	s11,0
+  li x28, 0
+   10078:	00000e13          	li	t3,0
+  li x29, 0
+   1007c:	00000e93          	li	t4,0
+  li x30, 0
+   10080:	00000f13          	li	t5,0
+  li x31, 0
+   10084:	00000f93          	li	t6,0
+
+  /* 5. Zero .bss and .sbss section in DSRAM */
+  la a0, _sbss
+   10088:	00010517          	auipc	a0,0x10
+   1008c:	fb050513          	addi	a0,a0,-80 # 20038 <g_unknown_irq_count>
+  la a1, _ebss
+   10090:	89018593          	addi	a1,gp,-1904 # 200c8 <_ebss>
+  bge a0, a1, .Lzero_bss_done
+   10094:	00b55863          	bge	a0,a1,100a4 <_start+0xa4>
+.Lzero_bss_loop:
+  sw zero, 0(a0)
+   10098:	00052023          	sw	zero,0(a0)
+  addi a0, a0, 4
+   1009c:	00450513          	addi	a0,a0,4
+  blt a0, a1, .Lzero_bss_loop
+   100a0:	feb54ce3          	blt	a0,a1,10098 <_start+0x98>
+.Lzero_bss_done:
+
+  /* 6. Install direct-mode trap vector (mtvec[1:0] = 00) */
+  la a0, trap_entry
+   100a4:	00000517          	auipc	a0,0x0
+   100a8:	02c50513          	addi	a0,a0,44 # 100d0 <trap_entry>
+  csrw mtvec, a0
+   100ac:	30551073          	csrw	mtvec,a0
+
+  /* 7. Initialize custom priority threshold CSR mintprio (0x7C0) to 0 (allow all) */
+  csrw 0x7C0, zero
+   100b0:	7c001073          	csrw	0x7c0,zero
+
+  /* 8. Call main() */
+  call main
+   100b4:	488000ef          	jal	1053c <main>
+
+000100b8 <_exit>:
+
+  /* 9. Clean halt on return from main() */
+_exit:
+  csrci mstatus, 0x8
+   100b8:	30047073          	csrci	mstatus,8
+.Lhalt_loop:
+  wfi
+   100bc:	10500073          	wfi
+  j .Lhalt_loop
+   100c0:	ffdff06f          	j	100bc <_exit+0x4>
+	...
+
+000100d0 <trap_entry>:
+  .global trap_entry
+  .type trap_entry, @function
+
+trap_entry:
+  /* Allocate 64 bytes on stack (16 words, preserving 16-byte alignment) */
+  addi sp, sp, -64
+   100d0:	fc010113          	addi	sp,sp,-64
+
+  sw ra,   0(sp)
+   100d4:	00112023          	sw	ra,0(sp)
+  sw t0,   4(sp)
+   100d8:	00512223          	sw	t0,4(sp)
+  sw t1,   8(sp)
+   100dc:	00612423          	sw	t1,8(sp)
+  sw t2,  12(sp)
+   100e0:	00712623          	sw	t2,12(sp)
+  sw a0,  16(sp)
+   100e4:	00a12823          	sw	a0,16(sp)
+  sw a1,  20(sp)
+   100e8:	00b12a23          	sw	a1,20(sp)
+  sw a2,  24(sp)
+   100ec:	00c12c23          	sw	a2,24(sp)
+  sw a3,  28(sp)
+   100f0:	00d12e23          	sw	a3,28(sp)
+  sw a4,  32(sp)
+   100f4:	02e12023          	sw	a4,32(sp)
+  sw a5,  36(sp)
+   100f8:	02f12223          	sw	a5,36(sp)
+  sw a6,  40(sp)
+   100fc:	03012423          	sw	a6,40(sp)
+  sw a7,  44(sp)
+   10100:	03112623          	sw	a7,44(sp)
+  sw t3,  48(sp)
+   10104:	03c12823          	sw	t3,48(sp)
+  sw t4,  52(sp)
+   10108:	03d12a23          	sw	t4,52(sp)
+  sw t5,  56(sp)
+   1010c:	03e12c23          	sw	t5,56(sp)
+  sw t6,  60(sp)
+   10110:	03f12e23          	sw	t6,60(sp)
+
+  /* Read trap cause and faulting program counter */
+  csrr a0, mcause
+   10114:	34202573          	csrr	a0,mcause
+  csrr a1, mepc
+   10118:	341025f3          	csrr	a1,mepc
+
+  /* Check Bit 31: 1 = Interrupt, 0 = Synchronous Exception */
+  bgez a0, .Lhandle_sync_exception
+   1011c:	04055c63          	bgez	a0,10174 <trap_entry+0xa4>
+
+  /* -------------------------------------------------------------------------
+   * Asynchronous Interrupt Path
+   * ------------------------------------------------------------------------- */
+  /* Clear bit 31 to isolate cause ID (e.g. 7 for MTIP, 16..27 for peripherals) */
+  slli a0, a0, 1
+   10120:	00151513          	slli	a0,a0,0x1
+  srli a0, a0, 1
+   10124:	00155513          	srli	a0,a0,0x1
+
+  /* Invoke C ISR dispatcher: void c_trap_handler(uint32_t cause, uint32_t epc) */
+  call c_trap_handler
+   10128:	224000ef          	jal	1034c <c_trap_handler>
+
+  /* Restore caller-saved registers */
+  lw ra,   0(sp)
+   1012c:	00012083          	lw	ra,0(sp)
+  lw t0,   4(sp)
+   10130:	00412283          	lw	t0,4(sp)
+  lw t1,   8(sp)
+   10134:	00812303          	lw	t1,8(sp)
+  lw t2,  12(sp)
+   10138:	00c12383          	lw	t2,12(sp)
+  lw a0,  16(sp)
+   1013c:	01012503          	lw	a0,16(sp)
+  lw a1,  20(sp)
+   10140:	01412583          	lw	a1,20(sp)
+  lw a2,  24(sp)
+   10144:	01812603          	lw	a2,24(sp)
+  lw a3,  28(sp)
+   10148:	01c12683          	lw	a3,28(sp)
+  lw a4,  32(sp)
+   1014c:	02012703          	lw	a4,32(sp)
+  lw a5,  36(sp)
+   10150:	02412783          	lw	a5,36(sp)
+  lw a6,  40(sp)
+   10154:	02812803          	lw	a6,40(sp)
+  lw a7,  44(sp)
+   10158:	02c12883          	lw	a7,44(sp)
+  lw t3,  48(sp)
+   1015c:	03012e03          	lw	t3,48(sp)
+  lw t4,  52(sp)
+   10160:	03412e83          	lw	t4,52(sp)
+  lw t5,  56(sp)
+   10164:	03812f03          	lw	t5,56(sp)
+  lw t6,  60(sp)
+   10168:	03c12f83          	lw	t6,60(sp)
+
+  addi sp, sp, 64
+   1016c:	04010113          	addi	sp,sp,64
+
+  /* Return from interrupt */
+  mret
+   10170:	30200073          	mret
+  /* -------------------------------------------------------------------------
+   * Synchronous Exception Path (Fault / Error Isolation)
+   * ------------------------------------------------------------------------- */
+.Lhandle_sync_exception:
+  /* Ensure interrupts are disabled */
+  csrci mstatus, 0x8
+   10174:	30047073          	csrci	mstatus,8
+
+  /* Record fault signatures to dedicated observation memory */
+  la t0, _trap_sig_cause
+   10178:	00018297          	auipc	t0,0x18
+   1017c:	e8028293          	addi	t0,t0,-384 # 27ff8 <_trap_sig_cause>
+  sw a0, 0(t0)
+   10180:	00a2a023          	sw	a0,0(t0)
+  la t0, _trap_sig_epc
+   10184:	00018297          	auipc	t0,0x18
+   10188:	e7828293          	addi	t0,t0,-392 # 27ffc <_trap_sig_epc>
+  sw a1, 0(t0)
+   1018c:	00b2a023          	sw	a1,0(t0)
+
+  /* Call C exception reporter: void c_exception_handler(uint32_t cause, uint32_t epc) */
+  call c_exception_handler
+   10190:	204000ef          	jal	10394 <c_exception_handler>
+
+  /* Unconditional deterministic halt: NEVER mret into faulting instruction */
+.Lsync_halt:
+  csrci mstatus, 0x8
+   10194:	30047073          	csrci	mstatus,8
+  wfi
+   10198:	10500073          	wfi
+  j .Lsync_halt
+   1019c:	ff9ff06f          	j	10194 <trap_entry+0xc4>
+	...
+
+000101ac <isr_timer0_cmp>:
+void isr_default_timer(uint32_t cause, uint32_t epc) __attribute__((weak));
+
+void isr_timer0_cmp(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Acknowledge Timer 0 Channel 0: disable IRQ or reset counter */
+    TIMER0_CTRL_CH0 = TIMER_CTRL_RESET;
+   101ac:	400017b7          	lui	a5,0x40001
+   101b0:	00200713          	li	a4,2
+   101b4:	00e7a023          	sw	a4,0(a5) # 40001000 <_stack_top+0x3ffd9000>
+}
+   101b8:	00008067          	ret
+
+000101bc <isr_gpio>:
+
+void isr_gpio(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Acknowledge GPIO: write-1-to-clear all pending state bits */
+    uint32_t pending = GPIO_INTR_STATE;
+   101bc:	400037b7          	lui	a5,0x40003
+   101c0:	0007a703          	lw	a4,0(a5) # 40003000 <_stack_top+0x3ffdb000>
+    GPIO_INTR_STATE = pending;
+   101c4:	00e7a023          	sw	a4,0(a5)
+}
+   101c8:	00008067          	ret
+
+000101cc <isr_i2c>:
+
+void isr_i2c(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Acknowledge I2C: read status register */
+    volatile uint32_t status = I2C_REG_STATUS;
+   101cc:	400007b7          	lui	a5,0x40000
+   101d0:	00c7a703          	lw	a4,12(a5) # 4000000c <_stack_top+0x3ffd800c>
+void isr_i2c(uint32_t cause, uint32_t epc) {
+   101d4:	ff010113          	addi	sp,sp,-16
+    volatile uint32_t status = I2C_REG_STATUS;
+   101d8:	00e12623          	sw	a4,12(sp)
+    (void)status;
+   101dc:	00c12783          	lw	a5,12(sp)
+}
+   101e0:	01010113          	addi	sp,sp,16
+   101e4:	00008067          	ret
+
+000101e8 <isr_spi_thold>:
+
+void isr_spi_thold(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Acknowledge SPI threshold: read status register */
+    volatile uint32_t status = SPI_REG_STATUS;
+   101e8:	400047b7          	lui	a5,0x40004
+   101ec:	0007a783          	lw	a5,0(a5) # 40004000 <_stack_top+0x3ffdc000>
+void isr_spi_thold(uint32_t cause, uint32_t epc) {
+   101f0:	ff010113          	addi	sp,sp,-16
+    volatile uint32_t status = SPI_REG_STATUS;
+   101f4:	00f12623          	sw	a5,12(sp)
+    (void)status;
+   101f8:	00c12783          	lw	a5,12(sp)
+}
+   101fc:	01010113          	addi	sp,sp,16
+   10200:	00008067          	ret
+
+00010204 <isr_uart>:
+
+void isr_uart(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Acknowledge UART: read IIR to clear pending line/TX interrupt */
+    volatile uint32_t iir = UART_IIR;
+   10204:	400027b7          	lui	a5,0x40002
+   10208:	0087a703          	lw	a4,8(a5) # 40002008 <_stack_top+0x3ffda008>
+void isr_uart(uint32_t cause, uint32_t epc) {
+   1020c:	ff010113          	addi	sp,sp,-16
+    volatile uint32_t iir = UART_IIR;
+   10210:	00e12623          	sw	a4,12(sp)
+    (void)iir;
+   10214:	00c12783          	lw	a5,12(sp)
+}
+   10218:	01010113          	addi	sp,sp,16
+   1021c:	00008067          	ret
+
+00010220 <isr_spi_eot>:
+
+void isr_spi_eot(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Acknowledge SPI EOT: clear interrupt status */
+    SPI_REG_INTSTA = 0x1;
+   10220:	400047b7          	lui	a5,0x40004
+   10224:	00100713          	li	a4,1
+   10228:	02e7a423          	sw	a4,40(a5) # 40004028 <_stack_top+0x3ffdc028>
+}
+   1022c:	00008067          	ret
+
+00010230 <isr_default_timer>:
+
+void isr_default_timer(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    /* Generic timer acknowledge: clear timer control reset bit */
+    TIMER0_CTRL_CH0 = TIMER_CTRL_RESET;
+   10230:	00200793          	li	a5,2
+   10234:	40001737          	lui	a4,0x40001
+   10238:	00f72023          	sw	a5,0(a4) # 40001000 <_stack_top+0x3ffd9000>
+    TIMER1_CTRL_CH0 = TIMER_CTRL_RESET;
+   1023c:	40005737          	lui	a4,0x40005
+   10240:	00f72023          	sw	a5,0(a4) # 40005000 <_stack_top+0x3ffdd000>
+}
+   10244:	00008067          	ret
+
+00010248 <irq_init>:
+
+/* =============================================================================
+ * Initialization & Configuration
+ * ============================================================================= */
+void irq_init(void) {
+    for (int i = 0; i < IRQ_NUM_SOURCES; i++) {
+   10248:	81018693          	addi	a3,gp,-2032 # 20048 <g_irq_vector_table>
+   1024c:	08068713          	addi	a4,a3,128
+   10250:	81018793          	addi	a5,gp,-2032 # 20048 <g_irq_vector_table>
+        g_irq_vector_table[i] = 0;
+   10254:	0007a023          	sw	zero,0(a5)
+    for (int i = 0; i < IRQ_NUM_SOURCES; i++) {
+   10258:	00478793          	addi	a5,a5,4
+   1025c:	fee79ce3          	bne	a5,a4,10254 <irq_init+0xc>
+    }
+    /* Bind default weak ISRs */
+    g_irq_vector_table[IRQ_CAUSE_TIMER0_CMP]     = isr_timer0_cmp;
+   10260:	00010737          	lui	a4,0x10
+   10264:	1ac70713          	addi	a4,a4,428 # 101ac <isr_timer0_cmp>
+   10268:	00e6ae23          	sw	a4,28(a3)
+    g_irq_vector_table[IRQ_CAUSE_GPIO]           = isr_gpio;
+   1026c:	00010737          	lui	a4,0x10
+   10270:	1bc70713          	addi	a4,a4,444 # 101bc <isr_gpio>
+   10274:	04e6a023          	sw	a4,64(a3)
+    g_irq_vector_table[IRQ_CAUSE_I2C]            = isr_i2c;
+   10278:	00010737          	lui	a4,0x10
+   1027c:	1cc70713          	addi	a4,a4,460 # 101cc <isr_i2c>
+   10280:	04e6a223          	sw	a4,68(a3)
+    g_irq_vector_table[IRQ_CAUSE_SPI_THOLD]      = isr_spi_thold;
+   10284:	00010737          	lui	a4,0x10
+   10288:	1e870713          	addi	a4,a4,488 # 101e8 <isr_spi_thold>
+   1028c:	04e6a423          	sw	a4,72(a3)
+    g_irq_vector_table[IRQ_CAUSE_UART]           = isr_uart;
+   10290:	00010737          	lui	a4,0x10
+   10294:	20470713          	addi	a4,a4,516 # 10204 <isr_uart>
+   10298:	04e6a623          	sw	a4,76(a3)
+    g_irq_vector_table[IRQ_CAUSE_SPI_EOT]        = isr_spi_eot;
+    g_irq_vector_table[IRQ_CAUSE_TIMER0_CH0_OVF] = isr_default_timer;
+   1029c:	000107b7          	lui	a5,0x10
+    g_irq_vector_table[IRQ_CAUSE_SPI_EOT]        = isr_spi_eot;
+   102a0:	00010737          	lui	a4,0x10
+    g_irq_vector_table[IRQ_CAUSE_TIMER0_CH0_OVF] = isr_default_timer;
+   102a4:	23078793          	addi	a5,a5,560 # 10230 <isr_default_timer>
+    g_irq_vector_table[IRQ_CAUSE_SPI_EOT]        = isr_spi_eot;
+   102a8:	22070713          	addi	a4,a4,544 # 10220 <isr_spi_eot>
+    g_irq_vector_table[IRQ_CAUSE_TIMER0_CH0_OVF] = isr_default_timer;
+   102ac:	04f6a823          	sw	a5,80(a3)
+    g_irq_vector_table[IRQ_CAUSE_TIMER0_CH1_OVF] = isr_default_timer;
+   102b0:	04f6aa23          	sw	a5,84(a3)
+    g_irq_vector_table[IRQ_CAUSE_TIMER0_CH1_CMP] = isr_default_timer;
+   102b4:	04f6ac23          	sw	a5,88(a3)
+    g_irq_vector_table[IRQ_CAUSE_TIMER1_CH0_OVF] = isr_default_timer;
+   102b8:	04f6ae23          	sw	a5,92(a3)
+    g_irq_vector_table[IRQ_CAUSE_TIMER1_CH0_CMP] = isr_default_timer;
+   102bc:	06f6a023          	sw	a5,96(a3)
+    g_irq_vector_table[IRQ_CAUSE_TIMER1_CH1_OVF] = isr_default_timer;
+   102c0:	06f6a223          	sw	a5,100(a3)
+    g_irq_vector_table[IRQ_CAUSE_TIMER1_CH1_CMP] = isr_default_timer;
+   102c4:	06f6a423          	sw	a5,104(a3)
+    g_irq_vector_table[IRQ_CAUSE_SPI_EOT]        = isr_spi_eot;
+   102c8:	06e6a623          	sw	a4,108(a3)
+        __asm__ volatile ("csrc mie, %0" : : "r"(mask));
+    }
+}
+
+void irq_set_priority_threshold(uint32_t threshold) {
+    __asm__ volatile ("csrw 0x7C0, %0" : : "r"(threshold & 0x3));
+   102cc:	00000793          	li	a5,0
+   102d0:	7c079073          	csrw	0x7c0,a5
+}
+   102d4:	00008067          	ret
+
+000102d8 <irq_enable_global>:
+    __asm__ volatile ("csrsi mstatus, 0x8");
+   102d8:	30046073          	csrsi	mstatus,8
+}
+   102dc:	00008067          	ret
+
+000102e0 <irq_disable_global>:
+    __asm__ volatile ("csrci mstatus, 0x8");
+   102e0:	30047073          	csrci	mstatus,8
+}
+   102e4:	00008067          	ret
+
+000102e8 <irq_enable_source>:
+    if (cause_id < 32) {
+   102e8:	01f00793          	li	a5,31
+   102ec:	00a7e863          	bltu	a5,a0,102fc <irq_enable_source+0x14>
+        uint32_t mask = (1UL << cause_id);
+   102f0:	00100793          	li	a5,1
+   102f4:	00a797b3          	sll	a5,a5,a0
+        __asm__ volatile ("csrs mie, %0" : : "r"(mask));
+   102f8:	3047a073          	csrs	mie,a5
+}
+   102fc:	00008067          	ret
+
+00010300 <irq_disable_source>:
+    if (cause_id < 32) {
+   10300:	01f00793          	li	a5,31
+   10304:	00a7e863          	bltu	a5,a0,10314 <irq_disable_source+0x14>
+        uint32_t mask = (1UL << cause_id);
+   10308:	00100793          	li	a5,1
+   1030c:	00a797b3          	sll	a5,a5,a0
+        __asm__ volatile ("csrc mie, %0" : : "r"(mask));
+   10310:	3047b073          	csrc	mie,a5
+}
+   10314:	00008067          	ret
+
+00010318 <irq_set_priority_threshold>:
+    __asm__ volatile ("csrw 0x7C0, %0" : : "r"(threshold & 0x3));
+   10318:	00357513          	andi	a0,a0,3
+   1031c:	7c051073          	csrw	0x7c0,a0
+}
+   10320:	00008067          	ret
+
+00010324 <irq_register_handler>:
+
+bool irq_register_handler(uint32_t cause_id, irq_handler_t handler) {
+    if (cause_id >= IRQ_NUM_SOURCES) return false;
+   10324:	01f00793          	li	a5,31
+   10328:	00a7ee63          	bltu	a5,a0,10344 <irq_register_handler+0x20>
+    g_irq_vector_table[cause_id] = handler;
+   1032c:	00251513          	slli	a0,a0,0x2
+   10330:	81018793          	addi	a5,gp,-2032 # 20048 <g_irq_vector_table>
+   10334:	00a787b3          	add	a5,a5,a0
+   10338:	00b7a023          	sw	a1,0(a5)
+    return true;
+   1033c:	00100513          	li	a0,1
+   10340:	00008067          	ret
+    if (cause_id >= IRQ_NUM_SOURCES) return false;
+   10344:	00000513          	li	a0,0
+}
+   10348:	00008067          	ret
+
+0001034c <c_trap_handler>:
+
+/* =============================================================================
+ * Trap Dispatchers
+ * ============================================================================= */
+void c_trap_handler(uint32_t cause, uint32_t epc) {
+    g_last_trap_cause = cause;
+   1034c:	80a1a423          	sw	a0,-2040(gp) # 20040 <g_last_trap_cause>
+    g_last_trap_epc   = epc;
+   10350:	000206b7          	lui	a3,0x20
+   10354:	02b6ae23          	sw	a1,60(a3) # 2003c <g_last_trap_epc>
+
+    if (cause < IRQ_NUM_SOURCES && g_irq_vector_table[cause]) {
+   10358:	01f00713          	li	a4,31
+   1035c:	00a76e63          	bltu	a4,a0,10378 <c_trap_handler+0x2c>
+   10360:	00251793          	slli	a5,a0,0x2
+   10364:	81018713          	addi	a4,gp,-2032 # 20048 <g_irq_vector_table>
+   10368:	00f707b3          	add	a5,a4,a5
+   1036c:	0007a783          	lw	a5,0(a5)
+   10370:	00078463          	beqz	a5,10378 <c_trap_handler+0x2c>
+        g_irq_vector_table[cause](cause, epc);
+   10374:	00078067          	jr	a5
+    } else {
+        /* Unimplemented / unregistered interrupt: record and halt */
+        g_unknown_irq_count++;
+   10378:	00020737          	lui	a4,0x20
+   1037c:	03872783          	lw	a5,56(a4) # 20038 <g_unknown_irq_count>
+   10380:	00178793          	addi	a5,a5,1
+   10384:	02f72c23          	sw	a5,56(a4)
+        while (1) {
+            __asm__ volatile ("csrci mstatus, 0x8; wfi");
+   10388:	30047073          	csrci	mstatus,8
+   1038c:	10500073          	wfi
+        while (1) {
+   10390:	ff9ff06f          	j	10388 <c_trap_handler+0x3c>
+
+00010394 <c_exception_handler>:
+        }
+    }
+}
+
+void c_exception_handler(uint32_t cause, uint32_t epc) {
+    g_last_trap_cause = cause;
+   10394:	80a1a423          	sw	a0,-2040(gp) # 20040 <g_last_trap_cause>
+    g_last_trap_epc   = epc;
+   10398:	000207b7          	lui	a5,0x20
+   1039c:	02b7ae23          	sw	a1,60(a5) # 2003c <g_last_trap_epc>
+    /* Synchronous exception: isolate and halt */
+    while (1) {
+        __asm__ volatile ("csrci mstatus, 0x8; wfi");
+   103a0:	30047073          	csrci	mstatus,8
+   103a4:	10500073          	wfi
+    while (1) {
+   103a8:	ff9ff06f          	j	103a0 <c_exception_handler+0xc>
+
+000103ac <uart_init>:
+
+#include "uart.h"
+
+void uart_init(uint32_t baud_divisor) {
+    /* 1. Disable all interrupts */
+    UART_IER = 0x00;
+   103ac:	400027b7          	lui	a5,0x40002
+   103b0:	0007a223          	sw	zero,4(a5) # 40002004 <_stack_top+0x3ffda004>
+
+    /* 2. Enable Divisor Latch Access (DLAB = 1) in LCR */
+    UART_LCR = 0x80;
+   103b4:	40002737          	lui	a4,0x40002
+   103b8:	08000693          	li	a3,128
+   103bc:	00d72623          	sw	a3,12(a4) # 4000200c <_stack_top+0x3ffda00c>
+
+    /* 3. Program divisor */
+    UART_DLL = (baud_divisor & 0xFF);
+   103c0:	0ff57613          	zext.b	a2,a0
+   103c4:	400026b7          	lui	a3,0x40002
+    UART_DLM = ((baud_divisor >> 8) & 0xFF);
+   103c8:	00855513          	srli	a0,a0,0x8
+    UART_DLL = (baud_divisor & 0xFF);
+   103cc:	00c6a023          	sw	a2,0(a3) # 40002000 <_stack_top+0x3ffda000>
+    UART_DLM = ((baud_divisor >> 8) & 0xFF);
+   103d0:	0ff57513          	zext.b	a0,a0
+   103d4:	00a7a223          	sw	a0,4(a5)
+
+    /* 4. Configure: 8 data bits, 1 stop bit, no parity (DLAB = 0) */
+    UART_LCR = 0x03;
+   103d8:	00300613          	li	a2,3
+   103dc:	00c72623          	sw	a2,12(a4)
+
+    /* 5. Enable and clear FIFOs */
+    UART_FCR = 0x07;
+   103e0:	00700793          	li	a5,7
+   103e4:	00f6a423          	sw	a5,8(a3)
+}
+   103e8:	00008067          	ret
+
+000103ec <uart_putc>:
+
+void uart_putc(char c) {
+    /* Poll until Transmitter Holding Register Empty (THRE = 1) */
+    while (!(UART_LSR & UART_LSR_THRE));
+   103ec:	40002737          	lui	a4,0x40002
+   103f0:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+   103f4:	00072783          	lw	a5,0(a4)
+   103f8:	0207f793          	andi	a5,a5,32
+   103fc:	fe078ce3          	beqz	a5,103f4 <uart_putc+0x8>
+    UART_THR = (uint32_t)c;
+   10400:	400027b7          	lui	a5,0x40002
+   10404:	00a7a023          	sw	a0,0(a5) # 40002000 <_stack_top+0x3ffda000>
+}
+   10408:	00008067          	ret
+
+0001040c <uart_puts>:
+
+void uart_puts(const char *str) {
+    while (*str) {
+   1040c:	00054783          	lbu	a5,0(a0)
+   10410:	02078e63          	beqz	a5,1044c <uart_puts+0x40>
+    while (!(UART_LSR & UART_LSR_THRE));
+   10414:	40002737          	lui	a4,0x40002
+        if (*str == '\n') {
+   10418:	00a00593          	li	a1,10
+    while (!(UART_LSR & UART_LSR_THRE));
+   1041c:	40002637          	lui	a2,0x40002
+   10420:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+    UART_THR = (uint32_t)c;
+   10424:	00d00813          	li	a6,13
+        if (*str == '\n') {
+   10428:	02b78463          	beq	a5,a1,10450 <uart_puts+0x44>
+            uart_putc('\r');
+        }
+        uart_putc(*str++);
+   1042c:	00054683          	lbu	a3,0(a0)
+   10430:	00150513          	addi	a0,a0,1
+    while (!(UART_LSR & UART_LSR_THRE));
+   10434:	00072783          	lw	a5,0(a4)
+   10438:	0207f793          	andi	a5,a5,32
+   1043c:	fe078ce3          	beqz	a5,10434 <uart_puts+0x28>
+    UART_THR = (uint32_t)c;
+   10440:	00d62023          	sw	a3,0(a2) # 40002000 <_stack_top+0x3ffda000>
+    while (*str) {
+   10444:	00054783          	lbu	a5,0(a0)
+   10448:	fe0790e3          	bnez	a5,10428 <uart_puts+0x1c>
+    }
+}
+   1044c:	00008067          	ret
+    while (!(UART_LSR & UART_LSR_THRE));
+   10450:	00072783          	lw	a5,0(a4)
+   10454:	0207f793          	andi	a5,a5,32
+   10458:	fe078ce3          	beqz	a5,10450 <uart_puts+0x44>
+    UART_THR = (uint32_t)c;
+   1045c:	01062023          	sw	a6,0(a2)
+}
+   10460:	fcdff06f          	j	1042c <uart_puts+0x20>
+
+00010464 <uart_getc_nonblocking>:
+
+int uart_getc_nonblocking(void) {
+    if (UART_LSR & UART_LSR_DR) {
+   10464:	40002737          	lui	a4,0x40002
+   10468:	01472783          	lw	a5,20(a4) # 40002014 <_stack_top+0x3ffda014>
+   1046c:	0017f793          	andi	a5,a5,1
+   10470:	00078a63          	beqz	a5,10484 <uart_getc_nonblocking+0x20>
+        return (int)(UART_RBR & 0xFF);
+   10474:	400027b7          	lui	a5,0x40002
+   10478:	0007a503          	lw	a0,0(a5) # 40002000 <_stack_top+0x3ffda000>
+   1047c:	0ff57513          	zext.b	a0,a0
+   10480:	00008067          	ret
+    }
+    return -1;
+   10484:	fff00513          	li	a0,-1
+}
+   10488:	00008067          	ret
+
+0001048c <uart_getc_blocking>:
+
+char uart_getc_blocking(void) {
+    while (!(UART_LSR & UART_LSR_DR));
+   1048c:	40002737          	lui	a4,0x40002
+   10490:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+   10494:	00072783          	lw	a5,0(a4)
+   10498:	0017f793          	andi	a5,a5,1
+   1049c:	fe078ce3          	beqz	a5,10494 <uart_getc_blocking+0x8>
+    return (char)(UART_RBR & 0xFF);
+   104a0:	400027b7          	lui	a5,0x40002
+   104a4:	0007a503          	lw	a0,0(a5) # 40002000 <_stack_top+0x3ffda000>
+}
+   104a8:	0ff57513          	zext.b	a0,a0
+   104ac:	00008067          	ret
+
+000104b0 <timer0_init>:
+
+#include "timer.h"
+
+void timer0_init(uint32_t compare_val, int irq_enable) {
+    /* Stop timer and reset counter */
+    TIMER0_CTRL_CH0 = TIMER_CTRL_RESET;
+   104b0:	40001737          	lui	a4,0x40001
+   104b4:	00200693          	li	a3,2
+    TIMER0_CMP_CH0  = compare_val;
+   104b8:	400017b7          	lui	a5,0x40001
+    TIMER0_CTRL_CH0 = TIMER_CTRL_RESET;
+   104bc:	00d72023          	sw	a3,0(a4) # 40001000 <_stack_top+0x3ffd9000>
+    TIMER0_CMP_CH0  = compare_val;
+   104c0:	00a7a423          	sw	a0,8(a5) # 40001008 <_stack_top+0x3ffd9008>
+    if (irq_enable) {
+   104c4:	00058863          	beqz	a1,104d4 <timer0_init+0x24>
+        TIMER0_CTRL_CH0 = TIMER_CTRL_IRQ_EN;
+   104c8:	00400793          	li	a5,4
+   104cc:	00f72023          	sw	a5,0(a4)
+   104d0:	00008067          	ret
+    } else {
+        TIMER0_CTRL_CH0 = 0;
+   104d4:	00072023          	sw	zero,0(a4)
+    }
+}
+   104d8:	00008067          	ret
+
+000104dc <timer0_start>:
+
+void timer0_start(void) {
+    TIMER0_CTRL_CH0 |= TIMER_CTRL_EN;
+   104dc:	40001737          	lui	a4,0x40001
+   104e0:	00072783          	lw	a5,0(a4) # 40001000 <_stack_top+0x3ffd9000>
+   104e4:	0017e793          	ori	a5,a5,1
+   104e8:	00f72023          	sw	a5,0(a4)
+}
+   104ec:	00008067          	ret
+
+000104f0 <timer0_stop>:
+
+void timer0_stop(void) {
+    TIMER0_CTRL_CH0 &= ~TIMER_CTRL_EN;
+   104f0:	40001737          	lui	a4,0x40001
+   104f4:	00072783          	lw	a5,0(a4) # 40001000 <_stack_top+0x3ffd9000>
+   104f8:	ffe7f793          	andi	a5,a5,-2
+   104fc:	00f72023          	sw	a5,0(a4)
+}
+   10500:	00008067          	ret
+
+00010504 <timer0_reset>:
+
+void timer0_reset(void) {
+    TIMER0_CTRL_CH0 |= TIMER_CTRL_RESET;
+   10504:	40001737          	lui	a4,0x40001
+   10508:	00072783          	lw	a5,0(a4) # 40001000 <_stack_top+0x3ffd9000>
+   1050c:	0027e793          	ori	a5,a5,2
+   10510:	00f72023          	sw	a5,0(a4)
+}
+   10514:	00008067          	ret
+
+00010518 <timer0_get_val>:
+
+uint32_t timer0_get_val(void) {
+    return TIMER0_VAL_CH0;
+   10518:	400017b7          	lui	a5,0x40001
+   1051c:	0047a503          	lw	a0,4(a5) # 40001004 <_stack_top+0x3ffd9004>
+}
+   10520:	00008067          	ret
+
+00010524 <test_timer_isr>:
+
+static volatile uint32_t g_timer_fired = 0;
+
+void test_timer_isr(uint32_t cause, uint32_t epc) {
+    (void)cause; (void)epc;
+    g_timer_fired++;
+   10524:	80c1a783          	lw	a5,-2036(gp) # 20044 <g_timer_fired>
+    /* Acknowledge and stop timer */
+    timer0_init(0, 0);
+   10528:	00000593          	li	a1,0
+   1052c:	00000513          	li	a0,0
+    g_timer_fired++;
+   10530:	00178793          	addi	a5,a5,1
+   10534:	80f1a623          	sw	a5,-2036(gp) # 20044 <g_timer_fired>
+    timer0_init(0, 0);
+   10538:	f79ff06f          	j	104b0 <timer0_init>
+
+0001053c <main>:
+}
+
+int main(void) {
+   1053c:	fe010113          	addi	sp,sp,-32
+    /* 1. Initialize UART for test reporting */
+    uart_init(27); /* Divisor for 115200 at 50MHz */
+   10540:	01b00513          	li	a0,27
+int main(void) {
+   10544:	00112e23          	sw	ra,28(sp)
+    uart_init(27); /* Divisor for 115200 at 50MHz */
+   10548:	e65ff0ef          	jal	103ac <uart_init>
+    uart_puts("TEST: Timer Interrupt Start\n");
+   1054c:	00020537          	lui	a0,0x20
+   10550:	00050513          	mv	a0,a0
+   10554:	eb9ff0ef          	jal	1040c <uart_puts>
+
+    /* 2. Initialize Interrupt Management */
+    irq_init();
+   10558:	cf1ff0ef          	jal	10248 <irq_init>
+    irq_register_handler(IRQ_CAUSE_TIMER0_CMP, test_timer_isr);
+   1055c:	000105b7          	lui	a1,0x10
+   10560:	52458593          	addi	a1,a1,1316 # 10524 <test_timer_isr>
+   10564:	00700513          	li	a0,7
+   10568:	dbdff0ef          	jal	10324 <irq_register_handler>
+    irq_enable_source(IRQ_CAUSE_TIMER0_CMP);
+   1056c:	00700513          	li	a0,7
+   10570:	d79ff0ef          	jal	102e8 <irq_enable_source>
+    irq_enable_global();
+   10574:	d65ff0ef          	jal	102d8 <irq_enable_global>
+
+    /* 3. Configure Timer 0 Channel 0: Compare value = 100 cycles, IRQ enabled */
+    timer0_init(100, 1);
+   10578:	00100593          	li	a1,1
+   1057c:	06400513          	li	a0,100
+   10580:	f31ff0ef          	jal	104b0 <timer0_init>
+    timer0_start();
+   10584:	f59ff0ef          	jal	104dc <timer0_start>
+
+    /* 4. Wait for interrupt to fire */
+    volatile uint32_t timeout = 50000;
+   10588:	0000c7b7          	lui	a5,0xc
+   1058c:	35078793          	addi	a5,a5,848 # c350 <_start-0x3cb0>
+   10590:	00f12623          	sw	a5,12(sp)
+    while (!g_timer_fired && --timeout);
+   10594:	0140006f          	j	105a8 <main+0x6c>
+   10598:	00c12783          	lw	a5,12(sp)
+   1059c:	fff78793          	addi	a5,a5,-1
+   105a0:	00f12623          	sw	a5,12(sp)
+   105a4:	00078663          	beqz	a5,105b0 <main+0x74>
+   105a8:	80c1a783          	lw	a5,-2036(gp) # 20044 <g_timer_fired>
+   105ac:	fe0786e3          	beqz	a5,10598 <main+0x5c>
+
+    if (g_timer_fired == 1) {
+   105b0:	80c1a703          	lw	a4,-2036(gp) # 20044 <g_timer_fired>
+   105b4:	00100793          	li	a5,1
+   105b8:	02f70063          	beq	a4,a5,105d8 <main+0x9c>
+        uart_puts("TIMER_PASS\n");
+    } else {
+        uart_puts("TIMER_FAIL\n");
+   105bc:	00020537          	lui	a0,0x20
+   105c0:	02c50513          	addi	a0,a0,44 # 2002c <_srodata+0x2c>
+   105c4:	e49ff0ef          	jal	1040c <uart_puts>
+    }
+
+    return 0;
+}
+   105c8:	01c12083          	lw	ra,28(sp)
+   105cc:	00000513          	li	a0,0
+   105d0:	02010113          	addi	sp,sp,32
+   105d4:	00008067          	ret
+        uart_puts("TIMER_PASS\n");
+   105d8:	00020537          	lui	a0,0x20
+   105dc:	02050513          	addi	a0,a0,32 # 20020 <_srodata+0x20>
+   105e0:	e2dff0ef          	jal	1040c <uart_puts>
+   105e4:	fe5ff06f          	j	105c8 <main+0x8c>
