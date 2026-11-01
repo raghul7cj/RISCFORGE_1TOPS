@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RISCFORGE Verification Stages 1 to 3 · Engineering Report</title>
+  <style>
+
+:root {
+  --sans: "IBM Plex Sans", Arial, Helvetica, sans-serif;
+  --display: "Archivo", "IBM Plex Sans", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --ground: #ffffff;
+  --paper: #ffffff;
+  --ink: #18202c;
+  --ink-2: #475063;
+  --ink-3: #626d7f;
+  --rule: #e2e8f0;
+  --rule-2: #cbd5e1;
+  --tint: #f8fafc;
+  --core: #2d56c8;
+  --core-f: rgba(45, 86, 200, 0.08);
+  --mem: #0c8577;
+  --mem-f: rgba(12, 133, 119, 0.08);
+  --bus: #7445bd;
+  --bus-f: rgba(116, 69, 189, 0.08);
+  --per: #a8660c;
+  --per-f: rgba(190, 120, 20, 0.09);
+  --irq: #c92c37;
+  --irq-f: rgba(201, 44, 55, 0.08);
+  --pass: #15803d;
+  --pass-f: rgba(21, 128, 61, 0.08);
+  --warn: #b45309;
+  --warn-f: rgba(180, 83, 9, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background-color: #f1f5f9;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.62;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  padding: 32px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.sheet {
+  background: var(--paper);
+  max-width: 860px;
+  width: 100%;
+  padding: 44px 48px;
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+  font-family: var(--display);
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 26px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-size: 19px;
+  margin-top: 36px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+h2 .no {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--core);
+  background: var(--core-f);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+h3 {
+  font-size: 15px;
+  margin-top: 22px;
+  margin-bottom: 8px;
+}
+
+h4 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+p {
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--core);
+  margin-bottom: 4px;
+}
+
+.lede {
+  font-size: 15.5px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Scope & Badges */
+.scope {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 12px 14px;
+  background: var(--tint);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid var(--rule-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.chip b { color: var(--ink); }
+/* Keep existing badges within narrow evidence-table cells. */
+td .chip { max-width: 100%; white-space: normal; overflow-wrap: normal; display: inline-block; }
+
+.chip.pass {
+  background: var(--pass-f);
+  border-color: rgba(21, 128, 61, 0.35);
+  color: var(--pass);
+  font-weight: 600;
+}
+
+.chip.warn {
+  background: var(--warn-f);
+  border-color: rgba(180, 83, 9, 0.35);
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.chip.fail {
+  background: var(--irq-f);
+  border-color: rgba(201, 44, 55, 0.35);
+  color: var(--irq);
+  font-weight: 600;
+}
+
+/* TOC */
+.toc {
+  background: var(--tint);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 32px;
+}
+
+.toc-title {
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  margin-bottom: 10px;
+}
+
+.toc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 24px;
+}
+
+.toc-grid a {
+  color: var(--core);
+  text-decoration: none;
+  font-size: 13px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.toc-grid a:hover {
+  text-decoration: underline;
+}
+
+.toc-grid .num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* Facts Grid */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.fact-item {
+  background: var(--tint);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.fact-item dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  margin-bottom: 3px;
+}
+
+.fact-item dd {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Tables */
+.tbl {
+  width: 100%;
+  margin: 16px 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12.5px;
+  table-layout: fixed;
+}
+
+thead {
+  background: var(--tint);
+  border-bottom: 1px solid var(--rule-2);
+  display: table-header-group;
+}
+
+th {
+  padding: 7px 10px;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+}
+
+td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  color: var(--ink);
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background-color: rgba(248, 250, 252, 0.7); }
+
+.m { font-family: var(--mono); font-size: 11.5px; }
+
+/* Note Boxes */
+.note {
+  border-left: 3px solid var(--core);
+  background: var(--core-f);
+  padding: 11px 15px;
+  margin: 15px 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+}
+
+.note.warn { border-left-color: var(--warn); background: var(--warn-f); }
+.note.pass { border-left-color: var(--pass); background: var(--pass-f); }
+.note.bug  { border-left-color: var(--irq);  background: var(--irq-f); }
+
+.note-title {
+  font-family: var(--display);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.note.warn .note-title { color: var(--warn); }
+.note.pass .note-title { color: var(--pass); }
+.note.bug .note-title  { color: var(--irq); }
+.note .note-title      { color: var(--core); }
+
+/* Code Blocks */
+pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 11px 14px;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.48;
+  margin: 12px 0;
+  border: 1px solid #1e293b;
+}
+
+pre code { font-family: inherit; font-size: inherit; color: inherit; }
+
+p code, td code, li code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  background: var(--tint);
+  border: 1px solid var(--rule-2);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--ink);
+}
+
+/* Diagrams */
+figure { margin: 18px 0; text-align: center; }
+
+.fig-box {
+  background: #ffffff;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 14px 10px;
+  overflow-x: auto;
+}
+
+figcaption {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+
+/* Lists */
+ul, ol { margin: 8px 0 12px 22px; color: var(--ink); }
+li { margin-bottom: 5px; font-size: 13.5px; }
+
+/* Section dividers */
+section {
+  margin-top: 28px;
+  padding-top: 4px;
+}
+
+/* Split Column Cards */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+/* Print Directive */
+@page {
+  size: A4 portrait;
+  margin: 14mm 12mm 16mm 12mm;
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    padding: 0 !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    color: #18202c !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sheet {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  section {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    margin-top: 18px !important;
+    padding-top: 6px !important;
+  }
+
+  h1, h2, h3, h4 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  figure, .note, pre, tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .tbl, .facts, .toc, .split { break-inside: auto !important; page-break-inside: auto !important; }
+  p { orphans: 3; widows: 3; }
+  td, th, a, code { overflow-wrap: anywhere; }
+
+  pre {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+  }
+
+  table { font-size: 11px !important; }
+  th, td { padding: 4px 6px !important; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <!-- Header / Cover -->
+    <div class="eyebrow">RISCFORGE 1TOPS SoC · Verification Report</div>
+    <h1>Verification Stages 1 to 3</h1>
+    <p>This report explains what the Stage 1–3 firmware exercises, how the testbench judges it, and what retained simulations demonstrate. All three latest retained runs carry success markers. That is useful bring-up evidence; exact per-phase accounting, independent checksum validation, and several diagnostic checks remain open. Read the stage sequences first, then the failure mechanism and evidence limits.</p>
+    <div class="scope">
+      <span class="chip"><b>DUT:</b> riscforge_soc_subsystem (RV32IM_Zicsr)</span>
+      <span class="chip"><b>Simulator:</b> AMD Vivado XSim v2022.2 (Build 3671981)</span>
+      <span class="chip"><b>Compiler:</b> GNU RISC-V GCC 13.2.0 (WSL Ubuntu)</span>
+      <span class="chip"><b>Evidence Cutoff:</b> 2026-10-24 23:58:23 IST</span>
+      <span class="chip"><b>Workspace:</b> rtl/ips/ (Standalone Windows tree)</span>
+    </div>
+    <!-- Table of Contents -->
+    <div class="toc">
+      <div class="toc-title">Report Contents</div>
+      <div class="toc-grid">
+        <a href="#sec-1"><span class="num">01</span> Report Identity &amp; Status Matrix</a>
+        <a href="#sec-2"><span class="num">02</span> Verification Architecture &amp; Progression</a>
+        <a href="#sec-3"><span class="num">03</span> Stage 1: Boot, Console &amp; Bus Liveness</a>
+        <a href="#sec-4"><span class="num">04</span> Stage 2: Watchdog, Freeze &amp; Blame</a>
+        <a href="#sec-5"><span class="num">05</span> Stage 3: Exact Bus Transaction Proof</a>
+        <a href="#sec-6"><span class="num">06</span> Pipeline Hazard Record (F-CORE-001)</a>
+        <a href="#sec-7"><span class="num">07</span> Requirements Traceability Matrix</a>
+        <a href="#sec-8"><span class="num">08</span> Engineering Study Notes &amp; Theory</a>
+        <a href="#sec-9"><span class="num">09</span> Next Work &amp; Stage Closure Roadmap</a>
+        <a href="#sec-10"><span class="num">10</span> Evidence &amp; Artifact Index</a>
+      </div>
+    </div>
+    <section id="sec-1">
+      <h2><span class="no">01</span> Report Identity &amp; Verification Status</h2>
+      <p>This report records progress rather than certifying the entire SoC. <b>Implemented</b> means present in inspected source; <b>executed</b> means a retained simulator transcript exists; <b>demonstrated</b> means that transcript supports a specific criterion. <b>Partially demonstrated</b> identifies an observed result whose intended automated check is incomplete. No new simulations or RTL changes were performed for this review on 25 October 2026.</p>
+      <dl class="facts">
+        <div class="fact-item"><dt>Report Date</dt><dd>2026-10-25</dd></div>
+        <div class="fact-item"><dt>Evidence Cutoff</dt><dd>2026-10-24 23:58:23</dd></div>
+        <div class="fact-item"><dt>Host Platform</dt><dd>Windows 11 / AMD XSim</dd></div>
+        <div class="fact-item"><dt>Git Metadata</dt><dd>f1e4661 (via manifest)</dd></div>
+      </dl>
+      <div class="note warn">
+        <div class="note-title">Workspace Source-of-Truth &amp; Git Repository Boundary</div>
+        The active working directory (<code>rtl/</code>) is operated as a standalone unversioned folder on the Windows host; there is no local <code>.git</code> repository subdirectory accessible from Windows. The commit hash (<code>f1e46615bdd7688ebf5e7fca3ff8f0a8fd05fa3a</code>) and branch (<code>Raghul</code>) cited throughout this report are sourced strictly from archived run manifests created during WSL Git tracking. The manifests declare that revision but do not independently bind every current source file and snapshot to it. Source edits after the runs cannot be excluded. SHA-256 matching establishes file integrity, not a verified source-to-snapshot chain.
+      </div>
+      <h3>Stage Status Matrix</h3>
+      <p>The latest retained transcripts show success for each suite. The table separates that execution result from closure of the broader stage objectives; a green transcript does not automatically close every row in the requirements matrix.</p>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 14%;">
+            <col style="width: 20%;">
+            <col style="width: 15%;">
+            <col style="width: 13%;">
+            <col style="width: 18%;">
+            <col style="width: 20%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Stage</th>
+              <th>Test Suite</th>
+              <th>Implemented</th>
+              <th>Executed</th>
+              <th>Acceptance Demonstrated</th>
+              <th>Key Gap / Limitation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Stage 1</b></td>
+              <td class="m">stage1_hello</td>
+              <td><span class="chip">Present in source</span></td>
+              <td><span class="chip pass">PASS</span></td>
+              <td><span class="chip pass">Demonstrated</span></td>
+              <td>No standalone proof package archived in <code>artifacts/stage_proofs/</code>; retained in <code>build/</code>.</td>
+            </tr>
+            <tr>
+              <td><b>Stage 2</b></td>
+              <td class="m">stage2_watchdog</td>
+              <td><span class="chip">Present in source</span></td>
+              <td><span class="chip pass">PASS</span></td>
+              <td><span class="chip warn">Partial</span></td>
+              <td>Rerun exercises reporter and dumps; freeze stability and recent-retirement checks remain open.</td>
+            </tr>
+            <tr>
+              <td><b>Stage 3</b></td>
+              <td class="m">stage3_monitor_count</td>
+              <td><span class="chip">Present in source</span></td>
+              <td><span class="chip pass">PASS</span></td>
+              <td><span class="chip warn">Partial</span></td>
+              <td>Counts agree in retained run; exact equality and phase isolation are not enforced. Signature evidence needs reconciliation.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section id="sec-2">
+      <h2><span class="no">02</span> Verification Architecture &amp; Progression</h2>
+      <p>
+        The verification methodology adopts an incremental, fail-fast progression where each stage provides the prerequisite foundation for subsequent stages. Rather than relying on monolithic testbenches or complex UVM VIPs, the infrastructure uses lightweight SystemVerilog passive monitors connected directly to internal signals, paired with bare-metal firmware that acts as deterministic stimulus.
+      </p>
+      <div class="note"><div class="note-title">Read the result at the right level</div>A <b>test case</b> is a scenario, such as deliberate noncompletion. A <b>transaction</b> is one load, store, or bus operation within it. An <b>activity threshold</b> rejects too little stimulus. An <b>acceptance criterion</b> decides whether the scenario proved its purpose. The earlier Stage 3 failure was an accounting discrepancy, not too few test cases. These implementation stages do not replace Rev B's broader release gates.</div>
+      <h3>The Four-Stage Verification Progression</h3>
+      <ol>
+        <li><b>Stage 1 (Boot &amp; Communication Baseline):</b> Validates toolchain assembly, <code>crt0.s</code> C runtime initialization, DSRAM <code>.mailbox</code> protocol, and basic APB read/write round-trips. Provides directed evidence that firmware can run, publish results, and request a testbench verdict.</li>
+        <li><b>Stage 2 (Failure Detection &amp; Blame Engine):</b> Demonstrates the watchdog timeout mechanism through an inverted negative test. Proves that when software hangs, the testbench catches the expiration, attributes failure to <code>LAYER_FIRMWARE</code> with the exact PC, and freezes cyclic history buffers for post-mortem triage.</li>
+        <li><b>Stage 3 (Quantitative Bus Observability):</b> Targets exact transaction accounting across the observation points. The firmware counts accesses issued while testbench monitors independently count AXI-Lite and APB beats. Exact agreement is the objective. Current acceptance enforces activity minimums; equality of printed totals is an audit observation, not yet an automated stage-specific assertion.</li>
+        <li><b>Stage 4+ (Protocol Formalisms &amp; Advanced Integration):</b> Extends monitoring with SVA protocol assertions, bus timeout fault injection, register reset sweeps, pin-level peripheral BFMs, and machine-mode trap preemption.</li>
+      </ol>
+      <!-- Build Path SVG -->
+      <figure>
+        <div class="fig-box">
+          <svg viewBox="0 0 780 84" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#626d7f"/>
+              </marker>
+            </defs>
+            <!-- Node 1: Sources -->
+            <rect x="5" y="12" width="95" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="5" y="12" width="4" height="60" rx="2" fill="#2d56c8"/>
+            <text x="16" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">Source Files</text>
+            <text x="16" y="47" font-family="var(--mono)" font-size="9" fill="#475063">main.c, crt0.s</text>
+            <text x="16" y="60" font-family="var(--mono)" font-size="9" fill="#475063">link.ld</text>
+            <!-- Arrow 1-2 -->
+            <line x1="100" y1="42" x2="115" y2="42" stroke="#626d7f" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- Node 2: GCC -->
+            <rect x="117" y="12" width="95" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="117" y="12" width="4" height="60" rx="2" fill="#2d56c8"/>
+            <text x="128" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">RISC-V GCC</text>
+            <text x="128" y="47" font-family="var(--mono)" font-size="9" fill="#475063">13.2.0 (WSL)</text>
+            <text x="128" y="60" font-family="var(--mono)" font-size="8.5" fill="#626d7f">rv32im_zicsr</text>
+            <!-- Arrow 2-3 -->
+            <line x1="212" y1="42" x2="227" y2="42" stroke="#626d7f" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- Node 3: ELF -->
+            <rect x="229" y="12" width="85" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="229" y="12" width="4" height="60" rx="2" fill="#0c8577"/>
+            <text x="240" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">Target ELF</text>
+            <text x="240" y="47" font-family="var(--mono)" font-size="9" fill="#475063">Linked Binary</text>
+            <text x="240" y="60" font-family="var(--mono)" font-size="9" fill="#475063">.dis ASM Dump</text>
+            <!-- Arrow 3-4 -->
+            <line x1="314" y1="42" x2="329" y2="42" stroke="#626d7f" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- Node 4: HexGen -->
+            <rect x="331" y="12" width="105" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="331" y="12" width="4" height="60" rx="2" fill="#0c8577"/>
+            <text x="342" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">elf_to_hex.py</text>
+            <text x="342" y="47" font-family="var(--mono)" font-size="8.5" fill="#475063">Bounded Slices</text>
+            <text x="342" y="60" font-family="var(--mono)" font-size="8.5" fill="#626d7f">ISRAM / DSRAM</text>
+            <!-- Arrow 4-5 -->
+            <line x1="436" y1="42" x2="451" y2="42" stroke="#626d7f" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- Node 5: Hex Files -->
+            <rect x="453" y="12" width="95" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="453" y="12" width="4" height="60" rx="2" fill="#0c8577"/>
+            <text x="464" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">Memory Hex</text>
+            <text x="464" y="47" font-family="var(--mono)" font-size="9" fill="#475063">imem.hex (32K)</text>
+            <text x="464" y="60" font-family="var(--mono)" font-size="9" fill="#475063">dmem.hex (32K)</text>
+            <!-- Arrow 5-6 -->
+            <line x1="548" y1="42" x2="563" y2="42" stroke="#626d7f" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- Node 6: Elab -->
+            <rect x="565" y="12" width="95" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="565" y="12" width="4" height="60" rx="2" fill="#7445bd"/>
+            <text x="576" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">Vivado XSim</text>
+            <text x="576" y="47" font-family="var(--mono)" font-size="9" fill="#475063">xvlog compile</text>
+            <text x="576" y="60" font-family="var(--mono)" font-size="9" fill="#475063">xelab snapshot</text>
+            <!-- Arrow 6-7 -->
+            <line x1="660" y1="42" x2="675" y2="42" stroke="#626d7f" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- Node 7: Simulation -->
+            <rect x="677" y="12" width="98" height="60" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="677" y="12" width="4" height="60" rx="2" fill="#15803d"/>
+            <text x="688" y="32" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">Simulation</text>
+            <text x="688" y="47" font-family="var(--mono)" font-size="9" fill="#475063">xsim -runall</text>
+            <text x="688" y="60" font-family="var(--mono)" font-size="9" fill="#15803d">PASS / Verdict</text>
+          </svg>
+        </div>
+        <figcaption>Figure 2.1: Automated Build Path — Firmware compilation, hex bounds clipping, elaboration, and test execution.</figcaption>
+      </figure>
+      <h3>Runtime System Architecture &amp; Datapath Partitioning</h3>
+      <p>
+        A crucial architectural concept in the RISCFORGE SoC is the distinction between <b>Direct SRAM Access</b> and <b>MMIO Bus Access</b>. The CPU core communicates with memory through <code>hybrid_mem_interface.sv</code>, which decodes the upper address bits to direct transactions down two physically separate paths:
+      </p>
+      <ul>
+        <li><b>Direct DSRAM Path (<code>0x0002_0000</code> &ndash; <code>0x0002_7FFF</code>):</b> Mapped directly to port 0 of the dual-port SRAM arbiter (<code>sram_mux.sv</code>). The interface uses a synchronous SRAM response; interface latency is not a promise that every CPU load completes in one clock. <em>Crucially, direct DSRAM accesses bypass the AXI4-Lite crossbar and APB bridge completely, producing zero AXI and zero APB bus activity.</em></li>
+        <li><b>MMIO Peripheral Aperture (<code>0x4000_0000</code> &ndash; <code>0x4FFF_FFFF</code>):</b> Forwarded to the 2x3 AXI4-Lite crossbar (<code>axi_lite_xbar.sv</code>), across the AXI-to-APB synchronous bridge (<code>axi_lite_to_apb.sv</code>), and into the 6-slot APB3 peripheral subsystem. The CPU core pipeline is frozen (<code>mem_stall_i = 1</code>) throughout the multi-cycle handshake until <code>BVALID</code> or <code>RVALID</code> commits.</li>
+      </ul>
+      <!-- Runtime Architecture SVG -->
+      <figure>
+        <div class="fig-box">
+          <svg viewBox="0 0 780 230" xmlns="http://www.w3.org/2000/svg">
+            <!-- Defs -->
+            <defs>
+              <marker id="arr-core" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2d56c8"/>
+              </marker>
+              <marker id="arr-mem" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0c8577"/>
+              </marker>
+              <marker id="arr-bus" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#7445bd"/>
+              </marker>
+              <marker id="arr-per" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#a8660c"/>
+              </marker>
+            </defs>
+            <!-- ISRAM & BootROM -->
+            <rect x="15" y="15" width="120" height="52" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="15" y="15" width="4" height="52" rx="2" fill="#0c8577"/>
+            <text x="26" y="33" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">32KB ISRAM</text>
+            <text x="26" y="47" font-family="var(--mono)" font-size="9" fill="#0c8577">0x0001_0000</text>
+            <text x="26" y="58" font-family="var(--mono)" font-size="8.5" fill="#626d7f">Instruction Store</text>
+            <rect x="15" y="78" width="120" height="44" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="15" y="78" width="4" height="44" rx="2" fill="#0c8577"/>
+            <text x="26" y="95" font-family="var(--display)" font-size="10.5" font-weight="700" fill="#18202c">BootROM</text>
+            <text x="26" y="110" font-family="var(--mono)" font-size="9" fill="#0c8577">0x0000_0000 (64B)</text>
+            <!-- CPU Core -->
+            <rect x="175" y="15" width="180" height="107" rx="5" fill="#ffffff" stroke="#2d56c8" stroke-width="1.5"/>
+            <rect x="175" y="15" width="6" height="107" rx="2" fill="#2d56c8"/>
+            <text x="190" y="35" font-family="var(--display)" font-size="12" font-weight="700" fill="#2d56c8">RV32IM_Zicsr Core</text>
+            <text x="190" y="52" font-family="var(--mono)" font-size="9.5" fill="#18202c">5-Stage In-Order Pipeline</text>
+            <text x="190" y="67" font-family="var(--mono)" font-size="8.5" fill="#626d7f">[IF]  [ID]  [EX]  [MEM]  [WB]</text>
+            <text x="190" y="88" font-family="var(--mono)" font-size="8.5" fill="#c92c37">Hazard Unit &amp; Stall Engine</text>
+            <text x="190" y="104" font-family="var(--mono)" font-size="8.5" fill="#2d56c8">WB / trap commit signals</text>
+            <!-- Fetch & Retire Monitor Taps -->
+            <path d="M 135 41 L 175 41" stroke="#0c8577" stroke-width="1.5" marker-end="url(#arr-mem)"/>
+            <text x="142" y="35" font-family="var(--mono)" font-size="8" fill="#0c8577">Fetch</text>
+            <rect x="175" y="135" width="85" height="38" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="182" y="150" font-family="var(--display)" font-size="9.5" font-weight="700" fill="#475063">Fetch Mon</text>
+            <text x="182" y="163" font-family="var(--mono)" font-size="8" fill="#626d7f">64-Ring Buffer</text>
+            <line x1="217" y1="122" x2="217" y2="135" stroke="#475063" stroke-width="1" stroke-dasharray="2,2"/>
+            <rect x="270" y="135" width="85" height="38" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="277" y="150" font-family="var(--display)" font-size="9.5" font-weight="700" fill="#475063">Retire Mon</text>
+            <text x="277" y="163" font-family="var(--mono)" font-size="8" fill="#626d7f">Commit tap</text>
+            <line x1="312" y1="122" x2="312" y2="135" stroke="#475063" stroke-width="1" stroke-dasharray="2,2"/>
+            <!-- Memory Router -->
+            <rect x="395" y="38" width="115" height="62" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="395" y="38" width="4" height="62" rx="2" fill="#7445bd"/>
+            <text x="406" y="56" font-family="var(--display)" font-size="10.5" font-weight="700" fill="#18202c">hybrid_mem</text>
+            <text x="406" y="70" font-family="var(--mono)" font-size="8.5" fill="#475063">Address Router</text>
+            <text x="406" y="84" font-family="var(--mono)" font-size="8" fill="#626d7f">sram_mux port0</text>
+            <!-- CPU to Router -->
+            <path d="M 355 69 L 395 69" stroke="#2d56c8" stroke-width="1.5" marker-end="url(#arr-core)"/>
+            <text x="361" y="63" font-family="var(--mono)" font-size="8" fill="#2d56c8">LSU Req</text>
+            <!-- Direct DSRAM Branch (Down) -->
+            <path d="M 435 100 L 435 135" stroke="#0c8577" stroke-width="1.5" marker-end="url(#arr-mem)"/>
+            <text x="380" y="120" font-family="var(--mono)" font-size="8" fill="#0c8577">Direct DSRAM</text>
+            <rect x="380" y="135" width="135" height="80" rx="4" fill="#ffffff" stroke="#0c8577" stroke-width="1.2"/>
+            <rect x="380" y="135" width="4" height="80" rx="2" fill="#0c8577"/>
+            <text x="392" y="153" font-family="var(--display)" font-size="11" font-weight="700" fill="#18202c">32KB DSRAM</text>
+            <text x="392" y="168" font-family="var(--mono)" font-size="8.5" fill="#0c8577">0x0002_0000 (1cyc/0cyc)</text>
+            <line x1="384" y1="175" x2="515" y2="175" stroke="#e2e8f0" stroke-width="1"/>
+            <text x="392" y="190" font-family="var(--mono)" font-size="8.5" font-weight="600" fill="#2d56c8">.mailbox (64B)</text>
+            <text x="392" y="204" font-family="var(--mono)" font-size="7.5" fill="#626d7f">0x0002_0000..0x3F</text>
+            <!-- MMIO AXI Crossbar Branch (Right) -->
+            <path d="M 510 69 L 545 69" stroke="#7445bd" stroke-width="1.5" marker-end="url(#arr-bus)"/>
+            <text x="514" y="63" font-family="var(--mono)" font-size="8" fill="#7445bd">MMIO</text>
+            <rect x="545" y="20" width="100" height="95" rx="4" fill="#ffffff" stroke="#7445bd" stroke-width="1.2"/>
+            <rect x="545" y="20" width="4" height="95" rx="2" fill="#7445bd"/>
+            <text x="556" y="38" font-family="var(--display)" font-size="10.5" font-weight="700" fill="#18202c">AXI4-Lite</text>
+            <text x="556" y="51" font-family="var(--mono)" font-size="8.5" fill="#7445bd">2x3 Crossbar</text>
+            <text x="556" y="65" font-family="var(--mono)" font-size="7.5" fill="#626d7f">0x4000_0000</text>
+            <line x1="549" y1="72" x2="645" y2="72" stroke="#e2e8f0" stroke-width="1"/>
+            <text x="556" y="86" font-family="var(--display)" font-size="10" font-weight="700" fill="#18202c">APB Bridge</text>
+            <text x="556" y="99" font-family="var(--mono)" font-size="8" fill="#7445bd">axi_to_apb.sv</text>
+            <!-- AXI & APB Tap Monitors -->
+            <line x1="595" y1="115" x2="595" y2="135" stroke="#7445bd" stroke-width="1" stroke-dasharray="2,2"/>
+            <rect x="550" y="135" width="95" height="38" rx="3" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="558" y="150" font-family="var(--display)" font-size="9.5" font-weight="700" fill="#7445bd">AXI / APB Mon</text>
+            <text x="558" y="163" font-family="var(--mono)" font-size="8" fill="#626d7f">5-Ch + 6-Slot Tap</text>
+            <!-- APB Slaves -->
+            <path d="M 645 69 L 675 69" stroke="#a8660c" stroke-width="1.5" marker-end="url(#arr-per)"/>
+            <rect x="675" y="15" width="95" height="165" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+            <rect x="675" y="15" width="4" height="165" rx="2" fill="#a8660c"/>
+            <text x="685" y="32" font-family="var(--display)" font-size="10" font-weight="700" fill="#18202c">APB Slaves</text>
+            <text x="685" y="48" font-family="var(--mono)" font-size="8" fill="#475063">[0] I2C 0x0000</text>
+            <text x="685" y="65" font-family="var(--mono)" font-size="8" fill="#475063">[1] TMR0 0x1000</text>
+            <text x="685" y="82" font-family="var(--mono)" font-size="8" fill="#475063">[2] UART 0x2000</text>
+            <text x="685" y="99" font-family="var(--mono)" font-size="8" fill="#475063">[3] GPIO 0x3000</text>
+            <text x="685" y="116" font-family="var(--mono)" font-size="8" fill="#475063">[4] SPI  0x4000</text>
+            <text x="685" y="133" font-family="var(--mono)" font-size="8" fill="#475063">[5] TMR1 0x5000</text>
+            <text x="685" y="160" font-family="var(--mono)" font-size="7.5" fill="#a8660c">Strict 32-bit APB</text>
+            <!-- Scoreboard & Blame Box -->
+            <rect x="15" y="190" width="340" height="32" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+            <text x="25" y="210" font-family="var(--display)" font-size="10" font-weight="700" fill="#2d56c8">Verification Top:</text>
+            <text x="130" y="210" font-family="var(--mono)" font-size="8.5" fill="#475063">soc_tb_top.sv · failure_reporter · mmio_path_sb</text>
+          </svg>
+        </div>
+        <figcaption>Figure 2.2: Runtime Hardware Architecture — Partitioned memory routing between Direct DSRAM and the AXI4-Lite / APB peripheral fabric with passive monitor tap points.</figcaption>
+      </figure>
+    </section>
+    <section id="sec-3">
+      <h2><span class="no">03</span> Stage 1 Deep Dive: Boot, Console &amp; Bus Liveness</h2>
+      <p><b>Purpose:</b> Prove that the RISC-V GCC toolchain produces structurally valid RV32IM machine code, that <code>crt0.s</code> executes from ISRAM, that the DSRAM mailbox accurately streams ASCII console messages to the testbench, and that the CPU can execute read-modify-write operations across the APB bus without wedging the interconnect.</p>
+      <h3>Execution Sequence</h3>
+      <ol>
+        <li><b>C Runtime Initialization (<code>crt0.s</code>):</b> Disables interrupts via <code>csrci mstatus, 0x8</code>, sets stack pointer <code>sp = 0x0002_8000</code>, sets <code>gp = __global_pointer$</code>, clears the other writable GPRs while preserving initialized sp and gp, zeroes <code>.bss</code> without touching <code>.mailbox</code>, and jumps to <code>main()</code>.</li>
+        <li><b>Section 1 (Canary &amp; Memory Layout Verification):</b> Firmware reads <code>bss_canary</code> (verifying 0), <code>data_canary</code> (verifying <code>0xC0FFEE11</code>), and <code>rodata_guard</code> (verifying <code>0x5A5A1234</code>). Then writes <code>bss_canary = 0x1234ABCD</code> and confirms write persistence.</li>
+        <li><b>Section 2 (Mailbox Console Streaming):</b> Calls <code>mailbox_puts()</code> to stream character packets through <code>MAILBOX-&gt;char_out</code> (DSRAM offset <code>+0x14</code>). Each character carries a sequence tag; the testbench notices a new nonzero tag and prints the character. This is a DSRAM side channel, not UART pin traffic.</li>
+        <li><b>Section 3 (DSRAM Data-Path Signature):</b> Executes <code>proof_dsram_signature(0xA11CE01)</code>, which writes a deterministic 16-word seed-derived pattern, checks every returned word, and folds the words using an FNV-style multiply/XOR checksum. It repeats with seed <code>0x0B0B0CA5</code> and checks that the signatures differ: 32 verified DSRAM reads are attempted. The log reports final signature <code>0x953C6BAC</code>; independent agreement with the source algorithm is not established (see Section 8).</li>
+        <li><b>Section 4 (APB Bus Liveness):</b> Executes <code>proof_mmio_ping()</code> against two separate peripheral apertures: I2C Prescaler Lo (<code>0x4000_0000</code>) and Timer 0 Compare Register (<code>0x4000_1008</code>). Performs read-modify-write and verifies physical restoration.</li>
+        <li><b>Vacuity &amp; Pass Gate:</b> Firmware asserts <code>TEST_REQUIRE_ACTIVITY(8, 6, 2, 0x1000)</code>, publishes activity to <code>MAILBOX-&gt;cycle_cnt</code>, writes <code>MAILBOX_CMD_PASS</code> (<code>0xC0DE_C0DE</code>), and executes <code>wfi</code>.</li>
+      </ol>
+      <h3>Boot assumptions and what the canaries establish</h3><p>The retained run uses <b>warm preload</b>: the harness synchronizes reset, loads ISRAM/DSRAM images, then releases the core through the BootROM trampoline to <code>0x00010000</code>. This does not exercise SPI-flash cold boot. The linker reserves <code>0x00020000–0x0002003F</code> for the mailbox; data sections follow. The stack starts at <code>0x00028000</code> and grows downward. Startup clears BSS, sets <code>mtvec</code>, and calls main; initialized data comes from preload.</p><p>The BSS canary checks zero and later write/read persistence. If memory was already zero, that alone cannot prove the clearing loop ran. Also, <code>rodata_guard</code> is a nonvolatile C constant: the compiler may substitute it into comparisons. Check the binary for an actual load before claiming a physical rodata-read test. The normal suites use mailbox helpers; startup's fallback return-from-main path uses different command values and is not validated by these passes.</p>
+      <h3>Console Output Evidence</h3>
+      <p>The retained transcript contains the expected banner, demonstrating the exercised mailbox output path. There is no byte-by-byte console scoreboard, so this does not establish lossless delivery for arbitrary message rates or sequences.</p>
+      <pre><code>========================================
+  Hello RISCFORGE Verification Infra!   
+  Firmware is stimulus, TB is judge.    
+========================================</code></pre>
+      <h3>Quantitative Simulation Results</h3>
+      <p>Sourced directly from retained log <code>ips/Verification/build/stage1_hello_sim.log</code> (executed 2026-10-24 23:58:18):</p>
+      <dl class="facts">
+        <div class="fact-item"><dt>Exit Status</dt><dd class="m">[MAILBOX PASS]</dd></div>
+        <div class="fact-item"><dt>Retired Instr</dt><dd class="m">6,895</dd></div>
+        <div class="fact-item"><dt>minstret CSR</dt><dd class="m">6,895</dd></div>
+        <div class="fact-item"><dt>Simulation Time</dt><dd class="m">92,375.0 ns (92.4 &mu;s)</dd></div>
+        <div class="fact-item"><dt>AXI Writes / Reads</dt><dd class="m">4 WR / 7 RD</dd></div>
+        <div class="fact-item"><dt>APB Transfers</dt><dd class="m">11 Transfers</dd></div>
+        <div class="fact-item"><dt>LSU Totals</dt><dd class="m">632 RD / 705 WR</dd></div>
+        <div class="fact-item"><dt>FW Attestation</dt><dd class="m">0x00040006</dd></div>
+      </dl>
+      <div class="note">
+        <div class="note-title">Stage 1 Hardware Evidence Analysis</div>
+        The testbench monitor logged <b>4 AXI writes and 7 AXI reads</b> (11 total APB transfers). The firmware attestation word <code>0x00040006</code> recorded 4 completed MMIO writes and 6 MMIO reads from within <code>proof_mmio_ping()</code>. The 7th AXI read represents the subsequent verification read of <code>PROOF_PROBE_T0_CTRL</code> at source line 95 (<code>REG32_READ(0x4000_1004)</code>). The totals are consistent after explaining the extra CTRL read. The attestation covers the pings rather than every MMIO access. This is a manual comparison, not a testbench equality assertion.
+      </div>
+      <h3>Limitations &amp; Gaps</h3>
+      <ul>
+        <li><b>Artifact Storage:</b> A dedicated proof package (<code>manifest.json</code> + hashed ELF files) was not archived in <code>artifacts/stage_proofs/20261024_stage1_hello/</code>; evidence is currently retained in <code>build/stage1_hello_sim.log</code>.</li>
+        <li><b>Phase Isolation:</b> The testbench checks nonzero cumulative activity and prints totals at simulation exit, but does not assert that exactly 0 AXI/APB beats occurred during the console streaming phase.</li>
+      </ul>
+    </section>
+    <section id="sec-4">
+      <h2><span class="no">04</span> Stage 2 Deep Dive: Watchdog, Freeze &amp; Blame Attribution</h2>
+      <p><b>Purpose:</b> Validate the testbench safety watchdog, monitor freezing logic, and diagnostic blame attribution engine. This stage implements an <b>Inverted Negative Proof</b>: because the intended outcome is a hard simulation timeout, a test that terminates with <code>CMD_PASS</code> is considered broken, whereas an intentional timeout attributed correctly to <code>LAYER_FIRMWARE</code> constitutes success.</p>
+      <h3>Firmware &amp; Testbench Inversion Protocol</h3>
+      <ol>
+        <li><b>Pre-Hang Evidence Generation:</b> Firmware first executes <code>proof_dsram_signature(0x5EED0002)</code> and two APB pings, publishing activity word <code>0x00040006</code> to the mailbox. This provides evidence for the specific memory and peripheral accesses exercised before the hang.</li>
+        <li><b>Deliberate Spin Loop:</b> Firmware enters an infinite loop (<code>while(1)</code>) that increments volatile counter <code>spin_iterations</code> and continuously polls <code>csr_read_mcycle()</code>. The loop is designed to continue executing; its presence and a cumulative retirement count do not assert recent retirement at the timeout boundary.</li>
+        <li><b>Watchdog Expiration:</b> Testbench watchdog timer expires at exactly <b>50,000 cycles</b> (configured via <code>-testplusarg TIMEOUT=50000</code>).</li>
+        <li><b>Blame Engine &amp; History Dump:</b> Testbench calls <code>failure_reporter.report_failure(LAYER_FIRMWARE, &ldquo;WATCHDOG_TIMEOUT&rdquo;, ...)</code>, freezing all cyclic ring buffers and dumping the last 10 retired instructions, LSU transactions, AXI handshakes, and APB transfers.</li>
+        <li><b>Inverted Verdict Evaluation:</b> Testbench checks that test ID is <code>0x0002</code>, retired instructions &gt;= 1 (<code>MIN_RETIRED_INSTR</code>), exactly 1 failure finding exists, blame layer is <code>LAYER_FIRMWARE (6)</code>, failure check ID is <code>WATCHDOG_TIMEOUT</code>, and pre-hang bus activity was recorded. If these checks pass, it prints <code>[STAGE2 PASS]</code> and calls <code>$finish(0)</code>.</li>
+      </ol>
+      <h3>Comparison of Historical vs. Retained Executions</h3>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 25%;">
+            <col style="width: 35%;">
+            <col style="width: 40%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Execution Metric</th>
+              <th>Archived Run (22:18 Backup)</th>
+              <th>Current Retained Run (23:56 Rerun)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Log File</b></td>
+              <td class="m">stage2_watchdog_sim_10824.backup.log</td>
+              <td class="m">artifacts/.../stage2_watchdog_sim.log</td>
+            </tr>
+            <tr>
+              <td><b>Retired Instructions</b></td>
+              <td class="m">31,734</td>
+              <td class="m">31,735</td>
+            </tr>
+            <tr>
+              <td><b>FW Attestation Word</b></td>
+              <td class="m">0x00010004 (historical)</td>
+              <td class="m">0x00040006 (matches Stage 1)</td>
+            </tr>
+            <tr>
+              <td><b>Failure Report Emitted</b></td>
+              <td><span class="chip warn">Missing (Bypassed)</span></td>
+              <td><span class="chip pass">Emitted (LAYER_FIRMWARE)</span></td>
+            </tr>
+            <tr>
+              <td><b>Freeze Buffers Dumped</b></td>
+              <td><span class="chip warn">None (Direct exit)</span></td>
+              <td><span class="chip pass">4 Buffers (Retire, LSU, AXI, APB)</span></td>
+            </tr>
+            <tr>
+              <td><b>Final Verdict</b></td>
+              <td><span class="chip pass">[STAGE2 PASS]</span></td>
+              <td><span class="chip pass">[STAGE2 PASS]</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note warn">
+        <div class="note-title">Resolution of the Stage 2 Architectural Gap</div>
+        In the historical archived testbench implementation, when the watchdog expired for Stage 2, the code executed <code>if (mb_test_id == STAGE2_TEST_ID) $finish(0);</code> <em>before</em> calling <code>report_failure()</code> or dumping the freeze buffers. Consequently, while the timeout threshold was verified, the blame engine and post-mortem dumps were never actually exercised under simulation! In the revised testbench (<code>soc_tb_top.sv</code> lines 667&ndash;732), the watchdog handler unconditionally fires <code>report_failure()</code>, dumps all four ring buffers, and then evaluates the 5-point Stage 2 acceptance criteria. The new log in <code>artifacts/stage_proofs/20261024_stage2_watchdog/logs/</code> shows execution of the reporter and four dump routines. Source drives a common freeze signal; post-freeze pointer and content stability is not separately asserted.
+      </div>
+      <h3>How to interpret an expected fatal finding</h3><p>Normal tests require zero reporter findings. Stage 2 intentionally creates <b>one</b> <code>WATCHDOG_TIMEOUT</code> finding and accepts it only for test ID 2 with the expected layer and prior activity. The layer is supplied by the caller; it is not an independent inference that any timeout has a firmware root cause.</p><p>The watchdog starts after boot/preload setup, not at time zero. At 10 ns per clock, 50,000 cycles are 500,000 ns; setup and the final 500 ns grace period explain termination at 500,765 ns. The reporter's approximate cycle number uses absolute simulation time and a different origin. AXI/APB dumps preserve pre-hang pings, while retirement and LSU records continue during the spin. Dump execution does not itself prove chronological accuracy or post-freeze stability.</p>
+      <h3>Regression Runner Bifurcation Logic</h3>
+      <p>Because Stage 2 deliberately causes <code>failure_reporter.sv</code> to log a failure report, standard regression parsers would interpret the string <code>&ldquo;FAILURE REPORT&rdquo;</code> as a test failure. In <code>ips/Verification/regression/run_regression.ps1</code> (lines 321&ndash;326), the verdict logic is explicitly bifurcated:</p>
+      <pre><code>if ($t -eq "stage2_watchdog") {
+    $hasFail = ($log -match "\[STAGE2 FAIL\]") -or ($log -match "\[FATAL TIMEOUT\]") -or ($log -match "\[MAILBOX FAIL\]")
+} else {
+    $hasFail = ($log -match "\[MAILBOX FAIL\]") -or ($log -match "\[FATAL TIMEOUT\]") -or
+               ($log -match "\[MAILBOX HALT\]") -or ($log -match "FAILURE REPORT")
+}</code></pre>
+    </section>
+    <section id="sec-5">
+      <h2><span class="no">05</span> Stage 3 Deep Dive: Exact Bus Transaction Proof</h2>
+      <p><b>Purpose:</b> Exercise known memory and peripheral sequences and compare firmware evidence with independently sampled bus activity. The latest run matches planned MMIO totals. Matching every LSU event to every bus completion, including dropped or duplicated operations, remains a closure objective rather than an implemented end-to-end guarantee.</p>
+      <h3>Firmware Phase Architecture</h3>
+      <ol>
+        <li><b>Phase 1 (Pure DSRAM Array Sweep):</b> Writes 20 distinct patterned words to <code>scratch_array[20]</code> using seed <code>0x3C0DE0</code>. Followed immediately by a full forward read-back sweep (20 loads) and an inverse reverse sweep (20 loads). <em>Expected bus activity: 0 AXI transfers, 0 APB transfers.</em></li>
+        <li><b>Phase 2 (Array Mutation &amp; Signature):</b> Computes seed-dependent signature <code>proof_dsram_signature(0x3A6E0003)</code>, then separately flips a bit in <code>scratch_array[7]</code>, checks the changed word, restores it, and checks restoration. The helper hashes <code>proof_dscratch[]</code>, not this array; no signature is recomputed after mutation. Checksum sensitivity to <code>scratch_array[]</code> is not tested.</li>
+        <li><b>Phase 3 (APB Path Liveness Across 2 Apertures):</b> Executes <code>proof_mmio_ping()</code> against Slot 0 (I2C PRER_LO, <code>0x4000_0000</code>) and Slot 1 (Timer 0 CMP, <code>0x4000_1008</code>).</li>
+        <li><b>Phase 4 (Sustained MMIO Read Burst):</b> Issues 8 sequential, blocking 32-bit reads against Timer 1 Control Register (<code>0x4000_5004</code>, Slot 5), asserting that each reads back <code>0x0000_0000</code>.</li>
+        <li><b>Phase 5 (Vacuity Gate &amp; Completion):</b> Asserts <code>TEST_REQUIRE_ACTIVITY(16, 14, 3, 0x3000)</code> requiring &gt;=16 DSRAM reads, &gt;=14 MMIO reads, &gt;=3 distinct APB apertures, writes attestation word <code>0x0004000E</code>, and writes <code>MAILBOX_CMD_PASS</code>.</li>
+      </ol>
+      <h3>Transaction Accounting Budget</h3>
+      <p>The budget comes from firmware control flow; the retained log supplies whole-run observed totals. In AXI4-Lite, these eight reads are separate single-beat transactions, not an AXI burst or evidence of pipelined throughput. The test checks returned values, not a latency target.</p>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 25%;">
+            <col style="width: 20%;">
+            <col style="width: 15%;">
+            <col style="width: 15%;">
+            <col style="width: 25%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Firmware Phase</th>
+              <th>Target Address / Slot</th>
+              <th>MMIO Reads</th>
+              <th>MMIO Writes</th>
+              <th>APB Transfers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>1. DSRAM Array Sweep</b></td>
+              <td class="m">DSRAM .bss buffers (not mailbox base)</td>
+              <td class="m">0</td>
+              <td class="m">0</td>
+              <td class="m">0 (Direct SRAM path)</td>
+            </tr>
+            <tr>
+              <td><b>2. DSRAM Signature</b></td>
+              <td class="m">DSRAM .bss buffers (not mailbox base)</td>
+              <td class="m">0</td>
+              <td class="m">0</td>
+              <td class="m">0 (Direct SRAM path)</td>
+            </tr>
+            <tr>
+              <td><b>3a. I2C Ping</b></td>
+              <td class="m">0x4000_0000 [Slot 0]</td>
+              <td class="m">3</td>
+              <td class="m">2</td>
+              <td class="m">5 transfers</td>
+            </tr>
+            <tr>
+              <td><b>3b. Timer 0 Ping</b></td>
+              <td class="m">0x4000_1008 [Slot 1]</td>
+              <td class="m">3</td>
+              <td class="m">2</td>
+              <td class="m">5 transfers</td>
+            </tr>
+            <tr>
+              <td><b>4. Timer 1 Burst</b></td>
+              <td class="m">0x4000_5004 [Slot 5]</td>
+              <td class="m">8</td>
+              <td class="m">0</td>
+              <td class="m">8 transfers</td>
+            </tr>
+            <tr>
+              <td><b>TOTALS</b></td>
+              <td><b>Slots: 0, 1, 5 (0x23)</b></td>
+              <td class="m"><b>14 Reads</b></td>
+              <td class="m"><b>4 Writes</b></td>
+              <td class="m"><b>18 APB Transfers</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>What the counters mean</h3><p>A successful ping reads a baseline, writes a toggled bit, checks it, restores the baseline, and checks restoration: <b>3 reads + 2 writes</b>. The checks cover the selected bit, not necessarily every register bit. Firmware counters are software bookkeeping; AXI/APB monitors observe handshakes. They are separate measurement points, but either can be wrong.</p><p><code>TEST_REQUIRE_ACTIVITY(16, 14, 3, 0x3000)</code> sets minimum DSRAM reads, minimum MMIO reads, and minimum distinct slots. It does not require exactly 14 reads or four writes. <code>0x0004000E = (4 &lt;&lt; 16) | 14</code> packs writes and reads; <code>0x23 = (1 &lt;&lt; 0) | (1 &lt;&lt; 1) | (1 &lt;&lt; 5)</code> records slots 0, 1, and 5.</p><p>The testbench requires nonzero retirement, AXI/APB activity and attestation with no unexpected reporter finding; it prints totals without enforcing exact equality. The path scoreboard checks completed APB slot selection from the address. Its LSU inputs are connected but unused by the matching logic. Without expected records and a completion drain, that checker cannot detect an expected transfer that never appears.</p><p>For the first array phase, count accepted stores in the array address range: expected <b>20 stores and 40 sweep reads</b>, with zero AXI/APB delta in the same window. Later mutation adds two array stores and more reads. BSS initialization, stack, mailbox and counter accesses add other LSU events. Whole-run LSU totals therefore cannot simply equal 20.</p>
+      <h3>Failing vs. Passing Execution Comparison</h3>
+      <p>The earlier failure matters because correct peripheral traffic did not imply correct execution of surrounding bookkeeping instructions. The passing rerun supports this exercised sequence after the change, not general hardware correctness.</p>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 25%;">
+            <col style="width: 35%;">
+            <col style="width: 40%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Metric / Field</th>
+              <th>Archived Failing Run (Backup 38044)</th>
+              <th>Current Passing Run (Retained)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Log File</b></td>
+              <td class="m">stage3_monitor_count_sim_38044.backup.log</td>
+              <td class="m">artifacts/.../stage3_monitor_count_sim.log</td>
+            </tr>
+            <tr>
+              <td><b>Simulator Verdict</b></td>
+              <td><span class="chip fail">[MAILBOX FAIL] 0x3002</span></td>
+              <td><span class="chip pass">[MAILBOX PASS]</span></td>
+            </tr>
+            <tr>
+              <td><b>Firmware mmio_reads</b></td>
+              <td class="m">12 (0x0000000C) &mdash; FAIL</td>
+              <td class="m">14 (0x0000000E) &mdash; PASS</td>
+            </tr>
+            <tr>
+              <td><b>Firmware mmio_writes</b></td>
+              <td class="m">0x00010001 (Corrupted) &mdash; FAIL</td>
+              <td class="m">4 (0x00000004) &mdash; PASS</td>
+            </tr>
+            <tr>
+              <td><b>Hardware AXI Counts</b></td>
+              <td class="m">4 WR / 14 RD (Correct)</td>
+              <td class="m">4 WR / 14 RD (Correct)</td>
+            </tr>
+            <tr>
+              <td><b>Hardware APB Transfers</b></td>
+              <td class="m">18 transfers (Correct)</td>
+              <td class="m">18 transfers (Correct)</td>
+            </tr>
+            <tr>
+              <td><b>Retired Instructions</b></td>
+              <td class="m">Not established; ~5,960 is a time/cycle figure, not a retired count</td>
+              <td class="m">5,551 (minstret = 5551)</td>
+            </tr>
+            <tr>
+              <td><b>Attestation Word</b></td>
+              <td class="m">Not established here; publication precedes activity checks</td>
+              <td class="m">0x0004000e (4 WR, 14 RD)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note pass">
+        <div class="note-title">Retained Stage 3 Success Evidence</div>
+        In the current passing run (Sat Oct 24 23:57:36 2026), the printed MMIO counters agree: firmware reports <code>mmio_rd=0000000E</code>, <code>mmio_wr=00000004</code>, <code>slots=00000023</code>, and <code>sig=A459670A</code>; hardware monitors report <b>4 AXI writes, 14 AXI reads, and 18 APB transfers</b>; and the simulation terminates cleanly with <code>[MAILBOX PASS]</code> at 75,405 ns. The documented hazard change and its evidence limits follow. The signature and DSRAM-count label need separate scrutiny; a green marker does not close those questions.
+      </div>
+    </section>
+    <section id="sec-6">
+      <h2><span class="no">06</span> Pipeline Hazard Record and Evidence Limits</h2>
+      <p>The Stage 3 failure separates <b>peripheral work completing</b> from <b>correct execution of instructions around that work</b>. The current hazard-unit change addresses a plausible instruction-loss mechanism and a later directed run passes. A cycle trace linking the first incorrect update to that mechanism is not retained in this report.</p>
+      <div class="note bug"><div class="note-title">F-CORE-001 — Data-hazard bubble while Execute must be held</div><b>Symptom:</b> reads 12 instead of 14; writes <code>0x00010001</code> instead of 4, despite observed peripheral totals of 14 reads and 4 writes.<br><b>Implementation:</b> three data-hazard contributions to <code>FlushE</code> are gated with <code>~mem_stall_i</code> in <code>hazard_unit.v:192</code>.<br><b>Status:</b> change present; passing directed rerun retained; historical mechanism reported and structurally supported, with trace confirmation and broader regression still open.</div>
+      <h3>1. Why a bubble is normally useful</h3>
+      <p>For <code>lw a5, offset(a3)</code> followed by <code>addi a5, a5, 1</code>, the add needs a value the load has not produced. With the load in Execute and the add in Decode, <code>lwstall</code> holds Fetch/Decode and inserts a bubble into ID/EX. In an advancing pipeline the load moves toward Memory while its consumer waits. The bubble is safe because the producer can advance.</p>
+      <h3>2. Why the same action is unsafe during an older memory stall</h3>
+      <p>An older MMIO operation may occupy Memory and assert <code>mem_stall_i</code>. The following counter load is then held in Execute; the dependent add waits in Decode. The load cannot advance. ID/EX must retain it until Memory becomes available. In <code>decode_cycle.v:273–305</code>, the FlushE branch precedes StallE. If both are high, clearing the control state wins over holding it. This is a synchronous control-priority conflict, not a simulator scheduling race.</p>
+      <div class="tbl"><table><colgroup><col style="width:23%"><col style="width:25%"><col style="width:27%"><col style="width:25%"></colgroup><thead><tr><th>Conceptual interval</th><th>Memory stage</th><th>Execute / Decode</th><th>Required decision</th></tr></thead><tbody><tr><td>Before MMIO completes</td><td>Older peripheral operation waits</td><td>Counter load held / dependent add waits</td><td>Hold ID/EX; no data-hazard bubble</td></tr><tr><td>Ungated hazard term</td><td>Still stalled</td><td>Load control bits cleared by FlushE</td><td>Producer may be lost</td></tr><tr><td>Memory stall releases</td><td>Can accept next operation</td><td>Load must advance before add consumes it</td><td>Resume normal hazard handling</td></tr></tbody></table></div>
+      <p><em>This table explains the mechanism; it is not a measured waveform.</em> A stale Timer 0 probe value <code>0x00010000</code> incremented by one would explain <code>0x00010001</code>. Matching that arithmetic is supporting evidence; the actual stale-register path and first lost read-count update need a retained trace.</p>
+      <h3>3. Ruling out a missing increment</h3>
+      <p>The historical archived disassembly contains the counter updates, including the restore-read increment. This rules out an omitted increment in that binary. It does <b>not</b> independently rule out bad load data, overwrites, source/snapshot mismatch or another execution defect. Do not jump directly from “instruction exists” to “instruction was flushed.”</p>
+      <pre><code>// Historical archived listing; do not assume these addresses in the new ELF.
+10a14: lw    a5, 732(a3)   // proof_mmio_writes
+10a18: addi  a5, a5, 1
+10a1c: sw    a5, 732(a3)
+// Restore-read bookkeeping also appears at 10a5c–10a68.</code></pre>
+      <h3>4. What the correction changes</h3>
+      <pre><code>// Current hazard_unit.v:192, reformatted only
+assign FlushE = (lwstall &amp; ~mem_stall_i) |
+                (csr_gpr_stall &amp; ~mem_stall_i) |
+                PCSrcE | (csr_stall &amp; ~mem_stall_i) |
+                exc_inflight_M | wb_redirect |
+                flush_pipeline_onehot[1] | stallMUL;</code></pre>
+      <p>Only data-hazard bubble terms are suppressed during the memory stall. Branch redirects, exceptions, explicit flushes and multiply-related control remain separate causes. The change does not globally forbid FlushE during all stalls. Decode priority remains unchanged in inspected source.</p>
+      <h3>5. Decisive experiment and regression still needed</h3>
+      <p>Capture a counter load in EX, its dependent add in ID, and an older MMIO operation stalled in M. Observe <code>mem_stall_i</code>, <code>lwstall</code>, <code>StallE</code>, <code>FlushE</code>, valid bits, destination register, and counter load/store data. The distinguishing result is that the producer survives the stall and its loaded value reaches the add. Retain pre-change failure and post-change success with identical stimulus and source/snapshot hashes. Repeat for CSR hazards and permitted redirects. This review proposes that experiment; it does not execute it.</p>
+      <h3>6. Assertion scope</h3>
+      <p>The previous proposal <code>mem_stall_i |-&gt; !(lwstall &amp;&amp; FlushE)</code> could reject a legitimate redirect when lwstall is also true. Exclude all other permitted flush causes. For the inspected expression, a narrow candidate is:</p>
+      <pre><code>// Proposed only: bind signals and verify reset polarity before use.
+assert property (@(posedge clk) disable iff (!rst_n)
+  (mem_stall_i &amp;&amp; !PCSrcE &amp;&amp; !exc_inflight_M &amp;&amp;
+   !wb_redirect &amp;&amp; !flush_pipeline_onehot[1] &amp;&amp; !stallMUL)
+  |-&gt; !FlushE);</code></pre>
+      <p>This combinational check is close to the implementation and cannot prove instruction preservation alone. Pair it with a temporal property that ID/EX data and control remain stable across a stalled edge without a permitted kill, and that the held instruction resumes. Formal property verification is distinct from lint; no formal proof is claimed here.</p>
+    </section>
+    <section id="sec-7">
+      <h2><span class="no">07</span> Requirements Traceability Matrix</h2>
+      <p>These are report-local requirement IDs, not a claimed complete mapping to Rev B. <b>Shown</b> means the retained scenario demonstrates the stated behavior; <b>Partial</b> means a necessary check or precondition is missing; <b>Open</b> means it has not been demonstrated. An observed count match is weaker than an automated equality check.</p>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 13%;">
+            <col style="width: 25%;">
+            <col style="width: 20%;">
+            <col style="width: 15%;">
+            <col style="width: 12%;">
+            <col style="width: 15%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Req ID</th>
+              <th>Requirement Description</th>
+              <th>Code Location</th>
+              <th>Evidence Source</th>
+              <th>Status</th>
+              <th>Identified Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+<td class="m">S1-REQ-01</td>
+<td>Firmware boots from ISRAM and completes crt0 BSS clear.</td>
+<td class="m">crt0.s, stage1/main.c</td>
+<td>stage1_hello_sim.log</td>
+<td><span class="chip warn">Partial</span></td>
+<td>Boot and zero canary observed; initially nonzero BSS precondition not established.</td>
+</tr>
+            <tr>
+              <td class="m">S1-REQ-02</td>
+              <td>Mailbox console channel streams ASCII banner to testbench.</td>
+              <td class="m">mailbox.h, soc_tb_top.sv</td>
+              <td>stage1_hello_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. Banner printed.</td>
+            </tr>
+            <tr>
+              <td class="m">S1-REQ-03</td>
+              <td>Firmware writes CMD_PASS before watchdog limit.</td>
+              <td class="m">mailbox.h, soc_tb_top.sv</td>
+              <td>stage1_hello_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. Pass at 92.4 &mu;s.</td>
+            </tr>
+            <tr>
+              <td class="m">S1-REQ-04</td>
+              <td>APB bus liveness proven on at least 2 distinct apertures.</td>
+              <td class="m">proof_activity.h</td>
+              <td>stage1_hello_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. I2C &amp; TMR0 pinged.</td>
+            </tr>
+            <tr>
+              <td class="m">S1-REQ-05</td>
+              <td>No unexpected watchdog or timeout assertions.</td>
+              <td class="m">soc_tb_top.sv:655</td>
+              <td>stage1_hello_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. 0 fatals.</td>
+            </tr>
+            <tr>
+              <td class="m">S2-REQ-01</td>
+              <td>Watchdog timer expires at configured cycle budget.</td>
+              <td class="m">soc_tb_top.sv:655</td>
+              <td>stage2_watchdog_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. Expired at 50,000 cyc.</td>
+            </tr>
+            <tr>
+              <td class="m">S2-REQ-02</td>
+              <td>Blame engine attributes death to LAYER_FIRMWARE:WATCHDOG_TIMEOUT.</td>
+              <td class="m">failure_reporter.sv</td>
+              <td>stage2_watchdog_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. Verified in rerun.</td>
+            </tr>
+            <tr>
+<td class="m">S2-REQ-03</td>
+<td>Cyclic freeze buffers dumped successfully upon timeout.</td>
+<td class="m">soc_tb_top.sv:675</td>
+<td>stage2_watchdog_sim.log</td>
+<td><span class="chip warn">Partial</span></td>
+<td>Reporter and dumps execute; post-freeze pointer/content stability is not asserted.</td>
+</tr>
+            <tr>
+              <td class="m">S2-REQ-04</td>
+              <td>Prior bus activity verified before watchdog hang.</td>
+              <td class="m">soc_tb_top.sv:714</td>
+              <td>stage2_watchdog_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. AXI=10, APB=10.</td>
+            </tr>
+            <tr>
+<td class="m">S2-REQ-05</td>
+<td>Regression runner correctly accepts inverted watchdog pass.</td>
+<td class="m">run_regression.ps1:321</td>
+<td>stage2_watchdog_sim.log</td>
+<td><span class="chip warn">Partial</span></td>
+<td>Current parser supports inversion; simulator log is not a retained runner-summary transcript.</td>
+</tr>
+            <tr>
+<td class="m">S3-REQ-01</td>
+<td>Exact accounting of 14 MMIO reads and 4 MMIO writes.</td>
+<td class="m">stage3/main.c</td>
+<td>stage3_monitor_count_sim.log</td>
+<td><span class="chip warn">Partial</span></td>
+<td>Observed 14/4; firmware enforces a minimum, not exact read/write equality.</td>
+</tr>
+            <tr>
+<td class="m">S3-REQ-02</td>
+<td>Hardware monitor counts match firmware attestation.</td>
+<td class="m">soc_tb_top.sv:780</td>
+<td>stage3_monitor_count_sim.log</td>
+<td><span class="chip warn">Partial</span></td>
+<td>Printed totals agree; no exact attestation-versus-monitor comparator.</td>
+</tr>
+            <tr>
+              <td class="m">S3-REQ-03</td>
+              <td>Accesses span at least 3 distinct APB peripheral slots.</td>
+              <td class="m">proof_activity.h</td>
+              <td>stage3_monitor_count_sim.log</td>
+              <td><span class="chip pass">Shown</span></td>
+              <td>None. Slots 0, 1, 5 (0x23).</td>
+            </tr>
+            <tr>
+              <td class="m">S3-REQ-04</td>
+              <td>DSRAM array stores strictly isolated from AXI/APB bus.</td>
+              <td class="m">hybrid_mem_interface.sv</td>
+              <td>stage3_monitor_count_sim.log</td>
+              <td><span class="chip warn">Open</span></td>
+              <td>No per-phase boundary assertion checking AXI==0 during Phase 1.</td>
+            </tr>
+            <tr>
+              <td class="m">S3-REQ-05</td>
+              <td>Per-phase transaction boundary enforcement in testbench.</td>
+              <td class="m">soc_tb_top.sv</td>
+              <td>stage3_monitor_count_sim.log</td>
+              <td><span class="chip warn">Open</span></td>
+              <td>Testbench evaluates cumulative counts only at test end.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section id="sec-8">
+      <h2><span class="no">08</span> Engineering Study Notes &amp; Theory</h2>
+      <p>This section provides pedagogical explanations and reference code listings designed for junior engineers and design verification trainees.</p>
+      <div class="note warn"><div class="note-title">Open evidence issues</div><p><b>F-DOC-001 — Mislabelled DSRAM count:</b> <code>proof_report()</code> sets <code>v = proof_dsram_sig</code> and prints it for both <code>dsram_rds</code> and <code>sig</code>. Thus <code>dsram_rds=A459670A</code> is not a read count. The current source label is wrong; only the report is corrected here.</p><p><b>F-EVID-002 — Source/log checksum discrepancy:</b> An independent unsigned 32-bit evaluation of the inspected helper gives <code>0x785C69AA</code> for seed <code>0x3A6E0003</code>; Stage 3 prints <code>0xA459670A</code>. Stage 1's second seed <code>0x0B0B0CA5</code> gives <code>0x0F7193AC</code>, while its final log prints <code>0x953C6BAC</code>. This is not yet a diagnosed hardware fault. Pin the compiled helper and image identity, then compare intermediate folds. Current tests require nonzero/different signatures, not these exact reference values.</p></div>
+      <h3>Plain-Language Walkthroughs</h3>
+      <p><b>Stage 1 walkthrough:</b> The CPU needs a reporting channel before UART itself has been verified. A fixed DSRAM mailbox supplies it. Startup prepares the C environment, firmware writes tagged characters and status, and the testbench observes memory directly. A banner plus successful canary and peripheral checks is useful bring-up evidence; it does not prove UART operation, cold boot or every memory location.</p>
+      <p><b>Stage 2 walkthrough:</b> Deliberate noncompletion exercises the timeout path. This watchdog belongs to simulation infrastructure, not an integrated hardware watchdog peripheral. The newer run reaches the deadline, records the expected timeout, freezes module histories, dumps them and reports inverted success. Recent retirement and freeze stability still need explicit checks.</p>
+      <p><b>Stage 3 walkthrough:</b> Firmware generates a known sequence; monitors count bus completions. Four writes plus fourteen reads give eighteen APB transfers. The passing run agrees with the budget. Current gates are weaker than an exact audit: firmware checks minimum activity and the testbench checks nonzero evidence. An extra transaction could leave both green. Exact matching and completion draining remain next steps.</p>
+      <h3>Key Code Excerpts</h3>
+      <h4>1. The Bus Liveness Probe (proof_activity.h, lines 224&ndash;258)</h4>
+      <p>Illustrates the 3-phase read-modify-write pattern ensuring inert, non-destructive bus testing:</p>
+      <pre><code>// Phase 1: Baseline read (1 read)
+v0 = *reg; proof_mmio_reads++;
+// Phase 2: Toggle test bit and read back (1 write, 1 read)
+*reg = v0 ^ test_bit; proof_mmio_writes++;
+v1 = *reg; proof_mmio_reads++;
+// Phase 3: Restore original value and verify (1 write, 1 read)
+*reg = v0; proof_mmio_writes++;
+if ((*reg &amp; test_bit) != (v0 &amp; test_bit)) return -1; // Restore failed
+proof_mmio_reads++; // Total: 3 reads, 2 writes per aperture</code></pre>
+      <h4>2. The Hazard Unit Pipeline Stall Gate (hazard_unit.v, line 192)</h4>
+      <p>Illustrates gating of data-hazard bubble terms; other permitted flush causes remain active:</p>
+      <pre><code>// Suppress data-hazard bubbles during mem_stall_i; allow valid kills.
+assign FlushE = (lwstall &amp; ~mem_stall_i) |
+                (csr_gpr_stall &amp; ~mem_stall_i) |
+                PCSrcE |
+                (csr_stall &amp; ~mem_stall_i) |
+                exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL;</code></pre>
+      <h4>3. The Inverted Stage 2 Acceptance Logic (soc_tb_top.sv, lines 689&ndash;721)</h4>
+      <p>Illustrates current acceptance checks after the reporter and dump calls; dump stability is not checked by this excerpt:</p>
+      <pre><code>if (mb_test_id == STAGE2_TEST_ID) begin
+  if (u_retire_mon.total_retired_instr &lt; MIN_RETIRED_INSTR) $finish(1);
+  if (u_failure_reporter.n_find != 1) $finish(1);
+  if (u_failure_reporter.failing_layer != LAYER_FIRMWARE ||
+      u_failure_reporter.failing_check_id != "WATCHDOG_TIMEOUT") $finish(1);
+  if (mb_activity == 32'h0) $finish(1);
+  if (u_axi_mon.total_axi_writes == 0 || u_apb_mon.total_apb_trans == 0) $finish(1);
+  $display("\n[STAGE2 PASS] Watchdog fired as designed at cycle %0d", sim_cycle_cnt);
+  $finish(0);
+end</code></pre>
+      <h3>Glossary of Technical Terms</h3>
+      <dl class="facts" style="grid-template-columns: 1fr 1fr;">
+        <div class="fact-item"><dt>mem_stall_i</dt><dd>Active-high stall signal asserted by LSU when awaiting an AXI/SRAM response, freezing the core pipeline.</dd></div>
+        <div class="fact-item"><dt>FlushE</dt><dd>Control signal clearing the ID/EX pipeline register to insert a NOP bubble into Execute.</dd></div>
+        <div class="fact-item"><dt>StallE</dt><dd>Control signal freezing the ID/EX register to hold an instruction in Execute across stall cycles.</dd></div>
+        <div class="fact-item"><dt>lwstall</dt><dd>Load-use data hazard signal asserting when an instruction in Decode depends on a load in Execute.</dd></div>
+        <div class="fact-item"><dt>Mailbox</dt><dd>Fixed 64-byte DSRAM communication structure (0x0002_0000) for firmware status and console streaming.</dd></div>
+        <div class="fact-item"><dt>Attestation Word</dt><dd>Packed 32-bit value at mailbox +0x1C containing [31:16]=mmio_writes and [15:0]=mmio_reads.</dd></div>
+        <div class="fact-item"><dt>Freeze Buffer</dt><dd>Circular history ring buffer (64 entries) that stops sampling on fatal error to preserve trace history.</dd></div>
+        <div class="fact-item"><dt>APB Slot</dt><dd>One of six slot selections spaced 4 KB apart; register offsets and aliasing require separate checks.</dd></div>
+        <div class="fact-item"><dt>LAYER_FIRMWARE</dt><dd>Caller-selected category 6 for firmware assertions/timeouts; it does not prove root cause or rule out hardware execution defects.</dd></div>
+        <div class="fact-item"><dt>Vacuity Violation</dt><dd>A pseudo-pass condition where a test completes successfully only because stimulus was skipped.</dd></div>
+        <div class="fact-item"><dt>AXI4-Lite</dt><dd>Subset of AXI4 protocol with single-beat transactions, fixed data width, and no burst support.</dd></div>
+        <div class="fact-item"><dt>FNV-1a</dt><dd>Fowler-Noll-Vo non-cryptographic hash function used in firmware to fold DSRAM reads into a signature.</dd></div>
+      </dl>
+      <h3>Common Architectural Misunderstandings</h3>
+      <ul>
+        <li><b>Misunderstanding 1: &ldquo;DSRAM stores generate AXI-Lite traffic.&rdquo;</b> Direct DSRAM accesses (<code>0x0002_0000..0x7FFF</code>) route directly to <code>sram_mux.sv</code>. They never touch the AXI4-Lite crossbar. In these warm suites MMIO generates the observed core AXI traffic. Other SoC masters and AXI SRAM routes exist; this is not a universal fabric restriction.</li>
+        <li><b>Misunderstanding 2: &ldquo;Stage 2 passed because the core halted.&rdquo;</b> Stage 2 passes because the <em>testbench watchdog</em> killed the simulation, not because the core stopped. The dump supports spin-loop execution; a recent-retirement assertion is still needed for automated boundary-liveness checking.</li>
+        <li><b>Misunderstanding 3: &ldquo;StallE automatically overrides FlushE.&rdquo;</b> In the original <code>decode_cycle.v</code> RTL, <code>FlushE</code> took precedence over <code>StallE</code> in an if-else ladder, which permits the instruction-loss mechanism discussed in Section 6 when an ungated data-hazard bubble coincides with a memory hold.</li>
+        <li><b>Misunderstanding 4: &ldquo;A simulator exit code of 0 proves verification success.&rdquo;</b> Do not assume the argument to <code>$finish</code> is a portable process exit-status contract. Check the process result and explicit verdict records. If the testbench calls <code>$finish(0)</code> erroneously, the test passes silently. Verification relies on log string matching and mailbox status.</li>
+        <li><b>Misunderstanding 5: &ldquo;Sub-word writes are supported across all peripherals.&rdquo;</b> Legacy APB3 slaves (UART, Timers, I2C, SPI) lack byte enable (<code>PSTRB</code>) inputs. All MMIO accesses must be strict 32-bit aligned transactions.</li>
+      </ul>
+      <h3>Engineering Review Questions</h3>
+      <ol>
+        <li><b>Q: Why does Stage 3 use Timer 1 for the sustained read burst instead of Timer 0?</b><br>
+            <em>A: Timer 0 was already modified during the ping phase. Timer 1 CTRL is reset-initialized and not written by this stage, so zero is expected. CTRL is not the live counter; elapsed time alone should not change it.</em></li>
+        <li><b>Q: Why must FlushE be gated with ~mem_stall_i in hazard_unit.v?</b><br>
+            <em>A: During a memory stall, the instruction in Execute cannot advance. A held load in Execute and its dependent consumer in Decode can keep lwstall high. Suppress that bubble while the load cannot advance; preserve legitimate redirects and exception kills.</em></li>
+        <li><b>Q: What prevents a test from falsely passing if it skips all peripheral accesses?</b><br>
+            <em>A: The vacuity gate <code>TEST_REQUIRE_ACTIVITY()</code> rejects the run if MMIO reads &lt; 14 or distinct slots &lt; 3. The testbench requires nonzero monitor activity and attestation. An exact equality comparator is missing; the retained totals are compared during review.</em></li>
+        <li><b>Q: How does the testbench distinguish between an unexpected crash and an intentional Stage 2 watchdog pass?</b><br>
+            <em>A: The testbench inspects the mailbox <code>test_id</code>. If <code>test_id == 0x0002</code>, it requires that exactly 1 failure finding exists, that the layer is <code>LAYER_FIRMWARE</code>, and that check ID is <code>WATCHDOG_TIMEOUT</code>.</em></li>
+        <li><b>Q: Why is the mailbox located at 0x0002_0000 instead of 0x0001_0000?</b><br>
+            <em>A: 0x0001_0000 is Instruction SRAM (ISRAM), which is read-only from the CPU data port. DSRAM is read-write data memory, allowing bidirectional message passing between core and testbench.</em></li>
+      </ol>
+      <h3>A two-minute explanation to another engineer</h3><p>“We first established that compiled firmware can boot through the preload path, use DSRAM, and report through a mailbox. Next we deliberately prevented completion to verify the simulation watchdog and diagnostic path. Finally we generated a known memory and peripheral sequence, expecting fourteen MMIO reads and four writes. Earlier peripheral totals were correct while firmware counters were wrong. A stall/flush control conflict can lose a counter load; the current hazard gating addresses that mechanism and a later directed run passes. The remaining work is to assert exact phase counts, correlate expected and observed transactions, prove freeze/hold behavior, and reconcile signature provenance. Passing runs are retained evidence for these scenarios, not complete SoC sign-off.”</p>
+    </section>
+    <section id="sec-9">
+      <h2><span class="no">09</span> Next Work &amp; Stage Closure Roadmap</h2>
+      <p>To achieve formal sign-off for Stages 1 through 3 and advance cleanly to Stage 4 (Fault Injection &amp; DECERR Verification), the following ordered engineering tasks should be executed:</p>
+      <p><b>First resolve evidence quality:</b> reconcile the source/log checksum discrepancy with a pinned ELF and independent fold model; correct the DSRAM-count label in a separately authorized implementation task. Retain the old logs, do not reinterpret their signatures as counts. Add a negative mutation test that recomputes the relevant buffer's signature. These are prerequisites for claiming independent signature verification.</p>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 10%;">
+            <col style="width: 25%;">
+            <col style="width: 20%;">
+            <col style="width: 45%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>Action Item</th>
+              <th>Target Component</th>
+              <th>Technical Objective &amp; Handoff Deliverable</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>1</b></td>
+              <td>Create Stage 1 Proof Package</td>
+              <td class="m">artifacts/stage_proofs/</td>
+              <td>Assemble <code>manifest.json</code>, hashed ELF files, hex images, and simulation logs for <code>stage1_hello</code> matching Stages 2 and 3.</td>
+            </tr>
+            <tr>
+              <td><b>2</b></td>
+              <td>Add Per-Phase Boundary SVA</td>
+              <td class="m">soc_tb_top.sv</td>
+              <td>Add phase markers and snapshots; require zero AXI/APB delta and 20 accepted array stores plus 40 sweep reads in the first array phase. Filter addresses and exclude startup/bookkeeping.</td>
+            </tr>
+            <tr>
+              <td><b>3</b></td>
+              <td>Implement LSU/Bus Matching</td>
+              <td class="m">mmio_path_scoreboard.sv</td>
+              <td>LSU inputs are already connected. Implement expected records, direction/address/data matching, exact count checks and an end-of-test drain rejecting unmatched records.</td>
+            </tr>
+            <tr>
+              <td><b>4</b></td>
+              <td>Validate Hold/Resume Properties</td>
+              <td class="m">hazard_unit.v</td>
+              <td>Use redirect-aware hold/resume properties and a directed hazard regression. Validate sampling/reset semantics; run FPV separately from lint and retain its proof or counterexample.</td>
+            </tr>
+            <tr>
+              <td><b>5</b></td>
+              <td>Full 3-Suite Regression Sweep</td>
+              <td class="m">run_regression.ps1</td>
+              <td>Execute automated regression sweep across Stages 1, 2, and 3, archiving unified, machine-verifiable pass manifests.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section id="sec-10">
+      <h2><span class="no">10</span> Evidence &amp; Artifact Index</h2>
+      <p>This section indexes primary source files, retained artifacts and SHA-256 file hashes supporting this verification report:</p>
+      <div class="tbl">
+        <table>
+          <colgroup>
+            <col style="width: 32%;">
+            <col style="width: 28%;">
+            <col style="width: 25%;">
+            <col style="width: 15%;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Artifact Name / Description</th>
+              <th>Relative Path</th>
+              <th>SHA-256 Hash / Identifier</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Stage 2 Proof Manifest</td>
+              <td class="m">artifacts/stage_proofs/20261024_stage2_watchdog/manifest.json</td>
+              <td class="m">Git: f1e46615bdd7688ebf5e7fca3ff8f0a8fd05fa3a</td>
+              <td><span class="chip pass">Archived</span></td>
+            </tr>
+            <tr>
+              <td>Stage 2 Simulation Log</td>
+              <td class="m">artifacts/stage_proofs/20261024_stage2_watchdog/logs/stage2_watchdog_sim.log</td>
+              <td class="m">BC25AC021D55BCC9CC61268BCB40E234F63E87E4EE735209806B1414DE0DADC0</td>
+              <td><span class="chip pass">Archived</span></td>
+            </tr>
+            <tr>
+              <td>Stage 2 ELF Binary</td>
+              <td class="m">build/stage2_watchdog.elf</td>
+              <td class="m">45B075DF2E6ED37A76BDE750C02E2D56E905DF6564F8BB3211B68CB94042748B</td>
+              <td><span class="chip pass">Retained</span></td>
+            </tr>
+            <tr>
+              <td>Stage 3 Proof Manifest</td>
+              <td class="m">artifacts/stage_proofs/20261024_stage3_monitor_count/manifest.json</td>
+              <td class="m">Git: f1e46615bdd7688ebf5e7fca3ff8f0a8fd05fa3a</td>
+              <td><span class="chip pass">Archived</span></td>
+            </tr>
+            <tr>
+              <td>Stage 3 Passing Log</td>
+              <td class="m">artifacts/stage_proofs/20261024_stage3_monitor_count/logs/stage3_monitor_count_sim.log</td>
+              <td class="m">FD5E658DA1E4F5C3B4116972B68CE562C6FDD44DA53312D6EFB2996D8872916C</td>
+              <td><span class="chip pass">Archived</span></td>
+            </tr>
+            <tr>
+              <td>Stage 3 ELF Binary</td>
+              <td class="m">build/stage3_monitor_count.elf</td>
+              <td class="m">14EF8BAA8F0451A7AE682C31898340D943B20CE303F64685840C7B1F1977E44D</td>
+              <td><span class="chip pass">Retained</span></td>
+            </tr>
+            <tr>
+              <td>Stage 3 Disassembly</td>
+              <td class="m">build/stage3.dis</td>
+              <td class="m">146C5CB14828DB9A9AC7457626932C3FF1319A159D4FF7DF1CDC14207515AF85</td>
+              <td><span class="chip pass">Retained</span></td>
+            </tr>
+            <tr>
+              <td>Stage 3 Failing Backup Log</td>
+              <td class="m">build/stage3_monitor_count_sim_38044.backup.log</td>
+              <td class="m">PID 38044 (Oct 24 22:19) [FW_ASSERT_FAIL 0x3002]</td>
+              <td><span class="chip warn">Retained Backup</span></td>
+            </tr>
+            <tr>
+              <td>Stage 1 Retained Log</td>
+              <td class="m">build/stage1_hello_sim.log</td>
+              <td class="m">PID 32812 (Oct 24 23:58) [MAILBOX PASS]</td>
+              <td><span class="chip pass">Retained</span></td>
+            </tr>
+            <tr>
+              <td>Stage 1 ELF Binary</td>
+              <td class="m">build/stage1_hello.elf</td>
+              <td class="m">Size: 46,060 bytes</td>
+              <td><span class="chip pass">Retained</span></td>
+            </tr>
+            <tr>
+              <td>Fixed Hazard Unit RTL</td>
+              <td class="m">ips/riscv_core/rtl/hazard_unit.v</td>
+              <td class="m">Line 192 (FlushE gated with ~mem_stall_i)</td>
+              <td><span class="chip pass">Verified Active</span></td>
+            </tr>
+            <tr>
+              <td>Unified Testbench Top</td>
+              <td class="m">ips/Verification/infrastructure/tb/soc_tb_top.sv</td>
+              <td class="m">Lines 667-732 (Watchdog blame dump before exit)</td>
+              <td><span class="chip pass">Verified Active</span></td>
+            </tr>
+            <tr>
+              <td>Regression Runner</td>
+              <td class="m">ips/Verification/regression/run_regression.ps1</td>
+              <td class="m">Lines 321-326 (Stage 2 fail bifurcation)</td>
+              <td><span class="chip pass">Verified Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>What this review changed</h3><p>The layout, palette, typography, section IDs and diagrams remain. Explanations now separate planned checks from observed success, derive the budgets, explain stall-versus-bubble control, qualify the historical diagnosis, and identify unresolved signature/count-label discrepancies. Source links and reproduction guidance were corrected. No implementation files were changed.</p>
+      <h3>Evidence interpretation and review provenance</h3><p>All ten files listed in the Stage 2/3 manifests (ELF, two images, disassembly and log per stage) match their declared SHA-256 values as checked on 25 October 2026. These are hashes, not digital signatures. The manifests share a declared Git commit despite later RTL/testbench changes; source and snapshot provenance remains incomplete.</p><p>The proof-package paths now contain the later passing runs; earlier failures survive in <code>build/*backup.log</code>. Preserve separate immutable directories for future run generations. A simulator transcript is not the runner's final exit status. No new simulation or formal proof was executed for this review.</p><h4>Source navigation used in this review</h4><ul id="review-sources"><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tests/suites/stage1_hello/main.c">Stage 1 firmware</a> — <code>ips/Verification/tests/suites/stage1_hello/main.c</code>, inspect from line 39.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tests/suites/stage3_monitor_count/main.c">Stage 3 firmware</a> — <code>ips/Verification/tests/suites/stage3_monitor_count/main.c</code>, inspect from line 35.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tests/bsp/crt0.s">Startup</a> — <code>ips/Verification/tests/bsp/crt0.s</code>, inspect from line 1.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tests/bsp/link.ld">Linker sections</a> — <code>ips/Verification/tests/bsp/link.ld</code>, inspect from line 25.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tests/bsp/proof_activity.h">Ping, signature, gate and print helper</a> — <code>ips/Verification/tests/bsp/proof_activity.h</code>, inspect from line 179.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure/tb/soc_tb_top.sv">Watchdog and verdict gates</a> — <code>ips/Verification/infrastructure/tb/soc_tb_top.sv</code>, inspect from line 650.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/riscv_core/rtl/hazard_unit.v">Hazard contribution gating</a> — <code>ips/riscv_core/rtl/hazard_unit.v</code>, inspect from line 146.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/riscv_core/rtl/decode_cycle.v">Flush-before-hold priority</a> — <code>ips/riscv_core/rtl/decode_cycle.v</code>, inspect from line 273.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/infrastructure/checkers/mmio_path_scoreboard.sv">Path scoreboard</a> — <code>ips/Verification/infrastructure/checkers/mmio_path_scoreboard.sv</code>, inspect from line 41.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/regression/run_regression.ps1">Regression runner</a> — <code>ips/Verification/regression/run_regression.ps1</code>, inspect from line 315.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/build/stage1_hello_sim.log">Stage 1 retained run</a> — <code>ips/Verification/build/stage1_hello_sim.log</code>, inspect from line 1.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/stage_proofs/20261024_stage2_watchdog/logs/stage2_watchdog_sim.log">Stage 2 retained run</a> — <code>ips/Verification/artifacts/stage_proofs/20261024_stage2_watchdog/logs/stage2_watchdog_sim.log</code>, inspect from line 1.</li><li><a href="../../../../Desktop/1TOPS%20project/RISCFORGE_1TOPS-main/rtl/ips/Verification/artifacts/stage_proofs/20261024_stage3_monitor_count/logs/stage3_monitor_count_sim.log">Stage 3 retained run</a> — <code>ips/Verification/artifacts/stage_proofs/20261024_stage3_monitor_count/logs/stage3_monitor_count_sim.log</code>, inspect from line 1.</li></ul>
+      <h3>Key Execution Commands (Reproducibility Reference)</h3>
+      <p><b>Supported reproduction entry point, inspected in the runner; not executed here.</b> From workspace <code>rtl</code> with Vivado 2022.2 and WSL GCC available, the runner builds firmware, converts/stages suite images, compiles/elaborates, executes XSim and judges the log.</p>
+      <pre><code>pwsh -File ips/Verification/regression/run_regression.ps1 -Target local -Suite stage1_hello -BootMode WARM -Timeout 1000000
+pwsh -File ips/Verification/regression/run_regression.ps1 -Target local -Suite stage2_watchdog -BootMode WARM -Timeout 50000
+pwsh -File ips/Verification/regression/run_regression.ps1 -Target local -Suite stage3_monitor_count -BootMode WARM -Timeout 1000000</code></pre>
+      <p>Manual XSim invocation alone does not select firmware. The top defaults to relative image paths, and BootROM loading is working-directory dependent. Wrong staged images can run another suite. The generated filelist comes from <code>rf_filelist.txt</code>; use the runner's directory handling. A full firmware link includes startup, trap handler, ISR dispatch, proof counters, drivers and suite main. The prior two-source example omitted required objects and was removed.</p>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,265 @@
+{
+  "date": "2026-10-19",
+  "simulator": "Vivado XSim 2022.2, local Windows installation",
+  "mcp_simulator_endpoint_available": true,
+  "vivado_mcp": {
+    "endpoint": "http://127.0.0.1:18090/mcp",
+    "server_version": "2026.9.1",
+    "session_id": "vivado-20261019-024344-ca5f1587",
+    "process_id": 16744,
+    "vivado_version": "2022.2",
+    "session_status_at_update": "process alive; webserver healthy; idle; queue length 0; last current_project command failed with exit 1 because no project is open",
+    "monitor_smoke": "compile, elaboration, and simulation passed through MCP; initial compile failed due to omitted include path and successful retry used -i ../../inputs",
+    "mcp_transport_session_used_for_status_query": "mcp-session-257eb3e4-65d6-4008-9225-25452641e449"
+  },
+  "rtl_design_changes": false,
+  "workspace": "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl",
+  "run_directory": "ips/Verification/artifacts/component_first/20261019_run02",
+  "execution_notes": [
+    "Per-test compile, elaboration, and simulation logs are preserved in each test subdirectory.",
+    "XSim runs used isolated temporary build directories under %TEMP%/riscforge_xsim_20261019_run02; Timer0 used %TEMP%/riscforge_xsim_20261019_timer0.",
+    "Timer0 required a staged compatibility testbench and source list because the checked-in filelist has stale references and the original bench has XSim-incompatible constructs. No RTL design file was edited.",
+    "Timer0's initial Z failure was caused by xelab --override_timeunit overriding the vendor flash model's 1 ps unit. With the override omitted, 300e6 model time units correctly represent 300 us, the flash is powered before boot read, and the staged smoke passes.",
+    "Timer0 final staged run commands, from its temporary RTL_SOC working directory: xvlog.bat --sv --nolog -d XSIM soc_timer0_boot_run_tb.sv; xelab.bat --nolog --timescale 1ns/1ps --debug all soc_timer0_boot_run_tb -s timer0_correct_timescale; xsim.bat timer0_correct_timescale -runall -nolog.",
+    "Timer0 staged testbench waits for both park PC and the committed DSRAM result; the checked-in testbench and RTL were not modified.",
+    "Monitor follow-up: rf_monitors.sv now constructs the packed LSU transaction atomically after the exact-path test exposed lost byte enables under XSim. The isolated smoke passes one-to-one LSU/AXI/APB UART payload/strobe matching; this is structural monitor-harness evidence, not Stage1 SoC accounting.",
+    "APB timeout follow-up: standalone test of the actual apb_timeout_monitor passes 14 checks under XSim 2022.2; source, filelist, compile/elab/simulation logs are preserved in monitor/apb_timeout_unit/.",
+    "Step4 checker self-proof was rerun from an isolated copy of the checker sources. The real-path bridge cannot be elaborated by XSim in this harness, so the checker test uses step4_apb_bridge_model; it is not real SoC timeout propagation evidence.",
+    "Step4 result: disassembler 31/31, clean non-vacuous traffic (LSU=17, AXI WR=8/RD=9, APB=14), injected fault matrix 11/11 expected IDs, runner GREEN. XSim warns that cover property statements are unsupported; this run does not claim functional coverage closure."
+  ],
+  "runs": {
+    "sram": {
+      "status": "PASS",
+      "top": "sram_sp_component_tb",
+      "checks": "7 passed, 0 failed",
+      "evidence": [
+        "sram/compile.log",
+        "sram/elab.log",
+        "sram/sim.log",
+        "sram/sram_sp_component_tb.sv"
+      ]
+    },
+    "axi_lite_to_apb": {
+      "status": "PASS",
+      "top": "tb_axi_lite_to_apb",
+      "checks": "28 passed, 0 failed",
+      "verification_only_change": "BFM handshake sampling and response timing; timeout guard for hung transactions.",
+      "evidence": [
+        "bridge/compile.log",
+        "bridge/elab.log",
+        "bridge/sim.log",
+        "bridge/tb_axi_lite_to_apb.sv",
+        "bridge/xvlog.f"
+      ]
+    },
+    "soc_apb_aperture": {
+      "status": "PASS",
+      "top": "soc_gpio_aperture_tb",
+      "checks": "43 passed, 0 failed",
+      "limitation": "Real SoC bridge/map with synthetic APB responders; peripheral RTL behavior is not exercised.",
+      "evidence": [
+        "gpio_aperture/compile.log",
+        "gpio_aperture/elab.log",
+        "gpio_aperture/sim.log",
+        "gpio_aperture/soc_gpio_aperture_tb.sv",
+        "gpio_aperture/xvlog.f"
+      ]
+    },
+    "spi_master": {
+      "status": "PASS_WITH_CAVEAT",
+      "top": "spi_master_m_bfm_tb",
+      "checks": "26 pass indications, no fail indication; TC6 EOT timeout remains unresolved even though PREADY recovery and data check pass.",
+      "evidence": [
+        "spi/compile.log",
+        "spi/elab.log",
+        "spi/sim.log",
+        "spi/source_tb_original.sv",
+        "spi/spi_bfm.sv",
+        "spi/tb_spi_xsim.sv",
+        "spi/xvlog.f",
+        "spi/exit_status.txt"
+      ]
+    },
+    "uart": {
+      "status": "INCOMPLETE",
+      "top": "tb_apb_uart_thorough",
+      "checks": "Compile and elaboration pass; XSim stops progressing after reset checks. Controlled benches show a no-time-advance stall on the APB-to-OBI combinational grant path; no-DUT control advances, minimal UART APB read and adapter-only apb_to_obi with synthetic gnt=req reproduce, forcing gnt low advances, and disabling OBI assertions does not fix it. This is not confirmed as an RTL defect or XSim bug.",
+      "evidence": [
+        "uart/compile.log",
+        "uart/elab.log",
+        "uart/sim.log",
+        "uart/debug/nodut_sim.log",
+        "uart/debug/sim_trace.log",
+        "uart/debug/sim_adapter.log",
+        "uart/debug/sim_force.log",
+        "uart/debug/sim_trace_noassert.log",
+        "uart/debug/tb_uart_trace.sv",
+        "uart/debug/tb_uart_minread.sv",
+        "uart/debug/xvlog_adapter.f",
+        "uart/tb_apb_uart_thorough_debug.sv",
+        "uart/xvlog.f"
+      ]
+    },
+    "timer_component": {
+      "status": "PASS",
+      "top": "timer_component_tb (two timer instances representing Timer0 and Timer1)",
+      "checks": "9 passed, 0 failed: reset values, independent counting and stopping, compare/overflow IRQs, invalid register read, and APB response.",
+      "evidence": [
+        "timers/compile.log",
+        "timers/elab.log",
+        "timers/sim.log",
+        "timers/timer_component_tb.sv"
+      ]
+    },
+    "monitor_smoke": {
+      "status": "PASS",
+      "top": "rf_mon_smoke_tb",
+      "checks": "Fresh local XSim smoke passed with nonzero fetch=396, retire=412, LSU=2, AXI-Lite=14, APB=8, IRQ=4, pin=2 activity and an LSU-to-AXI-Lite-to-APB cross-layer join.",
+      "evidence": [
+        "monitor/smoke/compile.log",
+        "monitor/smoke/elab.log",
+        "monitor/smoke/sim.log",
+        "monitor/smoke/monitor_postmortem.txt"
+      ]
+    },
+    "monitor_smoke_vivado_mcp": {
+      "status": "PASS",
+      "top": "rf_mon_smoke_tb",
+      "checks": "Fresh compile, elaboration, and simulation passed through the local Vivado MCP server. The first compile attempt failed because the isolated filelist omitted -i ../../inputs; the corrected retry passed.",
+      "evidence": [
+        "monitor/smoke/mcp_run/mcp_compile.log",
+        "monitor/smoke/mcp_run/mcp_compile_retry.log",
+        "monitor/smoke/mcp_run/mcp_elab.log",
+        "monitor/smoke/mcp_run/mcp_sim.log",
+        "monitor/smoke/mcp_run/monitor_postmortem.txt"
+      ]
+    },
+    "monitor_challenge_stress": {
+      "status": "PASS",
+      "checks": "Empirical challenge passed 25/25 with 0 errors, including freeze stability and 442-cycle monitored/golden DUT non-intrusiveness. Freeze-buffer stress passed 165 checks with 0 failures. Specific violation/timeout injection and real-traffic scoreboard non-vacuity still require explicit review before Stage1.",
+      "evidence": [
+        "monitor/challenge/compile.log",
+        "monitor/challenge/elab.log",
+        "monitor/challenge/sim.log",
+        "monitor/challenge/monitor_postmortem.txt",
+        "monitor/stress/compile.log",
+        "monitor/stress/elab.log",
+        "monitor/stress/sim.log"
+      ]
+    },
+    "soc_timer0_boot_runtime": {
+      "status": "PASS",
+      "top": "soc_timer0_boot_run_tb (XSim staged compatibility copy)",
+      "checks": "52 passed, 0 failed.",
+      "root_cause_of_prior_failure": "Elaboration option --override_timeunit overrode the S25FS512S model's 1 ps time unit. Its 300 us power-up delay became 300 seconds, leaving MISO tri-stated and loading Z into ISRAM.",
+      "observed_corrected_path": "No-override run: PoweredUp=1; READ opcode 0x03 decoded; SPI MISO drives data; first RXFIFO APB response is 0xb7100040; bootloader writes 0x400010b7 to ISRAM; Timer0 MMIO/readback and counting pass; DSRAM[0] commits 1; PC parks at 0x00010028.",
+      "evidence": [
+        "timer0_integration/compile_timescale_preserved.log",
+        "timer0_integration/elab_timescale_preserved.log",
+        "timer0_integration/sim_timescale_preserved.log",
+        "timer0_integration/sim_override_timeunit_z_failure.log",
+        "timer0_integration/sim_no_override_early_sample.log",
+        "timer0_integration/tb_xsim_compat.sv",
+        "timer0_integration/xsim_filelist.f",
+        "timer0_integration/xvlog_args.txt",
+        "timer0_integration/exit_status_timescale_corrected.txt"
+      ]
+    },
+    "monitor_exact_join_followup": {
+      "status": "PASS",
+      "top": "rf_mon_smoke_tb",
+      "checks": "All checks pass, including exact one-to-one LSU/AXI/APB UART write match; address 0x40002000, data 0x00000055, strobes 1111, ordered timestamps.",
+      "limitations": "Uses a deterministic structural monitor stub, not the real SoC/Stage1 firmware path.",
+      "evidence": [
+        "monitor/exact_join_fixed/compile.log",
+        "monitor/exact_join_fixed/elaborate.log",
+        "monitor/exact_join_fixed/simulation.stdout.log",
+        "monitor/exact_join_fixed/monitor_postmortem.txt",
+        "monitor/exact_join_fixed/exact_join.f"
+      ]
+    },
+    "apb_timeout_monitor_unit": {
+      "status": "PASS",
+      "top": "tb_apb_timeout_monitor",
+      "checks": "14 passed, 0 failed against actual apb_timeout_monitor RTL.",
+      "evidence": [
+        "monitor/apb_timeout_unit/compile.log",
+        "monitor/apb_timeout_unit/elaborate.log",
+        "monitor/apb_timeout_unit/simulation.stdout.log",
+        "monitor/apb_timeout_unit/unit.f",
+        "monitor/apb_timeout_unit/inputs/tb_apb_timeout_monitor.sv"
+      ]
+    },
+    "step4_checker_selfproof": {
+      "status": "PASS",
+      "top": "step4_smoke_tb and step4_disasm_tb",
+      "checks": "Disassembler 31/31; clean traffic LSU=17, AXI writes=8, reads=9, APB=14 with 0 findings; fault matrix 11/11 expected check IDs.",
+      "limitations": "Uses step4_apb_bridge_model, not the real axi_lite_to_apb or SoC. XSim ignores cover property statements.",
+      "evidence": [
+        "monitor/step4_selfproof/runner.stdout.log",
+        "monitor/step4_selfproof/xvlog.log",
+        "monitor/step4_selfproof/xelab.log",
+        "monitor/step4_selfproof/xsim.log",
+        "monitor/step4_selfproof/step4_report.txt",
+        "monitor/step4_selfproof/step4_sim.f"
+      ]
+    }
+  },
+  "stage1_firmware": {
+    "status": "DEFERRED",
+    "gate": "Still requires UART XSim/VCS arbitration after credential rotation, external UART/SPI/GPIO pin coverage, real SoC timeout/violation injection and Stage1 transaction accounting. The monitor harness exact join and standalone APB timeout component pass; direct Timer0/Timer1 checks remain 9/9 PASS."
+  },
+  "source_hashes": [
+    {
+      "path": "ips/Verification/artifacts/component_first/20261019_run02/bridge/tb_axi_lite_to_apb.sv",
+      "sha256": "F69BF3518B9B824340D256E05C22D6ADD6C0D98F7199531DD4F9756761FC6DD3",
+      "note": "Hash calculated from this run's preserved testbench snapshot."
+    },
+    {
+      "path": "ips/Verification/artifacts/component_first/20261019_run02/timer0_integration/tb_xsim_compat.sv",
+      "sha256": "1ACC545E23D7D9867845822B05EF4B9C3911407E0FEF196FE26111531E3F43E0",
+      "note": "Staged XSim-compatible diagnostic testbench; not the checked-in testbench."
+    },
+    {
+      "path": "ips/mem_files/riscforge_timer0_flash.mem",
+      "sha256": "2206875110C6E2DCEAFA737A7DEB546DA1C66E0E6E760B22A893558061796248",
+      "note": "Input flash image."
+    },
+    {
+      "path": "ips/Verification/infrastructure/monitors/rf_monitors.sv",
+      "sha256": "A7A4C3A73087B2E84480F2E2B598D506EFA4341557A63C4EA212F56F98BD3685",
+      "note": "Current verification source used for run02 follow-up."
+    },
+    {
+      "path": "ips/Verification/infrastructure/tb/rf_mon_smoke_tb.sv",
+      "sha256": "C4FFB9AFDE16D234599DE4270E1F9F16C714E044B1137233B600233A0F2204C7",
+      "note": "Current verification source used for run02 follow-up."
+    },
+    {
+      "path": "ips/Verification/infrastructure/tb/rf_mon_stub_dut.sv",
+      "sha256": "E15199E9DEF4CE072A4AD82BA66FAE5F55F6FB2F099DFB7A2D06B23D069323D2",
+      "note": "Current verification source used for run02 follow-up."
+    },
+    {
+      "path": "ips/Verification/infrastructure/tb/tb_apb_timeout_monitor.sv",
+      "sha256": "B8A5B60A5B54B77B5C4DA4280AFF082A2FF2DFFF38DF6D403B687BFC7B6BF131",
+      "note": "Current verification source used for run02 follow-up."
+    },
+    {
+      "path": "ips/Verification/step4_checkers/step4_smoke_tb.sv",
+      "sha256": "66B0F7B6D54263C427F98C7DD5135FA462E69A1D6A72FFB1710553DE5962B098",
+      "note": "Step4 checker source used for isolated run02 self-proof."
+    },
+    {
+      "path": "ips/Verification/step4_checkers/step4_fault_inject.sv",
+      "sha256": "5529E630E3A38176E06C921FF73304A6674AD8A3AF3B89FDCF55EE7237B2339B",
+      "note": "Step4 checker source used for isolated run02 self-proof."
+    },
+    {
+      "path": "ips/Verification/step4_checkers/step4_path_scoreboard.sv",
+      "sha256": "8E7225938DE985B481A03E3F358AB1C9A3E18FB5303F40267A97EA108005EF80",
+      "note": "Step4 checker source used for isolated run02 self-proof."
+    }
+  ],
+  "prior_checkpoint": "ips/Verification/artifacts/component_first/20261018_run01/reproducibility.json"
+}

@@ -1,0 +1,1154 @@
+<title>RISCFORGE Tapeout Verification Plan</title>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+:root{
+  --primary:#1e3a8a; --accent:#0284c7; --accent-2:#0ea5e9;
+  --ok:#15803d; --ok-bg:#f0fdf4; --ok-line:#bbf7d0;
+  --warn:#b45309; --warn-bg:#fffbeb; --warn-line:#fde68a;
+  --bad:#b91c1c; --bad-bg:#fef2f2; --bad-line:#fecaca;
+  --info-bg:#eff6ff; --info-line:#bfdbfe;
+  --text:#0f172a; --muted:#475569; --faint:#64748b;
+  --border:#e2e8f0; --border-dark:#cbd5e1;
+  --page:#f8fafc; --card:#ffffff; --sub:#f1f5f9; --diagram:#fafafa;
+  --tint-navy:#eef2ff; --tint-cyan:#ecfeff;
+  --code-bg:#0f172a; --code-text:#e2e8f0; --code-dim:#94a3b8;
+  --shadow:0 4px 20px rgba(0,0,0,.06);
+  --sans:'Inter',ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --primary:#a5bdf6; --accent:#38bdf8; --accent-2:#7dd3fc;
+    --ok:#4ade80; --ok-bg:rgba(34,197,94,.12); --ok-line:rgba(74,222,128,.35);
+    --warn:#fbbf24; --warn-bg:rgba(245,158,11,.12); --warn-line:rgba(251,191,36,.35);
+    --bad:#f87171; --bad-bg:rgba(239,68,68,.12); --bad-line:rgba(248,113,113,.38);
+    --info-bg:rgba(56,189,248,.10); --info-line:rgba(56,189,248,.35);
+    --text:#e5e9f0; --muted:#a7b3c6; --faint:#8a97ab;
+    --border:#223047; --border-dark:#2e3f5a;
+    --page:#0b111c; --card:#111827; --sub:#172133; --diagram:#0f1726;
+    --tint-navy:rgba(129,140,248,.14); --tint-cyan:rgba(34,211,238,.10);
+    --code-bg:#070b13; --code-text:#e5e9f0; --code-dim:#8a97ab;
+    --shadow:none;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --primary:#a5bdf6; --accent:#38bdf8; --accent-2:#7dd3fc;
+  --ok:#4ade80; --ok-bg:rgba(34,197,94,.12); --ok-line:rgba(74,222,128,.35);
+  --warn:#fbbf24; --warn-bg:rgba(245,158,11,.12); --warn-line:rgba(251,191,36,.35);
+  --bad:#f87171; --bad-bg:rgba(239,68,68,.12); --bad-line:rgba(248,113,113,.38);
+  --info-bg:rgba(56,189,248,.10); --info-line:rgba(56,189,248,.35);
+  --text:#e5e9f0; --muted:#a7b3c6; --faint:#8a97ab;
+  --border:#223047; --border-dark:#2e3f5a;
+  --page:#0b111c; --card:#111827; --sub:#172133; --diagram:#0f1726;
+  --tint-navy:rgba(129,140,248,.14); --tint-cyan:rgba(34,211,238,.10);
+  --code-bg:#070b13; --code-text:#e5e9f0; --code-dim:#8a97ab;
+  --shadow:none;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--page);color:var(--text);font-family:var(--sans);font-size:13.5px;line-height:1.62;padding-block:30px;padding-inline:16px;margin:0;-webkit-font-smoothing:antialiased}
+.doc{max-width:860px;margin:0 auto;background:var(--card);border:1px solid var(--border-dark);border-radius:8px;box-shadow:var(--shadow);padding:48px 56px}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+h1{font-size:24px;font-weight:700;color:var(--primary);letter-spacing:-.01em;line-height:1.25}
+h2{font-size:15px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.04em;border-left:3px solid var(--accent);padding-left:10px;margin:44px 0 14px;line-height:1.35}
+h2 .n{font-family:var(--mono);font-weight:500;color:var(--accent);margin-right:8px;letter-spacing:0}
+h3{font-size:13.5px;font-weight:600;color:var(--text);margin:22px 0 8px}
+h4{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0 0 8px}
+p{margin:0 0 10px;max-width:72ch}
+ul,ol{margin:0 0 12px;padding-left:20px}
+li{margin:3px 0}
+li::marker{color:var(--faint)}
+code{font-family:var(--mono);font-size:.86em;background:var(--sub);border:1px solid var(--border);padding:0 4px;border-radius:4px;white-space:nowrap}
+pre{background:var(--code-bg);color:var(--code-text);font-family:var(--mono);font-size:11.5px;line-height:1.55;padding:14px 16px;border-radius:6px;overflow-x:auto;margin:12px 0 16px}
+pre code{background:none;border:0;padding:0;font-size:inherit;white-space:pre;color:inherit}
+pre .c{color:var(--code-dim)}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+
+/* header */
+.doc-header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px 32px;border-bottom:2px solid var(--primary);padding-bottom:22px;margin-bottom:26px}
+.eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:0 0 6px}
+.lede{color:var(--muted);margin:8px 0 0;max-width:46ch}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:12px;align-content:start;min-width:0}
+.meta dt{color:var(--faint);font-weight:500;text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;padding-top:2px}
+.meta dd{margin:0;color:var(--text);overflow-wrap:anywhere}
+
+/* pills */
+.pill{display:inline-block;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:1px 8px;border-radius:999px;border:1px solid var(--border-dark);color:var(--muted);background:var(--sub);white-space:nowrap;line-height:1.7}
+.pill.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+.pill.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-line)}
+.pill.bad{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-line)}
+.pill.info{color:var(--accent);background:var(--info-bg);border-color:var(--info-line)}
+
+/* toc */
+.toc{border:1px solid var(--border);border-radius:6px;padding:14px 18px;background:var(--sub)}
+.toc ol{list-style:none;padding:0;margin:0;columns:2;column-gap:28px}
+.toc li{break-inside:avoid;margin:2px 0;font-size:12.5px}
+.toc .k{display:inline-block;width:26px;font-family:var(--mono);color:var(--accent);font-size:11.5px}
+.toc a{color:var(--text);text-decoration:none}
+.toc a:hover{color:var(--accent);text-decoration:underline}
+
+/* callouts */
+.callout{border:1px solid var(--info-line);background:var(--info-bg);border-radius:6px;padding:14px 16px;margin:16px 0}
+.callout.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.callout.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.callout.warn{border-color:var(--warn-line);background:var(--warn-bg)}
+.callout h4{color:var(--accent);margin-bottom:6px}
+.callout.bad h4{color:var(--bad)}
+.callout.ok h4{color:var(--ok)}
+.callout.warn h4{color:var(--warn)}
+.callout p:last-child,.callout ul:last-child,.callout ol:last-child{margin-bottom:0}
+
+/* grids */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;margin:16px 0}
+.grid2 ul{margin:0}
+.col{border-top:1px solid var(--border-dark);padding-top:10px}
+
+/* layer stack */
+.layers{display:grid;gap:6px;margin:16px 0}
+.layer{display:grid;grid-template-columns:128px 1fr 176px;gap:12px;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:6px;background:var(--card)}
+.layer .tier{font-weight:600;font-size:12.5px;line-height:1.35}
+.layer .tier small{display:block;font-family:var(--mono);font-weight:400;color:var(--accent);font-size:10.5px}
+.layer .ref{font-size:12px;color:var(--muted);line-height:1.4}
+.layer .ref b{display:block;color:var(--faint);font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.chip{display:inline-block;font-size:11.5px;font-weight:500;padding:1px 8px;margin:2px 4px 2px 0;border-radius:999px;border:1px solid var(--border-dark);background:var(--sub);white-space:nowrap}
+.chip.m{border-color:var(--info-line);background:var(--info-bg);color:var(--accent)}
+
+/* tables */
+.tbl{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--border);border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5}
+th,td{padding:7px 11px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{background:var(--sub);font-weight:600;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td.id,td.nw{white-space:nowrap}
+td.id{font-family:var(--mono);font-size:11.5px;color:var(--accent)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.grp td{background:var(--sub);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:5px 11px}
+
+/* diagrams */
+.diagram{background:var(--diagram);border:1px solid var(--border);border-radius:6px;padding:14px;margin:16px 0 6px;overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:660px}
+.caption{font-size:12px;color:var(--muted);margin:0 0 16px;max-width:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:var(--muted);margin:6px 0 16px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px;border:1.5px solid}
+.sw.core{background:var(--tint-navy);border-color:var(--primary)}
+.sw.mem{background:var(--tint-cyan);border-color:var(--accent)}
+.sw.fab{background:var(--warn-bg);border-color:var(--warn)}
+.sw.ok{background:var(--ok-bg);border-color:var(--ok)}
+.sw.bad{background:var(--bad-bg);border-color:var(--bad)}
+.sw.box{background:var(--card);border-color:var(--border-dark)}
+.sw.irq{border:0;border-top:2px dashed var(--bad);height:0;border-radius:0}
+
+svg .t{fill:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:600}
+svg .s{fill:var(--muted);font-family:var(--mono);font-size:10px}
+svg .lbl{fill:var(--text);font-family:var(--sans);font-size:11.5px;font-weight:500}
+svg .box{fill:var(--card);stroke:var(--border-dark);stroke-width:1.3}
+svg .core{fill:var(--tint-navy);stroke:var(--primary);stroke-width:1.4}
+svg .mem{fill:var(--tint-cyan);stroke:var(--accent);stroke-width:1.4}
+svg .fab{fill:var(--warn-bg);stroke:var(--warn);stroke-width:1.4}
+svg .okb{fill:var(--ok-bg);stroke:var(--ok);stroke-width:1.4}
+svg .badb{fill:var(--bad-bg);stroke:var(--bad);stroke-width:1.4}
+svg .dash{stroke-dasharray:6 4}
+svg .ln{stroke:var(--muted);stroke-width:1.4;fill:none}
+svg .bus{stroke:var(--muted);stroke-width:2.4;fill:none}
+svg .irq{stroke:var(--bad);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+svg .arw{fill:var(--muted)}
+svg .arw-r{fill:var(--bad)}
+svg .grid{stroke:var(--border);stroke-width:1}
+svg .freeze{stroke:var(--bad);stroke-width:1.4;stroke-dasharray:4 3}
+svg .bar-a{fill:var(--primary)}
+svg .bar-b{fill:var(--accent)}
+svg .bar-c{fill:var(--warn)}
+svg .bar-d{fill:var(--ok)}
+svg .gate{fill:var(--card);stroke:var(--text);stroke-width:1.5}
+
+.sig{font-family:var(--mono);font-size:11.5px}
+.foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--border);font-size:11.5px;color:var(--faint)}
+
+@media (max-width:680px){
+  .doc{padding:26px 18px}
+  .grid2{grid-template-columns:1fr}
+  .toc ol{columns:1}
+  .layer{grid-template-columns:1fr;gap:6px}
+  h1{font-size:21px}
+}
+@media print{
+  body{background:#fff;padding:0}
+  .doc{border:none;box-shadow:none;padding:0;max-width:100%}
+  h2{break-after:avoid}
+  .diagram,.tbl,pre{break-inside:avoid}
+}
+</style>
+
+<div class="doc">
+
+<header class="doc-header">
+  <div>
+    <p class="eyebrow">RISCFORGE 1TOPS &middot; SoC subsystem &middot; Verification</p>
+    <h1>Tapeout Verification Plan</h1>
+    <p class="lede">Nine methodologies, one integration reference, and the order to run them in, from today's RTL to a signed-off netlist for <code>riscforge_soc_subsystem</code>.</p>
+  </div>
+  <dl class="meta">
+    <dt>Status</dt><dd><span class="pill info">Plan baseline v1.0</span> <span class="pill">not executed</span></dd>
+    <dt>DUT</dt><dd><code>RTL_SOC/riscforge_soc_subsystem.sv</code></dd>
+    <dt>Core</dt><dd><code>riscv_core/rtl/top.v</code> &middot; RV32IM_Zicsr, 5-stage</dd>
+    <dt>Sim</dt><dd>VCS &middot; Xcelium &middot; Vivado xsim &middot; Verilator</dd>
+    <dt>Formal</dt><dd>JasperGold &middot; SpyGlass</dd>
+    <dt>Impl.</dt><dd>Genus / DC &middot; ICC2 &middot; PrimeTime</dd>
+    <dt>Date</dt><dd>25 Sep 2026</dd>
+  </dl>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <h4>Contents &middot; request items 1&ndash;12 map to sections 1&ndash;12; item 11 is this document</h4>
+  <ol>
+    <li><span class="k">&mdash;</span><a href="#summary">Executive summary</a></li>
+    <li><span class="k">&mdash;</span><a href="#dut">SoC under test &amp; memory map</a></li>
+    <li><span class="k">&mdash;</span><a href="#architecture">Verification architecture</a></li>
+    <li><span class="k">1</span><a href="#m1">SV OOP unit benches</a></li>
+    <li><span class="k">2</span><a href="#m2">UVM block &amp; SoC environments</a></li>
+    <li><span class="k">3</span><a href="#m3">RISC-DV random instruction streams</a></li>
+    <li><span class="k">4</span><a href="#m4">RISCOF compliance</a></li>
+    <li><span class="k">5</span><a href="#m5">FPGA emulation</a></li>
+    <li><span class="k">6</span><a href="#m6">Bare-metal C directed tests</a></li>
+    <li><span class="k">7</span><a href="#m7">Random C regressions</a></li>
+    <li><span class="k">8</span><a href="#m8">Peripheral datapath (SV TB + C)</a></li>
+    <li><span class="k">9</span><a href="#m9">Closing coverage</a></li>
+    <li><span class="k">10</span><a href="#m10">RISC-DV + Spike integration &amp; interrupt verdict</a></li>
+    <li><span class="k">12</span><a href="#order">Ordered path to tapeout</a></li>
+    <li><span class="k">&mdash;</span><a href="#signoff">Sign-off checklist</a></li>
+    <li><span class="k">&mdash;</span><a href="#risks">Risks</a></li>
+    <li><span class="k">&mdash;</span><a href="#appendix">Appendix: commands &amp; references</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="summary">Executive summary</h2>
+
+<p>The design under test is the RISCFORGE SoC subsystem: a 5-stage RV32IM_Zicsr core with direct ISRAM and DSRAM paths, a 2&times;3 AXI-Lite crossbar shared with the SPI-flash bootloader, an AXI-Lite&rarr;APB bridge and six APB peripherals (I2C, Timer 0, UART, GPIO, SPI, Timer 1). The plan layers nine methodologies so that every class of bug has one owner level and one golden reference. SV OOP unit benches cover micro-architecture. UVM covers the protocol-heavy blocks and the SoC fabric. RISCOF and riscv-dv with Spike cover the ISA. Bare-metal C, directed and random, covers the integrated datapaths. FPGA emulation covers long software runs, and equivalence checking, GLS, CDC/RDC and DFT cover the netlist.</p>
+
+<p>One finding changes the order of work. The interrupt path is not yet ready for riscv-dv and Spike. Three of the five connected interrupt sources are single-cycle pulses feeding an <code>mip</code> that does not latch, the priority order is the reverse of Spike's, and several mandatory CSRs are missing. Six small RTL changes, R1&ndash;R6 in <a href="#m10">&sect;10</a>, should land before the co-simulation is built. That way the verification environment is built once, against the final architecture.</p>
+
+<div class="callout bad">
+  <h4>Item 10 in one paragraph</h4>
+  <p>The current interrupt architecture works for directed tests of the level-type sources (UART, I2C). It does <b>not</b> yet work reliably for peripheral interrupts in general, or for riscv-dv + Spike. Timer 0 compare, SPI events and GPIO (in its reset-default edge mode) produce 1-cycle pulses. A pulse that arrives while EX holds a bubble, while the divider stalls, or while <code>mstatus.MIE</code>&nbsp;=&nbsp;0 is lost. Spike also orders simultaneous interrupts differently, cannot enable <code>mie[31:16]</code> without a patch, and does not know CSR <code>0x7C0</code>. The main integration reference is lowRISC Ibex's riscv-dv + Spike lockstep co-simulation, because Ibex uses the same fast-interrupt layout at <code>mip[16+]</code>.</p>
+</div>
+
+<div class="grid2">
+  <div class="col">
+    <h4>Core under test</h4>
+    <ul>
+      <li>RV32IM + Zicsr, M-mode only, in-order 5-stage with forwarding and hazard unit</li>
+      <li>Precise traps: accepted in EX, committed at WB (<code>wb_trap_mret_commit_controller</code>)</li>
+      <li>16 fast local interrupts at <code>mip[31:16]</code> plus MTIP/MEIP/MSIP; custom threshold CSR <code>mintprio</code> (0x7C0)</li>
+      <li>Multi-cycle MUL/DIV stalls EX; <code>mtvec</code> direct mode only</li>
+    </ul>
+  </div>
+  <div class="col">
+    <h4>Fabric &amp; peripherals</h4>
+    <ul>
+      <li>Direct ISRAM fetch and DSRAM load/store; only MMIO crosses AXI (<code>hybrid_mem_interface</code>)</li>
+      <li>2&times;3 AXI-Lite crossbar shared with the bootloader (privilege-gated ISRAM writes)</li>
+      <li>AXI-Lite&rarr;APB bridge, six slots; SPI muxed between bootloader and CPU</li>
+      <li>Cold boot (SRAM clear + flash load) and warm boot (<code>soft_rst_ni</code>, SRAM retained)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="dut">SoC under test &amp; memory map</h2>
+
+<div class="diagram" role="img" aria-label="Block diagram of the RISCFORGE SoC: core, fetch demux, BootROM, ISRAM, hybrid memory interface, DSRAM, AXI-Lite crossbar with bootloader, AXI to SRAM interfaces, APB bridge and six peripherals, with interrupt lines back to the core">
+<svg viewBox="0 0 800 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arw"/></marker>
+    <marker id="a1r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arw-r"/></marker>
+  </defs>
+  <!-- core -->
+  <rect x="30" y="30" width="150" height="170" rx="8" class="core"/>
+  <text x="105" y="58" text-anchor="middle" class="t">RISC-V core</text>
+  <text x="105" y="76" text-anchor="middle" class="s">RV32IM_Zicsr</text>
+  <text x="105" y="91" text-anchor="middle" class="s">5-stage &middot; top.v</text>
+  <text x="105" y="122" text-anchor="middle" class="s">IF ID EX MEM WB</text>
+  <text x="105" y="152" text-anchor="middle" class="s">csr_regfile</text>
+  <text x="105" y="167" text-anchor="middle" class="s">mip &middot; mie &middot; mintprio</text>
+  <!-- fetch path -->
+  <path d="M180,63 H230" class="ln" marker-end="url(#a1)"/>
+  <text x="205" y="57" text-anchor="middle" class="s">fetch</text>
+  <rect x="230" y="40" width="150" height="46" rx="6" class="fab"/>
+  <text x="305" y="60" text-anchor="middle" class="t">instr_fetch_demux</text>
+  <text x="305" y="76" text-anchor="middle" class="s">BootROM | ISRAM</text>
+  <rect x="440" y="18" width="150" height="40" rx="6" class="mem"/>
+  <text x="515" y="35" text-anchor="middle" class="t">BootROM &middot; 64 B</text>
+  <text x="515" y="50" text-anchor="middle" class="s">0x0000_0000</text>
+  <rect x="440" y="68" width="150" height="40" rx="6" class="mem"/>
+  <text x="515" y="85" text-anchor="middle" class="t">ISRAM &middot; 32 KB</text>
+  <text x="515" y="100" text-anchor="middle" class="s">0x0001_0000</text>
+  <path d="M380,54 H410 V38 H440" class="ln" marker-end="url(#a1)"/>
+  <path d="M380,74 H410 V88 H440" class="ln" marker-end="url(#a1)"/>
+  <!-- LSU path -->
+  <path d="M180,163 H230" class="ln" marker-end="url(#a1)"/>
+  <text x="205" y="157" text-anchor="middle" class="s">LSU</text>
+  <rect x="230" y="140" width="150" height="46" rx="6" class="fab"/>
+  <text x="305" y="160" text-anchor="middle" class="t">hybrid_mem_interface</text>
+  <text x="305" y="176" text-anchor="middle" class="s">SRAM | MMIO split</text>
+  <rect x="440" y="143" width="150" height="40" rx="6" class="mem"/>
+  <text x="515" y="160" text-anchor="middle" class="t">DSRAM &middot; 32 KB</text>
+  <text x="515" y="175" text-anchor="middle" class="s">0x0002_0000</text>
+  <path d="M380,163 H440" class="ln" marker-end="url(#a1)"/>
+  <!-- sram ifs -->
+  <rect x="630" y="68" width="150" height="40" rx="6" class="box"/>
+  <text x="705" y="85" text-anchor="middle" class="t">axi_lite_sram_if</text>
+  <text x="705" y="100" text-anchor="middle" class="s">MST0 &middot; awprot[0]=1</text>
+  <rect x="630" y="143" width="150" height="40" rx="6" class="box"/>
+  <text x="705" y="160" text-anchor="middle" class="t">axi_lite_sram_if</text>
+  <text x="705" y="175" text-anchor="middle" class="s">MST1 &middot; port 1</text>
+  <path d="M630,88 H590" class="ln" marker-end="url(#a1)"/>
+  <path d="M630,163 H590" class="ln" marker-end="url(#a1)"/>
+  <!-- xbar -->
+  <path d="M305,186 V240" class="ln" marker-end="url(#a1)"/>
+  <text x="312" y="218" class="s">MMIO &middot; SLV0</text>
+  <rect x="230" y="240" width="150" height="46" rx="6" class="fab"/>
+  <text x="305" y="260" text-anchor="middle" class="t">axi_lite_xbar</text>
+  <text x="305" y="276" text-anchor="middle" class="s">2 SLV &times; 3 MST</text>
+  <rect x="30" y="240" width="150" height="46" rx="6" class="box"/>
+  <text x="105" y="260" text-anchor="middle" class="t">bootloader</text>
+  <text x="105" y="276" text-anchor="middle" class="s">SPI flash &rarr; SRAM</text>
+  <path d="M180,263 H230" class="ln" marker-end="url(#a1)"/>
+  <text x="205" y="257" text-anchor="middle" class="s">SLV1</text>
+  <path d="M380,256 H705 V183" class="ln" marker-end="url(#a1)"/>
+  <text x="560" y="251" text-anchor="middle" class="s">MST1</text>
+  <path d="M380,272 H792 V88 H780" class="ln" marker-end="url(#a1)"/>
+  <text x="560" y="267" text-anchor="middle" class="s">MST0</text>
+  <!-- apb -->
+  <path d="M305,286 V320" class="ln" marker-end="url(#a1)"/>
+  <rect x="230" y="320" width="150" height="40" rx="6" class="fab"/>
+  <text x="305" y="337" text-anchor="middle" class="t">axi_lite_to_apb</text>
+  <text x="305" y="352" text-anchor="middle" class="s">MST2 &middot; 1 &rarr; 6 APB</text>
+  <path d="M305,360 V374" class="ln"/>
+  <path d="M79,374 H719" class="bus"/>
+  <!-- peripherals -->
+  <path d="M79,374 V390" class="ln" marker-end="url(#a1)"/>
+  <rect x="20" y="390" width="118" height="40" rx="6" class="okb"/>
+  <text x="79" y="406" text-anchor="middle" class="t">I2C</text>
+  <text x="79" y="421" text-anchor="middle" class="s">0x4000_0000</text>
+  <path d="M207,374 V390" class="ln" marker-end="url(#a1)"/>
+  <rect x="148" y="390" width="118" height="40" rx="6" class="badb"/>
+  <text x="207" y="406" text-anchor="middle" class="t">Timer 0</text>
+  <text x="207" y="421" text-anchor="middle" class="s">0x4000_1000</text>
+  <path d="M335,374 V390" class="ln" marker-end="url(#a1)"/>
+  <rect x="276" y="390" width="118" height="40" rx="6" class="okb"/>
+  <text x="335" y="406" text-anchor="middle" class="t">UART</text>
+  <text x="335" y="421" text-anchor="middle" class="s">0x4000_2000</text>
+  <path d="M463,374 V390" class="ln" marker-end="url(#a1)"/>
+  <rect x="404" y="390" width="118" height="40" rx="6" class="fab"/>
+  <text x="463" y="406" text-anchor="middle" class="t">GPIO</text>
+  <text x="463" y="421" text-anchor="middle" class="s">0x4000_3000</text>
+  <path d="M591,374 V390" class="ln" marker-end="url(#a1)"/>
+  <rect x="532" y="390" width="118" height="40" rx="6" class="badb"/>
+  <text x="591" y="406" text-anchor="middle" class="t">SPI</text>
+  <text x="591" y="421" text-anchor="middle" class="s">0x4000_4000</text>
+  <path d="M719,374 V390" class="ln" marker-end="url(#a1)"/>
+  <rect x="660" y="390" width="118" height="40" rx="6" class="box"/>
+  <text x="719" y="406" text-anchor="middle" class="t">Timer 1</text>
+  <text x="719" y="421" text-anchor="middle" class="s">0x4000_5000</text>
+  <!-- irq return -->
+  <path d="M20,410 H10 V120 H30" class="irq" marker-end="url(#a1r)"/>
+</svg>
+</div>
+<div class="legend">
+  <span><i class="sw core"></i>core</span>
+  <span><i class="sw mem"></i>memory</span>
+  <span><i class="sw fab"></i>router / translator, or GPIO pulse-by-default IRQ</span>
+  <span><i class="sw ok"></i>level IRQ (safe)</span>
+  <span><i class="sw bad"></i>1-cycle pulse IRQ (can be lost)</span>
+  <span><i class="sw box"></i>IRQ not connected / other</span>
+  <span><i class="sw irq"></i>interrupt lines to <code>mip</code></span>
+</div>
+
+<div class="tbl"><table>
+  <thead><tr><th>Region</th><th>Range</th><th>Size</th><th>Access path</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">BootROM</td><td class="sig nw">0x0000_0000&ndash;0x0000_003F</td><td class="num">64 B</td><td>Core fetch demux only</td><td>Reset vector: sets <code>sp</code> to top of DSRAM, jumps to ISRAM</td></tr>
+    <tr><td class="nw">ISRAM</td><td class="sig nw">0x0001_0000&ndash;0x0001_7FFF</td><td class="num">32 KB</td><td>Fetch direct &middot; AXI MST0 (privileged writes only)</td><td><code>.text</code>; locked after <code>boot_done</code></td></tr>
+    <tr><td class="nw">DSRAM</td><td class="sig nw">0x0002_0000&ndash;0x0002_7FFF</td><td class="num">32 KB</td><td>LSU direct (1-cycle stall FSM) &middot; AXI MST1</td><td><code>.rodata .data .bss</code>, stack</td></tr>
+    <tr><td class="nw">APB MMIO</td><td class="sig nw">0x4000_0000&ndash;0x4FFF_FFFF</td><td class="num">256 MB</td><td>LSU &rarr; AXI SLV0 &rarr; MST2 &rarr; bridge</td><td>I2C +0x0000, Timer 0 +0x1000, UART +0x2000, GPIO +0x3000, SPI +0x4000, Timer 1 +0x5000</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Interrupt map as wired today</h3>
+<div class="tbl"><table>
+  <thead><tr><th>mip bit</th><th>Source</th><th>Signal nature</th><th>Cleared by</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td class="id">[19]</td><td>UART <code>uart_int_o</code></td><td>Level</td><td>Reading IIR / RBR / LSR per cause</td><td><span class="pill ok">OK</span></td></tr>
+    <tr><td class="id">[18]</td><td>SPI <code>spi_events_o[0]</code></td><td>1-cycle pulse (<code>GEN_INT_TX/RX</code> state, <span class="sig">apb_spi_master.sv:116,178&ndash;182</span>)</td><td>n/a (pulse)</td><td><span class="pill bad">Lossy</span></td></tr>
+    <tr><td class="id">[17]</td><td>I2C <code>i2c_interrupt_o</code></td><td>Level, registered (<span class="sig">apb_i2c.sv:193</span>)</td><td><code>CR.IACK</code></td><td><span class="pill ok">OK</span></td></tr>
+    <tr><td class="id">[16]</td><td>GPIO <code>global_interrupt_o</code></td><td>Pulse when <code>CFG.glbl_intrpt_mode</code>&nbsp;=&nbsp;0 (reset value); level when 1 (<span class="sig">gpio.sv:133</span>)</td><td><code>INTRPT_STATUS</code> W1C</td><td><span class="pill warn">Mode-dependent</span></td></tr>
+    <tr><td class="id">[7]</td><td>Timer 0 <code>irq_o[1]</code> (MTIP)</td><td>1-cycle compare pulse; counter clears on match (<span class="sig">timer.sv:62&ndash;76</span>)</td><td>n/a (pulse)</td><td><span class="pill bad">Lossy</span></td></tr>
+    <tr><td class="id">[11] [3]</td><td>MEIP, MSIP</td><td>Tied 0 (no PLIC, no CLINT)</td><td>&mdash;</td><td><span class="pill">Unused</span></td></tr>
+  </tbody>
+</table></div>
+<p class="caption">Wiring: <span class="sig">riscforge_soc_subsystem.sv:1130&ndash;1137</span>. <code>mip</code> is assembled combinationally from these inputs (<span class="sig">csr_regfile.v:286</span>). An interrupt is only accepted on a valid, unstalled instruction in EX (<span class="sig">execute_cycle.v:440</span>).</p>
+
+<!-- ============================================================ -->
+<h2 id="architecture">Verification architecture</h2>
+
+<p>Each bug class is caught at the lowest level that can see it. Lower levels are fast and close to exhaustive; higher levels are slow and realistic. A check moves up a level only when the level below cannot observe the behaviour.</p>
+
+<div class="layers">
+  <div class="layer">
+    <div class="tier">Unit<small>L1 &middot; minutes</small></div>
+    <div><span class="chip m">1 &middot; SV OOP</span><span class="chip">ALU</span><span class="chip">MUL/DIV</span><span class="chip">hazard</span><span class="chip">CSR</span><span class="chip">commit ctrl</span><span class="chip">SoC glue</span></div>
+    <div class="ref"><b>Reference</b>SV reference functions, shadow models</div>
+  </div>
+  <div class="layer">
+    <div class="tier">Block<small>L2 &middot; hours</small></div>
+    <div><span class="chip m">2 &middot; UVM</span><span class="chip">APB IPs</span><span class="chip">xbar</span><span class="chip">AXI&rarr;APB</span><span class="chip">bootloader</span><span class="chip">FPV</span></div>
+    <div class="ref"><b>Reference</b>Predictors, RAL mirror, protocol SVA</div>
+  </div>
+  <div class="layer">
+    <div class="tier">Core ISA<small>L3 &middot; nightly</small></div>
+    <div><span class="chip m">4 &middot; RISCOF</span><span class="chip m">3 &middot; riscv-dv</span><span class="chip">lockstep cosim</span><span class="chip">IRQ agent</span></div>
+    <div class="ref"><b>Reference</b>Sail model, Spike ISS</div>
+  </div>
+  <div class="layer">
+    <div class="tier">SoC integration<small>L4 &middot; nightly</small></div>
+    <div><span class="chip m">6 &middot; C directed</span><span class="chip m">8 &middot; datapath SV+C</span><span class="chip">SoC UVM env</span><span class="chip">boot</span><span class="chip">IRQ end-to-end</span></div>
+    <div class="ref"><b>Reference</b>Pin scoreboards, Spike cosim with MMIO injection</div>
+  </div>
+  <div class="layer">
+    <div class="tier">System<small>L5 &middot; weekly soak</small></div>
+    <div><span class="chip m">7 &middot; random C</span><span class="chip m">5 &middot; FPGA</span><span class="chip">workloads</span><span class="chip">concurrency</span></div>
+    <div class="ref"><b>Reference</b>Checksums vs Spike, self-checking SW</div>
+  </div>
+  <div class="layer">
+    <div class="tier">Implementation<small>L6 &middot; per netlist</small></div>
+    <div><span class="chip">LEC</span><span class="chip">GLS 0-delay / SDF</span><span class="chip">CDC / RDC</span><span class="chip">STA</span><span class="chip">DFT patterns</span></div>
+    <div class="ref"><b>Reference</b>RTL results, formal equivalence</div>
+  </div>
+</div>
+<p class="caption">Section 9 (coverage closure) runs across all six levels.</p>
+
+<div class="tbl"><table>
+  <thead><tr><th>#</th><th>Methodology</th><th>DUT boundary</th><th>Golden reference</th><th>Owns these bugs</th><th>Exit criterion</th></tr></thead>
+  <tbody>
+    <tr><td class="id">1</td><td>SV OOP</td><td>Single modules</td><td>SV reference functions</td><td>Arithmetic, hazard/forwarding, WARL masks, FSM corners</td><td>100% unit covergroups, 0 mismatches over 200 seeds each</td></tr>
+    <tr><td class="id">2</td><td>UVM</td><td>Each IP, xbar, bridge, bootloader; SoC shell</td><td>Predictors, RAL, SVA</td><td>Protocol, register, arbitration, reset behaviour</td><td>100% RAL + protocol covers, 0 SVA fails</td></tr>
+    <tr><td class="id">3</td><td>riscv-dv</td><td>Core, later SoC</td><td>Spike (lockstep)</td><td>ISA corners, hazard mixes, trap and IRQ timing</td><td>0 mismatches, &ge; 50k cumulative seeds</td></tr>
+    <tr><td class="id">4</td><td>RISCOF</td><td>Core</td><td>Sail (and Spike)</td><td>Architectural non-conformance</td><td>100% pass on I, M, Zicsr, privilege</td></tr>
+    <tr><td class="id">5</td><td>FPGA</td><td>Full SoC on board</td><td>Self-checking SW</td><td>Rare hangs, boot robustness, bring-up flow</td><td>24 h soak, 1000/1000 cold boots</td></tr>
+    <tr><td class="id">6</td><td>C directed</td><td>SoC</td><td>Mailbox, pin monitors, cosim</td><td>Integration, address map, boot, IRQ end-to-end</td><td>Catalogue passes in cold and warm boot</td></tr>
+    <tr><td class="id">7</td><td>Random C</td><td>SoC</td><td>Checksum vs Spike</td><td>Compiler-exposed pipeline bugs, concurrency</td><td>&ge; 20k cumulative seeds, 0 fails</td></tr>
+    <tr><td class="id">8</td><td>Datapath SV+C</td><td>SoC with pin models</td><td>Pin scoreboards</td><td>Data integrity core&rarr;bus&rarr;pin and back</td><td>Every cell of the &sect;8 matrix</td></tr>
+    <tr><td class="id">9</td><td>Coverage closure</td><td>All levels</td><td>&mdash;</td><td>Unexercised logic, missing tests</td><td>&sect;9 targets met, waivers signed</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="m1"><span class="n">1</span>SV OOP unit benches</h2>
+
+<p>This is the fastest tier. It runs on every change (xsim, Verilator or VCS) and builds on the existing class-based work: the module plan in <code>modules_verificaction_implementation_plan.md</code> and the <code>commit_*</code> classes in <code>tb_sv_oop_csr_exc</code>. Every bench has the same shape: transaction &rarr; driver &rarr; monitor &rarr; scoreboard with a reference function &rarr; covergroup. Each bench ships three sequence flavours: directed, constrained-random and corner.</p>
+
+<div class="tbl"><table>
+  <thead><tr><th>Module</th><th>Focus</th><th>Must-hit corners</th></tr></thead>
+  <tbody>
+    <tr><td class="nw"><code>ALU</code>, <code>ALU_Decoder</code></td><td>All ops, flags</td><td>ADD/SUB wrap at 0xFFFF_FFFF, shifts by 0 and 31, SLT vs SLTU at 0x8000_0000 / 0xFFFF_FFFF</td></tr>
+    <tr><td class="nw"><code>rv32m_mul</code>, <code>rv32m_div</code></td><td>Booth/CSA multiplier, non-restoring divider</td><td>MULH/MULHSU/MULHU sign mixes; DIV by 0 &rarr; &minus;1 and REM by 0 &rarr; dividend; INT_MIN &divide; &minus;1 &rarr; INT_MIN, rem 0; flush during a divide</td></tr>
+    <tr><td class="nw"><code>hazard_unit</code></td><td>24 inputs, stall/flush priority</td><td>Load-use + CSR-use + MUL stall + branch flush + exception flush in one cycle. Small enough for near-exhaustive or formal checking</td></tr>
+    <tr><td class="nw"><code>decode_cycle</code>, <code>Main_Decoder</code></td><td>Legal and illegal decode</td><td>Every opcode/funct3/funct7; <code>illegal_instr</code> must not fire on bubbles (known bug 3)</td></tr>
+    <tr><td class="nw"><code>csr_regfile</code></td><td>WARL masks, port priority</td><td>Trap entry and CSR write in the same cycle; <code>mstatus</code> mask 0x188A; read-only <code>mip</code> bits; <code>mcycle</code> carry into <code>mcycleh</code></td></tr>
+    <tr><td class="nw"><code>wb_trap_mret_commit_controller</code></td><td>Trap and MRET commit</td><td>MRET with an IRQ pending, exception on an MRET, back-to-back traps</td></tr>
+    <tr><td class="nw"><code>ls_unit</code>, <code>hybrid_mem_interface</code></td><td>Byte lanes, both FSMs</td><td>All funct3 &times; offset; SRAM 1-cycle stall; AW-first, W-first and simultaneous; SLVERR/DECERR raising <code>mem_err</code> on the completing cycle</td></tr>
+    <tr><td class="nw">SoC glue</td><td><code>instr_fetch_demux</code>, <code>sram_mux</code>, <code>axi_lite_sram_if</code>, <code>boot_rom</code></td><td>Region boundaries; port 0 vs port 1 collision; <code>awprot[0]</code>&nbsp;=&nbsp;0 write to ISRAM &rarr; SLVERR and data unchanged</td></tr>
+  </tbody>
+</table></div>
+<p><b>Exit:</b> 100% of unit covergroups; line/branch &ge; 95% per module from unit benches alone; 0 mismatches over 200 random seeds per bench; full suite under 10 minutes so it can run before every commit.</p>
+
+<!-- ============================================================ -->
+<h2 id="m2"><span class="n">2</span>UVM block &amp; SoC environments</h2>
+
+<p>UVM has two jobs. At block level it verifies the protocol-heavy IP in the configuration you actually instantiate. Third-party PULP, lowRISC and OpenCores IP counts as unverified until it has been checked in that configuration. At SoC level it is the shell that hosts the pin agents, bus monitors, IRQ monitor and the co-simulation scoreboard. Run UVM on VCS or Xcelium; keep xsim for smoke runs.</p>
+
+<div class="tbl"><table>
+  <thead><tr><th>UVC</th><th>Active role</th><th>Passive role (SoC)</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">APB</td><td>Master for block benches</td><td>Monitor on all 6 slots</td><td>PREADY wait states, PSLVERR, back-to-back transfers</td></tr>
+    <tr><td class="nw">AXI-Lite</td><td>Master/slave for xbar and bridge benches</td><td>Core MMIO port, bootloader port, 3 xbar masters</td><td>Response codes, channel ordering, concurrent masters</td></tr>
+    <tr><td class="nw">UART</td><td>Serial driver (RX side)</td><td>Serial monitor (TX side)</td><td>Baud from DLL/DLM, 5&ndash;8 bits, parity, 1/2 stop, framing error and break injection</td></tr>
+    <tr><td class="nw">SPI</td><td>Slave responder</td><td>CS / mode / length monitor</td><td>Infineon <code>s25fs512s</code> model as the real flash for boot and runtime</td></tr>
+    <tr><td class="nw">I2C</td><td>Slave, plus a second master for arbitration</td><td>START/STOP/ACK monitor</td><td><code>at24c02</code> model as the real EEPROM</td></tr>
+    <tr><td class="nw">GPIO</td><td>Pin driver</td><td>Pin monitor</td><td>32 pins, edge and level stimulus with random timing</td></tr>
+    <tr><td class="nw">IRQ</td><td>Random IRQ driver (core level)</td><td>Raise-to-accept latency, lost-pulse detector</td><td>The checker that proves R1</td></tr>
+    <tr><td class="nw">RVFI</td><td>&mdash;</td><td>Retire monitor feeding cosim and coverage</td><td>Needs R2</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Register model (RAL): one source, three outputs</h3>
+<p>Describe every register once and generate the UVM RAL, the C header used by firmware, and the register documentation from it. GPIO already has lowRISC reggen output (<code>gpio_reg_pkg</code>, <code>gpio_reg_top</code>), so its description stays the source. For UART, SPI, I2C, the timers and the bootloader, write SystemRDL and generate with PeakRDL. Run <code>uvm_reg_hw_reset_seq</code>, <code>uvm_reg_bit_bash_seq</code> and <code>uvm_reg_access_seq</code> on each block. Registers whose reads have side effects must be excluded with <code>NO_REG_TEST</code>: UART RBR/IIR/LSR, SPI RXFIFO/INTSTA and GPIO W1C status.</p>
+
+<h3>Block environments</h3>
+<p>Build one environment each for <code>apb_uart</code>, <code>apb_spi_master</code> + flash, <code>apb_i2c</code> + EEPROM, <code>gpio_apb_wrap</code>, <code>apb_timer</code>, <code>axi_lite_xbar</code> (including both masters hitting the same slave), <code>axi_lite_to_apb</code> (six slots plus holes) and <code>bootloader</code> (flash images, reset modes, bad images). The existing directed benches (<code>tb_axi_lite_xbar.sv</code>, <code>tb_axi_lite_to_apb.sv</code>, <code>i2c_thorough_tb.sv</code>, <code>tb_apb_uart_thorough.sv</code>, <code>tb_gpio.sv</code>, <code>bootloader_tb_all_testcases.sv</code>, <code>apb_timer-master/tb</code>) become the directed seed set. UVM adds randomisation, RAL and coverage on top.</p>
+
+<h3>SoC environment</h3>
+<p>At SoC level the firmware is the stimulus. UVM virtual sequences play the outside world: they respond on pins, inject UART bytes, toggle GPIOs and synchronise with firmware through the mailbox described in &sect;6. Scoreboards chain end to end. An AXI transaction from the core LSU must appear as the APB transaction on the decoded slot, which checks address decode. That APB transaction must then appear as activity on the pins, which checks the data.</p>
+
+<h3>Protocol assertions everywhere</h3>
+<p>Bind AXI-Lite and APB SVA checkers on every fabric interface. Use the same properties in simulation and in JasperGold (ABVIP). The core rules: VALID holds until READY; no X on VALID/READY after reset; PENABLE follows PSEL by one cycle; PADDR/PWDATA stay stable through the access phase.</p>
+<p><b>Exit:</b> every block environment reaches 100% RAL coverage and hits all protocol covers, with 0 SVA failures and block code coverage per &sect;9.</p>
+
+<!-- ============================================================ -->
+<h2 id="m3"><span class="n">3</span>RISC-DV random instruction streams</h2>
+
+<p>riscv-dv generates random, self-consistent assembly programs. Its value here is in the core's interactions: hazard mixes, trap entry and exit, and interrupt timing against the pipeline. Run it in two stages. <b>3a</b> uses trace compare without interrupts and can start as soon as the RVFI port exists. <b>3b</b> uses lockstep co-simulation with a random IRQ agent (&sect;10). Run 3b at core level first, with <code>top.v</code> and a flat simulation memory, then at SoC level.</p>
+
+<ol>
+  <li><b>Custom target <code>riscforge</code>.</b> Copy <code>target/rv32imc</code> and edit <code>riscv_core_setting.sv</code> as shown below.</li>
+  <li><b>Custom program generator.</b> Extend <code>riscv_asm_program_gen</code> into <code>riscforge_asm_program_gen</code>. Replace the default interrupt handler's <code>csrrc mip</code>, which cannot clear hardware-driven bits, with a signature write (<code>HANDLING_IRQ</code>). The testbench IRQ agent drops the line when it sees that write. This is the Ibex pattern.</li>
+  <li><b>Memory.</b> At core level, use the 4 MB simulation memories (<code>Instruction_Memory.v</code> / <code>Data_Memory.v</code> outside <code>SYNTHESIS</code>). riscv-dv's default data regions and stacks do not fit a 32 KB DSRAM. SoC-level runs therefore need either a simulation-only enlarged SRAM parameter or reduced <code>+instr_cnt</code>, stack and region sizes.</li>
+  <li><b>End of test.</b> Pass <code>+require_signature_addr=1 +signature_addr=&lt;mailbox&gt;</code>. The testbench ends on <code>TEST_RESULT</code>; Spike ends on <code>tohost</code>.</li>
+  <li><b>Trace.</b> Convert the RVFI stream to riscv-dv's CSV format with a short script, then compare with <code>instr_trace_compare.py</code> against <code>spike_log_to_trace_csv.py</code> output (stage 3a only).</li>
+  <li><b>Coverage.</b> Run riscv-dv <code>cov.py</code> over the DUT traces to collect instruction &times; operand &times; hazard bins.</li>
+</ol>
+
+<pre><code><span class="c">// target/riscforge/riscv_core_setting.sv  (riscv-dv custom target)</span>
+parameter int XLEN = 32;
+parameter satp_mode_t SATP_MODE = BARE;
+privileged_mode_t supported_privileged_mode[] = {MACHINE_MODE};
+riscv_instr_name_t unsupported_instr[] = {};
+riscv_instr_group_t supported_isa[$] = {RV32I, RV32M};
+mtvec_mode_t supported_interrupt_mode[$] = {DIRECT};   <span class="c">// mtvec MODE is hardwired 0</span>
+int max_interrupt_vector_num = 32;
+bit support_pmp = 0;
+bit support_debug_mode = 0;
+bit support_umode_trap = 0;
+bit support_sfence = 0;
+bit support_unaligned_load_store = 0;                   <span class="c">// DUT traps on misaligned</span>
+parameter int NUM_HARTS = 1;
+const privileged_reg_t implemented_csr[] = {
+  MVENDORID, MARCHID, MIMPID, MHARTID, MISA,            <span class="c">// added by R4</span>
+  MSTATUS, MIE, MTVEC, MSCRATCH, MEPC, MCAUSE, MTVAL, MIP,
+  MCYCLE, MINSTRET, MCYCLEH, MINSTRETH
+};
+bit [11:0] custom_csr[] = {12'h7C0};                    <span class="c">// mintprio</span>
+const interrupt_cause_t implemented_interrupt[] = {
+  M_SOFTWARE_INTR, M_TIMER_INTR, M_EXTERNAL_INTR
+};
+const exception_cause_t implemented_exception[] = {     <span class="c">// prune to what the RTL raises</span>
+  INSTRUCTION_ADDRESS_MISALIGNED, ILLEGAL_INSTRUCTION, BREAKPOINT,
+  LOAD_ADDRESS_MISALIGNED, LOAD_ACCESS_FAULT,
+  STORE_AMO_ADDRESS_MISALIGNED, STORE_AMO_ACCESS_FAULT, ECALL_MMODE
+};</code></pre>
+
+<div class="tbl"><table>
+  <thead><tr><th>Test</th><th>Purpose</th><th>Key options</th></tr></thead>
+  <tbody>
+    <tr><td class="nw"><code>riscv_arithmetic_basic_test</code></td><td>ALU and M-extension only</td><td class="sig">+instr_cnt=4000 +no_fence=1</td></tr>
+    <tr><td class="nw"><code>riscv_rand_instr_test</code></td><td>Mixed streams, loads/stores, branches</td><td class="sig">+instr_cnt=6000 +num_of_sub_program=3</td></tr>
+    <tr><td class="nw"><code>riscv_jump_stress_test</code></td><td>JAL/JALR chains (finds known bug 1)</td><td class="sig">+directed_instr_1=riscv_jal_instr,20</td></tr>
+    <tr><td class="nw"><code>riscv_loop_test</code></td><td>Nested loops, branch flush pressure</td><td class="sig">+directed_instr_1=riscv_loop_instr,20</td></tr>
+    <tr><td class="nw"><code>riscv_mmu_stress_test</code></td><td>Load/store hazard density</td><td class="sig">+directed_instr_0=riscv_load_store_rand_instr_stream,40</td></tr>
+    <tr><td class="nw"><code>riscv_illegal_instr_test</code></td><td>Illegal encodings, ecall</td><td class="sig">+illegal_instr_ratio=5</td></tr>
+    <tr><td class="nw"><code>riscv_ebreak_test</code></td><td>EBREAK trap loop</td><td class="sig">+no_ebreak=0</td></tr>
+    <tr><td class="nw"><code>riscv_unaligned_load_store_test</code></td><td>Misaligned &rarr; trap with <code>mtval</code> (finds known bug 2)</td><td class="sig">+enable_unaligned_load_store=1</td></tr>
+    <tr><td class="nw"><code>riscv_csr_test</code></td><td>CSR WARL behaviour, generated from a RISCFORGE CSR YAML</td><td class="sig">gen_csr_test.py</td></tr>
+    <tr><td class="nw"><code>riscforge_irq_test</code></td><td>Random IRQ timing on every source, nested</td><td class="sig">+enable_interrupt=1 +enable_nested_interrupt=1</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Pitfalls specific to this core</h3>
+<div class="tbl"><table>
+  <thead><tr><th>Symptom</th><th>Cause in RISCFORGE</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Trap at <code>_start</code></td><td>riscv-dv reads <code>mhartid</code>; the CSR is not implemented, so the read is illegal</td><td>R4</td></tr>
+    <tr><td><code>mstatus</code> mismatch after <code>csrw</code></td><td>SIE writable and MPP accepts any value; Spike <code>--priv=m</code> does not</td><td>R5</td></tr>
+    <tr><td>Interrupt storm in the handler</td><td><code>csrrc mip</code> cannot clear hardware-driven bits</td><td>Custom handler + signature handshake</td></tr>
+    <tr><td><code>mtvec</code> read mismatch</td><td>MODE bits hardwired to 0</td><td>DIRECT only in the core setting</td></tr>
+    <tr><td>Spike raises illegal on 0x7C0</td><td>Custom <code>mintprio</code> CSR</td><td>Spike patch, or exclude from random CSR tests</td></tr>
+    <tr><td>Spike cannot load code at 0x0</td><td>Spike's debug module occupies 0x0&ndash;0xFFF</td><td>Start co-simulation at the first ISRAM instruction</td></tr>
+    <tr><td>Program does not fit</td><td>32 KB ISRAM / DSRAM</td><td>Simulation-only enlarged SRAM, or smaller regions</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="m4"><span class="n">4</span>RISCOF architectural compliance</h2>
+
+<p>RISCOF is the architectural sign-off against the Sail model. The flow already exists (<code>verification/riscof</code>, the <code>riscforge</code> plugin, Icarus). For tapeout it needs four changes.</p>
+<ul>
+  <li><b>One RTL source.</b> Point the DUT plugin at the tapeout tree (<code>ips/riscv_core/rtl</code>) through a single filelist. Either retire the flat copy in <code>rv32im_zicsr_5stage_exc_nointr</code> or regenerate it from the same source by script, with a hash check. Signing off RISCOF on a drifted copy signs off the wrong design.</li>
+  <li><b>Exact WARL description.</b> After R4/R5, the ISA and platform YAML must state the real behaviour: M-mode only, direct <code>mtvec</code>, misaligned accesses trap, the <code>misa</code> value, and SIE/MPP hardwired.</li>
+  <li><b>Coverage.</b> Run RISCOF in coverage mode (ISAC with the CGF files) to see which architectural cover points the suites hit. Feed any holes to riscv-dv directed streams.</li>
+  <li><b>Second reference.</b> Run the suites once with Spike as the reference as well as Sail. If the two model configurations disagree, fix that before building the co-simulation.</li>
+</ul>
+<p>Suites: <code>rv32i_m/I</code>, <code>M</code>, <code>Zicsr</code> and <code>privilege</code> (misalign-*, ecall, ebreak, mtvec). Run them on every RTL change (&lt; 30 min), and once on the synthesised netlist in zero-delay GLS. <b>Exit:</b> 100% pass with zero waivers against both references.</p>
+
+<!-- ============================================================ -->
+<h2 id="m5"><span class="n">5</span>FPGA emulation</h2>
+
+<p>Run the exact tapeout RTL at 25&ndash;50 MHz to reach cycle counts that simulation never will. FPGA emulation also rehearses silicon bring-up. It complements GLS; it does not replace it.</p>
+<div class="grid2">
+  <div class="col">
+    <h4>Build rules</h4>
+    <ul>
+      <li>Only the wrapper differs: <code>fpga_top.sv</code> with MMCM clock, reset synchroniser and button, IOBUFs (open-drain for I2C). <code>sram_sp</code> infers BRAM unchanged.</li>
+      <li>Core, fabric and peripheral files are byte-identical to the ASIC filelist. Record a hash list in every build log.</li>
+      <li>FPGA-only code stays under <code>`ifdef FPGA</code>. Close timing at the target clock in XDC.</li>
+      <li>Any Artix-7-class board fits: 64 KB of SRAM is a small fraction of its BRAM. Map UART to USB-UART, SPI to on-board QSPI or a flash PMOD, I2C to an EEPROM PMOD, GPIO to LEDs and switches.</li>
+    </ul>
+  </div>
+  <div class="col">
+    <h4>Content &amp; debug</h4>
+    <ul>
+      <li>Same ELFs as the &sect;6 catalogue, with results reported over UART.</li>
+      <li>Random C (&sect;7): 100k+ seeds from a host script, with checksums compared against Spike on the host.</li>
+      <li>Soak: 24 h of CoreMark + UART echo + GPIO interrupt storm + timer tick.</li>
+      <li>Boot robustness: 1000 reset cycles, alternating cold and warm.</li>
+      <li>ILA on the RVFI port, <code>mip</code>/<code>mie</code>, <code>irq_accept_E</code> and the AXI MMIO channel. Keep a 1K-entry retire ring buffer, readable over UART after a hang.</li>
+    </ul>
+  </div>
+</div>
+<p><b>Exit:</b> the whole directed catalogue passes on the board; 24 h soak with no hang and no checksum mismatch; 1000/1000 boots. FPGA does not prove ASIC timing, SRAM macro behaviour, X/reset behaviour or DFT.</p>
+
+<!-- ============================================================ -->
+<h2 id="m6"><span class="n">6</span>Bare-metal C directed tests</h2>
+
+<p>Every SoC-level test is a C (or assembly) program built by one toolchain. The same ELF runs on the RTL, on Spike and on the FPGA.</p>
+
+<div class="diagram" role="img" aria-label="Toolchain dataflow: sources, RISC-V GCC, ELF, image tools, memory images">
+<svg viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arw"/></marker></defs>
+  <rect x="6" y="18" width="136" height="84" rx="6" class="box"/>
+  <text x="74" y="44" text-anchor="middle" class="t">Sources</text>
+  <text x="74" y="63" text-anchor="middle" class="s">crt0.S &middot; link.ld</text>
+  <text x="74" y="79" text-anchor="middle" class="s">test.c &middot; rf_soc.h</text>
+  <path d="M142,60 H167" class="ln" marker-end="url(#a3)"/>
+  <rect x="167" y="18" width="136" height="84" rx="6" class="core"/>
+  <text x="235" y="44" text-anchor="middle" class="t">RISC-V GCC</text>
+  <text x="235" y="63" text-anchor="middle" class="s">-march=rv32im_zicsr</text>
+  <text x="235" y="79" text-anchor="middle" class="s">-mabi=ilp32 -O2</text>
+  <path d="M303,60 H328" class="ln" marker-end="url(#a3)"/>
+  <rect x="328" y="18" width="136" height="84" rx="6" class="box"/>
+  <text x="396" y="44" text-anchor="middle" class="t">ELF</text>
+  <text x="396" y="63" text-anchor="middle" class="s">app.elf &middot; app.dis</text>
+  <text x="396" y="79" text-anchor="middle" class="s">symbol: tohost</text>
+  <path d="M464,60 H489" class="ln" marker-end="url(#a3)"/>
+  <rect x="489" y="18" width="136" height="84" rx="6" class="fab"/>
+  <text x="557" y="44" text-anchor="middle" class="t">Image tools</text>
+  <text x="557" y="63" text-anchor="middle" class="s">elf_to_hex.py</text>
+  <text x="557" y="79" text-anchor="middle" class="s">gen_flash_image.py</text>
+  <path d="M625,60 H650" class="ln" marker-end="url(#a3)"/>
+  <rect x="650" y="18" width="136" height="84" rx="6" class="okb"/>
+  <text x="718" y="44" text-anchor="middle" class="t">Memory images</text>
+  <text x="718" y="63" text-anchor="middle" class="s">imem.hex @0x1_0000</text>
+  <text x="718" y="79" text-anchor="middle" class="s">dmem.hex &middot; flash.mem</text>
+</svg>
+</div>
+<p class="caption"><code>crt0.S</code> disables interrupts, sets <code>gp</code>/<code>sp</code>, zeroes <code>.bss</code>, clears x1&ndash;x31, installs the direct-mode <code>mtvec</code> and calls <code>main()</code>. <code>link.ld</code> places <code>.text</code> in ISRAM and <code>.rodata/.data/.bss</code>, the stack and a 64-byte <code>.tohost</code> mailbox in DSRAM. <code>elf_to_hex.py</code> writes word-addressed little-endian <code>$readmemh</code> images; <code>gen_flash_image.py</code> packs the same content for the SPI flash model.</p>
+
+<h3>Boot modes: every test must say which it uses</h3>
+<div class="tbl"><table>
+  <thead><tr><th></th><th>Cold boot</th><th>Warm boot</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">Trigger</td><td><code>hard_rst_ni</code> 0&rarr;1 with <code>soft_rst_ni</code>&nbsp;=&nbsp;1</td><td><code>hard_rst_ni</code>&nbsp;=&nbsp;1, pulse <code>soft_rst_ni</code> 0&rarr;1</td></tr>
+    <tr><td class="nw">Bootloader</td><td><code>S_CLEAR_SRAM</code> (16,384 cycles) &rarr; flash power-up wait &rarr; SPI read &rarr; AXI writes with <code>awprot[0]</code>=1 &rarr; clean-slate resets &rarr; release</td><td>Skips clear and flash; releases the core in about 6 cycles</td></tr>
+    <tr><td class="nw">SRAM content</td><td>Loaded from the flash image</td><td>Retained (backdoor <code>$readmemh</code> preload)</td></tr>
+    <tr><td class="nw">Used for</td><td>BOOT-* tests, one full catalogue pass before gate G4, GLS boot test, FPGA</td><td>Default for directed and random regressions (speed)</td></tr>
+    <tr><td class="nw">Watch out</td><td>Slow; dominated by the SRAM clear</td><td>Never pulse <code>hard_rst_ni</code> after a preload: it wipes both SRAMs</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Mailbox convention</h3>
+<p>The <code>.tohost</code> section holds <code>STATUS</code>, <code>TEST_ID</code>, <code>ARG</code> and <code>PUTC</code> words. The testbench reads the address from the ELF symbol table, passes it as <code>+MAILBOX_ADDR</code>, and monitors writes to it. Spike terminates on the same symbol. For tests that need the testbench to respond (UART RX, GPIO input), firmware writes <code>STATUS=READY</code> and waits for the testbench to answer through <code>ARG</code>.</p>
+
+<h3>Reference walkthrough: IRQ-01, Timer 0 tick</h3>
+<ol>
+  <li>BootROM sets <code>sp</code> to 0x0002_8000 (top of DSRAM) and jumps to 0x0001_0000.</li>
+  <li><code>crt0.S</code> builds the C runtime and points <code>mtvec</code> at <code>trap_entry</code> (direct mode).</li>
+  <li>The driver writes Timer 0 <code>CMP</code>&nbsp;=&nbsp;N and <code>CTRL</code>&nbsp;=&nbsp;EN&nbsp;|&nbsp;prescaler, sets <code>mie.MTIE</code> (or the FLI bit after R6) and <code>mstatus.MIE</code>, then writes <code>STATUS=READY</code>.</li>
+  <li>The core runs a mixed ALU, DIV and MMIO-polling loop. The IRQ monitor logs the cycle <code>irq_o[1]</code> rises and the cycle <code>irq_accept_E</code> fires.</li>
+  <li>On the trap, cosim checks <code>mcause</code>&nbsp;=&nbsp;0x8000_0007 and that <code>mepc</code> equals the PC of the instruction that was in EX. The handler acknowledges the source (R1 W1C), counts the tick and executes <code>mret</code>.</li>
+  <li>After K ticks the firmware writes <code>PASS</code>. The testbench requires K accepts, 0 lost pulses, latency within bound and no spurious traps.</li>
+</ol>
+<pre><code><span class="c"># Log format every SoC test must emit (template; values are illustrative, not a captured run)</span>
+[TB]    warm boot: soft_rst_ni released, SRAM retained
+[TB]    core_rst_n=1, first fetch 0x0000_0000 -&gt; 0x0001_0000
+[IRQ]   src=TIMER0 raise=t0 accept=t0+3 mcause=0x80000007 mepc=0x000100a4
+[COSIM] retired=1824 mismatches=0
+[MBX]   TEST_ID=IRQ-01 STATUS=PASS ticks=16 lost=0 max_latency=5</code></pre>
+
+<h3>Directed catalogue</h3>
+<div class="tbl"><table>
+  <thead><tr><th>ID</th><th>Test</th><th>What must hold</th><th>Checker</th></tr></thead>
+  <tbody>
+    <tr class="grp"><td colspan="4">Boot &amp; reset</td></tr>
+    <tr><td class="id">BOOT-01</td><td>Cold boot from flash</td><td>SRAM contents match the image; <code>boot_done</code>; first fetch 0x0 then 0x1_0000</td><td>CRC + PC trace</td></tr>
+    <tr><td class="id">BOOT-02</td><td>Warm boot</td><td>SRAM unchanged; release in about 6 cycles</td><td>Backdoor compare</td></tr>
+    <tr><td class="id">BOOT-03</td><td>ISRAM lock</td><td>After <code>boot_done</code>, an unprivileged AXI write to ISRAM returns SLVERR and data is unchanged</td><td>AXI monitor + readback</td></tr>
+    <tr><td class="id">BOOT-04</td><td>Clean-slate resets</td><td><code>periph_rst_n</code> / <code>spi_rst_n</code> ordering; every peripheral at reset value</td><td>RAL reset check from C</td></tr>
+    <tr><td class="id">BOOT-05</td><td>Blank or bad flash</td><td>Erased (0xFF) or truncated image produces the specified bootloader behaviour, never a silent run</td><td>Status pin / register</td></tr>
+    <tr><td class="id">BOOT-06</td><td>Reset during boot</td><td><code>hard_rst_ni</code> mid-load, then a clean cold boot</td><td>Final CRC</td></tr>
+    <tr class="grp"><td colspan="4">Memory &amp; bus</td></tr>
+    <tr><td class="id">MEM-01</td><td>DSRAM access matrix</td><td>LB/LBU/LH/LHU/LW/SB/SH/SW &times; all offsets</td><td>Self-check + cosim</td></tr>
+    <tr><td class="id">MEM-02</td><td>Misaligned access</td><td>Cause 4/6, <code>mtval</code>&nbsp;=&nbsp;address (covers known bug 2)</td><td>Handler + cosim</td></tr>
+    <tr><td class="id">MEM-03</td><td>Unmapped data address</td><td>Load/store access fault (cause 5/7) via <code>mem_err</code></td><td>Handler</td></tr>
+    <tr><td class="id">MEM-04</td><td>Fetch out of range</td><td>Jump to DSRAM or unmapped space: behaviour defined in the spec first, then checked</td><td>Handler + cosim</td></tr>
+    <tr><td class="id">BUS-01</td><td>APB slot decode</td><td>Reset values of every slot; boundaries 0x4000_0FFC / 0x4000_1000</td><td>AXI&harr;APB scoreboard</td></tr>
+    <tr><td class="id">BUS-02</td><td>APB holes</td><td>0x4000_6000 and above: error response &rarr; access fault, never a hang</td><td>Handler + watchdog</td></tr>
+    <tr><td class="id">BUS-03</td><td>Sub-word MMIO</td><td>SB/SH to APB registers: PSTRB and per-peripheral byte behaviour</td><td>RAL mirror</td></tr>
+    <tr><td class="id">BUS-04</td><td>Back-to-back MMIO</td><td>Store-load-store bursts; load-use on MMIO data</td><td>Cosim</td></tr>
+    <tr class="grp"><td colspan="4">Interrupts &amp; exceptions</td></tr>
+    <tr><td class="id">IRQ-01..05</td><td>Each source end to end</td><td>Timer 0, SPI, I2C, UART, GPIO: <code>mcause</code>, <code>mepc</code>, ack at the source, <code>mret</code> resumes</td><td>Cosim + IRQ monitor</td></tr>
+    <tr><td class="id">IRQ-06</td><td>Simultaneous sources</td><td>Taken in specified priority order</td><td>IRQ monitor</td></tr>
+    <tr><td class="id">IRQ-07</td><td><code>mintprio</code> threshold</td><td>Sources at or below threshold held; above it taken</td><td>Cosim</td></tr>
+    <tr><td class="id">IRQ-08</td><td>Nested</td><td>Handler re-enables MIE; a higher source pre-empts; <code>mepc</code>/<code>mstatus</code> saved in software</td><td>Cosim</td></tr>
+    <tr><td class="id">IRQ-09</td><td>Pipeline collisions</td><td>IRQ during DIV, MMIO stall, branch flush, load-use stall, CSR write, MRET in WB</td><td>IRQ monitor (no loss) + cosim</td></tr>
+    <tr><td class="id">IRQ-10</td><td>Masked, then enabled</td><td>Level sources still pending; pulse sources captured (after R1)</td><td>IRQ monitor</td></tr>
+    <tr><td class="id">EXC-01</td><td>ecall / ebreak / illegal</td><td>Cause, <code>mtval</code>, <code>mepc</code>, including illegal CSR addresses</td><td>Cosim</td></tr>
+    <tr><td class="id">EXC-02</td><td>Trap inside a handler</td><td>Exception with MIE=0; MPIE/MPP chain correct</td><td>Cosim</td></tr>
+    <tr><td class="id">CSR-01</td><td>Counters</td><td><code>mcycle</code>/<code>minstret</code> monotonic, write-then-count, carry into the high half</td><td>Self-check</td></tr>
+  </tbody>
+</table></div>
+<p><b>Exit:</b> the whole catalogue passes in warm boot on every nightly run, and in cold boot at least once before gate G4. Every fixed bug adds a directed test here.</p>
+
+<!-- ============================================================ -->
+<h2 id="m7"><span class="n">7</span>Random C regressions</h2>
+
+<p>Random C finds the bugs that hand-written tests never think of: pipeline hazards exposed by compiler scheduling, and races between peripherals and interrupts. There are three generators, all seed-reproducible.</p>
+<div class="tbl"><table>
+  <thead><tr><th>Generator</th><th>What it produces</th><th>Checked against</th><th>Catches</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">Csmith (or YARPGen)</td><td>Random, UB-free C programs at <code>-O0</code>, <code>-O2</code> and <code>-Os</code></td><td>Final checksum written to the mailbox, compared with the same ELF on Spike</td><td>Forwarding, load-use, branch and M-extension interactions under real compiler output</td></tr>
+    <tr><td class="nw">Driver-stress generator</td><td>Seeded sequences of peripheral operations (UART bytes, SPI lengths/CLKDIV, I2C EEPROM reads/writes, GPIO toggles, timer periods) with random IRQ enables</td><td>Expected-value model in firmware plus UVM pin scoreboards</td><td>Concurrency, FIFO edges, IRQ/driver races, bus contention</td></tr>
+    <tr><td class="nw">Workloads</td><td>CoreMark, Dhrystone, Embench-IoT; a FreeRTOS tick with UART and GPIO ISRs</td><td>Built-in self-check, Spike output</td><td>Long-run state corruption, nested IRQ handling under load</td></tr>
+  </tbody>
+</table></div>
+<ul>
+  <li><b>Filter on Spike first.</b> Drop programs that time out or overflow 32 KB before they reach RTL.</li>
+  <li><b>Triage.</b> Bucket failures by signature (PC of first mismatch plus cause). Reduce a failing Csmith seed with <code>creduce</code>, then promote the minimal reproducer into the &sect;6 catalogue.</li>
+  <li><b>Volume targets.</b> Nightly: 500 Csmith + 200 driver-stress seeds. Weekly: 5k + 1k. FPGA: 100k+. <b>Exit:</b> &ge; 20k cumulative simulation seeds and 0 open failures.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="m8"><span class="n">8</span>Peripheral datapath verification (SV TB + C)</h2>
+
+<p>This is the pattern already proven on UART0, SPI0 and I2C0 in <code>datapath_verification/</code>, formalised and extended. Firmware drives the peripheral through the real core and fabric. SV models sit on the pins. Three checkpoints must agree:</p>
+<ul>
+  <li><b>Bus:</b> the AXI and APB monitors see the right access at the right slot.</li>
+  <li><b>Register:</b> the RAL predictor mirrors every write and checks every read.</li>
+  <li><b>Pin:</b> the protocol monitor decodes the wire traffic, and the scoreboard compares it with what firmware sent or expected.</li>
+</ul>
+
+<div class="tbl"><table>
+  <thead><tr><th>Peripheral</th><th>Today</th><th>Firmware drives</th><th>TB side</th><th>Must-cover modes</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">UART</td><td><span class="pill ok">smoke</span></td><td>THR/RBR, DLAB + DLL/DLM, FCR, IER, LCR</td><td>Serial driver + monitor</td><td>Divisors 1 (sim speed), 54 (115200 Bd at 100 MHz) and 651 (9600 Bd); 5&ndash;8 bits; parity none/odd/even; 1/2 stop; FIFO full; overrun; RX-available and THRE IRQs</td></tr>
+    <tr><td class="nw">SPI</td><td><span class="pill ok">smoke</span></td><td>CLKDIV, CMD/ADR/LEN/DUM, TX/RX FIFO, INTCFG</td><td><code>s25fs512s</code> flash model</td><td>Standard and quad read; write enable + page program; dummy cycles; CLKDIV 0/1/max; FIFO thresholds; event IRQ (after R1)</td></tr>
+    <tr><td class="nw">I2C</td><td><span class="pill ok">smoke</span></td><td>PRE, CTR, TXR/CR, SR</td><td><code>at24c02</code> model + second master</td><td>Byte and page write; random and sequential read; NACK on a wrong address; repeated START; arbitration lost; IACK clearing the IRQ</td></tr>
+    <tr><td class="nw">GPIO</td><td><span class="pill">none</span></td><td>EN, OUT, SET/CLEAR/TOGGLE, IRQ enables, CFG</td><td>Pin driver/monitor, loopback</td><td>All 32 pins in both directions; rise/fall/level-high/level-low per pin; W1C status; <code>glbl_intrpt_mode</code> 0 and 1</td></tr>
+    <tr><td class="nw">Timer 0 / 1</td><td><span class="pill warn">boot-run TB</span></td><td>CMP, CTRL, VAL on both channels</td><td>IRQ monitor + cycle reference</td><td>Prescaler 0&ndash;7; compare 1, small and large; overflow; both channels; IRQ at the exact expected cycle</td></tr>
+    <tr><td class="nw">Bootloader &rarr; SPI handover</td><td><span class="pill warn">boot TBs</span></td><td>Runtime SPI through APB[4] after boot</td><td>Flash model</td><td>Ownership switch; no stray CS after <code>boot_done</code>; runtime flash read after a cold boot</td></tr>
+  </tbody>
+</table></div>
+<p><b>Exit:</b> every cell in the matrix has a passing test, and each peripheral has at least one interrupt-driven variant, not just a polled one.</p>
+
+<!-- ============================================================ -->
+<h2 id="m9"><span class="n">9</span>Closing coverage</h2>
+
+<p>Coverage is closed by a loop, not a final push. Write the functional model from the specifications (this plan and the interrupt specification), not from the RTL. Otherwise the coverage only confirms what the RTL already does.</p>
+
+<div class="tbl"><table>
+  <thead><tr><th>Metric</th><th>Scope</th><th>Target</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">Line</td><td>In-house RTL: core, <code>RTL_SOC</code>, bootloader, glue</td><td class="num">100% after reviewed exclusions</td></tr>
+    <tr><td class="nw">Branch</td><td>Same</td><td class="num">&ge; 98%</td></tr>
+    <tr><td class="nw">Condition / expression</td><td>Same; watch <code>hazard_unit</code> and the commit controller</td><td class="num">&ge; 95%</td></tr>
+    <tr><td class="nw">FSM state / transition</td><td>Bootloader, hybrid-mem FSMs, <code>axi_lite_sram_if</code>, APB bridge, I2C/SPI controllers</td><td class="num">100% / &ge; 98%</td></tr>
+    <tr><td class="nw">Toggle</td><td>Top-level ports, IRQ, reset and strap nets; internal buses</td><td class="num">100%; &ge; 95%</td></tr>
+    <tr><td class="nw">Third-party IP</td><td>Instantiated modules, used parameterisation only</td><td class="num">line/branch &ge; 90%, functional 100% on used features</td></tr>
+    <tr><td class="nw">ISA</td><td>riscv-dv <code>cov.py</code> + RISCOF ISAC</td><td class="num">100% implemented instrs &times; operand &times; hazard bins</td></tr>
+    <tr><td class="nw">CSR</td><td>Every CSR &times; op (RW/RS/RC/imm) &times; rd/rs1&nbsp;=&nbsp;x0 &times; WARL field values</td><td class="num">100%</td></tr>
+    <tr><td class="nw">Trap</td><td>Cause &times; originating stage &times; back-to-back &times; inside handler</td><td class="num">100%</td></tr>
+    <tr><td class="nw">Interrupt</td><td>Source &times; {MIE, mie bit, mintprio above/below} &times; pipeline event (DIV busy, MMIO stall, branch flush, load-use, CSR write, MRET in WB)</td><td class="num">100%</td></tr>
+    <tr><td class="nw">Bus</td><td>Master &times; slave &times; R/W &times; response &times; wait states &times; concurrent masters</td><td class="num">100%</td></tr>
+    <tr><td class="nw">Peripheral</td><td>Register fields &times; modes from the &sect;8 matrix</td><td class="num">100%</td></tr>
+    <tr><td class="nw">Boot / reset</td><td>Cold/warm &times; image size &times; reset mid-boot &times; flash error</td><td class="num">100%</td></tr>
+    <tr><td class="nw">Assertions</td><td>Every SVA has a cover; no vacuous passes</td><td class="num">100%</td></tr>
+  </tbody>
+</table></div>
+
+<div class="diagram" role="img" aria-label="Coverage closure loop: nightly regression, merge, hole report, classify into unreachable, reachable-missed, or out-of-scope, then re-run">
+<svg viewBox="0 0 800 186" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arw"/></marker></defs>
+  <rect x="10" y="62" width="130" height="44" rx="6" class="box"/>
+  <text x="75" y="81" text-anchor="middle" class="t">Nightly regression</text>
+  <text x="75" y="97" text-anchor="middle" class="s">seeds &middot; all levels</text>
+  <path d="M140,84 H165" class="ln" marker-end="url(#a6)"/>
+  <rect x="165" y="62" width="120" height="44" rx="6" class="box"/>
+  <text x="225" y="81" text-anchor="middle" class="t">Merge</text>
+  <text x="225" y="97" text-anchor="middle" class="s">urg / IMC</text>
+  <path d="M285,84 H310" class="ln" marker-end="url(#a6)"/>
+  <rect x="310" y="62" width="120" height="44" rx="6" class="box"/>
+  <text x="370" y="81" text-anchor="middle" class="t">Hole report</text>
+  <text x="370" y="97" text-anchor="middle" class="s">per block</text>
+  <path d="M430,84 H455" class="ln" marker-end="url(#a6)"/>
+  <rect x="455" y="62" width="120" height="44" rx="6" class="fab"/>
+  <text x="515" y="81" text-anchor="middle" class="t">Classify</text>
+  <text x="515" y="97" text-anchor="middle" class="s">owner + reason</text>
+  <path d="M575,84 H592 V32 H610" class="ln" marker-end="url(#a6)"/>
+  <path d="M592,84 H610" class="ln" marker-end="url(#a6)"/>
+  <path d="M592,84 V136 H610" class="ln" marker-end="url(#a6)"/>
+  <rect x="610" y="10" width="180" height="44" rx="6" class="okb"/>
+  <text x="700" y="29" text-anchor="middle" class="t">Unreachable</text>
+  <text x="700" y="45" text-anchor="middle" class="s">formal UNR &rarr; exclusion</text>
+  <rect x="610" y="62" width="180" height="44" rx="6" class="core"/>
+  <text x="700" y="81" text-anchor="middle" class="t">Reachable, missed</text>
+  <text x="700" y="97" text-anchor="middle" class="s">constraint / directed / C</text>
+  <rect x="610" y="114" width="180" height="44" rx="6" class="fab"/>
+  <text x="700" y="133" text-anchor="middle" class="t">Out of scope</text>
+  <text x="700" y="149" text-anchor="middle" class="s">reviewed waiver</text>
+  <path d="M700,158 V176 H75 V106" class="ln" marker-end="url(#a6)"/>
+  <text x="390" y="170" text-anchor="middle" class="s">re-run until targets hold for 2 weeks</text>
+</svg>
+</div>
+
+<ol>
+  <li><b>Scope before you measure.</b> Restrict collection (<code>-cm_hier</code> / <code>-covdut</code>) to instantiated RTL. The PULP <code>common_cells</code> and <code>axi</code> include trees contain dozens of modules you never instantiate. Measure only what is used, in the configuration used.</li>
+  <li><b>Merge nightly</b> across every level (unit, block, SoC, riscv-dv, C) into one database with per-test names.</li>
+  <li><b>Classify every hole.</b> Holes the design cannot reach go to JasperGold's unreachability analysis (the UNR app works on the Xcelium/IMC database). Proven items become machine-generated exclusions, kept separate from human waivers. Reachable holes get a constraint change, a directed test or a C test. Features out of scope, such as unused IP modes or tie-offs, get a written waiver with an owner.</li>
+  <li><b>Close control logic with formal.</b> Use FPV to close the bootloader FSM, the hybrid-mem FSMs and <code>axi_lite_sram_if</code> directly, rather than chasing their transitions in simulation. Use Jasper's connectivity (CONN) app to prove IRQ and APB slot wiring after R3.</li>
+  <li><b>Keep exclusions in git.</b> Every exclusion file is code-reviewed, with a reason per item.</li>
+  <li><b>Declare closure only on trend.</b> Closure means targets met, no new holes for 2 consecutive weeks, and fewer than 1 new major-or-worse bug per week for 3 weeks.</li>
+</ol>
+<pre><code><span class="c"># VCS: collect per test, merge with exclusions</span>
+vcs -full64 -sverilog -f soc_subsystem_vcs.f -f tb/tb.f \
+    -cm line+cond+fsm+tgl+branch+assert -cm_hier cov_scope.cfg -o simv
+./simv -cm line+cond+fsm+tgl+branch+assert -cm_name ${TEST}_${SEED} +ntb_random_seed=${SEED}
+urg -full64 -dir simv.vdb -elfile waivers/soc.el -format both -report cov_report
+
+<span class="c"># Xcelium: collect per test, merge in IMC (then hand holes to Jasper UNR)</span>
+xrun -sv -f soc_subsystem.f -f tb/tb.f -coverage all -covdut riscforge_soc_subsystem \
+     -covtest ${TEST}_${SEED} -svseed ${SEED}
+imc -exec merge_report.tcl</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="m10"><span class="n">10</span>RISC-DV + Spike integration &amp; interrupt verdict</h2>
+
+<div class="callout">
+  <h4>Main integration reference</h4>
+  <p><b>lowRISC Ibex</b>: <code>dv/uvm/core_ibex</code> (riscv-dv integration, IRQ agent, signature handshake) and <code>dv/cosim</code> (Spike lockstep over DPI), built on lowRISC's <code>riscv-isa-sim</code> fork. Ibex is the closest match to RISCFORGE: an in-order RV32 core with machine-mode traps and 15 fast local interrupts at <code>mip[30:16]</code>, the same layout RISCFORGE uses at <code>mip[31:16]</code>. The riscv-dv <code>target/</code> and <code>user_extension/</code> hooks, the RVFI specification and OpenHW's core-v-verif are secondary references.</p>
+</div>
+
+<div class="diagram" role="img" aria-label="Lockstep co-simulation: RTL simulation with RVFI, IRQ and MMIO monitors feeding a DPI-C bridge into a patched Spike that steps per retired instruction and reports mismatches">
+<svg viewBox="0 0 800 312" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arw"/></marker></defs>
+  <rect x="20" y="20" width="330" height="262" rx="8" class="box"/>
+  <text x="185" y="42" text-anchor="middle" class="t">RTL simulation &middot; VCS / Xcelium</text>
+  <rect x="40" y="56" width="290" height="46" rx="6" class="core"/>
+  <text x="185" y="76" text-anchor="middle" class="t">DUT: core (L3) or SoC (L4)</text>
+  <text x="185" y="92" text-anchor="middle" class="s">RVFI retire port (R2)</text>
+  <path d="M56,102 V227" class="ln"/>
+  <path d="M56,135 H76" class="ln" marker-end="url(#a5)"/>
+  <path d="M56,181 H76" class="ln" marker-end="url(#a5)"/>
+  <path d="M56,227 H76" class="ln" marker-end="url(#a5)"/>
+  <rect x="76" y="118" width="254" height="34" rx="5" class="box"/>
+  <text x="203" y="139" text-anchor="middle" class="lbl">RVFI retire monitor</text>
+  <rect x="76" y="164" width="254" height="34" rx="5" class="box"/>
+  <text x="203" y="185" text-anchor="middle" class="lbl">mip / IRQ-accept monitor</text>
+  <rect x="76" y="210" width="254" height="34" rx="5" class="box"/>
+  <text x="203" y="231" text-anchor="middle" class="lbl">MMIO load/store monitor (AXI)</text>
+  <path d="M330,135 H355 V158 H380" class="ln" marker-end="url(#a5)"/>
+  <path d="M330,181 H355 V158" class="ln"/>
+  <path d="M330,227 H355 V181" class="ln"/>
+  <rect x="380" y="126" width="120" height="64" rx="6" class="fab"/>
+  <text x="440" y="152" text-anchor="middle" class="t">DPI-C bridge</text>
+  <text x="440" y="170" text-anchor="middle" class="s">cosim.cc</text>
+  <path d="M500,158 H530" class="ln" marker-end="url(#a5)"/>
+  <rect x="530" y="20" width="250" height="262" rx="8" class="core"/>
+  <text x="655" y="42" text-anchor="middle" class="t">Spike &middot; lowRISC ibex_cosim</text>
+  <rect x="548" y="58" width="214" height="34" rx="5" class="box"/>
+  <text x="655" y="79" text-anchor="middle" class="lbl">step() per retired instr</text>
+  <rect x="548" y="100" width="214" height="34" rx="5" class="box"/>
+  <text x="655" y="121" text-anchor="middle" class="lbl">set_mip(DUT mip) first</text>
+  <rect x="548" y="142" width="214" height="34" rx="5" class="box"/>
+  <text x="655" y="163" text-anchor="middle" class="lbl">MMIO: take DUT load data</text>
+  <rect x="548" y="184" width="214" height="34" rx="5" class="box"/>
+  <text x="655" y="205" text-anchor="middle" class="lbl">patch: mie/mip[31:16], 0x7C0</text>
+  <rect x="548" y="226" width="214" height="34" rx="5" class="box"/>
+  <text x="655" y="247" text-anchor="middle" class="lbl">check PC &middot; rd &middot; CSR &middot; trap</text>
+  <path d="M655,282 V302 H185 V282" class="ln dash" marker-end="url(#a5)"/>
+  <text x="420" y="296" text-anchor="middle" class="s">mismatch &rarr; $error + last 32 retired instrs</text>
+</svg>
+</div>
+
+<h3>Integration steps</h3>
+<ol>
+  <li><b>RTL: RVFI retire port (R2).</b> Behind <code>`ifdef RVFI</code>, carry PC and instruction to WB and expose <code>rvfi_valid</code>, <code>order</code>, <code>insn</code>, <code>trap</code>, <code>intr</code>, <code>pc_rdata/pc_wdata</code>, <code>rd_addr/rd_wdata</code>, <code>mem_addr</code>, <code>mem_rmask/wmask</code>, <code>mem_rdata/wdata</code> and CSR <code>mip/mcause/mepc</code>. The same port serves trace compare, lockstep cosim, coverage, the FPGA ILA and, optionally, riscv-formal.</li>
+  <li><b>Spike.</b> Start from lowRISC's fork, which already supports a fast-interrupt <code>mip</code>/<code>mie</code> layout. Add CSR 0x7C0 and its threshold gate in <code>take_interrupt</code>. Configure M-mode only, the RISCFORGE <code>misa</code> and direct-only <code>mtvec</code>. On upstream Spike the <code>mie</code> write mask covers only the standard bits, so <code>mie[19:16]</code> can never be set without the same patch.</li>
+  <li><b>Cosim library (C++ over DPI-C).</b> Use Ibex's <code>cosim.h</code> / <code>spike_cosim.cc</code> as the template. On each retire, call <code>step()</code> with rd, wdata, PC and sync-trap. Before each step, call <code>set_mip()</code>. For each MMIO access, call <code>notify_dside_access()</code> so Spike uses the DUT's load data for 0x4000_xxxx. Sync <code>mcycle</code> from the DUT; cycle counts are not architectural. ISRAM/DSRAM load from the same ELF; the MMIO range belongs to the DUT.</li>
+  <li><b>riscv-dv.</b> Use the <code>riscforge</code> target and program generator from &sect;3. The core-level IRQ agent asserts <code>fast_irq_i</code> / <code>timer_irq_i</code> as levels, holds them until the handler's signature write, and in a second mode fires single-cycle pulses to prove R1.</li>
+  <li><b>SoC level.</b> Remove the IRQ agent; the real peripherals drive the lines, stimulated by UVM pin agents. Cosim still checks the core's architectural reaction, while the pin scoreboards check the peripherals.</li>
+  <li><b>Runner.</b> One flow, in the style of riscv-dv's <code>run.py</code>: generate &rarr; compile &rarr; RTL sim with cosim &rarr; coverage &rarr; triage, with every seed recorded.</li>
+</ol>
+
+<div class="callout ok">
+  <h4>Who checks what</h4>
+  <p>Spike checks the core's architectural behaviour: which interrupt it takes and when that is allowed, <code>mepc</code>/<code>mcause</code>, handler effects, and MMIO data as software sees it. Spike does <b>not</b> model the peripherals. Peripheral correctness belongs to the UVM pin scoreboards and the RAL. Spike MMIO plugins are useful for firmware development without RTL, not for sign-off.</p>
+</div>
+
+<h3>Verdict: does the current interrupt architecture work for riscv-dv, Spike and peripherals?</h3>
+<p><span class="pill ok">Works today</span></p>
+<ul>
+  <li><code>mie</code> masking and <code>mstatus.MIE</code> gating; <code>mcause</code> interrupt bit; precise EX accept and WB commit with front-end flush. This is exactly what an Ibex-style cosim expects.</li>
+  <li>Fast local interrupts at <code>mip[16+]</code>: the same layout as Ibex, so the lowRISC cosim pattern applies almost as-is.</li>
+  <li>UART and I2C interrupts are level-sensitive and cleared at the source, the right model for software and for Spike.</li>
+  <li>Direct-mode <code>mtvec</code> and trapping misaligned accesses match riscv-dv DIRECT mode and Spike's defaults.</li>
+</ul>
+<p><span class="pill bad">Blocks sign-off</span></p>
+<div class="tbl"><table>
+  <thead><tr><th>#</th><th>Finding</th><th>Evidence</th><th>Effect</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td class="id">B1</td><td>Pulse interrupts are dropped</td><td class="small"><span class="sig">timer.sv:62&ndash;76</span> compare pulse, counter clears on match; <span class="sig">apb_spi_master.sv:116,178&ndash;182</span> one-cycle GEN_INT; <span class="sig">gpio.sv:133</span> edge mode at reset; <span class="sig">csr_regfile.v:286</span> <code>mip</code> not latched; <span class="sig">execute_cycle.v:440</span> accept needs <code>valid_E &amp; ~stallMUL</code></td><td>A pulse during a bubble, a MUL/DIV stall, MIE=0 or a handler is lost for good. RTOS ticks drift, and cosim results depend on exact cycle timing</td><td class="nw">R1</td></tr>
+    <tr><td class="id">B2</td><td>Priority order reversed vs Spike</td><td class="small"><span class="sig">top.v:247&ndash;254</span>: UART(19) &gt; SPI &gt; I2C &gt; GPIO(16); MTI above MSI</td><td>Spike takes the lowest-numbered pending local interrupt first and orders MEI &gt; MSI &gt; MTI, so cosim mismatches whenever two are pending</td><td class="nw">R3</td></tr>
+    <tr><td class="id">B3</td><td>Upstream Spike cannot enable <code>mie[31:16]</code></td><td class="small">Spike's <code>mie</code> write mask covers standard bits only</td><td>FLIs never fire in Spike</td><td class="nw">Fork / patch</td></tr>
+    <tr><td class="id">B4</td><td>Custom <code>mintprio</code> CSR</td><td class="small"><span class="sig">csr_regfile.v:103</span>, <span class="sig">top.v:219</span></td><td>Spike raises illegal instruction; riscv-dv does not know the CSR</td><td class="nw">Spike patch + <code>custom_csr</code></td></tr>
+    <tr><td class="id">B5</td><td>Mandatory CSRs missing</td><td class="small"><span class="sig">csr_regfile.v:305&ndash;317</span>: no <code>misa</code>, <code>mvendorid</code>, <code>marchid</code>, <code>mimpid</code>, <code>mhartid</code>, <code>mstatush</code></td><td>riscv-dv's <code>_start</code> reads <code>mhartid</code>, so the DUT traps and Spike does not</td><td class="nw">R4</td></tr>
+    <tr><td class="id">B6</td><td><code>mstatus</code> WARL not M-only</td><td class="small"><span class="sig">csr_regfile.v:245</span>: SIE writable, MPP takes any value</td><td><code>csrr mstatus</code> differs from Spike <code>--priv=m</code> after random writes</td><td class="nw">R5</td></tr>
+    <tr><td class="id">B7</td><td>riscv-dv handler clears with <code>csrrc mip</code></td><td class="small">riscv-dv default handler</td><td>Hardware-driven bits stay set, causing an interrupt storm</td><td class="nw">Custom handler</td></tr>
+    <tr><td class="id">B8</td><td>No retire trace</td><td class="small">No RVFI or tracer in <code>top.v</code></td><td>Nothing to compare against</td><td class="nw">R2</td></tr>
+    <tr><td class="id">B9</td><td>BootROM at 0x0</td><td class="small"><span class="sig">boot_rom.sv</span>, 16 words at 0x0</td><td>Spike's debug module owns 0x0&ndash;0xFFF</td><td class="nw">Cosim starts at ISRAM</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Recommended RTL changes, before RTL freeze</h3>
+<div class="tbl"><table>
+  <thead><tr><th>ID</th><th>Change</th><th>Size</th><th>Unblocks</th></tr></thead>
+  <tbody>
+    <tr><td class="id">R1</td><td><b>IRQ capture block.</b> Sticky pending flop per pulse source (Timer 0/1 compare and overflow, SPI events, GPIO), cleared by a W1C register. Level sources pass through. Put it on a 7th APB slot (0x4000_6000) so the peripheral IPs stay untouched. Also make GPIO level mode the documented BSP default.</td><td class="nw">~80 lines + 1 APB slot</td><td>Reliable Timer/SPI/GPIO interrupts; deterministic cosim</td></tr>
+    <tr><td class="id">R2</td><td><b>RVFI retire port</b> under <code>`ifdef RVFI</code> (simulation and FPGA only).</td><td class="nw">~80 lines</td><td>Trace compare, lockstep cosim, riscv-formal, ILA</td></tr>
+    <tr><td class="id">R3</td><td><b>Priority alignment.</b> Rewire UART&rarr;<code>fast_irq_i[0]</code>, SPI&rarr;[1], I2C&rarr;[2], GPIO&rarr;[3] and make the encoder lowest-index-first; put MSI above MTI. The effective priority (UART highest) is unchanged. <code>mintprio</code> must then compare a priority <i>rank</i>, not the cause number: update <span class="sig">top.v:219</span> and the interrupt specification together.</td><td class="nw">~25 lines + wiring</td><td>Spike's default ordering; matches Ibex</td></tr>
+    <tr><td class="id">R4</td><td><b>Mandatory CSRs.</b> <code>misa</code>&nbsp;=&nbsp;0x4000_1100 (RV32, I, M). <code>mvendorid</code>, <code>marchid</code>, <code>mimpid</code>, <code>mhartid</code> and <code>mstatush</code> read-only 0.</td><td class="nw">~30 lines</td><td>riscv-dv boot, Spike, RISCOF privilege suite, OS ports</td></tr>
+    <tr><td class="id">R5</td><td><b>M-only <code>mstatus</code>.</b> SIE read-only 0; MPP hardwired to 2'b11. Re-sign RISCOF with Sail configured M-only.</td><td class="nw">~5 lines</td><td>Equality with Spike <code>--priv=m</code></td></tr>
+    <tr><td class="id">R6</td><td><b>CLINT-style timer</b> (<code>mtime</code>/<code>mtimecmp</code>/<code>msip</code>) driving MTIP as a level and giving MSIP a real source. Timer 0/1 compare then go to FLIs through R1. Can slip to a later tapeout if the schedule is tight; MTIP then stays on Timer 0 through R1.</td><td class="nw">~150 lines + APB slot</td><td>FreeRTOS/Zephyr portability; Spike-native MTIP semantics</td></tr>
+  </tbody>
+</table></div>
+
+<div class="diagram" role="img" aria-label="Interrupt path from peripheral sources through a proposed capture block into mip and mie, then priority and threshold, EX acceptance and WB commit">
+<svg viewBox="0 0 800 275" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="arw"/></marker></defs>
+  <rect x="20" y="20" width="170" height="40" rx="6" class="badb"/>
+  <text x="105" y="37" text-anchor="middle" class="t">Timer 0 &middot; irq_o[1]</text>
+  <text x="105" y="52" text-anchor="middle" class="s">1-cycle pulse &rarr; mip[7]</text>
+  <rect x="20" y="70" width="170" height="40" rx="6" class="badb"/>
+  <text x="105" y="87" text-anchor="middle" class="t">SPI &middot; events_o[0]</text>
+  <text x="105" y="102" text-anchor="middle" class="s">1-cycle pulse &rarr; mip[18]</text>
+  <rect x="20" y="120" width="170" height="40" rx="6" class="fab"/>
+  <text x="105" y="137" text-anchor="middle" class="t">GPIO &middot; global irq</text>
+  <text x="105" y="152" text-anchor="middle" class="s">edge-mode pulse &rarr; [16]</text>
+  <rect x="20" y="170" width="170" height="40" rx="6" class="okb"/>
+  <text x="105" y="187" text-anchor="middle" class="t">I2C &middot; interrupt_o</text>
+  <text x="105" y="202" text-anchor="middle" class="s">level until IACK &rarr; [17]</text>
+  <rect x="20" y="220" width="170" height="40" rx="6" class="okb"/>
+  <text x="105" y="237" text-anchor="middle" class="t">UART &middot; intr_o</text>
+  <text x="105" y="252" text-anchor="middle" class="s">level until read &rarr; [19]</text>
+  <path d="M190,40 H230" class="ln" marker-end="url(#a4)"/>
+  <path d="M190,90 H230" class="ln" marker-end="url(#a4)"/>
+  <path d="M190,140 H230" class="ln" marker-end="url(#a4)"/>
+  <path d="M190,190 H230" class="ln" marker-end="url(#a4)"/>
+  <path d="M190,240 H230" class="ln" marker-end="url(#a4)"/>
+  <rect x="230" y="20" width="150" height="240" rx="8" class="box dash"/>
+  <text x="305" y="116" text-anchor="middle" class="t">R1 &middot; irq_capture</text>
+  <text x="305" y="134" text-anchor="middle" class="s">proposed</text>
+  <text x="305" y="156" text-anchor="middle" class="s">pulse &rarr; sticky</text>
+  <text x="305" y="172" text-anchor="middle" class="s">clear: W1C / ack</text>
+  <text x="305" y="188" text-anchor="middle" class="s">level: pass-through</text>
+  <path d="M380,95 H420" class="ln" marker-end="url(#a4)"/>
+  <rect x="420" y="70" width="150" height="50" rx="6" class="core"/>
+  <text x="495" y="91" text-anchor="middle" class="t">mip[31:16,11,7,3]</text>
+  <text x="495" y="108" text-anchor="middle" class="s">combinational</text>
+  <rect x="420" y="150" width="150" height="50" rx="6" class="core"/>
+  <text x="495" y="171" text-anchor="middle" class="t">mie &amp; mstatus.MIE</text>
+  <text x="495" y="188" text-anchor="middle" class="s">software enables</text>
+  <path d="M570,95 H590 V48 H610" class="ln" marker-end="url(#a4)"/>
+  <path d="M570,175 H590 V95" class="ln"/>
+  <rect x="610" y="20" width="170" height="56" rx="6" class="fab"/>
+  <text x="695" y="42" text-anchor="middle" class="t">priority + threshold</text>
+  <text x="695" y="60" text-anchor="middle" class="s">top.v:219-255</text>
+  <path d="M695,76 V112" class="ln" marker-end="url(#a4)"/>
+  <rect x="610" y="112" width="170" height="56" rx="6" class="fab"/>
+  <text x="695" y="134" text-anchor="middle" class="t">EX acceptance</text>
+  <text x="695" y="152" text-anchor="middle" class="s">valid_E &amp; ~stallMUL</text>
+  <path d="M695,168 V204" class="ln" marker-end="url(#a4)"/>
+  <rect x="610" y="204" width="170" height="56" rx="6" class="core"/>
+  <text x="695" y="226" text-anchor="middle" class="t">WB commit</text>
+  <text x="695" y="244" text-anchor="middle" class="s">mepc &middot; mcause &middot; flush</text>
+</svg>
+</div>
+<p class="caption">Today there is no capture stage: each source wires straight into <code>mip</code>. The dashed box is R1. With it, every source reaches <code>mip</code> as a level that software clears. The IRQ monitor's lost-pulse assertion then proves that no raise goes unaccepted.</p>
+
+<!-- ============================================================ -->
+<h2 id="order"><span class="n">12</span>Ordered path to tapeout</h2>
+
+<p>Order matters more than speed. R1&ndash;R6 come before riscv-dv and cosim because each one changes what the golden model must do; building the cosim first means building it twice. Lint, CDC and RDC run at every phase, not just at the end. The week numbers are indicative for a team of two or three engineers; shift the bars to your tapeout date.</p>
+
+<div class="diagram" role="img" aria-label="Gantt chart of phases P0 to P8 with FPGA emulation in parallel, RTL freeze at week 18 and tape-out at week 23">
+<svg viewBox="0 0 800 372" xmlns="http://www.w3.org/2000/svg">
+  <text x="8" y="22" class="s">indicative weeks &rarr;</text>
+  <text x="212" y="22" text-anchor="middle" class="s">W1</text>
+  <text x="287" y="22" text-anchor="middle" class="s">W4</text>
+  <text x="387" y="22" text-anchor="middle" class="s">W8</text>
+  <text x="487" y="22" text-anchor="middle" class="s">W12</text>
+  <text x="587" y="22" text-anchor="middle" class="s">W16</text>
+  <text x="687" y="22" text-anchor="middle" class="s">W20</text>
+  <text x="762" y="22" text-anchor="middle" class="s">W23</text>
+  <path d="M200,30 V340 M275,30 V340 M375,30 V340 M475,30 V340 M575,30 V340 M675,30 V340 M775,30 V340" class="grid"/>
+  <!-- rows -->
+  <text x="8" y="54" class="lbl">P0 Baseline &amp; hygiene</text>
+  <rect x="200" y="41" width="50" height="18" rx="3" class="bar-a"/>
+  <path d="M250,43 L257,50 L250,57 L243,50 Z" class="gate"/><text x="261" y="54" class="s">G0</text>
+  <text x="8" y="84" class="lbl">P1 Architecture closure</text>
+  <rect x="225" y="71" width="75" height="18" rx="3" class="bar-a"/>
+  <path d="M300,73 L307,80 L300,87 L293,80 Z" class="gate"/><text x="311" y="84" class="s">G1</text>
+  <text x="8" y="114" class="lbl">P2 Unit &amp; block</text>
+  <rect x="250" y="101" width="175" height="18" rx="3" class="bar-b"/>
+  <path d="M425,103 L432,110 L425,117 L418,110 Z" class="gate"/><text x="436" y="114" class="s">G2</text>
+  <text x="8" y="144" class="lbl">P3 Core ISA</text>
+  <rect x="275" y="131" width="175" height="18" rx="3" class="bar-b"/>
+  <path d="M450,133 L457,140 L450,147 L443,140 Z" class="gate"/><text x="461" y="144" class="s">G3</text>
+  <text x="8" y="174" class="lbl">P4 SoC integration</text>
+  <rect x="350" y="161" width="175" height="18" rx="3" class="bar-b"/>
+  <path d="M525,163 L532,170 L525,177 L518,170 Z" class="gate"/><text x="536" y="174" class="s">G4</text>
+  <text x="8" y="204" class="lbl">P5 System stress</text>
+  <rect x="450" y="191" width="150" height="18" rx="3" class="bar-b"/>
+  <path d="M600,193 L607,200 L600,207 L593,200 Z" class="gate"/><text x="611" y="204" class="s">G5</text>
+  <text x="8" y="234" class="lbl">&#8741; FPGA emulation</text>
+  <rect x="425" y="221" width="225" height="18" rx="3" class="bar-d"/>
+  <path d="M650,223 L657,230 L650,237 L643,230 Z" class="gate"/><text x="661" y="234" class="s">GF</text>
+  <text x="8" y="264" class="lbl">P6 Coverage closure</text>
+  <rect x="525" y="251" width="125" height="18" rx="3" class="bar-b"/>
+  <path d="M650,253 L657,260 L650,267 L643,260 Z" class="gate"/><text x="661" y="264" class="s">G6</text>
+  <text x="8" y="294" class="lbl">P7 Implementation verif.</text>
+  <rect x="600" y="281" width="150" height="18" rx="3" class="bar-c"/>
+  <path d="M750,283 L757,290 L750,297 L743,290 Z" class="gate"/><text x="761" y="294" class="s">G7</text>
+  <text x="8" y="324" class="lbl">P8 Sign-off review</text>
+  <rect x="725" y="311" width="50" height="18" rx="3" class="bar-c"/>
+  <path d="M775,313 L782,320 L775,327 L768,320 Z" class="gate"/><text x="785" y="324" class="s">G8</text>
+  <path d="M650,30 V342" class="freeze"/>
+  <text x="650" y="360" text-anchor="middle" class="s">RTL freeze (G6)</text>
+  <text x="775" y="360" text-anchor="end" class="s">Tape-out</text>
+</svg>
+</div>
+<div class="legend">
+  <span><i class="sw" style="background:var(--primary);border-color:var(--primary)"></i>foundation</span>
+  <span><i class="sw" style="background:var(--accent);border-color:var(--accent)"></i>RTL verification</span>
+  <span><i class="sw" style="background:var(--ok);border-color:var(--ok)"></i>parallel track</span>
+  <span><i class="sw" style="background:var(--warn);border-color:var(--warn)"></i>implementation &amp; sign-off</span>
+  <span>&#9670; exit gate</span>
+</div>
+
+<div class="tbl"><table>
+  <thead><tr><th>Phase</th><th>Do</th><th>Exit gate: must be true to move on</th></tr></thead>
+  <tbody>
+    <tr><td class="id">P0</td><td><b>Baseline &amp; hygiene.</b> Put the workspace under git with a tag per gate (the <code>ips/</code> tree is not a repository today). Make <code>ips/riscv_core/rtl</code> the single RTL source and generate every other copy from it. Unify filelists; add a regression runner (make or Python) for VCS and Xcelium. Fix known bugs 1&ndash;4 (JALR bit 0, LHU misalign, illegal on bubble, CSR write gate), each with a regression test. Record a lint baseline in SpyGlass and Jasper Superlint.</td><td><b>G0:</b> one tree, reproducible build, lint errors 0 (warnings waived with reasons), bugs 1&ndash;4 closed</td></tr>
+    <tr><td class="id">P1</td><td><b>Architecture closure.</b> Decide and implement R1&ndash;R6. Freeze memory map, IRQ map, CSR list and reset behaviour as spec v1. Stand up the single register description and generate RAL and C headers.</td><td><b>G1:</b> spec v1 frozen; R-changes merged; RISCOF still 100%; C headers generated, not hand-written</td></tr>
+    <tr><td class="id">P2</td><td><b>Unit &amp; block.</b> SV OOP benches (&sect;1); UVM block environments (&sect;2); FPV on bootloader, <code>axi_lite_sram_if</code> and hybrid-mem FSMs; ABVIP on the fabric; first CDC/RDC run.</td><td><b>G2:</b> &sect;1 and &sect;2 exit criteria met for every block</td></tr>
+    <tr><td class="id">P3</td><td><b>Core ISA.</b> RISCOF against Sail and Spike (&sect;4); riscv-dv trace compare (3a); lockstep cosim with IRQ agent (3b).</td><td><b>G3:</b> RISCOF 100%; 0 cosim mismatches over 5 consecutive nightlies of &ge; 2k seeds</td></tr>
+    <tr><td class="id">P4</td><td><b>SoC integration.</b> Cold and warm boot; the &sect;6 catalogue; the &sect;8 datapath matrix; IRQ end to end with SoC-level cosim; Jasper CONN on IRQ and pad wiring.</td><td><b>G4:</b> catalogue 100% in warm boot and once in cold boot; datapath matrix complete</td></tr>
+    <tr><td class="id">P5</td><td><b>System stress.</b> Random C (&sect;7), riscv-dv at SoC level, multi-peripheral concurrency, workloads.</td><td><b>G5:</b> volume targets met; 0 open critical or major bugs</td></tr>
+    <tr><td class="id">&#8741;</td><td><b>FPGA emulation</b> (&sect;5). Starts once G4 smoke passes and runs in parallel through RTL freeze.</td><td><b>GF:</b> 24 h soak, 1000/1000 boots, catalogue passes on board</td></tr>
+    <tr><td class="id">P6</td><td><b>Coverage closure &rarr; RTL freeze.</b> Merge, UNR, targeted tests, waiver review (&sect;9).</td><td><b>G6:</b> &sect;9 targets met; waivers signed; bug-rate trend flat &rarr; <b>RTL freeze</b></td></tr>
+    <tr><td class="id">P7</td><td><b>Implementation verification.</b> LEC on every netlist drop, RTL vs synthesis and synthesis vs P&amp;R. Zero-delay GLS: boot, catalogue subset, RISCOF subset. SDF GLS at min and max corners after P&amp;R. VCS X-propagation. Final CDC/RDC, paying attention to the bootloader-generated resets. PrimeTime sign-off. DFT scan and ATPG pattern simulation. Regression on the foundry SRAM macro models.</td><td><b>G7:</b> LEC clean; GLS passes with no X on outputs after reset; STA met at all corners; CDC/RDC waived with reasons; patterns pass</td></tr>
+    <tr><td class="id">P8</td><td><b>Tape-out review.</b> Walk the sign-off checklist; tag the release; package the bring-up kit (the same C tests, already proven on FPGA).</td><td><b>G8:</b> checklist signed; release tagged; bring-up guide reviewed</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="signoff">Sign-off checklist</h2>
+<div class="tbl"><table>
+  <thead><tr><th>Area</th><th>Criterion</th><th>Target</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td class="nw">ISA compliance</td><td>RISCOF I, M, Zicsr, privilege</td><td>100%, Sail and Spike</td><td><code>report.html</code> per reference</td></tr>
+    <tr><td class="nw">Random ISA</td><td>riscv-dv + lockstep cosim</td><td>0 mismatches, &ge; 50k cumulative seeds</td><td>Regression dashboard</td></tr>
+    <tr><td class="nw">SoC directed</td><td>&sect;6 catalogue</td><td>100%, warm and cold</td><td>Test report</td></tr>
+    <tr><td class="nw">Peripheral datapath</td><td>&sect;8 matrix</td><td>Every cell</td><td>Coverage report</td></tr>
+    <tr><td class="nw">Random C</td><td>Csmith + driver stress</td><td>&ge; 20k seeds, 0 fails</td><td>Regression log</td></tr>
+    <tr><td class="nw">Code coverage</td><td>Line / branch / cond / FSM / toggle</td><td>Per &sect;9</td><td>Merged URG / IMC report + exclusion files</td></tr>
+    <tr><td class="nw">Functional coverage</td><td>ISA, CSR, trap, IRQ, bus, peripheral, boot</td><td>100% with signed waivers</td><td>Covergroup report</td></tr>
+    <tr><td class="nw">Assertions</td><td>Protocol + design SVA</td><td>0 fails, 0 vacuous</td><td>Sim + Jasper reports</td></tr>
+    <tr><td class="nw">Lint</td><td>SpyGlass + Jasper Superlint</td><td>0 errors; warnings waived</td><td>Lint reports</td></tr>
+    <tr><td class="nw">CDC / RDC</td><td>Including bootloader-generated resets</td><td>0 unwaived</td><td>CDC/RDC reports</td></tr>
+    <tr><td class="nw">Equivalence</td><td>RTL vs synth, synth vs P&amp;R</td><td>Clean</td><td>LEC logs</td></tr>
+    <tr><td class="nw">GLS</td><td>Zero-delay and SDF min/max</td><td>Boot + subset pass; no X after reset</td><td>GLS logs</td></tr>
+    <tr><td class="nw">Timing</td><td>PrimeTime, all corners</td><td>0 violations</td><td>PT reports</td></tr>
+    <tr><td class="nw">DFT</td><td>Scan chains + ATPG patterns</td><td>Pattern simulation passes</td><td>Pattern sim log</td></tr>
+    <tr><td class="nw">FPGA</td><td>Soak + boot</td><td>24 h; 1000/1000</td><td>Board log</td></tr>
+    <tr><td class="nw">Bugs</td><td>Open issues</td><td>0 critical/major; minors reviewed</td><td>Issue tracker</td></tr>
+    <tr><td class="nw">Documents</td><td>Spec v1, this plan, waivers, bring-up guide</td><td>Reviewed</td><td>Release tag</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="risks">Risks</h2>
+<div class="tbl"><table>
+  <thead><tr><th>Risk</th><th>Why it matters</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>RTL trees drift (<code>ips/riscv_core</code> vs <code>rv32im_zicsr_5stage_exc_nointr</code>)</td><td>Compliance signed off on a design that is not the one taped out</td><td>Single source, generated copies, hash check in every run (P0)</td></tr>
+    <tr><td>Pulse interrupts lost</td><td>Silent functional failure in silicon</td><td>R1 plus a lost-pulse assertion in the IRQ monitor</td></tr>
+    <tr><td>No debug module / JTAG</td><td>Bring-up depends entirely on SPI flash and UART</td><td>Consider a UART-load boot strap as a fallback; rehearse bring-up on FPGA</td></tr>
+    <tr><td>Behavioural SRAM vs foundry macro</td><td>X at power-up, timing and BIST differ</td><td>Regress on macro models; verify the bootloader's SRAM clear in GLS</td></tr>
+    <tr><td>Bootloader-generated resets</td><td>Reset-domain glitches and ordering bugs</td><td>RDC analysis plus reset-ordering assertions</td></tr>
+    <tr><td>Third-party IP modes</td><td>Firmware may use modes nobody verified</td><td>Block UVM in the used configuration; the BSP restricts itself to verified modes</td></tr>
+    <tr><td>Remote-only licences</td><td>Slow iteration on VCS/Xcelium/Jasper</td><td>Nightly queue on the servers; xsim/Verilator for fast local loops</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="appendix">Appendix: commands &amp; references</h2>
+
+<h3>Representative invocations</h3>
+<pre><code><span class="c"># Spike: standalone trace compare (stage 3a, no interrupts). ELF entry = 0x0001_0000.</span>
+spike --isa=rv32im_zicsr --priv=m \
+      -m0x10000:0x8000,0x20000:0x8000 \
+      --log-commits test.elf 2&gt; spike_commit.log
+python3 scripts/spike_log_to_trace_csv.py --log spike_commit.log --csv spike_trace.csv
+python3 scripts/instr_trace_compare.py --csv_file_1 dut_trace.csv --csv_file_2 spike_trace.csv
+
+<span class="c"># riscv-dv testlist entry for the custom IRQ test (core level)</span>
+- test: riscforge_irq_test
+  description: random stream + randomly timed fast IRQs, nested
+  gen_test: riscv_instr_base_test
+  gen_opts: &gt;
+    +instr_cnt=4000 +num_of_sub_program=2
+    +enable_interrupt=1 +enable_nested_interrupt=1
+    +require_signature_addr=1 +signature_addr=0x00027ff0
+    +disable_compressed_instr=1 +no_wfi=1
+  iterations: 50
+  rtl_test: core_riscforge_irq_test   <span class="c"># consumed by our runner (Ibex convention)</span></code></pre>
+
+<h3>External references</h3>
+<ul>
+  <li>riscv-dv: <a href="https://github.com/chipsalliance/riscv-dv">github.com/chipsalliance/riscv-dv</a></li>
+  <li>Ibex DV (riscv-dv integration, IRQ agent, cosim): <a href="https://github.com/lowRISC/ibex/tree/master/dv">github.com/lowRISC/ibex/tree/master/dv</a></li>
+  <li>lowRISC Spike fork: <a href="https://github.com/lowRISC/riscv-isa-sim">github.com/lowRISC/riscv-isa-sim</a> &middot; upstream Spike: <a href="https://github.com/riscv-software-src/riscv-isa-sim">github.com/riscv-software-src/riscv-isa-sim</a></li>
+  <li>RVFI / riscv-formal: <a href="https://github.com/YosysHQ/riscv-formal">github.com/YosysHQ/riscv-formal</a></li>
+  <li>RISCOF: <a href="https://riscof.readthedocs.io/">riscof.readthedocs.io</a> &middot; architecture tests: <a href="https://github.com/riscv-non-isa/riscv-arch-test">github.com/riscv-non-isa/riscv-arch-test</a> &middot; Sail: <a href="https://github.com/riscv/sail-riscv">github.com/riscv/sail-riscv</a></li>
+  <li>Csmith: <a href="https://github.com/csmith-project/csmith">github.com/csmith-project/csmith</a> &middot; PeakRDL: <a href="https://github.com/SystemRDL/PeakRDL">github.com/SystemRDL/PeakRDL</a> &middot; OpenHW core-v-verif: <a href="https://github.com/openhwgroup/core-v-verif">github.com/openhwgroup/core-v-verif</a></li>
+</ul>
+
+<h3>Project documents this plan builds on</h3>
+<ul>
+  <li><code>rtl/interrupt_architecture_spec.html</code>: priority, <code>mintprio</code> and verification invariants (update with R1/R3)</li>
+  <li><code>rtl/modules_verificaction_implementation_plan.md</code>: unit bench layouts (&sect;1)</li>
+  <li><code>rtl/exception_bugs.md</code>: known bugs 1&ndash;4 (P0)</li>
+  <li><code>ips/Sw/sw_plan.md</code>, <code>ips/Sw/soc_spec.md</code>: BSP, HAL and register map</li>
+  <li><code>ips/datapath_verification/{UART0,spi0,i2c0}</code>: the datapath pattern extended in &sect;8</li>
+</ul>
+
+<p class="foot">RISCFORGE 1TOPS &middot; Tapeout Verification Plan &middot; baseline v1.0 &middot; 25 Sep 2026. File and line references point at the RTL as surveyed on this date. This is a plan, not a record of executed runs.</p>
+
+</div>
