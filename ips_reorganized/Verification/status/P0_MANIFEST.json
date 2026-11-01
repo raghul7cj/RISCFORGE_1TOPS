@@ -1,0 +1,509 @@
+{
+  "manifest_version": "1.0",
+  "phase": "P0",
+  "description": "RISCFORGE P0 Bring-up Execution Contract & Golden Identity Manifest",
+  "contract": {
+    "golden_filelist": "RTL_SOC/soc_subsystem.f",
+    "canonical_filelist": "RTL_SOC/soc_subsystem.f",
+    "tool_pins": {
+      "simulator": "AMD Vivado XSim v2022.2 (64-bit, SW Build 3671981)",
+      "toolchain": "GNU RISC-V GCC 13.2.0 (riscv64-unknown-elf-gcc via WSL Ubuntu)",
+      "python": "CPython 3.12"
+    },
+    "parameters": {
+      "boot_mode": "WARM",
+      "timeout_cycles": 1000000,
+      "seed": "none"
+    },
+    "pass_predicates": {
+      "g0_harness_integrity": {
+        "unresolved_modules": 0,
+        "extra_modules": 0,
+        "artifact_write_test": "PASS",
+        "build_logs_retained": "YES"
+      },
+      "g1_stimulus_reached_dut": {
+        "instructions_retired_gt_0": true,
+        "axi_transfers_gt_0": true,
+        "apb_transfers_gt_0": true,
+        "attestation_words_written_gt_0": true
+      }
+    }
+  },
+  "identity": {
+    "H_rtl": "d25104a436315617194263f1c3338eb1c4e596b0390cb5a34df91219c3b2edf1",
+    "H_filelist": "a931d6b425a197bb03ac237378839b7628cc0893743bc59f25a4d29f1a0e5407",
+    "ID_1_divergent_reachable_groups": 22,
+    "ID_2_unresolved_entries": 0,
+    "ID_3_absolute_path_entries": 0,
+    "design_files_count": 90,
+    "manifest_file": "Verification/status/manifest_rtl.sha256"
+  },
+  "divergent_groups_detail": [
+    {
+      "filename": "apb_timer.sv",
+      "instances": [
+        {
+          "path": "apb_timer-master/apb_timer.sv",
+          "sha256": "22dce4e3ff8328bdd6e1621c20e2877e7f44cfecccc07203d09e994632cc1778"
+        },
+        {
+          "path": "apb_timer-master/rtl/apb_timer.sv",
+          "sha256": "a231231caa242092f90c9de267b89bea8026b2efbea09715e126007f89b47dcb"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_timer-master/rtl/apb_timer.sv",
+          "sha256": "a231231caa242092f90c9de267b89bea8026b2efbea09715e126007f89b47dcb"
+        }
+      ]
+    },
+    {
+      "filename": "timer.sv",
+      "instances": [
+        {
+          "path": "apb_timer-master/timer.sv",
+          "sha256": "d352fc4476da83658d361e8f500b5a73f857f0a11e9436ab47d5bf0ba0bc7fce"
+        },
+        {
+          "path": "apb_timer-master/rtl/timer.sv",
+          "sha256": "d352fc4476da83658d361e8f500b5a73f857f0a11e9436ab47d5bf0ba0bc7fce"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_timer-master/rtl/timer.sv",
+          "sha256": "33a8613c16b0fbad6d8d1d41ec9955cb394b59425d4705d49e02e2db47a220c5"
+        }
+      ]
+    },
+    {
+      "filename": "apb_pkg.sv",
+      "instances": [
+        {
+          "path": "apb_uart-main/include/apb/apb_pkg.sv",
+          "sha256": "7e4164416c1778ccd8a0a42f1e03aecc336c4c1229eda49f62cc0f047f536b25"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/apb/apb_pkg.sv",
+          "sha256": "7e4164416c1778ccd8a0a42f1e03aecc336c4c1229eda49f62cc0f047f536b25"
+        },
+        {
+          "path": "SOC_FILES/include/apb/apb_pkg.sv",
+          "sha256": "c1fcab460f5dd67cf787279afdee0e7b86b5bb96416d42fe48d081fc1efa169d"
+        }
+      ]
+    },
+    {
+      "filename": "assign.svh",
+      "instances": [
+        {
+          "path": "apb_uart-main/include/apb/assign.svh",
+          "sha256": "58683b654ef81926ebe94734a8de78638afe57c7905132dcf0c23ceb945595bb"
+        },
+        {
+          "path": "apb_uart-main/include/axi/assign.svh",
+          "sha256": "8d6aa6ecc736515db75bb691e377b64753310c442e107757b99caabdf043b6cd"
+        },
+        {
+          "path": "apb_uart-main/include/obi/assign.svh",
+          "sha256": "6677aa2c7973a083c36c42f7282baff634724ea30bb8ea82fd2aca17a25ec44a"
+        },
+        {
+          "path": "apb_uart-main/include/register_interface/assign.svh",
+          "sha256": "362408c8e4fe2d73be91b8ec7a753620bdd2734f25fd8d4851c66f38131b883c"
+        },
+        {
+          "path": "axi_lite_xbar/include/axi/assign.svh",
+          "sha256": "8d6aa6ecc736515db75bb691e377b64753310c442e107757b99caabdf043b6cd"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/apb/assign.svh",
+          "sha256": "58683b654ef81926ebe94734a8de78638afe57c7905132dcf0c23ceb945595bb"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/axi/assign.svh",
+          "sha256": "8d6aa6ecc736515db75bb691e377b64753310c442e107757b99caabdf043b6cd"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/obi/assign.svh",
+          "sha256": "6677aa2c7973a083c36c42f7282baff634724ea30bb8ea82fd2aca17a25ec44a"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/register_interface/assign.svh",
+          "sha256": "362408c8e4fe2d73be91b8ec7a753620bdd2734f25fd8d4851c66f38131b883c"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/axi_lite_xbar/include/axi/assign.svh",
+          "sha256": "8d6aa6ecc736515db75bb691e377b64753310c442e107757b99caabdf043b6cd"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/register_interface/assign.svh",
+          "sha256": "362408c8e4fe2d73be91b8ec7a753620bdd2734f25fd8d4851c66f38131b883c"
+        },
+        {
+          "path": "register_interface/assign.svh",
+          "sha256": "362408c8e4fe2d73be91b8ec7a753620bdd2734f25fd8d4851c66f38131b883c"
+        },
+        {
+          "path": "SOC_FILES/include/apb/assign.svh",
+          "sha256": "58683b654ef81926ebe94734a8de78638afe57c7905132dcf0c23ceb945595bb"
+        },
+        {
+          "path": "SOC_FILES/include/obi/assign.svh",
+          "sha256": "6677aa2c7973a083c36c42f7282baff634724ea30bb8ea82fd2aca17a25ec44a"
+        },
+        {
+          "path": "SOC_FILES/include/register_interface/assign.svh",
+          "sha256": "362408c8e4fe2d73be91b8ec7a753620bdd2734f25fd8d4851c66f38131b883c"
+        },
+        {
+          "path": "SOC_FILES/include/register_interface-master/assign.svh",
+          "sha256": "362408c8e4fe2d73be91b8ec7a753620bdd2734f25fd8d4851c66f38131b883c"
+        }
+      ]
+    },
+    {
+      "filename": "typedef.svh",
+      "instances": [
+        {
+          "path": "apb_uart-main/include/apb/typedef.svh",
+          "sha256": "7c6abb82cbc2f6f64a4635a976dd2b70650f92eb7b35e50e6e3c62c7b17b608f"
+        },
+        {
+          "path": "apb_uart-main/include/axi/typedef.svh",
+          "sha256": "c2ef2098fea077e07100b9b9c40f2ac5453e7e01af407e236a810b43aeb8b2ef"
+        },
+        {
+          "path": "apb_uart-main/include/obi/typedef.svh",
+          "sha256": "b21c8b87080fa448b113cac67432f476bf5fa541608e1fe61f580d35d5d991d3"
+        },
+        {
+          "path": "apb_uart-main/include/register_interface/typedef.svh",
+          "sha256": "d78094f45d6e67b72d5ccfe998495dac562c301f03619d6a2a1a4b0c5cf27189"
+        },
+        {
+          "path": "axi_lite_xbar/include/axi/typedef.svh",
+          "sha256": "c2ef2098fea077e07100b9b9c40f2ac5453e7e01af407e236a810b43aeb8b2ef"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/apb/typedef.svh",
+          "sha256": "7c6abb82cbc2f6f64a4635a976dd2b70650f92eb7b35e50e6e3c62c7b17b608f"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/axi/typedef.svh",
+          "sha256": "c2ef2098fea077e07100b9b9c40f2ac5453e7e01af407e236a810b43aeb8b2ef"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/obi/typedef.svh",
+          "sha256": "b21c8b87080fa448b113cac67432f476bf5fa541608e1fe61f580d35d5d991d3"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/register_interface/typedef.svh",
+          "sha256": "d78094f45d6e67b72d5ccfe998495dac562c301f03619d6a2a1a4b0c5cf27189"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/axi_lite_xbar/include/axi/typedef.svh",
+          "sha256": "c2ef2098fea077e07100b9b9c40f2ac5453e7e01af407e236a810b43aeb8b2ef"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/register_interface/typedef.svh",
+          "sha256": "d78094f45d6e67b72d5ccfe998495dac562c301f03619d6a2a1a4b0c5cf27189"
+        },
+        {
+          "path": "register_interface/typedef.svh",
+          "sha256": "d78094f45d6e67b72d5ccfe998495dac562c301f03619d6a2a1a4b0c5cf27189"
+        },
+        {
+          "path": "SOC_FILES/include/apb/typedef.svh",
+          "sha256": "7c6abb82cbc2f6f64a4635a976dd2b70650f92eb7b35e50e6e3c62c7b17b608f"
+        },
+        {
+          "path": "SOC_FILES/include/obi/typedef.svh",
+          "sha256": "b21c8b87080fa448b113cac67432f476bf5fa541608e1fe61f580d35d5d991d3"
+        },
+        {
+          "path": "SOC_FILES/include/register_interface/typedef.svh",
+          "sha256": "d78094f45d6e67b72d5ccfe998495dac562c301f03619d6a2a1a4b0c5cf27189"
+        },
+        {
+          "path": "SOC_FILES/include/register_interface-master/typedef.svh",
+          "sha256": "d78094f45d6e67b72d5ccfe998495dac562c301f03619d6a2a1a4b0c5cf27189"
+        }
+      ]
+    },
+    {
+      "filename": "apb_to_obi.sv",
+      "instances": [
+        {
+          "path": "apb_uart-main/include/obi/apb_to_obi.sv",
+          "sha256": "91ed8d6e6db9542df29ee4d95a9309890c2656b58c6f3d6e377144e0920930f1"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/apb_uart-main/include/obi/apb_to_obi.sv",
+          "sha256": "b0699f6ae3232cc002d389f25a7a7f8a5cc3d844bf1e941a2fd6088c6c9c9304"
+        },
+        {
+          "path": "SOC_FILES/include/obi/apb_to_obi.sv",
+          "sha256": "91ed8d6e6db9542df29ee4d95a9309890c2656b58c6f3d6e377144e0920930f1"
+        }
+      ]
+    },
+    {
+      "filename": "tb_axi_lite_to_apb.sv",
+      "instances": [
+        {
+          "path": "axi_lite_to_apb/tb_axi_lite_to_apb.sv",
+          "sha256": "f69bf3518b9b824340d256e05c22d6add6c0d98f7199531dd4f9756761fc6dd3"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/axi_lite_to_apb/tb_axi_lite_to_apb.sv",
+          "sha256": "61a5eed9524fa74bb19f86da10b00005e926628d95f4c0f8671a11d66742926c"
+        }
+      ]
+    },
+    {
+      "filename": "axi_lite_xbar.sv",
+      "instances": [
+        {
+          "path": "axi_lite_xbar/axi_lite_xbar.sv",
+          "sha256": "7922789b237e831e6cc8a08da7347c83f97be2ccc228b282e74b384f3013775b"
+        },
+        {
+          "path": "axi_lite_xbar/include/axi/axi_lite_xbar.sv",
+          "sha256": "3ffa30755647a1a7aa3923e4ab03cd31d237934e3dc1a0a537c63e95aad8cb9e"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/axi_lite_xbar/axi_lite_xbar.sv",
+          "sha256": "7922789b237e831e6cc8a08da7347c83f97be2ccc228b282e74b384f3013775b"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/axi_lite_xbar/include/axi/axi_lite_xbar.sv",
+          "sha256": "3ffa30755647a1a7aa3923e4ab03cd31d237934e3dc1a0a537c63e95aad8cb9e"
+        }
+      ]
+    },
+    {
+      "filename": "tb_axi_lite_xbar.sv",
+      "instances": [
+        {
+          "path": "axi_lite_xbar/tb_axi_lite_xbar.sv",
+          "sha256": "5efd6a77bc87d51935ea184f5c12558c119994e89436aa9f19d13764116309dd"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/axi_lite_xbar/tb_axi_lite_xbar.sv",
+          "sha256": "20b66b91546eb7f74e51fa7c4044bca45104db58469bc1ae02ce4d141d7f829e"
+        }
+      ]
+    },
+    {
+      "filename": "fetch_cycle.v",
+      "instances": [
+        {
+          "path": "instr_module/fetch_cycle.v",
+          "sha256": "ba31c911ccb8674a5a7af193348b3b8007a4015a57afe5e948cd624d4c700343"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/instr_module/fetch_cycle.v",
+          "sha256": "ba31c911ccb8674a5a7af193348b3b8007a4015a57afe5e948cd624d4c700343"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/fetch_cycle.v",
+          "sha256": "4dbf5fe7982c32b6b8b2537ac0efc1142d127e53fcc19339b8f0dae45da26ed7"
+        },
+        {
+          "path": "riscv_core/rtl/fetch_cycle.v",
+          "sha256": "4dbf5fe7982c32b6b8b2537ac0efc1142d127e53fcc19339b8f0dae45da26ed7"
+        }
+      ]
+    },
+    {
+      "filename": "imem_controller.v",
+      "instances": [
+        {
+          "path": "instr_module/imem_controller.v",
+          "sha256": "38f74cb9be0ba320b0762c245dab7156512a5b7bd40437bc2a597a46ce6a6ca3"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/instr_module/imem_controller.v",
+          "sha256": "38f74cb9be0ba320b0762c245dab7156512a5b7bd40437bc2a597a46ce6a6ca3"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/imem_controller.v",
+          "sha256": "92201786ac5bd1d430d1eb43d09c65481f41455cda023c6222d3c9d0c2edbc11"
+        },
+        {
+          "path": "riscv_core/rtl/imem_controller.v",
+          "sha256": "92201786ac5bd1d430d1eb43d09c65481f41455cda023c6222d3c9d0c2edbc11"
+        }
+      ]
+    },
+    {
+      "filename": "PC.v",
+      "instances": [
+        {
+          "path": "instr_module/PC.v",
+          "sha256": "7c7bd6f41412f8e6c90864171fb1e37d31c71fd1987b5cff1f705e184d33a6d1"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/instr_module/PC.v",
+          "sha256": "7c7bd6f41412f8e6c90864171fb1e37d31c71fd1987b5cff1f705e184d33a6d1"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/PC.v",
+          "sha256": "37c0373a8a38854e7e8d76c78a5546d3be216dab9a6fbfee841729d884104546"
+        },
+        {
+          "path": "riscv_core/rtl/PC.v",
+          "sha256": "37c0373a8a38854e7e8d76c78a5546d3be216dab9a6fbfee841729d884104546"
+        }
+      ]
+    },
+    {
+      "filename": "PC_Adder.v",
+      "instances": [
+        {
+          "path": "instr_module/PC_Adder.v",
+          "sha256": "87d6160a2b6cbf81744cb1adf3e06d86717ea52713db44035bd380023e89fff4"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/instr_module/PC_Adder.v",
+          "sha256": "87d6160a2b6cbf81744cb1adf3e06d86717ea52713db44035bd380023e89fff4"
+        },
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/PC_Adder.v",
+          "sha256": "3af35698bcdab79340af4dbb53311e4947583931a31265c697b015c3df290ba6"
+        },
+        {
+          "path": "riscv_core/rtl/PC_Adder.v",
+          "sha256": "3af35698bcdab79340af4dbb53311e4947583931a31265c697b015c3df290ba6"
+        }
+      ]
+    },
+    {
+      "filename": "csr_regfile.v",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/csr_regfile.v",
+          "sha256": "e9229c12586dc12850689c1405f017a9220d7bbaa5bb991d30be25793d1ea58c"
+        },
+        {
+          "path": "riscv_core/rtl/csr_regfile.v",
+          "sha256": "4d991cabde1da22e93ddc61d77628bda90168e28a6f7dcd2b56b5d2a22592d1d"
+        }
+      ]
+    },
+    {
+      "filename": "hazard_unit.v",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/hazard_unit.v",
+          "sha256": "938c973a667ea21910cc64a29f4df426750c40ca9ed9a615423a53f4b07e4cf3"
+        },
+        {
+          "path": "riscv_core/rtl/hazard_unit.v",
+          "sha256": "5fa0203b77cdae20a74ac60475e6cc557d0f45295e624f74e143218973455e60"
+        }
+      ]
+    },
+    {
+      "filename": "irq_arbiter.v",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/irq_arbiter.v",
+          "sha256": "4a6dd04c8c69006acb7bf95f28636dac8f1248b69d8f4349a1d214da42773035"
+        },
+        {
+          "path": "riscv_core/rtl/irq_arbiter.v",
+          "sha256": "9f7b62517fd726b178a54631de557e8def000ad3acd4dfe78319315d5b4d1386"
+        }
+      ]
+    },
+    {
+      "filename": "irq_gateway.v",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/irq_gateway.v",
+          "sha256": "e74ae99c0507036aeb8c14ffb79782ba26b6ee10550ae0dc0eaf5f158186d793"
+        },
+        {
+          "path": "riscv_core/rtl/irq_gateway.v",
+          "sha256": "c3d380e792afa6ab93aa073ebaae13e9a1cb1ce73528bc616b3d7e66ffdd1590"
+        }
+      ]
+    },
+    {
+      "filename": "top.v",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/top.v",
+          "sha256": "ffd7965f5c082841aea3e6728a9dff6dbdfb3cc0525c9a837be2d13b55f2d4bf"
+        },
+        {
+          "path": "riscv_core/rtl/top.v",
+          "sha256": "2fc6a4dcfc0fb1c9cae418cdb8cef553699f336dcf59c8d75ee12a39871ebbb6"
+        }
+      ]
+    },
+    {
+      "filename": "wb_trap_mret_commit_controller.v",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/riscv_core/rtl/wb_trap_mret_commit_controller.v",
+          "sha256": "748f130b9493ea0b236d72c25c6d7c1bf38dcefe2a8af18535f01dccabf81dda"
+        },
+        {
+          "path": "riscv_core/rtl/wb_trap_mret_commit_controller.v",
+          "sha256": "f68589ee9458d2eb9cdfcf64509280e9c68d51c151bcbe723833eb09fc3ac502"
+        }
+      ]
+    },
+    {
+      "filename": "riscforge_soc_subsystem.sv",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/RTL_SOC/riscforge_soc_subsystem.sv",
+          "sha256": "ba730ab4a76af6e4c8990a697ac28ece5c50a0b8a22111d1d9e32a7a654b5508"
+        },
+        {
+          "path": "RTL_SOC/riscforge_soc_subsystem.sv",
+          "sha256": "10ea98fd785d7dc504caf66ce13bbc40d57f1a08d0747b28c24af659acab80f5"
+        }
+      ]
+    },
+    {
+      "filename": "soc_imem_boot_tb.sv",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/RTL_SOC/soc_imem_boot_tb.sv",
+          "sha256": "e2dd6bb47a527fab3a25014d128882612d1d1db11ab974ba4ee80243c6e6c335"
+        },
+        {
+          "path": "RTL_SOC/soc_imem_boot_tb.sv",
+          "sha256": "3d50102f531b312b3f7755372ed8ca5e1351776ebb0e800e50b367d55c8d54ae"
+        }
+      ]
+    },
+    {
+      "filename": "spi_master_m_bfm_tb.sv",
+      "instances": [
+        {
+          "path": "jaspergold/runs/soc_superlint_20261018_01/source_snapshot/spi_master_ip/spi_master/spi_master_m_bfm_tb.sv",
+          "sha256": "774f3d4d6585a68235e255867d45a941b004600e7ec564122b5acc9275ff8805"
+        },
+        {
+          "path": "spi_master_ip/spi_master/spi_master_m_bfm_tb.sv",
+          "sha256": "20360a520746bcfe2c51ad5b6d0a4167f447003d9b2c9749da965642548e890b"
+        }
+      ]
+    }
+  ],
+  "empirical_proof_baseline": {
+    "run_id": "20261024_stage3_monitor_count",
+    "verdict": "PASSED",
+    "retired_instructions": 5551,
+    "axi_reads": 14,
+    "axi_writes": 4,
+    "apb_transfers": 18,
+    "fw_attestation": "0x0004000e",
+    "attestation_words_written": 1,
+    "fatal_checks": 0
+  }
+}
