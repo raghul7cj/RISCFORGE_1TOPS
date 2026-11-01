@@ -1,0 +1,631 @@
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3007
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   141  LSU  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (1 of 16 retained)
+    #  0 c   145  AXR  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   144  APB  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1100 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : strobe/apb
+  time / cycle    : 1485000 ps   /  145
+  VERDICT         : *** BLAME = PATH  (check PATH-3007) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : byte strobes survive the path unchanged: 1111
+  actual          : byte strobes 1100, expected 1111 -- a byte lane was dropped or duplicated
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   141  LSU  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (1 of 16 retained)
+    #  0 c   145  AXR  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   144  APB  W addr=0x40003080 wdata=0x11223344 rdata=0x00000000 strb=1100 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3007
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   187  LSU  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   187  AXI  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=0011 slot=        - ok
+    #  1 c   191  AXR  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   190  APB  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : strobe/axi
+  time / cycle    : 1975000 ps   /  194
+  VERDICT         : *** BLAME = PATH  (check PATH-3007) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : byte strobes survive the path unchanged: 1111
+  actual          : byte strobes 0011, expected 1111 -- a byte lane was dropped or duplicated
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   187  LSU  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   187  AXI  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=0011 slot=        - ok
+    #  1 c   191  AXR  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   190  APB  W addr=0x40003084 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  BLAME APB-2004
+            PATH  quiet -
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   233  LSU  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   233  AXI  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   237  AXR  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   236  APB  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : wait-state
+  time / cycle    : 2445000 ps   /  241
+  VERDICT         : *** BLAME = PROTOCOL  (check APB-2004) ***
+  location        : apb-bridge/APB[1]/TIMER0
+  expected        : APB[1] (TIMER0) completes within 64 wait states at PADDR 0x00000000
+  actual          : APB[1] still not ready after 64 cycles
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   233  LSU  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   233  AXI  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   237  AXR  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   236  APB  W addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3009
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   479  LSU  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   479  AXI  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   483  AXR  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   482  APB  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C BAD
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : parity-trigger
+  time / cycle    : 4945000 ps   /  491
+  VERDICT         : *** BLAME = PATH  (check PATH-3009) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : APB PSLVERR reaches the core as RESP_SLVERR
+  actual          : the APB slave raised PSLVERR but the AXI response was OKAY
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   479  LSU  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   479  AXI  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   483  AXR  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   482  APB  W addr=0x40002080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C BAD
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3008
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   525  LSU  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   525  AXI  R addr=0x40005080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   529  AXR  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   528  APB  R addr=0x40005080 wdata=0x11223344 rdata=0xdeadbeef strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : timeout-trigger
+  time / cycle    : 5355000 ps   /  532
+  VERDICT         : *** BLAME = PATH  (check PATH-3008) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : AXI RDATA equals the APB PRDATA read from the slot: 0xdeadbeef
+  actual          : AXI RDATA 0x00000000, the APB slave returned 0xdeadbeef
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   525  LSU  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   525  AXI  R addr=0x40005080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   529  AXR  R addr=0x40005080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   528  APB  R addr=0x40005080 wdata=0x11223344 rdata=0xdeadbeef strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3005
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   571  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   571  AXI  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   575  AXR  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   574  APB  W addr=0x40000180 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : paddr-corruptor
+  time / cycle    : 5845000 ps   /  581
+  VERDICT         : *** BLAME = PATH  (check PATH-3005) ***
+  location        : core-MMIO-path
+  expected        : PADDR equals the 4-byte-aligned AXI address: 0x40000080
+  actual          : PADDR 0x40000180 for an access to 0x40000080
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   571  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   571  AXI  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   575  AXR  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   574  APB  W addr=0x40000180 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3001
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   617  LSU  R addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   617  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   621  AXR  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   620  APB  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : axi-addr
+  time / cycle    : 6255000 ps   /  622
+  VERDICT         : *** BLAME = PATH  (check PATH-3001) ***
+  location        : core-MMIO-path
+  expected        : the access to 0x40001080 reaches the AXI fabric as one transaction
+  actual          : no AW/W or AR was ever issued for 0x40001080
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   617  LSU  R addr=0x40001080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   617  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   621  AXR  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   620  APB  R addr=0x40001080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3006
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   663  LSU  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   663  AXI  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   667  AXR  W addr=0x40004080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   666  APB  W addr=0x40004080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : pwrite-data/apb
+  time / cycle    : 6745000 ps   /  671
+  VERDICT         : *** BLAME = PATH  (check PATH-3006) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : write data survives the path unchanged: 0x11223344
+  actual          : write data 0xeeddccbb, expected 0x11223344
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   663  LSU  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   663  AXI  W addr=0x40004080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - ok
+    #  1 c   667  AXR  W addr=0x40004080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   666  APB  W addr=0x40004080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3006
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   709  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (1 of 16 retained)
+    #  0 c   709  AXI  W addr=0x40000080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (0 of 16 retained)
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : pwrite-data/axi
+  time / cycle    : 7155000 ps   /  712
+  VERDICT         : *** BLAME = PATH  (check PATH-3006) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : write data survives the path unchanged: 0x11223344
+  actual          : write data 0xeeddccbb, expected 0x11223344
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   709  LSU  W addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (1 of 16 retained)
+    #  0 c   709  AXI  W addr=0x40000080 wdata=0xeeddccbb rdata=0x00000000 strb=1111 slot=        - ok
+                              APB BRIDGE (0 of 16 retained)
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=1  axi_rds=0  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3008
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   755  LSU  R addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   755  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   759  AXR  R addr=0x40000080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (1 of 16 retained)
+    #  0 c   758  APB  R addr=0x40000080 wdata=0x11223344 rdata=0xeeddccbb strb=1111 slot=      I2C ok
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : pread-data/apb
+  time / cycle    : 7645000 ps   /  761
+  VERDICT         : *** BLAME = PATH  (check PATH-3008) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : AXI RDATA equals the APB PRDATA read from the slot: 0xeeddccbb
+  actual          : AXI RDATA 0x11223344, the APB slave returned 0xeeddccbb
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   755  LSU  R addr=0x40000080 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   755  AXI  R addr=0x40000080 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   759  AXR  R addr=0x40000080 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (1 of 16 retained)
+    #  0 c   758  APB  R addr=0x40000080 wdata=0x11223344 rdata=0xeeddccbb strb=1111 slot=      I2C ok
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  LAYER STATUS
+        PROTOCOL  quiet -
+            PATH  BLAME PATH-3014
+        REGISTER  quiet -
+      FUNCTIONAL  quiet -
+       INTERRUPT  quiet -
+       CPU-STATE  quiet -
+        FIRMWARE  quiet -
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+  CORE LSU  (hybrid_mem_interface mem_*) (1 of 16 retained)
+    #  0 c   801  LSU  R addr=0x40006000 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+       AXI4-LITE MASTER 2  (xbar slv[0]) (2 of 16 retained)
+    #  0 c   801  AXI  R addr=0x40006000 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   803  AXR  R addr=0x40006000 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+           APB BRIDGE  (axi_lite_to_apb) (0 of 16 retained)
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================
+  test            : resp/unmapped
+  time / cycle    : 8135000 ps   /  810
+  VERDICT         : *** BLAME = PATH  (check PATH-3014) ***
+  location        : core-MMIO-path/APB[0]/I2C
+  expected        : an unmapped MMIO address (0x40006000) returns RESP_DECERR
+  actual          : returned OKAY
+  findings        : 1 recorded, 0 downstream, 0 reassign
+================================================================================
+  LAST RETIRED INSTRUCTIONS  (8 of 32, oldest first)
+    #  0 0x00010000  400002b7  lui     x5, 0x40000
+    #  1 0x00010004  30000313  addi    x6, x0, 768
+    #  2 0x00010008  0462a023  sw      x6, 64(x5)
+    #  3 0x0001000c  0402a383  lw      x7, 64(x5)
+    #  4 0x00010010  20800213  addi    x4, x0, 520
+    #  5 0x00010014  0042a023  sw      x4, 0(x5)
+    #  6 0x00010018  30200073  mret
+    #  7 0x0001001c  00504463  blt     x0, x5, 8
+================================================================================
+                                CORE LSU (1 of 16 retained)
+    #  0 c   801  LSU  R addr=0x40006000 wdata=0x11223344 rdata=0x00000000 strb=1111 slot=        - BAD
+                      AXI4-LITE MASTER 2 (2 of 16 retained)
+    #  0 c   801  AXI  R addr=0x40006000 wdata=0x00000000 rdata=0x00000000 strb=0000 slot=        - ok
+    #  1 c   803  AXR  R addr=0x40006000 wdata=0x11223344 rdata=0x11223344 strb=1111 slot=        - ok
+                              APB BRIDGE (0 of 16 retained)
+================================================================================
+    mailbox drops: axi=0 apb=0 scoreboard=0
+    lsu_reqs=1  axi_wrs=0  axi_rds=1  retired=0
+    apb_timeouts=0  RESP_SLVERR=0  RESP_DECERR=0
+================================================================================

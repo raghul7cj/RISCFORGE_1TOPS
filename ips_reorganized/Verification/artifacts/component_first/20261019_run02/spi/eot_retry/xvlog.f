@@ -1,0 +1,9 @@
+apb_spi_master.sv
+spi_master_apb_if.sv
+spi_master_clkgen.sv
+spi_master_controller.sv
+spi_master_fifo.sv
+spi_master_rx.sv
+spi_master_tx.sv
+spi_bfm.sv
+spi_master_m_bfm_tb.sv
