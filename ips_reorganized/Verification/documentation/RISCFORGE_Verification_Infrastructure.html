@@ -1,0 +1,1560 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RISCFORGE 1TOPS — Verification Infrastructure & Methodology Specification</title>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9;
+    --bg-accent: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --border-accent: #2563eb;
+    --accent-blue: #0284c7;
+    --accent-indigo: #4f46e5;
+    --accent-emerald: #059669;
+    --accent-amber: #d97706;
+    --accent-rose: #e11d48;
+    --tier1-color: #0284c7;
+    --tier2-color: #4f46e5;
+    --tier3-color: #059669;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding: 1.5rem;
+  }
+
+  .container {
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  /* Navigation Bar */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 0;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-accent);
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .badge-header {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #f0f9ff;
+    color: var(--accent-blue);
+    border: 1px solid #bae6fd;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #0f172a;
+    margin-bottom: 0.75rem;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 950px;
+  }
+
+  section {
+    margin-bottom: 3.5rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--accent-blue);
+    padding-left: 1rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .section-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  /* Responsive Grids */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 1.5rem;
+  }
+
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 1.25rem;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: #cbd5e1;
+    background: var(--bg-card-hover);
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: #0f172a;
+  }
+
+  .card p {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Structural Hierarchy Trees */
+  .hierarchy-tree {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tree-node {
+    margin-left: 1.25rem;
+    position: relative;
+    padding-left: 1.25rem;
+    border-left: 2px dashed #cbd5e1;
+    margin-top: 0.6rem;
+  }
+
+  .tree-node::before {
+    content: "";
+    position: absolute;
+    top: 1.1rem;
+    left: 0;
+    width: 1rem;
+    height: 2px;
+    background: #cbd5e1;
+  }
+
+  .node-content {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .node-title {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.92rem;
+  }
+
+  .node-meta {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+
+  /* Responsive Tables */
+  .table-container {
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    text-align: left;
+    min-width: 600px;
+  }
+
+  thead {
+    background: #f8fafc;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  th {
+    padding: 0.85rem 1.1rem;
+    color: #0f172a;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+
+  /* Badges & Pills */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  .pill-tier1 { background: #f0f9ff; color: var(--tier1-color); border: 1px solid #bae6fd; }
+  .pill-tier2 { background: #f5f3ff; color: var(--tier2-color); border: 1px solid #ddd6fe; }
+  .pill-tier3 { background: #f0fdf4; color: var(--tier3-color); border: 1px solid #bbf7d0; }
+  .pill-amber { background: #fffbeb; color: var(--accent-amber); border: 1px solid #fde68a; }
+  .pill-rose  { background: #fff1f2; color: var(--accent-rose);  border: 1px solid #fecdd3; }
+
+  /* Flow Pipeline Blocks */
+  .pipeline-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .pipeline-step {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  }
+
+  .step-badge {
+    background: #f0f9ff;
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.375rem;
+    white-space: nowrap;
+    border: 1px solid #bae6fd;
+  }
+
+  .step-details h4 {
+    color: #0f172a;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .step-details p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  /* Callout Boxes */
+  .callout {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-left: 4px solid var(--accent-blue);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin: 1.25rem 0;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #0369a1;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .callout-content {
+    font-size: 0.9rem;
+    color: #334155;
+  }
+
+  ul.feature-list {
+    list-style: none;
+    margin-top: 0.5rem;
+  }
+
+  ul.feature-list li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.45rem;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+
+  ul.feature-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--accent-blue);
+    font-weight: bold;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    body { padding: 1rem; }
+    h1 { font-size: 1.8rem; }
+    .node-content { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .tree-node { margin-left: 0.75rem; padding-left: 0.75rem; }
+    .pipeline-step { flex-direction: column; gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Sticky Section Navigation -->
+  <nav class="nav-bar">
+    <a href="#infra-overview" class="nav-link">0. Infrastructure Map</a>
+    <a href="#hardware-hierarchy" class="nav-link">1. Hardware Hierarchy</a>
+    <a href="#verification-hierarchy" class="nav-link">2. 3-Tier Hierarchy</a>
+    <a href="#baseline-governance" class="nav-link">3. Identity Governance</a>
+    <a href="#execution-infrastructure" class="nav-link">4. Sandboxed Runner</a>
+    <a href="#evidence-classification" class="nav-link">5. Evidence Classifier</a>
+    <a href="#firmware-architecture" class="nav-link">6. Firmware Architecture</a>
+    <a href="#gating-matrix" class="nav-link">7. G0–G6 Gate Matrix</a>
+    <a href="#ledger-governance" class="nav-link">8. Ledger Engine</a>
+    <a href="#tooling-taxonomy" class="nav-link">9. Automation Tooling</a>
+  </nav>
+
+  <!-- Header -->
+  <header>
+    <div class="badge-header">Architectural &amp; Methodological Specification</div>
+    <h1>RISCFORGE 1TOPS Verification Infrastructure</h1>
+    <p class="subtitle">
+      Comprehensive technical documentation of the established 3-tier verification hierarchy, golden RTL identity governance,
+      ephemeral sandboxed execution model, anti-vacuity classification engine, and bare-metal firmware verification architecture.
+    </p>
+  </header>
+
+  <!-- Section 0: End-to-End Infrastructure Architecture Map -->
+  <section id="infra-overview">
+    <div class="section-header">
+      <h2>0. End-to-End Verification Infrastructure &amp; Methodology Map</h2>
+      <p>System-level visual architectural blueprint connecting golden baseline identity, 3-tier verification filelists, ephemeral sandboxed execution, strict anti-vacuity classification, and automated dynamic governance.</p>
+    </div>
+    <div class="card" style="padding: 1rem; overflow-x: auto; background: #ffffff;">
+      <div style="min-width: 960px; max-width: 1240px; margin: 0 auto;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 880" width="100%" height="100%" style="background:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Shadow Filter -->
+    <filter id="card-shadow" x="-3%" y="-3%" width="106%" height="108%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+
+    <!-- Marker Arrow -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
+    </marker>
+    <marker id="arrow-indigo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4f46e5" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
+    </marker>
+  </defs>
+
+  <!-- ==================== HEADER BANNER ==================== -->
+  <g transform="translate(40, 20)">
+    <rect width="1200" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <text x="24" y="28" font-size="16" font-weight="800" fill="#0f172a" letter-spacing="-0.01em">
+      RISCFORGE 1TOPS — Complete Verification Infrastructure &amp; Methodology Architecture
+    </text>
+    <text x="24" y="49" font-size="12" font-weight="500" fill="#475569">
+      3-Tier Verification Hierarchy • Ephemeral Sandboxing • Strict Anti-Vacuity Classifier • Automated Dynamic Governance
+    </text>
+
+    <!-- Badges -->
+    <g transform="translate(810, 20)">
+      <rect x="0" y="0" width="88" height="26" rx="13" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+      <text x="44" y="17" font-size="10.5" font-weight="700" fill="#0284c7" text-anchor="middle">RV32IM_Zicsr</text>
+
+      <rect x="96" y="0" width="88" height="26" rx="13" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+      <text x="140" y="17" font-size="10.5" font-weight="700" fill="#4f46e5" text-anchor="middle">Vivado XSim</text>
+
+      <rect x="192" y="0" width="88" height="26" rx="13" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+      <text x="236" y="17" font-size="10.5" font-weight="700" fill="#059669" text-anchor="middle">G0-G6 Gates</text>
+
+      <rect x="288" y="0" width="92" height="26" rx="13" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+      <text x="334" y="17" font-size="10.5" font-weight="700" fill="#d97706" text-anchor="middle">Anti-Vacuous</text>
+    </g>
+  </g>
+
+  <!-- ==================== TOP ROW: 3 INPUT PILLARS ==================== -->
+
+  <!-- Pillar 1: Golden Baseline & RTL Identity -->
+  <g transform="translate(40, 105)">
+    <rect width="370" height="168" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 362 0 Q 370 0 370 8 L 370 32 L 0 32 Z" fill="#f8fafc"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#0284c7"/>
+    <text x="28" y="21" font-size="11.5" font-weight="700" fill="#0f172a">1. GOLDEN BASELINE &amp; RTL IDENTITY</text>
+    <line x1="0" y1="32" x2="370" y2="32" stroke="#e2e8f0" stroke-width="1"/>
+
+    <text x="16" y="54" font-size="11" font-weight="700" fill="#0f172a">Frozen Cryptographic Hashes:</text>
+    <text x="26" y="72" font-size="10.5" fill="#475569">• H_filelist: <tspan font-weight="700" fill="#0284c7">a931d6b4...</tspan> (90 Master Source Files)</text>
+    <text x="26" y="88" font-size="10.5" fill="#475569">• H_rtl: <tspan font-weight="700" fill="#0284c7">d25104a4...</tspan> (Cumulative byte-exact)</text>
+
+    <text x="16" y="112" font-size="11" font-weight="700" fill="#0f172a">Rev B Identity Predicates:</text>
+    <text x="26" y="130" font-size="10" fill="#475569">• ID-1: Converged duplicate timer.sv (0 divergent copies)</text>
+    <text x="26" y="146" font-size="10" fill="#475569">• ID-2 / ID-3: 0 Unresolved paths, 0 Absolute paths</text>
+  </g>
+
+  <!-- Pillar 2: 3-Tier Verification Hierarchy & Forwarding Filelists -->
+  <g transform="translate(440, 105)">
+    <rect width="410" height="168" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 402 0 Q 410 0 410 8 L 410 32 L 0 32 Z" fill="#f8fafc"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#4f46e5"/>
+    <text x="28" y="21" font-size="11.5" font-weight="700" fill="#0f172a">2. 3-TIER VERIFICATION HIERARCHY</text>
+    <line x1="0" y1="32" x2="410" y2="32" stroke="#e2e8f0" stroke-width="1"/>
+
+    <g transform="translate(16, 44)">
+      <rect width="378" height="32" rx="5" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+      <text x="10" y="20" font-size="10" font-weight="700" fill="#0284c7">TIER 1 (IP Unit):</text>
+      <text x="110" y="20" font-size="9.5" fill="#0369a1">tb_irq_arbiter, tb_gpio, tb_spi, tb_uart, tb_xbar</text>
+    </g>
+
+    <g transform="translate(16, 82)">
+      <rect width="378" height="32" rx="5" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+      <text x="10" y="20" font-size="10" font-weight="700" fill="#4f46e5">TIER 2 (Fabric):</text>
+      <text x="110" y="20" font-size="9.5" fill="#4338ca">tb_soc_gpio_aperture, tb_datapath_uart0/i2c0</text>
+    </g>
+
+    <g transform="translate(16, 120)">
+      <rect width="378" height="32" rx="5" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+      <text x="10" y="20" font-size="10" font-weight="700" fill="#059669">TIER 3 (SoC):</text>
+      <text x="110" y="20" font-size="9.5" fill="#047857">soc_subsystem_design, soc_tb_top, bootloader</text>
+    </g>
+  </g>
+
+  <!-- Pillar 3: Firmware & Memory Architecture -->
+  <g transform="translate(880, 105)">
+    <rect width="360" height="168" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 352 0 Q 360 0 360 8 L 360 32 L 0 32 Z" fill="#f8fafc"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#059669"/>
+    <text x="28" y="21" font-size="11.5" font-weight="700" fill="#0f172a">3. REFERENCE FIRMWARE &amp; BSP</text>
+    <line x1="0" y1="32" x2="360" y2="32" stroke="#e2e8f0" stroke-width="1"/>
+
+    <text x="16" y="54" font-size="11" font-weight="700" fill="#0f172a">Authoritative Memory Map:</text>
+    <text x="24" y="72" font-size="10" fill="#475569">• BootROM: <tspan font-weight="700" fill="#0f172a">0x00000000</tspan> (64B boot jump)</text>
+    <text x="24" y="88" font-size="10" fill="#475569">• ISRAM: <tspan font-weight="700" fill="#0f172a">0x00010000</tspan> (32 KiB instruction .text)</text>
+    <text x="24" y="104" font-size="10" fill="#475569">• DSRAM: <tspan font-weight="700" fill="#0f172a">0x00020000</tspan> (32 KiB data, stack, heap)</text>
+    <text x="24" y="120" font-size="10" fill="#475569">• APB Base: <tspan font-weight="700" fill="#0f172a">0x40000000</tspan> (4 KiB apertures 0..5)</text>
+
+    <text x="16" y="144" font-size="10.5" font-weight="700" fill="#059669">Unified Drivers:</text>
+    <text x="110" y="144" font-size="10" fill="#475569">UART, Timers, GPIO, SPI, I2C, crt0.S</text>
+  </g>
+
+  <!-- Connectors from Top Pillars to Sandbox Runner -->
+  <path d="M 225 273 L 225 310" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <path d="M 645 273 L 645 310" stroke="#4f46e5" stroke-width="1.5" marker-end="url(#arrow-indigo)"/>
+  <path d="M 1060 273 L 1060 310" stroke="#059669" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+
+  <!-- ==================== MIDDLE ROW: EPHEMERAL SANDBOX RUNNER ==================== -->
+  <g transform="translate(40, 318)">
+    <!-- Big Sandbox Outer Frame -->
+    <rect width="1200" height="232" rx="10" fill="#f8fafc" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6,4"/>
+    <rect x="16" y="-12" width="390" height="24" rx="4" fill="#0284c7"/>
+    <text x="24" y="4" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.05em">
+      EPHEMERAL SANDBOX REGRESSION RUNNER (cwd = sandbox_dir)
+    </text>
+
+    <text x="420" y="6" font-size="10" font-weight="600" fill="#0369a1">
+      Location: Verification/artifacts/runs/&lt;test_id&gt;_&lt;timestamp&gt;_&lt;uuid&gt;/  [Zero Repository Footprint]
+    </text>
+
+    <!-- Stage 1: Path Normalization -->
+    <g transform="translate(25, 30)">
+      <rect width="195" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="195" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">1. PATH RESOLUTION</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#475569">Input: Target Filelist (.f)</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Parse +incdir+ &amp; files</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Convert relative paths</text>
+      <text x="12" y="106" font-size="9.5" font-weight="600" fill="#0284c7">➔ Normalized Absolute</text>
+      <text x="12" y="128" font-size="9.5" fill="#64748b">• Stage runtime assets</text>
+      <text x="12" y="146" font-size="9.5" fill="#64748b">  (CRT0 / Hex / Binaries)</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#059669">✓ Prevents Path Drift</text>
+    </g>
+
+    <path d="M 225 117 L 255 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 2: xvlog Compilation -->
+    <g transform="translate(265, 30)">
+      <rect width="200" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="200" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">2. STATIC COMPILE</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#0284c7">Command: xvlog --sv</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Macro define: -d XSIM</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Run inside sandbox_dir</text>
+      <text x="12" y="110" font-size="10" font-weight="600" fill="#475569">Error Interception:</text>
+      <text x="12" y="130" font-size="9.5" fill="#e11d48">• If c_code != 0 ➔ FAILED</text>
+      <text x="12" y="148" font-size="9.5" fill="#e11d48">• Capture ERROR: [VRFC]</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#0f172a">Output: work library</text>
+    </g>
+
+    <path d="M 470 117 L 500 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 3: xelab Elaboration -->
+    <g transform="translate(510, 30)">
+      <rect width="205" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="205" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">3. ELABORATION</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#4f46e5">Command: xelab -s snap</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Timescale: 1ns/1ps</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Resolve top-level hierarchy</text>
+      <text x="12" y="110" font-size="10" font-weight="600" fill="#059669">Design-Only Branch:</text>
+      <text x="12" y="130" font-size="9.5" fill="#059669">• Clean elab = Exit Code 0</text>
+      <text x="12" y="148" font-size="9.5" fill="#059669">• Simulation skipped</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#e11d48">• Trap unresolved ports</text>
+    </g>
+
+    <path d="M 720 117 L 750 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 4: xsim Simulation -->
+    <g transform="translate(760, 30)">
+      <rect width="200" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="200" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">4. BATCH SIMULATION</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#059669">Command: xsim snap -R</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Real-time log capture</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Execute inside sandbox_dir</text>
+      <text x="12" y="110" font-size="10" font-weight="600" fill="#475569">Deadlock Safeguard:</text>
+      <text x="12" y="130" font-size="9.5" fill="#64748b">• Wall-clock timeout</text>
+      <text x="12" y="148" font-size="9.5" fill="#64748b">• Max cycles threshold</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#0f172a">Generated: run.log</text>
+    </g>
+
+    <path d="M 965 117 L 995 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 5: Bounded Tree Kill -->
+    <g transform="translate(1005, 30)">
+      <rect width="170" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="170" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">5. TREE CLEANUP</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#d97706">On Timeout / Exit:</text>
+      <text x="12" y="70" font-size="9" fill="#475569">• taskkill /F /T /PID</text>
+      <text x="12" y="88" font-size="9" fill="#059669">• Code 0: Terminated</text>
+      <text x="12" y="104" font-size="9" fill="#0284c7">• Code 128: Reaped</text>
+      <text x="12" y="122" font-size="9" fill="#e11d48">• Other: Kill Warning</text>
+      <text x="12" y="144" font-size="9.5" font-weight="600" fill="#475569">Pipe Drain Guard:</text>
+      <text x="12" y="162" font-size="9" fill="#475569">• Bounded 5s drain limit</text>
+    </g>
+  </g>
+
+  <!-- Connectors from Sandbox Runner to Bottom Row -->
+  <path d="M 340 550 L 340 585" stroke="#d97706" stroke-width="2" marker-end="url(#arrow-amber)"/>
+  <path d="M 940 550 L 940 585" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+  <!-- ==================== BOTTOM ROW: CLASSIFIER & GOVERNANCE ==================== -->
+
+  <!-- Left Bottom: Strict Evidence Classifier -->
+  <g transform="translate(40, 590)">
+    <rect width="575" height="268" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 567 0 Q 575 0 575 8 L 575 32 L 0 32 Z" fill="#fffbeb"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#d97706"/>
+    <text x="28" y="21" font-size="12" font-weight="700" fill="#92400e">STRICT ANTI-VACUITY EVIDENCE CLASSIFIER</text>
+    <line x1="0" y1="32" x2="575" y2="32" stroke="#fde68a" stroke-width="1"/>
+
+    <g transform="translate(16, 42)">
+      <rect width="543" height="38" rx="5" fill="#fefce8" stroke="#fef08a" stroke-width="1"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#a16207">1. MANDATORY POSITIVE COUNTERS (Strict Regex [1-9]\d*):</text>
+      <text x="12" y="31" font-size="9.5" fill="#713f12">Prohibits generic count-free banners (e.g. bare "PASSED"). Requires verified non-zero activity.</text>
+    </g>
+
+    <g transform="translate(16, 88)">
+      <rect width="543" height="38" rx="5" fill="#fff1f2" stroke="#fecdd3" stroke-width="1"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#be123c">2. ACTIVE VACUITY TRAPPING (Zero-Work Fails):</text>
+      <text x="12" y="31" font-size="9.5" fill="#881337">Traps checks=0, pass=0, 0 PASSED ➔ Flags vacuity_detected = True ➔ Forces FAILED verdict.</text>
+    </g>
+
+    <g transform="translate(16, 134)">
+      <rect width="543" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#334155">3. MULTISTAGE FORBIDDEN FILTERING:</text>
+      <text x="12" y="31" font-size="9.5" fill="#475569">Scans compile, elab, and sim logs for $fatal, assertion failed, ERROR: [XSIM, *E,.</text>
+    </g>
+
+    <!-- Deterministic 9-Step Ladder -->
+    <g transform="translate(16, 180)">
+      <text x="0" y="12" font-size="10.5" font-weight="700" fill="#0f172a">Deterministic 9-Step Evaluation Ladder:</text>
+      <text x="0" y="30" font-size="8.5" fill="#475569">Missing List ➔ Compile Err ➔ Elab Err ➔ Sim Err ➔ Vacuity Hit ➔</text>
+      <text x="0" y="44" font-size="8.5" fill="#475569">Forbidden Token ➔ Missing Counter ➔ Design-Only ➔ <tspan font-weight="700" fill="#059669">PASSED</tspan></text>
+      <text x="0" y="62" font-size="9.5" font-weight="600" fill="#0284c7">Atomic Emission: verdict.json.tmp ➔ verdict.json (Thread-safe publish)</text>
+    </g>
+  </g>
+
+  <!-- Right Bottom: Version-Controlled Ledgers & Dynamic Tracking -->
+  <g transform="translate(645, 590)">
+    <rect width="595" height="268" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 587 0 Q 595 0 595 8 L 595 32 L 0 32 Z" fill="#f0fdf4"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#059669"/>
+    <text x="28" y="21" font-size="12" font-weight="700" fill="#065f46">DYNAMIC TRACKING &amp; GOVERNANCE VAULT</text>
+    <line x1="0" y1="32" x2="595" y2="32" stroke="#bbf7d0" stroke-width="1"/>
+
+    <g transform="translate(16, 44)">
+      <rect width="270" height="82" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+      <text x="12" y="18" font-size="10.5" font-weight="700" fill="#0f172a">Master Verification Matrix</text>
+      <text x="12" y="34" font-size="9.5" font-weight="600" fill="#0284c7">verification_matrix.csv (26 Rows)</text>
+      <text x="12" y="50" font-size="9" fill="#64748b">• Permanent Evidence IDs (MEM, FAB, APB)</text>
+      <text x="12" y="64" font-size="9" fill="#64748b">• Live pointers to retained runs</text>
+      <text x="12" y="76" font-size="9" fill="#64748b">• Boundary closure indicators</text>
+    </g>
+
+    <g transform="translate(300, 44)">
+      <rect width="280" height="82" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+      <text x="12" y="18" font-size="10.5" font-weight="700" fill="#0f172a">Defect Lifecycle Register</text>
+      <text x="12" y="34" font-size="9.5" font-weight="600" fill="#e11d48">defects.csv (C-DUT, C-HARNESS, C-SPEC)</text>
+      <text x="12" y="50" font-size="9" fill="#64748b">• Severity triage: S1 (Blocker) to S4</text>
+      <text x="12" y="64" font-size="9" fill="#64748b">• Mandates 2nd-person closer sign-off</text>
+      <text x="12" y="76" font-size="9" fill="#64748b">• Designated regression test required</text>
+    </g>
+
+    <!-- Dynamic Engine Callout -->
+    <g transform="translate(16, 136)">
+      <rect width="564" height="116" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+      <text x="14" y="20" font-size="11" font-weight="700" fill="#166534">Dynamic Build Engine (build_tracker.py):</text>
+      <text x="14" y="38" font-size="9.5" fill="#15803d">• Schema Validation: checks keys, allowed statuses, and physical path integrity.</text>
+      <text x="14" y="54" font-size="9.5" fill="#15803d">• Generates RISCFORGE_Verification_Tracker.xlsx with native dynamic Excel formulas</text>
+      <text x="24" y="68" font-size="9" fill="#166534">(COUNTIF, SUMPRODUCT, INDEX/MATCH across exact rows 2..27 - Zero manual entry).</text>
+      <text x="14" y="86" font-size="9.5" fill="#15803d">• Emits PHASE_STATUS.md snapshot evaluating progressive milestones G0 through G6.</text>
+      <text x="14" y="103" font-size="9.5" font-weight="700" fill="#0f172a">Evidence Retained: run.log + verdict.json + waveforms in artifacts/runs/&lt;run_id&gt;/</text>
+    </g>
+  </g>
+
+</svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 1: System Structural & Hardware Hierarchy -->
+  <section id="hardware-hierarchy">
+    <div class="section-header">
+      <h2>1. System Architecture &amp; Hardware Structural Hierarchy</h2>
+      <p>The authoritative physical and structural breakdown of the RISCFORGE SoC subsystem from core to memory and peripherals.</p>
+    </div>
+
+    <div class="hierarchy-tree">
+      <div class="node-content">
+        <span class="node-title">RISCFORGE SoC Subsystem (Complete Integrated Boundary)</span>
+        <span class="pill pill-tier3">SoC Boundary</span>
+      </div>
+
+      <div class="tree-node">
+        <div class="node-content">
+          <span class="node-title">RISC-V 32-bit Core Subsystem</span>
+          <span class="node-meta">RV32IM + Zicsr Instruction Set Architecture</span>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">5-Stage Execution Pipeline &amp; Hazard Unit</span>
+            <span class="node-meta">Load-use interlock, structural stall gating, and branch flush logic</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Control &amp; Status Register (CSR) Unit</span>
+            <span class="node-meta">Machine-mode CSRs: mstatus, mie, mtvec, mepc, mcause, mip</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Interrupt Arbiter &amp; Trap Controller</span>
+            <span class="node-meta">2-Level priority arbitration, round-robin fairness, and commit clearance</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="node-content">
+          <span class="node-title">Interconnect &amp; Bus Fabric</span>
+          <span class="node-meta">Multi-Master Crossbar, Protocol Bridge, and Autonomous Guard</span>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">AXI4-Lite Crossbar Matrix (4x4)</span>
+            <span class="node-meta">Pipelined AW/W channel decoupling, concurrent transaction routing</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Synchronous AXI4-Lite to APB Bridge</span>
+            <span class="node-meta">Protocol translation, wait-state propagation, PSLVERR generation</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">APB Timeout Monitor</span>
+            <span class="node-meta">Configurable deadlock detection and autonomous bus termination</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="node-content">
+          <span class="node-title">Integrated APB Peripherals</span>
+          <span class="node-meta">Base 0x40000000 (4 KiB Contiguous Apertures per Peripheral)</span>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Slot 0: I2C Master Controller [0x40000000]</span>
+            <span class="node-meta">Standard &amp; Fast mode bus timings with external pin model response</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Slot 1: General Purpose Timer 0 [0x40001000]</span>
+            <span class="node-meta">Prescaled periodic interval and one-shot interrupt generation</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Slot 2: 16550-Compatible UART [0x40002000]</span>
+            <span class="node-meta">Decoupled OBI bus interface, baud generator, 16-byte TX/RX FIFOs</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Slot 3: 32-bit GPIO Controller [0x40003000]</span>
+            <span class="node-meta">Configurable pin direction, output strobes, rising/falling edge IRQs</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Slot 4: SPI Master Controller [0x40004000]</span>
+            <span class="node-meta">Programmable clock prescaler, CS control, multi-byte FIFO transfers</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Slot 5: General Purpose Timer 1 [0x40005000]</span>
+            <span class="node-meta">Secondary high-resolution system counter with independent IRQ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tree-node">
+        <div class="node-content">
+          <span class="node-title">Memory &amp; Storage Subsystem</span>
+          <span class="node-meta">Internal SRAMs, BootROM, and Direct Memory Ports</span>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">BootROM [0x00000000]</span>
+            <span class="node-meta">64 Bytes (16 words) startup jump stub</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Instruction SRAM (ISRAM) [0x00010000]</span>
+            <span class="node-meta">32 KiB dedicated instruction fetch window</span>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div class="node-content">
+            <span class="node-title">Data SRAM (DSRAM) [0x00020000]</span>
+            <span class="node-meta">32 KiB load/store port for stack, heap, and static data</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: 3-Tier Verification Hierarchy -->
+  <section id="verification-hierarchy">
+    <div class="section-header">
+      <h2>2. The 3-Tier Verification Boundary Hierarchy</h2>
+      <p>A rigorous classification methodology segregating targets by their exact Design Under Test (DUT) boundary.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="border-top: 4px solid var(--tier1-color);">
+        <div class="card-title">
+          <span>Tier 1: IP Unit Level</span>
+          <span class="pill pill-tier1">Unit Focus</span>
+        </div>
+        <p>
+          Isolates individual IP blocks from the system. Uses direct Bus Functional Models (BFMs),
+          pin stubs, or synthesizable wrappers to exercise boundary state spaces exhaustively.
+        </p>
+        <ul class="feature-list">
+          <li><strong>DUT Boundary:</strong> Standalone block interface (APB, AXI4-Lite, or custom signals).</li>
+          <li><strong>Stimulus Mechanism:</strong> Dedicated SystemVerilog tasks, randomized BFMs, directed cycle vectors.</li>
+          <li><strong>Observation Points:</strong> Pin protocol assertions, internal FIFO pointers, local coverage bins.</li>
+          <li><strong>Scope Intent:</strong> Exhaustive functional verification of registers, state transitions, and edge cases.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-top: 4px solid var(--tier2-color);">
+        <div class="card-title">
+          <span>Tier 2: Subsystem Fabric Level</span>
+          <span class="pill pill-tier2">Fabric &amp; Routing</span>
+        </div>
+        <p>
+          Verifies bus interconnects, memory-mapped aperture decoders, and structural protocol bridges using synthetic responders
+          or isolated traffic controllers.
+        </p>
+        <ul class="feature-list">
+          <li><strong>DUT Boundary:</strong> Interconnect matrix + bridge + aperture decoder (peripherals replaced with stubs).</li>
+          <li><strong>Stimulus Mechanism:</strong> Synthetic master transactions injecting contiguous and out-of-range addresses.</li>
+          <li><strong>Observation Points:</strong> Select-line routing, wait-state propagation, PSLVERR abort injection.</li>
+          <li><strong>Scope Intent:</strong> Proof of address space isolation, routing correctness, and fabric deadlock immunity.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-top: 4px solid var(--tier3-color);">
+        <div class="card-title">
+          <span>Tier 3: SoC Integration Level</span>
+          <span class="pill pill-tier3">Closed-Loop SoC</span>
+        </div>
+        <p>
+          Complete closed-loop system simulation combining the RISC-V core, bus fabric, integrated peripherals,
+          and dual memory banks executing real compiled firmware.
+        </p>
+        <ul class="feature-list">
+          <li><strong>DUT Boundary:</strong> Complete RISCFORGE chip boundary (including clock, reset, external pins).</li>
+          <li><strong>Stimulus Mechanism:</strong> Preloaded bare-metal C/assembly firmware programs.</li>
+          <li><strong>Observation Points:</strong> Instruction retirement counters, passive bus monitors, firmware attestations.</li>
+          <li><strong>Scope Intent:</strong> End-to-end confirmation of pipeline execution, interrupt handling, and peripheral control.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Methodological Rule: Tier Follows the DUT Boundary, Not Module Function</div>
+      <div class="callout-content">
+        Under this framework, tier classification is dictated strictly by the physical boundary instantiated in the testbench.
+        A standalone crossbar testbench is classified as <strong>Tier 1 IP Unit</strong> because it tests the isolated crossbar against synthetic master/slave BFMs.
+        Conversely, tests exercising bus apertures through the SoC bridge are classified as <strong>Tier 2 Subsystem</strong>, while complete core-driven firmware executions represent <strong>Tier 3 SoC Integration</strong>.
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Tier Level</th>
+            <th>Reference Target Examples</th>
+            <th>Primary Stimulus Driver</th>
+            <th>Checking Mechanism</th>
+            <th>Closure Gate Dependency</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill pill-tier1">Tier 1 Unit</span></td>
+            <td><code>tb_irq_arbiter</code>, <code>tb_gpio</code>, <code>tb_spi_master</code>, <code>tb_apb_uart</code>, <code>tb_axi_lite_xbar</code></td>
+            <td>SV Direct / Randomized BFMs</td>
+            <td>Self-checking procedural assertions &amp; functional coverage bins</td>
+            <td>G0 (Clean Build) &amp; G1 (Unit Positive Checks)</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-tier2">Tier 2 Subsystem</span></td>
+            <td><code>tb_soc_gpio_aperture</code>, <code>tb_datapath_uart0</code></td>
+            <td>Synthetic Aperture Exerciser / Subsystem CRT0</td>
+            <td>Bus monitor comparison &amp; decode response matching</td>
+            <td>G1 (Aperture Traversal) &amp; G3 (Zero Violations)</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill-tier3">Tier 3 SoC</span></td>
+            <td><code>soc_subsystem_design</code>, <code>soc_tb_top</code></td>
+            <td>Compiled Bare-Metal Firmware (ELF/Hex)</td>
+            <td>Passive structural bus monitors &amp; firmware attestation words</td>
+            <td>G0 to G6 (Full SoC Milestone Exit)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 3: Golden Baseline & RTL Identity Governance -->
+  <section id="baseline-governance">
+    <div class="section-header">
+      <h2>3. Golden Baseline Freezing &amp; RTL Identity Governance</h2>
+      <p>Cryptographic provenance, filelist decoupling, and Rev B identity predicates safeguarding baseline integrity.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Cryptographic Identity Stamping</div>
+        <p>
+          To prevent unverified changes from corrupting golden sign-off baselines, the repository enforces dual-layer SHA-256
+          cryptographic freezing stamped into version-controlled manifests:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Filelist Identity:</strong> Master list hash computed across all registered source files.</li>
+          <li><strong>RTL Identity:</strong> Cumulative hash computed over the raw byte content of all golden RTL and header files.</li>
+          <li><strong>Git Provenance Stamping:</strong> Git commit hash and dirty status recorded in every execution record.</li>
+          <li><strong>Immutability Guarantee:</strong> Development edits occur in forwarding filelists, keeping baseline hashes unchanged.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">The Three Rev B Identity Predicates</div>
+        <p>
+          Specific architectural hygiene rules enforced across all filelists and component directories:
+        </p>
+        <ul class="feature-list">
+          <li><strong>ID-1 (Duplicate Module Convergence):</strong> Prohibits divergent copies of the same Verilog module in reachable directories (both timer copies converged to identical content).</li>
+          <li><strong>ID-2 (Zero Unresolvable Paths):</strong> All source files and include directories declared in filelists must physically exist on disk.</li>
+          <li><strong>ID-3 (Absolute Path Ban):</strong> Filelists must never contain absolute host paths; all references must be strictly relative to the repository root.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Execution Infrastructure & Sandboxed Runner -->
+  <section id="execution-infrastructure">
+    <div class="section-header">
+      <h2>4. Execution Infrastructure &amp; Sandboxed Regression Engine</h2>
+      <p>Zero-footprint simulation orchestration ensuring isolated execution, bounded deadlines, and leak-free artifact containment.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Sandboxed Execution Model</div>
+        <p>
+          Simulators generate intermediate databases, wave logs, and journal files that pollute source trees if unmanaged.
+          The established execution model guarantees complete containment:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Isolated Execution CWD:</strong> Compiler, elaborator, and simulator tools execute strictly with <code>cwd = sandbox_dir</code>.</li>
+          <li><strong>Absolute Path Normalization:</strong> Filelist relative paths are dynamically translated to absolute paths at invocation time.</li>
+          <li><strong>Zero Repository Footprint:</strong> All simulation artifacts (<code>xsim.dir</code>, waveforms <code>.wdb</code>, snapshots, compiler databases) remain confined within the unique run folder.</li>
+          <li><strong>Deterministic Retention:</strong> Only the final run log (<code>run.log</code>) and structured verdict (<code>verdict.json</code>) are permanently archived.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Multi-Process Tree Termination Architecture</div>
+        <p>
+          EDA tools spawn nested worker processes (e.g. <code>xsimk.exe</code>) that easily orphan when parent wrappers die.
+          The regression runner implements bounded, verified process reclamation:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Process-Tree Killing:</strong> Windows invocation of <code>taskkill /F /T /PID</code> targeting the parent and all child nodes.</li>
+          <li><strong>Return Code Distinction:</strong> Explicitly audits return code 0 (terminated) vs code 128 (already reaped), flagging unrecognized failures.</li>
+          <li><strong>Bounded Pipe Drain:</strong> Subprocess stdout/stderr pipes are drained under a strict 5-second deadline.</li>
+          <li><strong>Explicit Failure Reporting:</strong> Failure to kill or drain immediately marks the run log with explicit diagnostic warnings.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="section-intro">The established regression entry point is <code>run_regression.py</code>; its autorun harness stages each target in an ephemeral sandbox and owns cleanup of the simulator process tree.</p>
+
+    <div class="pipeline-flow">
+      <div class="pipeline-step">
+        <span class="step-badge">Stage 1</span>
+        <div class="step-details">
+          <h4>Identity Verification &amp; Sandbox Creation</h4>
+          <p>Extracts git commit and stamps P0 manifest hash. Generates isolated timestamped run directory under <code>artifacts/runs/</code>.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-badge">Stage 2</span>
+        <div class="step-details">
+          <h4>Path Normalization &amp; Static Compilation</h4>
+          <p>Converts relative filelist references to absolute paths. Invokes <code>xvlog</code> inside the sandbox with strict error-code capture.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-badge">Stage 3</span>
+        <div class="step-details">
+          <h4>Elaboration &amp; Snapshot Generation</h4>
+          <p>Invokes <code>xelab</code> with timescale <code>1ns/1ps</code>. For design-only targets, halts after clean elaboration; for testbenches, produces simulation snapshot.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-badge">Stage 4</span>
+        <div class="step-details">
+          <h4>Simulation Execution with Bounded Deadlines</h4>
+          <p>Executes <code>xsim</code> in batch mode under a wall-clock timeout. On timeout, triggers hierarchical process tree kill and bounded pipe drain.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-badge">Stage 5</span>
+        <div class="step-details">
+          <h4>Strict Evidence Classification &amp; Atomic Publishing</h4>
+          <p>Scans log for non-zero activity counters, vacuity violations, and forbidden errors. Emits immutable JSON verdict record atomically via temporary-rename protocol.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Strict Evidence Classifier & Anti-Vacuity -->
+  <section id="evidence-classification">
+    <div class="section-header">
+      <h2>5. Strict Evidence Classification &amp; Anti-Vacuity Policy</h2>
+      <p>A multi-clause verification grading engine enforcing active stimulus accounting and prohibiting synthetic passes.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Quantified Positive Counters</div>
+        <p>
+          A passing simulation must actively demonstrate functional work. Banners lacking non-zero numeric counters are strictly prohibited.
+        </p>
+        <ul class="feature-list">
+          <li>Requires regex pattern <code>[1-9]\d*</code> in pass banners.</li>
+          <li>Enforces minimum check, transfer, or snapshot counts.</li>
+          <li>Generic fallbacks (e.g. bare "PASSED") are completely disabled.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Autonomous Vacuity Trapping</div>
+        <p>
+          Testbenches that exit cleanly without exercising any logic are caught and failed by an active anti-vacuity monitor.
+        </p>
+        <ul class="feature-list">
+          <li>Traps patterns like <code>checks=0</code>, <code>pass=0</code>, <code>0 PASSED</code>.</li>
+          <li>Flags <code>vacuity_detected = True</code> in verdict records.</li>
+          <li>Forces overall verdict to <code>FAILED</code> despite exit code 0.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Multistage Signature Auditing</div>
+        <p>
+          Error detection operates across all three execution phases: compilation, static elaboration, and runtime simulation.
+        </p>
+        <ul class="feature-list">
+          <li>Scans for tool error codes (<code>ERROR: [XSIM</code>, <code>*E,</code>).</li>
+          <li>Traps SystemVerilog fatal calls (<code>$fatal</code>, <code>Assertion failed</code>).</li>
+          <li>Emits complete failure diagnostics into <code>verdict.json</code>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Classification Verdict Precedence Engine</div>
+      <div class="callout-content">
+        The classifier evaluates execution results through strict deterministic priority:
+        (1) Pre-execution failure (missing filelist) ➔ <strong>BLOCKED</strong>;
+        (2) Compiler exit non-zero (syntax/type error) ➔ <strong>FAILED</strong>;
+        (3) Elaboration exit non-zero (unresolved module/port mismatch) ➔ <strong>FAILED</strong>;
+        (4) Simulator exit non-zero or wall timeout ➔ <strong>FAILED</strong>;
+        (5) Vacuity violation detected (zero checks/transfers) ➔ <strong>FAILED</strong>;
+        (6) Forbidden fatal or assertion token detected in log ➔ <strong>FAILED</strong>;
+        (7) Missing mandatory positive count regex signature ➔ <strong>FAILED</strong>;
+        (8) Design-only target with clean elaboration ➔ <strong>PASSED (Design-Only)</strong>;
+        (9) Clean exit 0 with validated positive activity counter and zero forbidden tokens ➔ <strong>PASSED</strong>.
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Simulation Target</th>
+            <th>Strict Pass Pattern Requirement</th>
+            <th>Required Counter Metric</th>
+            <th>Anti-Vacuity Threshold</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>tb_irq_arbiter</code></td>
+            <td><code>PASS: [1-9]\d* arbitration snapshots</code></td>
+            <td>Arbitration Snapshots Evaluated</td>
+            <td>&gt; 0 snapshots (actual: 196,608)</td>
+          </tr>
+          <tr>
+            <td><code>tb_apb_i2c</code></td>
+            <td><code>PASS = [1-9]\d* \n FAIL = 0</code></td>
+            <td>Peripheral Functional Assertions</td>
+            <td>&gt; 0 checks (actual: 90 passed, 0 failed)</td>
+          </tr>
+          <tr>
+            <td><code>tb_apb_uart</code></td>
+            <td><code>TB SUMMARY: [1-9]\d* PASSED / 0 FAILED</code></td>
+            <td>Complete Testcase Assertions</td>
+            <td>&gt; 0 checks (actual: 69 passed, 0 failed)</td>
+          </tr>
+          <tr>
+            <td><code>tb_gpio</code></td>
+            <td><code>TB SUMMARY: [1-9]\d* PASSED / 0 FAILED</code></td>
+            <td>Random &amp; Directed Pin Injections</td>
+            <td>&gt; 0 checks (actual: 312 passed, 0 failed)</td>
+          </tr>
+          <tr>
+            <td><code>tb_bootloader</code></td>
+            <td><code>PASS: all [1-9]\d* words</code></td>
+            <td>SRAM Verified Memory Words</td>
+            <td>&gt; 0 words (actual: 1,539 words verified)</td>
+          </tr>
+          <tr>
+            <td><code>tb_axi_lite_xbar</code></td>
+            <td><code>RESULTS: PASSED = [1-9]\d* / FAILED = 0</code></td>
+            <td>Multi-Master Concurrent Operations</td>
+            <td>&gt; 0 operations (actual: 79 passed, 0 failed)</td>
+          </tr>
+          <tr>
+            <td><code>soc_subsystem_design</code></td>
+            <td><code>Design-Only Elaboration Clean</code></td>
+            <td>Elaboration Top-Level Netlist Generation</td>
+            <td>Exit Code 0 (Design-Only Elaboration Pass)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 6: Reference Firmware Architecture -->
+  <section id="firmware-architecture">
+    <div class="section-header">
+      <h2>6. Bare-Metal Reference Firmware Architecture &amp; Hardware Abstraction</h2>
+      <p>A unified firmware Board Support Package (BSP) decoupling software test payloads from physical bus topologies.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Authoritative Hardware Memory Map</div>
+        <p>
+          Derived from the golden RTL definitions (<code>riscforge_soc_subsystem.sv</code> and <code>boot_rom.sv</code>) and implemented in <code>soc_regs.h</code>:
+        </p>
+        <ul class="feature-list">
+          <li><strong>BootROM:</strong> <code>0x00000000</code> (64 Bytes = 16 words startup jump stub).</li>
+          <li><strong>Instruction SRAM (ISRAM):</strong> <code>0x00010000</code> (32 KiB executable instruction window).</li>
+          <li><strong>Data SRAM (DSRAM):</strong> <code>0x00020000</code> (32 KiB data, rodata, stack, and heap window).</li>
+          <li><strong>APB Peripheral Base:</strong> <code>0x40000000</code> (Contiguous 4 KiB apertures per integrated peripheral).</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Peripheral Aperture Register Mapping</div>
+        <p>
+          Standardized base addresses for all integrated peripheral controllers:
+        </p>
+        <ul class="feature-list">
+          <li><strong>APB[0] I2C Master:</strong> <code>0x40000000</code> (Prescaler, Control, RX, Status, TX, Command).</li>
+          <li><strong>APB[1] Timer 0:</strong> <code>0x40001000</code> (Control, Limit, Prescaler, Counter Value).</li>
+          <li><strong>APB[2] UART 16550:</strong> <code>0x40002000</code> (RBR/THR/DLL, IER/DLM, IIR/FCR, LCR, MCR, LSR).</li>
+          <li><strong>APB[3] GPIO 32-bit:</strong> <code>0x40003000</code> (Input, Output, Direction, Interrupt Enable/Status).</li>
+          <li><strong>APB[4] SPI Master:</strong> <code>0x40004000</code> (Control, Status, Clock Divider, CS, TX/RX Data).</li>
+          <li><strong>APB[5] Timer 1:</strong> <code>0x40005000</code> (Secondary system timer registers).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 1.5rem;">
+      <div class="card">
+        <div class="card-title">CRT0 Startup &amp; Trap Dispatch</div>
+        <p>
+          Low-level processor initialization ensuring predictable hardware execution prior to payload entry:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Reset Vector Hook:</strong> Initializes global pointer (<code>gp</code>) and aligns stack pointer (<code>sp</code>) at top of DSRAM.</li>
+          <li><strong>BSS Zeroing &amp; Data Copy:</strong> Clears uninitialized memory and copies initialized data segments.</li>
+          <li><strong>Trap Vector Vectoring:</strong> Installs default synchronous exception and asynchronous interrupt handlers.</li>
+          <li><strong>Trap-Frame Preservation:</strong> Saves caller-saved registers upon trap entry, preserving hardware state for blame analysis.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Linker Memory Segmentation</div>
+        <p>
+          GNU linker architecture enforcing memory boundaries at compile-time:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Preload Execution Model:</strong> Maps <code>.text</code> directly to ISRAM (<code>0x00010000</code>) and data to DSRAM (<code>0x00020000</code>).</li>
+          <li><strong>Mandatory Entry Offset:</strong> Enforces <code>_start</code> symbol placement strictly at <code>0x00010000</code>.</li>
+          <li><strong>Linker Overflow Assertions:</strong> Strict linker scripts abort compilation if segments exceed 32 KiB physical memory limits.</li>
+          <li><strong>Standardized Drivers:</strong> Production C drivers sharing unified initialization, transfer, and status interfaces.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7: Progressive Milestone Gate Matrix -->
+  <section id="gating-matrix">
+    <div class="section-header">
+      <h2>7. Progressive Milestone Gate Matrix (G0 through G6)</h2>
+      <p>A multi-stage engineering gate framework defining the exact entry, execution, and exit criteria across all project phases.</p>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Gate ID</th>
+            <th>Gate Name</th>
+            <th>Objective &amp; Scope</th>
+            <th>Mandatory Exit Evidence</th>
+            <th>Enforcement Phase</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>G0</strong></td>
+            <td>Structural Integrity</td>
+            <td>Zero unresolved references and clean static elaboration across the golden module set.</td>
+            <td>Clean compiler &amp; elaborator logs; zero missing modules against golden set.</td>
+            <td>Phase 0 Bring-up Exit</td>
+          </tr>
+          <tr>
+            <td><strong>G1</strong></td>
+            <td>Stimulus &amp; Activity</td>
+            <td>Confirmed non-vacuous hardware execution (Tier 3: Core retirement, AXI/APB transfers; Tier 1/2: BFM/aperture transactions).</td>
+            <td>Retirement &gt; 0, transfers &gt; 0, or target-specific assertion counters &gt; 0.</td>
+            <td>Phase 0 Exit &amp; Phase 1 Entry</td>
+          </tr>
+          <tr>
+            <td><strong>G2</strong></td>
+            <td>Checker Viability</td>
+            <td>Proof that assertions and checkers fail when stimulated by deliberate fault injection.</td>
+            <td>Intentional fault injection log matching expected assertion failure.</td>
+            <td>Phase 4 Testbench Viability</td>
+          </tr>
+          <tr>
+            <td><strong>G3</strong></td>
+            <td>Clean Checking</td>
+            <td>Targeted regression execution with zero functional violations and zero open findings.</td>
+            <td>Regression suites passing with zero fatals, zero unhandled errors, open findings = 0.</td>
+            <td>Phase 1b, Phase 2, Phase 3 Exit</td>
+          </tr>
+          <tr>
+            <td><strong>G4</strong></td>
+            <td>Coverage Closure</td>
+            <td>Convergence of design state space according to documented coverage plans and waivers.</td>
+            <td>Covergroup bins and code coverage meeting targets with approved exclusions.</td>
+            <td>Phase 4 Candidate Regression</td>
+          </tr>
+          <tr>
+            <td><strong>G5</strong></td>
+            <td>Compliance &amp; Formal</td>
+            <td>Adherence to RISC-V architectural specifications and formal safety assertions.</td>
+            <td>Clean RISCOF RV32IM compliance run + bounded formal model checking.</td>
+            <td>Phase 6 Release Gate</td>
+          </tr>
+          <tr>
+            <td><strong>G6</strong></td>
+            <td>Traceability Closure</td>
+            <td>Complete bi-directional mapping from specification clauses to verified test evidence.</td>
+            <td>100% of master verification plan clauses mapped to passing evidence IDs.</td>
+            <td>Phase 4 / Phase 6 Exit</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 8: Ledger Governance & Dynamic Tracking Engine -->
+  <section id="ledger-governance">
+    <div class="section-header">
+      <h2>8. Ledger Governance &amp; Dynamic Verification Tracking</h2>
+      <p>Automated, version-controlled metadata engines generating dynamic reporting dashboards without manual bookkeeping.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Master Verification Matrix</div>
+        <p>
+          The primary source of truth across all components and integrations, version-controlled as a 26-row schema-validated CSV:
+        </p>
+        <ul class="feature-list">
+          <li>Assigns unique permanent Evidence IDs (e.g. <code>APB-02</code>, <code>FAB-03</code>).</li>
+          <li>Tracks component scope (Unit, Subsystem, System, Harness).</li>
+          <li>Maps every row directly to master plan chapters and sections.</li>
+          <li>Records live retained run directory pointers and exact pass metrics.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Unified Defect Register</div>
+        <p>
+          A formal lifecycle tracking ledger categorizing all design and verification anomalies:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Defect Classes:</strong> C-DUT (Silicon bug), C-HARNESS (TB flaw), C-SPEC (Doc ambiguity).</li>
+          <li><strong>Severity Levels:</strong> S1 (Blocker) to S4 (Cosmetic enhancement).</li>
+          <li><strong>Verification Status:</strong> Requires second-person closer and designated regression test before marking FIXED-VERIFIED.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Dynamic Metric Engine</div>
+        <p>
+          A Python build script (<code>build_tracker.py</code>) transforming CSV ledgers into analytical outputs:
+        </p>
+        <ul class="feature-list">
+          <li>Generates <code>RISCFORGE_Verification_Tracker.xlsx</code> with native dynamic Excel formulas (<code>COUNTIF</code>, <code>INDEX/MATCH</code>).</li>
+          <li>Emits executive markdown snapshot <code>PHASE_STATUS.md</code>.</li>
+          <li>Eliminates human error and manual transcription drift.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-title">Relational Traceability Model</div>
+      <div class="callout-content">
+        The established tracking architecture enforces strict relational data integrity:
+        <strong>Master Verification Plan Clauses</strong> ➔ 
+        <strong>Verification Matrix Evidence IDs (26 Rows)</strong> ➔ 
+        <strong>Crosswalk Target Catalog (17 Targets)</strong> ➔ 
+        <strong>Isolated Run Directory Sandboxes</strong> ➔ 
+        <strong>Structured Machine Verdicts (verdict.json)</strong> ➔ 
+        <strong>Defect Lifecycle Register (defects.csv)</strong> ➔ 
+        <strong>Dynamic Excel Dashboard &amp; Phase Status Snapshots</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 9: Verification Automation Tooling & Script Classification -->
+  <section id="tooling-taxonomy">
+    <div class="section-header">
+      <h2>9. Verification Automation Tooling &amp; Script Inventory</h2>
+      <p>Architectural rationale, lifecycle boundaries, and categorization of the Python automation toolchain.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Why Python is Required in EDA Verification</div>
+        <p>
+          Hardware description languages execute strictly within simulator memory and lack operating-system-level execution authority. Python serves as the essential control and governance plane:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Cleanroom Sandbox Isolation:</strong> Spawns ephemeral scratch execution run directories, isolating temporary simulator locks (<code>xsim.dir</code>) from golden repository sources.</li>
+          <li><strong>Bounded Process-Tree Lifecycle:</strong> Enforces wall-clock execution deadlines and issues recursive process-tree termination (<code>taskkill /F /T /PID</code>), distinguishing exit code 0 (terminated) from 128 (already reaped).</li>
+          <li><strong>Strict Evidence Classification:</strong> Scans raw stdout/stderr streams to mandate <code>[1-9]\d*</code> positive transaction counters and autonomously traps vacuous passes (e.g., <code>checks=0</code>).</li>
+          <li><strong>Cryptographic Baseline Integrity:</strong> Computes byte-exact SHA-256 digests across 90 source files ($H_{filelist}$, $H_{rtl}$) and enforces multi-directory module convergence ($ID_1, ID_2, ID_3$).</li>
+          <li><strong>Automated Formulaic Ledger Building:</strong> Reads version-controlled CSV matrices to emit multi-sheet analytical workbooks with live Excel formulas (<code>COUNTIF</code>, <code>INDEX/MATCH</code>), eliminating human data entry error.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Toolchain Structure: 3 Daily Engines vs. Auxiliary Staging</div>
+        <p>
+          While ~25 Python scripts exist across the verification folder, <strong>only three scripts constitute the active daily execution runtime</strong>:
+        </p>
+        <ul class="feature-list">
+          <li><strong>Primary Regression Engine:</strong> <code>run_regression.py</code> (443 lines) — The single entry point for all testbench execution, timeout monitoring, and evidence classification.</li>
+          <li><strong>Baseline Identity Stamping:</strong> <code>p0_identity.py</code> (235 lines) — Frozen manifest and cryptographic hash generator.</li>
+          <li><strong>Governance &amp; Dashboard Engine:</strong> <code>build_tracker.py</code> (803 lines) — Dynamic spreadsheet and status report builder.</li>
+          <li><strong>Firmware Hex Translators:</strong> Bridging GNU GCC ELF outputs to 32-bit hex word arrays for Verilog <code>$readmemh</code>.</li>
+          <li><strong>Immutable Audit Snapshots:</strong> 11 scripts under <code>artifacts/P0/</code> are preserved historical run logs, never executed in regular regression.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+      <div class="card-title">Complete Verification Tooling Inventory &amp; Lifecycle Classification</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Script Path</th>
+              <th>Category</th>
+              <th>Lines</th>
+              <th>Operational Responsibility</th>
+              <th>Execution Cadence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Verification/regression/run_regression.py</code></td>
+              <td><span class="pill pill-tier1">Core Runtime</span></td>
+              <td>443</td>
+              <td>Ephemeral sandbox creation, XSim compile/elab/sim invocation, anti-vacuity regex enforcement, bounded taskkill process cleanup, atomic verdict.json emission.</td>
+              <td>Per test / Daily regression</td>
+            </tr>
+            <tr>
+              <td><code>Verification/status/p0_identity.py</code></td>
+              <td><span class="pill pill-tier1">Core Runtime</span></td>
+              <td>235</td>
+              <td>Calculates H_filelist and H_rtl SHA-256 hashes across 90 files, verifies ID-1/2/3 hygiene predicates, and stamps P0_MANIFEST.json.</td>
+              <td>RTL change / Milestone freeze</td>
+            </tr>
+            <tr>
+              <td><code>Verification/status/build_tracker.py</code></td>
+              <td><span class="pill pill-tier1">Core Runtime</span></td>
+              <td>803</td>
+              <td>Parses verification_matrix.csv (26 rows) and defects.csv; builds RISCFORGE_Verification_Tracker.xlsx with live formulas; emits PHASE_STATUS.md.</td>
+              <td>Post-run / Status update</td>
+            </tr>
+            <tr>
+              <td><code>Verification/firmware/tools/elf_to_hex.py</code></td>
+              <td><span class="pill pill-tier2">Firmware Bridge</span></td>
+              <td>137</td>
+              <td>Parses RISC-V GCC ELF binaries and emits 32-bit hex word text files (imem.hex, dmem.hex, riscforge_bootrom.hex) for Verilog $readmemh memory models.</td>
+              <td>Firmware build</td>
+            </tr>
+            <tr>
+              <td><code>Verification/regression/elf_to_hex_clean.py</code></td>
+              <td><span class="pill pill-tier2">Firmware Bridge</span></td>
+              <td>87</td>
+              <td>Fallback standalone hex parser operating without GNU objcopy dependencies.</td>
+              <td>On-demand fallback</td>
+            </tr>
+            <tr>
+              <td><code>Verification/compile_asm.py</code></td>
+              <td><span class="pill pill-tier2">Firmware Bridge</span></td>
+              <td>409</td>
+              <td>Direct micro-assembler tool converting raw assembly instructions into simulation memory vectors for unit testbenches.</td>
+              <td>Unit bench development</td>
+            </tr>
+            <tr>
+              <td><code>Verification/gen_tb1_hex.py</code></td>
+              <td><span class="pill pill-tier2">Firmware Bridge</span></td>
+              <td>521</td>
+              <td>Generates specialized SRAM memory patterns and register test hex words for Tier 1 memory components.</td>
+              <td>Unit bench development</td>
+            </tr>
+            <tr>
+              <td><code>Verification/filelists/create_filelists.py</code></td>
+              <td><span class="pill pill-amber">Filelist Setup</span></td>
+              <td>753</td>
+              <td>Reads TESTBENCH_CROSSWALK.csv to auto-generate forwarding filelists across Tier 1 (unit), Tier 2 (subsystem), and Tier 3 (SoC).</td>
+              <td>Infrastructure setup</td>
+            </tr>
+            <tr>
+              <td><code>Verification/filelists/validate_filelists.py</code></td>
+              <td><span class="pill pill-amber">Filelist Setup</span></td>
+              <td>204</td>
+              <td>Scans all repository filelists to guarantee 0 unresolved include paths and 0 absolute paths (ID-2/3 pre-flight check).</td>
+              <td>Pre-flight / CI check</td>
+            </tr>
+            <tr>
+              <td><code>Verification/scripts/embed_svg.py</code></td>
+              <td><span class="pill pill-tier3">Documentation</span></td>
+              <td>41</td>
+              <td>Utility script to inject standalone SVG architecture maps into the single-file self-contained HTML specification.</td>
+              <td>Documentation build</td>
+            </tr>
+            <tr>
+              <td><code>Verification/filelists/archive_historical_logs.py</code></td>
+              <td><span class="pill pill-tier3">Maintenance</span></td>
+              <td>113</td>
+              <td>Sweeps legacy simulation directories, logs, and lockfiles from working tree into artifacts/.</td>
+              <td>Maintenance</td>
+            </tr>
+            <tr>
+              <td><code>Verification/artifacts/P0/ (11 files)</code></td>
+              <td><span class="pill pill-rose">Audit Snapshot</span></td>
+              <td>~800</td>
+              <td>Preserved run scripts and attempt inputs from historical October 18 Xcelium bring-up runs. Retained strictly for audit provenance; not executable.</td>
+              <td>Frozen / Read-only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>RISCFORGE 1TOPS Verification Architecture Specification • Established Baseline 2026-10-31 • System Architecture &amp; Verification Team</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

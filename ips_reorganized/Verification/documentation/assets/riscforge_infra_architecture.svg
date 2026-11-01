@@ -1,0 +1,289 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 880" width="100%" height="100%" style="background:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Shadow Filter -->
+    <filter id="card-shadow" x="-3%" y="-3%" width="106%" height="108%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.05"/>
+    </filter>
+
+    <!-- Marker Arrow -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7" />
+    </marker>
+    <marker id="arrow-indigo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4f46e5" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669" />
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706" />
+    </marker>
+  </defs>
+
+  <!-- ==================== HEADER BANNER ==================== -->
+  <g transform="translate(40, 20)">
+    <rect width="1200" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <text x="24" y="28" font-size="16" font-weight="800" fill="#0f172a" letter-spacing="-0.01em">
+      RISCFORGE 1TOPS — Complete Verification Infrastructure &amp; Methodology Architecture
+    </text>
+    <text x="24" y="49" font-size="12" font-weight="500" fill="#475569">
+      3-Tier Verification Hierarchy • Ephemeral Sandboxing • Strict Anti-Vacuity Classifier • Automated Dynamic Governance
+    </text>
+
+    <!-- Badges -->
+    <g transform="translate(810, 20)">
+      <rect x="0" y="0" width="88" height="26" rx="13" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+      <text x="44" y="17" font-size="10.5" font-weight="700" fill="#0284c7" text-anchor="middle">RV32IM_Zicsr</text>
+
+      <rect x="96" y="0" width="88" height="26" rx="13" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+      <text x="140" y="17" font-size="10.5" font-weight="700" fill="#4f46e5" text-anchor="middle">Vivado XSim</text>
+
+      <rect x="192" y="0" width="88" height="26" rx="13" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+      <text x="236" y="17" font-size="10.5" font-weight="700" fill="#059669" text-anchor="middle">G0-G6 Gates</text>
+
+      <rect x="288" y="0" width="92" height="26" rx="13" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+      <text x="334" y="17" font-size="10.5" font-weight="700" fill="#d97706" text-anchor="middle">Anti-Vacuous</text>
+    </g>
+  </g>
+
+  <!-- ==================== TOP ROW: 3 INPUT PILLARS ==================== -->
+
+  <!-- Pillar 1: Golden Baseline & RTL Identity -->
+  <g transform="translate(40, 105)">
+    <rect width="370" height="168" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 362 0 Q 370 0 370 8 L 370 32 L 0 32 Z" fill="#f8fafc"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#0284c7"/>
+    <text x="28" y="21" font-size="11.5" font-weight="700" fill="#0f172a">1. GOLDEN BASELINE &amp; RTL IDENTITY</text>
+    <line x1="0" y1="32" x2="370" y2="32" stroke="#e2e8f0" stroke-width="1"/>
+
+    <text x="16" y="54" font-size="11" font-weight="700" fill="#0f172a">Frozen Cryptographic Hashes:</text>
+    <text x="26" y="72" font-size="10.5" fill="#475569">• H_filelist: <tspan font-weight="700" fill="#0284c7">a931d6b4...</tspan> (90 Master Source Files)</text>
+    <text x="26" y="88" font-size="10.5" fill="#475569">• H_rtl: <tspan font-weight="700" fill="#0284c7">d25104a4...</tspan> (Cumulative byte-exact)</text>
+
+    <text x="16" y="112" font-size="11" font-weight="700" fill="#0f172a">Rev B Identity Predicates:</text>
+    <text x="26" y="130" font-size="10" fill="#475569">• ID-1: Converged duplicate timer.sv (0 divergent copies)</text>
+    <text x="26" y="146" font-size="10" fill="#475569">• ID-2 / ID-3: 0 Unresolved paths, 0 Absolute paths</text>
+  </g>
+
+  <!-- Pillar 2: 3-Tier Verification Hierarchy & Forwarding Filelists -->
+  <g transform="translate(440, 105)">
+    <rect width="410" height="168" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 402 0 Q 410 0 410 8 L 410 32 L 0 32 Z" fill="#f8fafc"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#4f46e5"/>
+    <text x="28" y="21" font-size="11.5" font-weight="700" fill="#0f172a">2. 3-TIER VERIFICATION HIERARCHY</text>
+    <line x1="0" y1="32" x2="410" y2="32" stroke="#e2e8f0" stroke-width="1"/>
+
+    <g transform="translate(16, 44)">
+      <rect width="378" height="32" rx="5" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+      <text x="10" y="20" font-size="10" font-weight="700" fill="#0284c7">TIER 1 (IP Unit):</text>
+      <text x="110" y="20" font-size="9.5" fill="#0369a1">tb_irq_arbiter, tb_gpio, tb_spi, tb_uart, tb_xbar</text>
+    </g>
+
+    <g transform="translate(16, 82)">
+      <rect width="378" height="32" rx="5" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+      <text x="10" y="20" font-size="10" font-weight="700" fill="#4f46e5">TIER 2 (Fabric):</text>
+      <text x="110" y="20" font-size="9.5" fill="#4338ca">tb_soc_gpio_aperture, tb_datapath_uart0/i2c0</text>
+    </g>
+
+    <g transform="translate(16, 120)">
+      <rect width="378" height="32" rx="5" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+      <text x="10" y="20" font-size="10" font-weight="700" fill="#059669">TIER 3 (SoC):</text>
+      <text x="110" y="20" font-size="9.5" fill="#047857">soc_subsystem_design, soc_tb_top, bootloader</text>
+    </g>
+  </g>
+
+  <!-- Pillar 3: Firmware & Memory Architecture -->
+  <g transform="translate(880, 105)">
+    <rect width="360" height="168" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 352 0 Q 360 0 360 8 L 360 32 L 0 32 Z" fill="#f8fafc"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#059669"/>
+    <text x="28" y="21" font-size="11.5" font-weight="700" fill="#0f172a">3. REFERENCE FIRMWARE &amp; BSP</text>
+    <line x1="0" y1="32" x2="360" y2="32" stroke="#e2e8f0" stroke-width="1"/>
+
+    <text x="16" y="54" font-size="11" font-weight="700" fill="#0f172a">Authoritative Memory Map:</text>
+    <text x="24" y="72" font-size="10" fill="#475569">• BootROM: <tspan font-weight="700" fill="#0f172a">0x00000000</tspan> (64B boot jump)</text>
+    <text x="24" y="88" font-size="10" fill="#475569">• ISRAM: <tspan font-weight="700" fill="#0f172a">0x00010000</tspan> (32 KiB instruction .text)</text>
+    <text x="24" y="104" font-size="10" fill="#475569">• DSRAM: <tspan font-weight="700" fill="#0f172a">0x00020000</tspan> (32 KiB data, stack, heap)</text>
+    <text x="24" y="120" font-size="10" fill="#475569">• APB Base: <tspan font-weight="700" fill="#0f172a">0x40000000</tspan> (4 KiB apertures 0..5)</text>
+
+    <text x="16" y="144" font-size="10.5" font-weight="700" fill="#059669">Unified Drivers:</text>
+    <text x="110" y="144" font-size="10" fill="#475569">UART, Timers, GPIO, SPI, I2C, crt0.S</text>
+  </g>
+
+  <!-- Connectors from Top Pillars to Sandbox Runner -->
+  <path d="M 225 273 L 225 310" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <path d="M 645 273 L 645 310" stroke="#4f46e5" stroke-width="1.5" marker-end="url(#arrow-indigo)"/>
+  <path d="M 1060 273 L 1060 310" stroke="#059669" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+
+  <!-- ==================== MIDDLE ROW: EPHEMERAL SANDBOX RUNNER ==================== -->
+  <g transform="translate(40, 318)">
+    <!-- Big Sandbox Outer Frame -->
+    <rect width="1200" height="232" rx="10" fill="#f8fafc" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6,4"/>
+    <rect x="16" y="-12" width="390" height="24" rx="4" fill="#0284c7"/>
+    <text x="24" y="4" font-size="11" font-weight="800" fill="#ffffff" letter-spacing="0.05em">
+      EPHEMERAL SANDBOX REGRESSION RUNNER (cwd = sandbox_dir)
+    </text>
+
+    <text x="420" y="6" font-size="10" font-weight="600" fill="#0369a1">
+      Location: Verification/artifacts/runs/&lt;test_id&gt;_&lt;timestamp&gt;_&lt;uuid&gt;/  [Zero Repository Footprint]
+    </text>
+
+    <!-- Stage 1: Path Normalization -->
+    <g transform="translate(25, 30)">
+      <rect width="195" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="195" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">1. PATH RESOLUTION</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#475569">Input: Target Filelist (.f)</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Parse +incdir+ &amp; files</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Convert relative paths</text>
+      <text x="12" y="106" font-size="9.5" font-weight="600" fill="#0284c7">➔ Normalized Absolute</text>
+      <text x="12" y="128" font-size="9.5" fill="#64748b">• Stage runtime assets</text>
+      <text x="12" y="146" font-size="9.5" fill="#64748b">  (CRT0 / Hex / Binaries)</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#059669">✓ Prevents Path Drift</text>
+    </g>
+
+    <path d="M 225 117 L 255 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 2: xvlog Compilation -->
+    <g transform="translate(265, 30)">
+      <rect width="200" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="200" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">2. STATIC COMPILE</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#0284c7">Command: xvlog --sv</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Macro define: -d XSIM</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Run inside sandbox_dir</text>
+      <text x="12" y="110" font-size="10" font-weight="600" fill="#475569">Error Interception:</text>
+      <text x="12" y="130" font-size="9.5" fill="#e11d48">• If c_code != 0 ➔ FAILED</text>
+      <text x="12" y="148" font-size="9.5" fill="#e11d48">• Capture ERROR: [VRFC]</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#0f172a">Output: work library</text>
+    </g>
+
+    <path d="M 470 117 L 500 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 3: xelab Elaboration -->
+    <g transform="translate(510, 30)">
+      <rect width="205" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="205" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">3. ELABORATION</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#4f46e5">Command: xelab -s snap</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Timescale: 1ns/1ps</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Resolve top-level hierarchy</text>
+      <text x="12" y="110" font-size="10" font-weight="600" fill="#059669">Design-Only Branch:</text>
+      <text x="12" y="130" font-size="9.5" fill="#059669">• Clean elab = Exit Code 0</text>
+      <text x="12" y="148" font-size="9.5" fill="#059669">• Simulation skipped</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#e11d48">• Trap unresolved ports</text>
+    </g>
+
+    <path d="M 720 117 L 750 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 4: xsim Simulation -->
+    <g transform="translate(760, 30)">
+      <rect width="200" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="200" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">4. BATCH SIMULATION</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#059669">Command: xsim snap -R</text>
+      <text x="12" y="70" font-size="9.5" fill="#64748b">• Real-time log capture</text>
+      <text x="12" y="88" font-size="9.5" fill="#64748b">• Execute inside sandbox_dir</text>
+      <text x="12" y="110" font-size="10" font-weight="600" fill="#475569">Deadlock Safeguard:</text>
+      <text x="12" y="130" font-size="9.5" fill="#64748b">• Wall-clock timeout</text>
+      <text x="12" y="148" font-size="9.5" fill="#64748b">• Max cycles threshold</text>
+      <text x="12" y="166" font-size="9" font-weight="700" fill="#0f172a">Generated: run.log</text>
+    </g>
+
+    <path d="M 965 117 L 995 117" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Stage 5: Bounded Tree Kill -->
+    <g transform="translate(1005, 30)">
+      <rect width="170" height="175" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#card-shadow)"/>
+      <rect width="170" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="12" y="18" font-size="11" font-weight="700" fill="#0f172a">5. TREE CLEANUP</text>
+      <text x="12" y="50" font-size="10" font-weight="600" fill="#d97706">On Timeout / Exit:</text>
+      <text x="12" y="70" font-size="9" fill="#475569">• taskkill /F /T /PID</text>
+      <text x="12" y="88" font-size="9" fill="#059669">• Code 0: Terminated</text>
+      <text x="12" y="104" font-size="9" fill="#0284c7">• Code 128: Reaped</text>
+      <text x="12" y="122" font-size="9" fill="#e11d48">• Other: Kill Warning</text>
+      <text x="12" y="144" font-size="9.5" font-weight="600" fill="#475569">Pipe Drain Guard:</text>
+      <text x="12" y="162" font-size="9" fill="#475569">• Bounded 5s drain limit</text>
+    </g>
+  </g>
+
+  <!-- Connectors from Sandbox Runner to Bottom Row -->
+  <path d="M 340 550 L 340 585" stroke="#d97706" stroke-width="2" marker-end="url(#arrow-amber)"/>
+  <path d="M 940 550 L 940 585" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+  <!-- ==================== BOTTOM ROW: CLASSIFIER & GOVERNANCE ==================== -->
+
+  <!-- Left Bottom: Strict Evidence Classifier -->
+  <g transform="translate(40, 590)">
+    <rect width="575" height="268" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 567 0 Q 575 0 575 8 L 575 32 L 0 32 Z" fill="#fffbeb"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#d97706"/>
+    <text x="28" y="21" font-size="12" font-weight="700" fill="#92400e">STRICT ANTI-VACUITY EVIDENCE CLASSIFIER</text>
+    <line x1="0" y1="32" x2="575" y2="32" stroke="#fde68a" stroke-width="1"/>
+
+    <g transform="translate(16, 42)">
+      <rect width="543" height="38" rx="5" fill="#fefce8" stroke="#fef08a" stroke-width="1"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#a16207">1. MANDATORY POSITIVE COUNTERS (Strict Regex [1-9]\d*):</text>
+      <text x="12" y="31" font-size="9.5" fill="#713f12">Prohibits generic count-free banners (e.g. bare "PASSED"). Requires verified non-zero activity.</text>
+    </g>
+
+    <g transform="translate(16, 88)">
+      <rect width="543" height="38" rx="5" fill="#fff1f2" stroke="#fecdd3" stroke-width="1"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#be123c">2. ACTIVE VACUITY TRAPPING (Zero-Work Fails):</text>
+      <text x="12" y="31" font-size="9.5" fill="#881337">Traps checks=0, pass=0, 0 PASSED ➔ Flags vacuity_detected = True ➔ Forces FAILED verdict.</text>
+    </g>
+
+    <g transform="translate(16, 134)">
+      <rect width="543" height="38" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="12" y="16" font-size="10.5" font-weight="700" fill="#334155">3. MULTISTAGE FORBIDDEN FILTERING:</text>
+      <text x="12" y="31" font-size="9.5" fill="#475569">Scans compile, elab, and sim logs for $fatal, assertion failed, ERROR: [XSIM, *E,.</text>
+    </g>
+
+    <!-- Deterministic 9-Step Ladder -->
+    <g transform="translate(16, 180)">
+      <text x="0" y="12" font-size="10.5" font-weight="700" fill="#0f172a">Deterministic 9-Step Evaluation Ladder:</text>
+      <text x="0" y="30" font-size="8.5" fill="#475569">Missing List ➔ Compile Err ➔ Elab Err ➔ Sim Err ➔ Vacuity Hit ➔</text>
+      <text x="0" y="44" font-size="8.5" fill="#475569">Forbidden Token ➔ Missing Counter ➔ Design-Only ➔ <tspan font-weight="700" fill="#059669">PASSED</tspan></text>
+      <text x="0" y="62" font-size="9.5" font-weight="600" fill="#0284c7">Atomic Emission: verdict.json.tmp ➔ verdict.json (Thread-safe publish)</text>
+    </g>
+  </g>
+
+  <!-- Right Bottom: Version-Controlled Ledgers & Dynamic Tracking -->
+  <g transform="translate(645, 590)">
+    <rect width="595" height="268" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#card-shadow)"/>
+    <path d="M 0 8 Q 0 0 8 0 L 587 0 Q 595 0 595 8 L 595 32 L 0 32 Z" fill="#f0fdf4"/>
+    <rect x="14" y="9" width="6" height="14" rx="2" fill="#059669"/>
+    <text x="28" y="21" font-size="12" font-weight="700" fill="#065f46">DYNAMIC TRACKING &amp; GOVERNANCE VAULT</text>
+    <line x1="0" y1="32" x2="595" y2="32" stroke="#bbf7d0" stroke-width="1"/>
+
+    <g transform="translate(16, 44)">
+      <rect width="270" height="82" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+      <text x="12" y="18" font-size="10.5" font-weight="700" fill="#0f172a">Master Verification Matrix</text>
+      <text x="12" y="34" font-size="9.5" font-weight="600" fill="#0284c7">verification_matrix.csv (26 Rows)</text>
+      <text x="12" y="50" font-size="9" fill="#64748b">• Permanent Evidence IDs (MEM, FAB, APB)</text>
+      <text x="12" y="64" font-size="9" fill="#64748b">• Live pointers to retained runs</text>
+      <text x="12" y="76" font-size="9" fill="#64748b">• Boundary closure indicators</text>
+    </g>
+
+    <g transform="translate(300, 44)">
+      <rect width="280" height="82" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+      <text x="12" y="18" font-size="10.5" font-weight="700" fill="#0f172a">Defect Lifecycle Register</text>
+      <text x="12" y="34" font-size="9.5" font-weight="600" fill="#e11d48">defects.csv (C-DUT, C-HARNESS, C-SPEC)</text>
+      <text x="12" y="50" font-size="9" fill="#64748b">• Severity triage: S1 (Blocker) to S4</text>
+      <text x="12" y="64" font-size="9" fill="#64748b">• Mandates 2nd-person closer sign-off</text>
+      <text x="12" y="76" font-size="9" fill="#64748b">• Designated regression test required</text>
+    </g>
+
+    <!-- Dynamic Engine Callout -->
+    <g transform="translate(16, 136)">
+      <rect width="564" height="116" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+      <text x="14" y="20" font-size="11" font-weight="700" fill="#166534">Dynamic Build Engine (build_tracker.py):</text>
+      <text x="14" y="38" font-size="9.5" fill="#15803d">• Schema Validation: checks keys, allowed statuses, and physical path integrity.</text>
+      <text x="14" y="54" font-size="9.5" fill="#15803d">• Generates RISCFORGE_Verification_Tracker.xlsx with native dynamic Excel formulas</text>
+      <text x="24" y="68" font-size="9" fill="#166534">(COUNTIF, SUMPRODUCT, INDEX/MATCH across exact rows 2..27 - Zero manual entry).</text>
+      <text x="14" y="86" font-size="9.5" fill="#15803d">• Emits PHASE_STATUS.md snapshot evaluating progressive milestones G0 through G6.</text>
+      <text x="14" y="103" font-size="9.5" font-weight="700" fill="#0f172a">Evidence Retained: run.log + verdict.json + waveforms in artifacts/runs/&lt;run_id&gt;/</text>
+    </g>
+  </g>
+
+</svg>

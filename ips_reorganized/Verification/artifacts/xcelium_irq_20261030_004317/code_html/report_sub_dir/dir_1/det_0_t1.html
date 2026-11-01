@@ -1,0 +1,500 @@
+<HTML>
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../imc.css"></link>
+<script type="text/javascript" src="../../sortable.js"></script>
+<TITLE>IMC Report: code_html</TITLE></HEAD>
+<BODY>
+<A NAME="_topcov"></A>
+<P class="summary_title">Coverage   Summary Report, Instance-Based</P>
+
+<P class="fs"><A STYLE="float: left" class="namet" HREF="../../index.html">Top Level Summary</A><A STYLE="float: right" class="namet" HREF="../../legend.html">Legend and Help</A></P>
+<BR>
+<TABLE class="detail_header"><TR class="detail"><TD>
+
+<B>Instance name: </B>tb_irq_restructure<BR>
+
+<B>Type name: </B>tb_irq_restructure<BR>
+
+<B>File name: </B><A HREF="/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv" TARGET="_blank">/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv</A><BR>
+
+</TD></TR></TABLE>
+
+<BR>
+<P class="subtitle">Coverage Summary Report, Instance-Based</P>
+<TABLE class="sortable sml summary_table" id="totalTable">
+
+
+<TR><TH class="wht">Code</TH>
+<TH class="wht">Code Covered</TH>
+<TH class="wht">name</TH>
+
+</TR>
+
+<TR><TD class="range65to69"><A HREF="#_Codecov">66.16%</A></TD>
+<TD class="range65to69"><A HREF="#_Codecov">68.60%&nbsp;(579/844)</A></TD>
+<TD class="namecell">tb_irq_restructure</TD>
+
+</TR>
+
+
+</TABLE>
+<A NAME="_Codecov"></A>
+<P class="detail_title">     Uncovered Code Detail Report, Instance Based</P>
+<P class="fs"><A STYLE="float: right" class="namet" HREF="#_topcov">To Top</A></P><BR>
+
+<TABLE class="detail_header"><TR class="detail"><TD>
+<B>Instance name: </B>tb_irq_restructure<BR>
+<B>Type name: </B>tb_irq_restructure<BR>
+<B>File name: </B><A HREF="/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv" TARGET="_blank">/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv</A><BR><B>Number of uncovered blocks: </B>50 of 343<BR>
+<B>Number of unreachable blocks: </B>0<BR>
+
+
+</TD></TR></TABLE>
+
+<PRE class="detail_report_text">
+Count  Block Line  Kind                 Origin Source Code                    
+------------------------------------------------------------------------------
+0      13    181   implicit default     181    case (p)                       
+0      22    200   true part of         199    $fatal(1,"reset state mismatch"); 
+0      47    232   true part of         230    $fatal(1,"arbiter mismatch vector=%h ptr=%0d threshold=%0d got=%b/%0d/%0d expected=%0d/%0d/%0d", 
+0      58    246   true part of         246    if (irq_valid) $fatal(1,"mie mask did not block interrupt"); 
+0      63    251   true part of         250    $fatal(1,"individual mie mask mismatch cause=%0d",expected_id); 
+0      67    253   true part of         253    global_mie=0; #1; if (irq_valid) $fatal(1,"global MIE did not block interrupt"); 
+0      73    262   true part of         262    if (!irq_valid || irq_id != fixed_order[i]) $fatal(1,"fixed pair mismatch"); 
+0      83    277   true part of         276    $fatal(1,"eligibility mismatch source=%0d threshold=%0d enable=%0d MIE=%0d",expected_id,t,en,glob); 
+0      93    293   true part of         293    #1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch"); 
+0      100   297   true part of         297    if (!irq_valid || irq_id != expected_id) $fatal(1,"RR changed without matching commit"); 
+0      106   302   true part of         302    if (!irq_valid || irq_id != next_id) $fatal(1,"RR did not advance after commit"); 
+0      112   310   true part of         310    if (wb_clear !== (13'b1 &lt;&lt; i) || !wb_irq) $fatal(1,"commit clear mismatch bit=%0d",i); 
+0      117   313   true part of         313    wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ"); 
+0      122   316   true part of         316    if (wb_clear || !wb_irq) $fatal(1,"unsupported IRQ clear mismatch"); 
+0      127   319   true part of         319    if (wb_clear || wb_irq) $fatal(1,"invalid exception packet acknowledged"); 
+0      132   322   true part of         322    if (wb_clear || wb_irq) $fatal(1,"invalid WB packet acknowledged"); 
+0      138   328   true part of         328    #1; if ((pending & 13'h1fe9) !== 13'h1fe9) $fatal(1,"event capture failed"); 
+0      141   330   true part of         329    $fatal(1,"mip mapping failed: %h",csr_mip); 
+0      146   333   true part of         333    if (pending !== 13'h0008) $fatal(1,"event/ack coincidence failed: %h",pending); 
+0      152   338   true part of         338    if (!pending[3]) $fatal(1,"adjacent event samples lost"); 
+0      157   340   true part of         340    @(negedge clk); clear=0; #1; if (pending) $fatal(1,"ack failed"); 
+0      161   343   true part of         343    if ((pending & 13'h0014) !== 13'h0014) $fatal(1,"level passthrough failed"); 
+0      165   345   true part of         345    if (pending !== 13'h0002) $fatal(1,"GPIO edge capture failed"); 
+0      174   354   true part of         354    if (!pending[i]) $fatal(1,"event capture missing bit %0d",i); 
+0      177   356   true part of         356    if (!csr_mip[expected_id]) $fatal(1,"mip mapping missing source %0d",expected_id); 
+0      182   359   true part of         359    if (pending[i]) $fatal(1,"event clear missing bit %0d",i); 
+0      190   367   true part of         367    if (!pending[i]) $fatal(1,"separated event lost bit %0d",i); 
+0      199   376   true part of         376    if (!pending[i]) $fatal(1,"consecutive event lost bit %0d",i); 
+0      209   386   true part of         386    if (!pending[i]) $fatal(1,"held event/ack lost bit %0d",i); 
+0      218   395   true part of         395    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0); 
+0      224   398   true part of         398    if (pending[1]) $fatal(1,"GPIO held level retriggered"); gpio_cov.sample(1); 
+0      231   402   true part of         402    if (!pending[1]) $fatal(1,"GPIO edge did not win ack"); gpio_cov.sample(2); 
+0      238   406   true part of         406    if (!pending[1]) $fatal(1,"GPIO rearm failed"); gpio_cov.sample(3); 
+0      246   413   true part of         413    if (!pending[i]) $fatal(1,"level assertion missing bit %0d",i); level_cov.sample(i,0); 
+0      252   416   true part of         416    if (!pending[i]) $fatal(1,"level ack changed output bit %0d",i); level_cov.sample(i,1); 
+0      257   418   true part of         418    if (pending[i]) $fatal(1,"level deassertion missing bit %0d",i); level_cov.sample(i,2); 
+0      262   422   true part of         422    if (csr_mie !== 32'h0fff0080) $fatal(1,"mie CSR fast bits mismatch"); 
+0      274   434   true part of         434    if (csr_read !== j || csr_threshold !== j) $fatal(1,"mintprio CSR transition mismatch"); 
+0      281   441   true part of         441    if (csr_threshold !== 2) $fatal(1,"trap changed mintprio"); csr_control_cov.sample(1); 
+0      287   444   true part of         444    if (csr_threshold !== 2) $fatal(1,"MRET changed mintprio"); csr_control_cov.sample(2); 
+0      294   450   true part of         450    if (csr_mie !== (32'b1 &lt;&lt; i)) $fatal(1,"mie CSR bit %0d failed",i); 
+0      300   455   true part of         455    if (csr_mie !== 32'hffff_0888) $fatal(1,"mie implemented-bit mask failed"); 
+0      307   463   true part of         461    $fatal(1,"trap CSR capture mismatch MIE=%0d",i); 
+0      313   468   true part of         467    $fatal(1,"MRET CSR restore mismatch MPIE=%0d",i); 
+0      318   472   true part of         472    if (!csr_mip[3]) $fatal(1,"software MSIP write missing"); 
+0      322   474   true part of         474    if (csr_mip[3]) $fatal(1,"software MSIP clear failed"); csr_irq_cov.sample(4); 
+0      327   475   true part of         475    csr_sw=1; #1; if (!csr_mip[3]) $fatal(1,"MSIP input missing"); 
+0      331   476   true part of         476    csr_sw=0; #1; if (csr_mip[3]) $fatal(1,"MSIP input clear failed"); csr_irq_cov.sample(5); 
+0      336   477   true part of         477    csr_ext=1; #1; if (!csr_mip[11]) $fatal(1,"MEIP input missing"); 
+0      340   478   true part of         478    csr_ext=0; #1; if (csr_mip[11]) $fatal(1,"MEIP input clear failed"); csr_irq_cov.sample(6); 
+
+</PRE>
+
+<TABLE class="detail_header"><TR class="detail"><TD>
+<B>Instance name: </B>tb_irq_restructure<BR>
+<B>Type name: </B>tb_irq_restructure<BR>
+<B>File name: </B><A HREF="/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv" TARGET="_blank">/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv</A><BR><B>Number of uncovered expressions: </B>39 of 88<BR>
+<B>Number of unreachable expressions: </B>0<BR>
+
+
+</TD></TR></TABLE>
+
+<PRE class="detail_report_text">
+index  | grade         | line   | expression                                         
+-------------------------------------------------------------------------------------
+1.1    | 25.00% (1/4)  | 199    | ((csr_threshold !== 0) || (csr_mie !== 0)) || (pending !== 0) 
+6.1    | 40.00% (2/5)  | 230    | (irq_valid !== (found && ((expected_class + 1) &gt; t))) || (irq_valid && ((irq_id !== expected_id) || (irq_class !== expected_class))) 
+9.1    | 33.33% (1/3)  | 250    | (! irq_valid) || (irq_id != expected_id)           
+10.1   | 33.33% (1/3)  | 262    | (! irq_valid) || (irq_id != fixed_order[i])        
+12.1   | 40.00% (2/5)  | 276    | (irq_valid !== found) || (found && ((irq_id != expected_id) || (irq_class != expected_class))) 
+13.1   | 33.33% (1/3)  | 293    | (! irq_valid) || (irq_id != expected_id)           
+14.1   | 33.33% (1/3)  | 297    | (! irq_valid) || (irq_id != expected_id)           
+15.1   | 33.33% (1/3)  | 302    | (! irq_valid) || (irq_id != next_id)               
+16.1   | 33.33% (1/3)  | 310    | (wb_clear !== (13'b0000000000001 &lt;&lt; i)) || (! wb_irq) 
+17.1   | 33.33% (1/3)  | 313    | wb_clear || wb_irq                                 
+18.1   | 33.33% (1/3)  | 316    | wb_clear || (! wb_irq)                             
+19.1   | 33.33% (1/3)  | 319    | wb_clear || wb_irq                                 
+20.1   | 33.33% (1/3)  | 322    | wb_clear || wb_irq                                 
+21.1   | 33.33% (1/3)  | 434    | (csr_read !== j) || (csr_threshold !== j)          
+23.1   | 16.67% (1/6)  | 462    | ((((csr_mstatus[3] !== 0) || (csr_mstatus[7] !== i)) || (csr_mepc !== 32'h00000120)) || (csr_mcause !== 32'h80000013)) || (csr_threshold !== 2) 
+24.1   | 25.00% (1/4)  | 467    | ((csr_mstatus[3] !== i) || (csr_mstatus[7] !== 1)) || (csr_threshold !== 2) 
+
+<B>index: </B><B>1.1</B><B> grade: </B><B>25.00% (1/4)</B><B> line: </B><B>199</B><B> source: </B><B>#1; if (csr_threshold !== 0 || csr_mie !== 0 || pending !== 0)</B>
+
+((csr_threshold !== 0) || (csr_mie !== 0)) || (pending !== 0)<BR>
+ <B><</B>---------<B>1</B>---------<B>></B>    <B><</B>------<B>2</B>------<B>></B>     <B><</B>------<B>3</B>------<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; &lt;3&gt; 
+-------------------------------- '||'
+1.1.1     | 0     | 1   -   -   
+1.1.2     | 0     | -   1   -   
+1.1.3     | 0     | -   -   1   
+
+<B>index: </B><B>6.1</B><B> grade: </B><B>40.00% (2/5)</B><B> line: </B><B>230</B><B> source: </B><B>if (irq_valid !== (found && expected_class+1 > t) ||</B>
+
+(irq_valid !== (found && ((expected_class + 1) > t))) || (irq_valid && ((irq_id !== expected_id) || (irq_class !== expected_class)))<BR>
+<B><</B>-------------------------<B>1</B>-------------------------<B>></B>     <B><</B>---<B>2</B>---<B>></B>     <B><</B>----------<B>3</B>-----------<B>></B>    <B><</B>-------------<B>4</B>--------------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; &lt;3&gt; &lt;4&gt; 
+-------------------------------------------
+6.1.1     | 0     | 1    | -   1   -   1   
+6.1.2     | 0     | 1    | -   1   1   -   
+6.1.3     | 0     | 1    | 1   -   -   -   
+
+<B>index: </B><B>9.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>250</B><B> source: </B><B>if (!irq_valid || irq_id != expected_id)</B>
+
+(! irq_valid) || (irq_id != expected_id)<BR>
+   <B><</B>---<B>1</B>---<B>></B>     <B><</B>----------<B>2</B>----------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+9.1.1     | 0     | 1    | -   1   
+9.1.2     | 0     | 1    | 0   -   
+
+<B>index: </B><B>10.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>262</B><B> source: </B><B>if (!irq_valid || irq_id != fixed_order[i]) $fatal(1,"fixed pair mismatch");</B>
+
+(! irq_valid) || (irq_id != fixed_order[i])<BR>
+   <B><</B>---<B>1</B>---<B>></B>     <B><</B>-----------<B>2</B>------------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+10.1.1    | 0     | 1    | -   1   
+10.1.2    | 0     | 1    | 0   -   
+
+<B>index: </B><B>12.1</B><B> grade: </B><B>40.00% (2/5)</B><B> line: </B><B>276</B><B> source: </B><B>if (irq_valid !== found || (found && (irq_id != expected_id || irq_class != expected_class)))</B>
+
+(irq_valid !== found) || (found && ((irq_id != expected_id) || (irq_class != expected_class)))<BR>
+<B><</B>---------<B>1</B>---------<B>></B>     <B><</B>-<B>2</B>-<B>></B>     <B><</B>----------<B>3</B>----------<B>></B>    <B><</B>-------------<B>4</B>-------------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; &lt;3&gt; &lt;4&gt; 
+-------------------------------------------
+12.1.1    | 0     | 1    | -   1   -   1   
+12.1.2    | 0     | 1    | -   1   1   -   
+12.1.3    | 0     | 1    | 1   -   -   -   
+
+<B>index: </B><B>13.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>293</B><B> source: </B><B>#1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch");</B>
+
+(! irq_valid) || (irq_id != expected_id)<BR>
+   <B><</B>---<B>1</B>---<B>></B>     <B><</B>----------<B>2</B>----------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+13.1.1    | 0     | 1    | -   1   
+13.1.2    | 0     | 1    | 0   -   
+
+<B>index: </B><B>14.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>297</B><B> source: </B><B>if (!irq_valid || irq_id != expected_id) $fatal(1,"RR changed without matching commit");</B>
+
+(! irq_valid) || (irq_id != expected_id)<BR>
+   <B><</B>---<B>1</B>---<B>></B>     <B><</B>----------<B>2</B>----------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+14.1.1    | 0     | 1    | -   1   
+14.1.2    | 0     | 1    | 0   -   
+
+<B>index: </B><B>15.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>302</B><B> source: </B><B>if (!irq_valid || irq_id != next_id) $fatal(1,"RR did not advance after commit");</B>
+
+(! irq_valid) || (irq_id != next_id)<BR>
+   <B><</B>---<B>1</B>---<B>></B>     <B><</B>--------<B>2</B>--------<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+15.1.1    | 0     | 1    | -   1   
+15.1.2    | 0     | 1    | 0   -   
+
+<B>index: </B><B>16.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>310</B><B> source: </B><B>if (wb_clear !== (13'b1 << i) || !wb_irq) $fatal(1,"commit clear mismatch bit=%0d",i);</B>
+
+(wb_clear !== (13'b0000000000001 << i)) || (! wb_irq)<BR>
+<B><</B>------------------<B>1</B>------------------<B>></B>       <B><</B>-<B>2</B>--<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+16.1.1    | 0     | 1    | -   0   
+16.1.2    | 0     | 1    | 1   -   
+
+<B>index: </B><B>17.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>313</B><B> source: </B><B>wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ");</B>
+
+wb_clear || wb_irq<BR>
+<B><</B>--<B>1</B>---<B>></B>    <B><</B>-<B>2</B>--<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; 
+---------------------------- '||'
+17.1.1    | 0     | 1   -   
+17.1.2    | 0     | -   1   
+
+<B>index: </B><B>18.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>316</B><B> source: </B><B>if (wb_clear || !wb_irq) $fatal(1,"unsupported IRQ clear mismatch");</B>
+
+wb_clear || (! wb_irq)<BR>
+<B><</B>--<B>1</B>---<B>></B>       <B><</B>-<B>2</B>--<B>></B>
+
+index     | hit   | rval | &lt;1&gt; &lt;2&gt; 
+-----------------------------------
+18.1.1    | 0     | 1    | -   0   
+18.1.2    | 0     | 1    | 1   -   
+
+<B>index: </B><B>19.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>319</B><B> source: </B><B>if (wb_clear || wb_irq) $fatal(1,"invalid exception packet acknowledged");</B>
+
+wb_clear || wb_irq<BR>
+<B><</B>--<B>1</B>---<B>></B>    <B><</B>-<B>2</B>--<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; 
+---------------------------- '||'
+19.1.1    | 0     | 1   -   
+19.1.2    | 0     | -   1   
+
+<B>index: </B><B>20.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>322</B><B> source: </B><B>if (wb_clear || wb_irq) $fatal(1,"invalid WB packet acknowledged");</B>
+
+wb_clear || wb_irq<BR>
+<B><</B>--<B>1</B>---<B>></B>    <B><</B>-<B>2</B>--<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; 
+---------------------------- '||'
+20.1.1    | 0     | 1   -   
+20.1.2    | 0     | -   1   
+
+<B>index: </B><B>21.1</B><B> grade: </B><B>33.33% (1/3)</B><B> line: </B><B>434</B><B> source: </B><B>if (csr_read !== j || csr_threshold !== j) $fatal(1,"mintprio CSR transition mismatch");</B>
+
+(csr_read !== j) || (csr_threshold !== j)<BR>
+<B><</B>------<B>1</B>-------<B>></B>    <B><</B>---------<B>2</B>---------<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; 
+---------------------------- '||'
+21.1.1    | 0     | 1   -   
+21.1.2    | 0     | -   1   
+
+<B>index: </B><B>23.1</B><B> grade: </B><B>16.67% (1/6)</B><B> line: </B><B>462</B><B> source: </B><B>csr_mepc !== 32'h120 || csr_mcause !== 32'h8000_0013 || csr_threshold !== 2)</B>
+
+((((csr_mstatus[3] !== 0) || (csr_mstatus[7] !== i)) || (csr_mepc !== 32'h00000120)) || (csr_mcause !== 32'h80000013)) || (csr_threshold !== 2)<BR>
+   <B><</B>---------<B>1</B>----------<B>></B>    <B><</B>---------<B>2</B>----------<B>></B>     <B><</B>------------<B>3</B>------------<B>></B>     <B><</B>-------------<B>4</B>-------------<B>></B>     <B><</B>---------<B>5</B>---------<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; &lt;3&gt; &lt;4&gt; &lt;5&gt; 
+---------------------------------------- '||'
+23.1.1    | 0     | 1   -   -   -   -   
+23.1.2    | 0     | -   1   -   -   -   
+23.1.3    | 0     | -   -   1   -   -   
+23.1.4    | 0     | -   -   -   1   -   
+23.1.5    | 0     | -   -   -   -   1   
+
+<B>index: </B><B>24.1</B><B> grade: </B><B>25.00% (1/4)</B><B> line: </B><B>467</B><B> source: </B><B>if (csr_mstatus[3] !== i || csr_mstatus[7] !== 1 || csr_threshold !== 2)</B>
+
+((csr_mstatus[3] !== i) || (csr_mstatus[7] !== 1)) || (csr_threshold !== 2)<BR>
+ <B><</B>---------<B>1</B>----------<B>></B>    <B><</B>---------<B>2</B>----------<B>></B>     <B><</B>---------<B>3</B>---------<B>></B>
+
+index     | hit   | &lt;1&gt; &lt;2&gt; &lt;3&gt; 
+-------------------------------- '||'
+24.1.1    | 0     | 1   -   -   
+24.1.2    | 0     | -   1   -   
+24.1.3    | 0     | -   -   1   
+
+
+</PRE>
+
+<TABLE class="detail_header"><TR class="detail"><TD>
+<B>Instance name: </B>tb_irq_restructure<BR>
+<B>Type name: </B>tb_irq_restructure<BR>
+<B>File name: </B><A HREF="/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv" TARGET="_blank">/home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv</A><BR><B>Number of uncovered signal bits: </B>176 of 413<BR>
+<B>Number of unreachable signal bits: </B>0<BR>
+<B>Number of signal bits partially toggled(rise): </B>16 of 413<BR>
+<B>Number of signal bits partially toggled(fall): </B>0 of 413<BR>
+
+
+</TD></TR></TABLE>
+
+<PRE class="detail_report_text">
+Hit(Full)  Hit(Rise)  Hit(Fall)  Signal                    
+-----------------------------------------------------------
+0          1          0          rst_n                     
+0          1          0          committed_id[4]           
+0          0          0          committed_id[2]           
+0          0          0          csr_addr[11]              
+0          1          0          csr_addr[10]              
+0          1          0          csr_addr[9]               
+0          1          0          csr_addr[8]               
+0          1          0          csr_addr[7]               
+0          1          0          csr_addr[6]               
+0          0          0          csr_addr[5]               
+0          0          0          csr_addr[4]               
+0          0          0          csr_addr[3]               
+0          0          0          csr_addr[2]               
+0          0          0          csr_addr[1]               
+0          0          0          csr_addr[0]               
+0          0          0          csr_write_addr[11]        
+0          1          0          csr_write_addr[9]         
+0          1          0          csr_write_addr[8]         
+0          0          0          csr_write_addr[5]         
+0          0          0          csr_write_addr[4]         
+0          0          0          csr_write_addr[3]         
+0          0          0          csr_write_addr[1]         
+0          0          0          csr_write_addr[0]         
+0          0          0          csr_read[31]              
+0          0          0          csr_read[30]              
+0          0          0          csr_read[29]              
+0          0          0          csr_read[28]              
+0          0          0          csr_read[27]              
+0          0          0          csr_read[26]              
+0          0          0          csr_read[25]              
+0          0          0          csr_read[24]              
+0          0          0          csr_read[23]              
+0          0          0          csr_read[22]              
+0          0          0          csr_read[21]              
+0          0          0          csr_read[20]              
+0          0          0          csr_read[19]              
+0          0          0          csr_read[18]              
+0          0          0          csr_read[17]              
+0          0          0          csr_read[16]              
+0          0          0          csr_read[15]              
+0          0          0          csr_read[14]              
+0          0          0          csr_read[13]              
+0          0          0          csr_read[12]              
+0          0          0          csr_read[11]              
+0          0          0          csr_read[10]              
+0          0          0          csr_read[9]               
+0          0          0          csr_read[8]               
+0          0          0          csr_read[7]               
+0          0          0          csr_read[6]               
+0          0          0          csr_read[5]               
+0          0          0          csr_read[4]               
+0          0          0          csr_read[3]               
+0          0          0          csr_read[2]               
+0          0          0          csr_mip[31]               
+0          0          0          csr_mip[30]               
+0          0          0          csr_mip[29]               
+0          0          0          csr_mip[28]               
+0          0          0          csr_mip[15]               
+0          0          0          csr_mip[14]               
+0          0          0          csr_mip[13]               
+0          0          0          csr_mip[12]               
+0          0          0          csr_mip[10]               
+0          0          0          csr_mip[9]                
+0          0          0          csr_mip[8]                
+0          0          0          csr_mip[6]                
+0          0          0          csr_mip[5]                
+0          0          0          csr_mip[4]                
+0          0          0          csr_mip[2]                
+0          0          0          csr_mip[1]                
+0          0          0          csr_mip[0]                
+0          1          0          csr_mie[31]               
+0          0          0          csr_mie[15]               
+0          0          0          csr_mie[14]               
+0          0          0          csr_mie[13]               
+0          0          0          csr_mie[12]               
+0          0          0          csr_mie[10]               
+0          0          0          csr_mie[9]                
+0          0          0          csr_mie[8]                
+0          0          0          csr_mie[6]                
+0          0          0          csr_mie[5]                
+0          0          0          csr_mie[4]                
+0          0          0          csr_mie[2]                
+0          0          0          csr_mie[1]                
+0          0          0          csr_mie[0]                
+0          0          0          csr_mstatus[31]           
+0          0          0          csr_mstatus[30]           
+0          0          0          csr_mstatus[29]           
+0          0          0          csr_mstatus[28]           
+0          0          0          csr_mstatus[27]           
+0          0          0          csr_mstatus[26]           
+0          0          0          csr_mstatus[25]           
+0          0          0          csr_mstatus[24]           
+0          0          0          csr_mstatus[23]           
+0          0          0          csr_mstatus[22]           
+0          0          0          csr_mstatus[21]           
+0          0          0          csr_mstatus[20]           
+0          0          0          csr_mstatus[19]           
+0          0          0          csr_mstatus[18]           
+0          0          0          csr_mstatus[17]           
+0          0          0          csr_mstatus[16]           
+0          0          0          csr_mstatus[15]           
+0          0          0          csr_mstatus[14]           
+0          0          0          csr_mstatus[13]           
+0          0          0          csr_mstatus[10]           
+0          0          0          csr_mstatus[9]            
+0          0          0          csr_mstatus[8]            
+0          0          0          csr_mstatus[6]            
+0          0          0          csr_mstatus[5]            
+0          0          0          csr_mstatus[4]            
+0          0          0          csr_mstatus[2]            
+0          0          0          csr_mstatus[1]            
+0          0          0          csr_mstatus[0]            
+0          0          0          csr_mepc[31]              
+0          0          0          csr_mepc[30]              
+0          0          0          csr_mepc[29]              
+0          0          0          csr_mepc[28]              
+0          0          0          csr_mepc[27]              
+0          0          0          csr_mepc[26]              
+0          0          0          csr_mepc[25]              
+0          0          0          csr_mepc[24]              
+0          0          0          csr_mepc[23]              
+0          0          0          csr_mepc[22]              
+0          0          0          csr_mepc[21]              
+0          0          0          csr_mepc[20]              
+0          0          0          csr_mepc[19]              
+0          0          0          csr_mepc[18]              
+0          0          0          csr_mepc[17]              
+0          0          0          csr_mepc[16]              
+0          0          0          csr_mepc[15]              
+0          0          0          csr_mepc[14]              
+0          0          0          csr_mepc[13]              
+0          0          0          csr_mepc[12]              
+0          0          0          csr_mepc[11]              
+0          0          0          csr_mepc[10]              
+0          0          0          csr_mepc[9]               
+0          1          0          csr_mepc[8]               
+0          0          0          csr_mepc[7]               
+0          0          0          csr_mepc[6]               
+0          1          0          csr_mepc[5]               
+0          0          0          csr_mepc[4]               
+0          0          0          csr_mepc[3]               
+0          0          0          csr_mepc[2]               
+0          0          0          csr_mepc[1]               
+0          0          0          csr_mepc[0]               
+0          1          0          csr_mcause[31]            
+0          0          0          csr_mcause[30]            
+0          0          0          csr_mcause[29]            
+0          0          0          csr_mcause[28]            
+0          0          0          csr_mcause[27]            
+0          0          0          csr_mcause[26]            
+0          0          0          csr_mcause[25]            
+0          0          0          csr_mcause[24]            
+0          0          0          csr_mcause[23]            
+0          0          0          csr_mcause[22]            
+0          0          0          csr_mcause[21]            
+0          0          0          csr_mcause[20]            
+0          0          0          csr_mcause[19]            
+0          0          0          csr_mcause[18]            
+0          0          0          csr_mcause[17]            
+0          0          0          csr_mcause[16]            
+0          0          0          csr_mcause[15]            
+0          0          0          csr_mcause[14]            
+0          0          0          csr_mcause[13]            
+0          0          0          csr_mcause[12]            
+0          0          0          csr_mcause[11]            
+0          0          0          csr_mcause[10]            
+0          0          0          csr_mcause[9]             
+0          0          0          csr_mcause[8]             
+0          0          0          csr_mcause[7]             
+0          0          0          csr_mcause[6]             
+0          0          0          csr_mcause[5]             
+0          1          0          csr_mcause[4]             
+0          0          0          csr_mcause[3]             
+0          0          0          csr_mcause[2]             
+0          1          0          csr_mcause[1]             
+0          1          0          csr_mcause[0]             
+
+</PRE>

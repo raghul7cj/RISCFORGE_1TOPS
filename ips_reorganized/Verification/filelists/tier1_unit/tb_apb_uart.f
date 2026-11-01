@@ -1,0 +1,35 @@
+// RISCFORGE 1TOPS — Tier 1 IP Unit: apb_uart
+// Invocation root: rtl/ips
+// Top: tb_apb_uart_thorough
+
++incdir+SOC_FILES/include
++incdir+SOC_FILES/include/common_cells
+
+SOC_FILES/include/common_cells/cf_math_pkg.sv
+SOC_FILES/include/obi/obi_pkg.sv
+SOC_FILES/include/obi/obi_uart_pkg.sv
+SOC_FILES/include/apb/apb_pkg.sv
+
+SOC_FILES/include/common_cells/sync.sv
+SOC_FILES/include/common_cells/counter.sv
+SOC_FILES/include/common_cells/fifo_v3.sv
+SOC_FILES/include/common_cells/fall_through_register.sv
+SOC_FILES/include/common_cells/shift_reg.sv
+SOC_FILES/include/common_cells/lzc.sv
+SOC_FILES/include/common_cells/delta_counter.sv
+SOC_FILES/include/common_cells/shift_reg_gated.sv
+SOC_FILES/include/register_interface/reg_to_apb.sv
+
+SOC_FILES/include/obi/apb_to_obi.sv
+SOC_FILES/include/obi/obi_uart.sv
+SOC_FILES/include/obi/obi_uart_register.sv
+SOC_FILES/include/obi/obi_uart_modem.sv
+SOC_FILES/include/obi/obi_uart_baudgen.sv
+SOC_FILES/include/obi/obi_uart_rx.sv
+SOC_FILES/include/obi/obi_uart_tx.sv
+SOC_FILES/include/obi/obi_uart_interrupts.sv
+
+apb_uart-main/rtl/apb_uart.sv
+apb_uart-main/rtl/apb_uart_wrap.sv
+apb_uart-main/rtl/reg_uart_wrap.sv
+apb_uart-main/rtl/tb_apb_uart_thorough.sv
