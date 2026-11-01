@@ -1,0 +1,270 @@
+// =============================================================================
+// RISCFORGE 1TOPS - Full Boot-to-Runtime Testbench Filelist
+// =============================================================================
+// Drives soc_timer0_boot_run_tb: cold boot from the Infineon S25FS512S flash
+// model, then runtime execution of the Timer 0 test program on the real core.
+//
+// Run from RTL_SOC/ :
+//     xrun -f rtl/soc_timer0_boot_run.f
+//
+// The flash image and boot ROM hex are opened with paths relative to the
+// simulator's working directory, so it MUST be RTL_SOC/:
+//     ../mem_files/riscforge_timer0_flash.mem   (flash image)
+//     ../mem_files/riscforge_bootrom.hex        (boot ROM, via boot_rom.sv)
+//
+// Regenerate the flash image after changing the test program:
+//     cd ../mem_files && python gen_flash_image.py
+//
+// This list mirrors soc_subsystem.f, with the top module changed and the
+// flash model + testbench appended. Keep the two in sync.
+// =============================================================================
+
+-sv
+-timescale 1ns/1ps
+
+// Hierarchical read/write access. Required for the testbench's backdoor probes:
+//   u_flash.memory_features_i0.read_mem_w()  (flash preload check)
+//   dut.i_isram.u_imem.mem_array[]           (ISRAM image check)
+//   dut.i_dsram.mem[]                        (DSRAM image + result)
+//   dut.i_riscv_core.Decode.rf.Register[]    (core register state)
+// and for $shm_probe when waveforms are enabled.
+
+// Selects the $shm_* branch of the testbench's waveform block. Dumping is still
+// OPT-IN at runtime — add +WAVES to the xrun command line to turn it on:
+//     xrun -f rtl/soc_timer0_boot_run.f +WAVES
+// Top module (testbench)
+
+// =============================================================================
+// Section 1: Include Paths (for `include directives in IP source files)
+// =============================================================================
++incdir+../axi_lite_xbar/include/axi
++incdir+../axi_lite_xbar/include/common_cells
++incdir+../axi_lite_xbar/include
++incdir+../SOC_FILES/include/apb
++incdir+../SOC_FILES/include/obi
++incdir+../SOC_FILES/include/common_cells
++incdir+../SOC_FILES/include/axi
++incdir+../SOC_FILES/include
+
+// I2C and SPI master local includes
++incdir+../apb_i2c-master/rtl
++incdir+../spi/spi_master
+
+// PULP register_interface + OBI UART sources are under SOC_FILES/include/.
+// The `include directives are of the form "register_interface/assign.svh",
+// so the include path must be the PARENT directory.
++incdir+../SOC_FILES/include
+
+// =============================================================================
+// Section 2: Packages (compile order matters — packages before modules)
+// =============================================================================
+
+// Common math functions
+../axi_lite_xbar/include/common_cells/cf_math_pkg.sv
+
+// AXI package (xbar_cfg_t, resp_t, prot_t, etc.)
+../axi_lite_xbar/include/common_cells/axi_pkg.sv
+
+// GPIO register package (GPIOCount, reg2hw/hw2reg structs)
+../gpio-master/gpio_reg_pkg.sv
+
+// APB package (apb_to_reg / gpio_apb_wrap)
+../SOC_FILES/include/apb/apb_pkg.sv
+
+// OBI packages (needed by apb_uart → apb_uart_wrap → apb_to_obi → obi_uart)
+// NOTE: obi_pkg.sv is under SOC_FILES/include/obi/.
+//       Compile exactly ONE copy — same package name.
+../SOC_FILES/include/obi/obi_pkg.sv
+../SOC_FILES/include/obi/obi_uart_pkg.sv
+
+// =============================================================================
+// Section 3: Common Cells (shared infrastructure modules)
+// =============================================================================
+../axi_lite_xbar/include/common_cells/addr_decode_dync.sv
+../axi_lite_xbar/include/common_cells/addr_decode.sv
+../axi_lite_xbar/include/common_cells/fifo_v3.sv
+../axi_lite_xbar/include/common_cells/fall_through_register.sv
+../axi_lite_xbar/include/common_cells/spill_register.sv
+../axi_lite_xbar/include/common_cells/spill_register_flushable.sv
+../axi_lite_xbar/include/common_cells/counter.sv
+../axi_lite_xbar/include/common_cells/rr_arb_tree.sv
+../axi_lite_xbar/include/common_cells/lzc.sv
+../axi_lite_xbar/include/common_cells/onehot_to_bin.sv
+../axi_lite_xbar/include/common_cells/delta_counter.sv
+../axi_lite_xbar/include/common_cells/id_queue.sv
+../axi_lite_xbar/include/common_cells/sync.sv
+../axi_lite_xbar/include/common_cells/stream_register.sv
+
+// =============================================================================
+// Section 4: AXI Infrastructure Modules (crossbar dependencies)
+// =============================================================================
+../axi_lite_xbar/include/axi/axi_err_slv.sv
+../axi_lite_xbar/include/axi/axi_atop_filter.sv
+../axi_lite_xbar/include/axi/axi_lite_to_axi.sv
+../axi_lite_xbar/include/axi/axi_lite_demux.sv
+../axi_lite_xbar/include/axi/axi_lite_mux.sv
+
+// =============================================================================
+// Section 5: AXI-Lite Crossbar
+// =============================================================================
+../axi_lite_xbar/axi_lite_xbar.sv
+
+// =============================================================================
+// Section 6: AXI-Lite → APB Bridge
+// =============================================================================
+../axi_lite_to_apb/axi_lite_to_apb.sv
+
+// =============================================================================
+// Section 7: APB I2C Master
+// NOTE: i2c_master_defines.sv is `included by apb_i2c.sv (resolved via +incdir)
+// =============================================================================
+../apb_i2c-master/i2c_master_bit_ctrl.sv
+../apb_i2c-master/i2c_master_byte_ctrl.sv
+../apb_i2c-master/apb_i2c.sv
+
+// =============================================================================
+// Section 8: APB Timer (used by both Timer 0 and Timer 1 instances)
+// =============================================================================
+../apb_timer-master/rtl/timer.sv
+../apb_timer-master/rtl/apb_timer.sv
+
+// =============================================================================
+// Section 9: APB UART
+// NOTE: The UART has a dependency chain:
+//   apb_uart → apb_uart_wrap → apb_to_obi → obi_uart
+//   OBI infrastructure and UART sub-modules are in SOC_FILES/include/obi/
+//   UART wrappers are in uart/rtl/
+// =============================================================================
+// OBI infrastructure (from SOC_FILES/include/obi/)
+../SOC_FILES/include/obi/apb_to_obi.sv
+
+// OBI UART core + sub-modules (from SOC_FILES/include/obi/)
+../SOC_FILES/include/obi/obi_uart_baudgen.sv
+../SOC_FILES/include/obi/obi_uart_rx.sv
+../SOC_FILES/include/obi/obi_uart_tx.sv
+../SOC_FILES/include/obi/obi_uart_interrupts.sv
+../SOC_FILES/include/obi/obi_uart_modem.sv
+../SOC_FILES/include/obi/obi_uart_register.sv
+../SOC_FILES/include/obi/obi_uart.sv
+
+// UART wrappers
+../apb_uart-main/rtl/apb_uart_wrap.sv
+../apb_uart-main/rtl/apb_uart.sv
+
+// =============================================================================
+// Section 10: GPIO
+// NOTE: gpio_apb_wrap depends on 'register_interface' package for:
+//   - apb_to_reg module
+//   - REG_BUS interface
+//   Obtain from https://github.com/pulp-platform/register_interface
+// =============================================================================
+// PULP register_interface (REG_BUS interface, apb_to_reg, prim_subreg*)
+../SOC_FILES/include/register_interface/reg_intf.sv
+../SOC_FILES/include/register_interface/apb_to_reg.sv
+../SOC_FILES/include/register_interface/prim_subreg_arb.sv
+../SOC_FILES/include/register_interface/prim_subreg.sv
+../SOC_FILES/include/register_interface/prim_subreg_ext.sv
+
+// NOTE: the _no_clk_gates variant declares the SAME module name
+// (gpio_input_stage) but drops the tc_clk_gating dependency, which no
+// technology cell library is bound in this flow to provide.
+../gpio-master/gpio_input_stage_no_clk_gates.sv
+../gpio-master/gpio_reg_top.sv
+../gpio-master/gpio.sv
+../gpio-master/gpio_apb_wrap.sv
+
+// =============================================================================
+// Section 11: APB SPI Master
+// =============================================================================
+../spi_master_ip/spi_master/spi_master_clkgen.sv
+../spi_master_ip/spi_master/spi_master_fifo.sv
+../spi_master_ip/spi_master/spi_master_rx.sv
+../spi_master_ip/spi_master/spi_master_tx.sv
+../spi_master_ip/spi_master/spi_master_controller.sv
+../spi_master_ip/spi_master/spi_master_apb_if.sv
+../spi_master_ip/spi_master/apb_spi_master.sv
+
+// =============================================================================
+// Section 12: SoC Internal Memory Modules
+// =============================================================================
+../SOC_SRC/sram_sp.sv
+../SOC_SRC/sram_mux.sv
+../SOC_SRC/axi_lite_sram_if.sv
+../instr_module/Instruction_Memory.v
+../SOC_SRC/imem_sram_wrapper.sv
+../SOC_SRC/boot_rom.sv
+../SOC_SRC/instr_fetch_demux.sv
+
+// =============================================================================
+// Section 13: RISC-V Core (RV32IM, 5-stage) + Bootloader
+// =============================================================================
+// NOTE: ../riscv_core/rtl/axi_pkg.sv is deliberately NOT listed. It is a
+//       copy of the common_cells axi_pkg compiled in Section 2 and declares the
+//       same package name; compiling both is a duplicate-package error. It
+//       exists so the core can be simulated standalone, outside this filelist.
+
+// Leaf / combinational blocks
+../riscv_core/rtl/PC.v
+../riscv_core/rtl/PC_Adder.v
+../riscv_core/rtl/Mux2.v
+../riscv_core/rtl/Mux_3_by_1.v
+../riscv_core/rtl/ALU.v
+../riscv_core/rtl/ALU_Decoder.v
+../riscv_core/rtl/Main_Decoder.v
+../riscv_core/rtl/Control_Unit_Top.v
+../riscv_core/rtl/Sign_Extend.v
+../riscv_core/rtl/Register_File.v
+../riscv_core/rtl/JB_unit.v
+../riscv_core/rtl/opcode_check.v
+
+// M-extension (multiply / divide)
+../riscv_core/rtl/booth_enc.v
+../riscv_core/rtl/csa.v
+../riscv_core/rtl/pp_gen.v
+../riscv_core/rtl/rv32m_mul.v
+../riscv_core/rtl/rv32m_div.v
+../riscv_core/rtl/rv32m_unit.v
+
+// CSR / trap / hazard control
+../riscv_core/rtl/csr_regfile.v
+../riscv_core/rtl/wb_trap_mret_commit_controller.v
+../riscv_core/rtl/hazard_unit.v
+
+// Memory-side helpers (instantiated inside the pipeline stages)
+../riscv_core/rtl/imem_controller.v
+../riscv_core/rtl/ls_unit.v
+
+// Pipeline stages
+../riscv_core/rtl/fetch_cycle.v
+../riscv_core/rtl/decode_cycle.v
+../riscv_core/rtl/execute_cycle.v
+../riscv_core/rtl/memory_cycle.v
+../riscv_core/rtl/writeback_cycle.v
+
+// Core top
+../riscv_core/rtl/top.v
+
+// Data-memory router (DSRAM direct / MMIO over AXI-Lite)
+../riscv_core/rtl/hybrid_mem_interface.sv
+
+// Bootloader
+../bootloader/bootloader.sv
+
+// =============================================================================
+// Section 14: SoC Subsystem Top-Level
+// =============================================================================
+../SOC_SRC/riscforge_soc_subsystem.sv
+
+// =============================================================================
+// Section 15: SPI Flash Model (Infineon S25FS512S - vendor behavioural model)
+// =============================================================================
+// Preloaded via its mem_file_name parameter from the testbench; see
+// ../mem_files/gen_flash_image.py for how that image is produced.
+../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
+
+// =============================================================================
+// Section 16: Testbench
+// =============================================================================
+soc_timer0_boot_run_tb.sv
+
+

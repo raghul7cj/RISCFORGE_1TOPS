@@ -1,0 +1,31 @@
+{
+  "investigation_id": "UART_DELTA_CYCLE_ISOLATION_20261024",
+  "date": "2026-10-24",
+  "author": "Antigravity & Engineer",
+  "tool": {
+    "simulator": "AMD Vivado XSim",
+    "version": "2022.2 (64-bit)",
+    "os": "Windows 10/11"
+  },
+  "target_components": [
+    "ips/SOC_FILES/include/obi/apb_to_obi.sv",
+    "ips/apb_uart-main/include/obi/apb_to_obi.sv",
+    "ips/apb_uart-main/rtl/tb_apb_uart_thorough.sv"
+  ],
+  "files": {
+    "test_adapter.sv": "1dbee791a5cfcf7a253c509847d60791ecc371a7ec3b4a90ad81f65b7f4fcaa5",
+    "apb_to_obi_fix.sv": "91ed8d6e6db9542df29ee4d95a9309890c2656b58c6f3d6e377144e0920930f1",
+    "tb_uart_thorough_xsim_pass.log": "12bef61fdf566b571dbba1a605203e1e1baff82a408261e7d05c18135504ccd9",
+    "xvlog_test.f": "3be0ee8bffd51962c3d914b00f2118c755abcb69e9f2135de5bb5b4c37538b99"
+  },
+  "commands": {
+    "reproducer_compile": "xvlog -sv -f xvlog_test.f",
+    "reproducer_elab": "xelab tb_apb_uart_thorough -s sim_uart_thorough -timescale 1ns/1ps",
+    "reproducer_sim": "xsim sim_uart_thorough -R"
+  },
+  "result": {
+    "reproducer_orig": "Stalls at 60 ns (delta cycle loop between Always111_2 and Always13_1)",
+    "reproducer_fixed": "Completes in 81 ns in <1s",
+    "tb_apb_uart_thorough_fixed": "69 PASSED / 0 FAILED across 30 testcases at 127946 ns"
+  }
+}

@@ -1,0 +1,2734 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Xcrg Code Coverage Report - File</title>	
+<link type="text/css" rel="stylesheet" href="cssCodeCov/file.css">
+
+<!--script type="text/javascript" src=".js/.stickyheader.js"></script-->  
+
+</head>
+
+
+<body>
+
+<div class='header'>
+<a  class='logo'>  </a>
+<div class='header-right'>
+<a href='dashboard.html'>Dashboard</a>
+<a href='files.html'>Files</a>
+<a href='modules.html'>Modules</a>
+</div>
+</div>
+<br clear=all>
+
+<div class=fader>
+
+<div class = fileHTMLlayout>
+
+<div class='fileSummary'>
+<font size='2' face='verdana' padding-left:'2px'><b> File Summary of C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tb_irq_restructure.sv </b></font>
+<br clear=all>
+<br clear=all>
+<font face='arial' color=black style='font-size: 12px'>
+<table class='fileSummaryTable'>
+<tr>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='50px'> File ID </td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='60px'> Modules Count </td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='100px'> Total Instances Count </td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='80px'> Total Lines</td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='80px'> Total Statements</td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='80px'> Statement Coverage Score</td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='70px'> Show Statement Coverage </td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='80px'> Branch Coverage Score</td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='70px'> Show Branch Coverage </td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='80px'> Condition Coverage Score</td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='70px'> Show Condition Coverage </td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='80px'> Toggle Coverage Score</td>
+<td class='fileSummaryTable' bgcolor='#BCC7CC' width='70px'> Show Toggle Coverage </td>
+</tr>
+<tr>
+<td class='fileSummaryTable'>1</td>
+<td class='fileSummaryTable'>1</td>
+<td class='fileSummaryTable'>1</td>
+<td class='fileSummaryTable'>222</td>
+<td class='fileSummaryTable'>596</td>
+<td class='fileSummaryTable'>99.1611</td>
+<td class='fileSummaryTable' bgcolor='#FFFFFF' align='center'>
+<label class = 'fileLineCovContainer'>
+<input type='checkbox' id='checkbox_file_linecov' onclick="checkdisplay('checkbox_file_linecov', 'file_linecov');
+openFileContent('button_file_linecov');">
+<span class='fileLineCovCheckmark'> </span> </label>
+</td>
+<td class='fileSummaryTable'>68.9394</td>
+<td class='fileSummaryTable' bgcolor='#FFFFFF' align='center'>
+<label class = 'fileBranchCovContainer'>
+<input type='checkbox' id='checkbox_file_branchcov' onclick="checkdisplay('checkbox_file_branchcov', 'file_branchcov');
+openFileContent('button_file_branchcov');">
+<span class='fileBranchCovCheckmark'> </span> </label>
+</td>
+<td class='fileSummaryTable'>71.875</td>
+<td class='fileSummaryTable' bgcolor='#FFFFFF' align='center'>
+<label class = 'fileCondCovContainer'>
+<input type='checkbox' id='checkbox_file_condcov' onclick="checkdisplay('checkbox_file_condcov', 'file_condcov');
+openFileContent('button_file_condcov');">
+<span class='fileCondCovCheckmark'> </span> </label>
+</td>
+<td class='fileSummaryTable'>18.2</td>
+<td class='fileSummaryTable' bgcolor='#FFFFFF' align='center'>
+<label class = 'fileToggleCovContainer'>
+<input type='checkbox' id='checkbox_file_togglecov' onclick="checkdisplay('checkbox_file_togglecov', 'file_togglecov');
+openFileContent('button_file_togglecov');">
+<span class='fileToggleCovCheckmark'> </span> </label>
+</td>
+</tr>
+</table>
+</font>
+</div>
+<hr>
+<div class ='linesSection' style='padding-left:20px; padding-right:20px;'>
+<font face='arial' color=black style='font-size: 14px'>
+<div style='display:none' id='file_linecov'>
+<button class='fileCollapsible' id='button_file_linecov'> <font size='4' color=#009933> &#9776; </font>
+ Statement Coverage of File 1 : C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tb_irq_restructure.sv</button> 
+<div class='fileContent'>
+<br clear=all>
+<font size='2' face='arial' style='padding-left:6px'> Statement Coverage Summary for File : C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/tb_irq_restructure.sv</font>
+<br clear=all>
+<table class='fileScoreTable'>
+<tr>
+<th class='fileScoreTable' bgcolor='#DEE8EE'> Total Statements </th>
+<th class='fileScoreTable' bgcolor='#DEE8EE'> Covered Statements </th>
+<th class='fileScoreTable' bgcolor='#DEE8EE'> Uncovered Statements </th>
+<th class='fileScoreTable' bgcolor='#DEE8EE'> Statement Coverage Score </th>
+</tr>
+<tr>
+<td class='fileScoreTable'>596</td>
+<td class='fileScoreTable' bgcolor='#FFFFC2'>591</td>
+<td class='fileScoreTable' bgcolor='#FFD2D2'>5</td>
+<td class='fileScoreTable' bgcolor='#98FF98'>99.1611</td>
+</tr>
+</table>
+<br clear=all>
+<div class='lineCoverageTable'>
+<table class='lineTable'>
+<tr>
+<th class='lineTable' style='background-color:#ccffff; line-height:0;' width='80px'> LineNumber </th>
+<th class='lineTable' style='background-color:#FFEB99; line-height:0;'> LineContent </th>
+<th class='lineTable' style='background-color:#80FFBF; line-height:1;' width='140px'> Execution Count </th>
+<th class='lineTable' style='background-color:#FFE6E6; line-height:1;' width='140px'> Num Of Statements </th>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>1</td>
+<td class='lineTable'> <pre class='codegrey'>`timescale 1ns/1ps</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>2</td>
+<td class='lineTable'> <pre class='codegrey'>// Focused block-level checks for the 13-source IRQ interface. This does not</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>3</td>
+<td class='lineTable'> <pre class='codegrey'>// replace instruction-pipeline, firmware, or peripheral integration tests.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>4</td>
+<td class='lineTable'> <pre class='codegrey'>module tb_irq_restructure;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>5</td>
+<td class='lineTable'> <pre class='codegrey'>  reg clk = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>6</td>
+<td class='lineTable'> <pre class='codegreen'>  always #5 clk = ~clk;</pre> </td>
+<td class='lineTable'>80237</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>7</td>
+<td class='lineTable'> <pre class='codegrey'>  reg rst_n = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>8</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [12:0] raw = 0, clear = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>9</td>
+<td class='lineTable'> <pre class='codegrey'>  wire [12:0] pending;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>10</td>
+<td class='lineTable'> <pre class='codegrey'>  irq_gateway gw (.clk_i(clk), .rst_ni(rst_n), .irq_raw_i(raw),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>11</td>
+<td class='lineTable'> <pre class='codegrey'>    .edge_mode_i(13'h002), .event_mode_i(13'h1fe9), .clear_i(clear), .pend_o(pending));</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>12</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>13</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [12:0] arb_pending = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>14</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [31:0] mie = 32'hffff_ffff;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>15</td>
+<td class='lineTable'> <pre class='codegrey'>  reg global_mie = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>16</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [1:0] threshold = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>17</td>
+<td class='lineTable'> <pre class='codegrey'>  reg commit = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>18</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [4:0] committed_id = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>19</td>
+<td class='lineTable'> <pre class='codegrey'>  wire irq_valid;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>20</td>
+<td class='lineTable'> <pre class='codegrey'>  wire [4:0] irq_id;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>21</td>
+<td class='lineTable'> <pre class='codegrey'>  wire [1:0] irq_class;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>22</td>
+<td class='lineTable'> <pre class='codegrey'>  irq_arbiter arb (.clk_i(clk), .rst_ni(rst_n), .pend_i(arb_pending),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>23</td>
+<td class='lineTable'> <pre class='codegrey'>    .mie_i(mie), .mstatus_mie_i(global_mie), .mintprio_i(threshold),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>24</td>
+<td class='lineTable'> <pre class='codegrey'>    .wb_commit_i(commit), .wb_trap_cause_i(committed_id),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>25</td>
+<td class='lineTable'> <pre class='codegrey'>    .irq_pending_o(irq_valid), .irq_id_o(irq_id), .irq_class_o(irq_class));</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>26</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>27</td>
+<td class='lineTable'> <pre class='codegrey'>  reg wb_valid = 0, wb_exc_valid = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>28</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [5:0] wb_cause = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>29</td>
+<td class='lineTable'> <pre class='codegrey'>  wire [12:0] wb_clear;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>30</td>
+<td class='lineTable'> <pre class='codegrey'>  wire wb_irq;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>31</td>
+<td class='lineTable'> <pre class='codegrey'>  wb_trap_mret_commit_controller wb (.valid_W(wb_valid),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>32</td>
+<td class='lineTable'> <pre class='codegrey'>    .exc_valid_W(wb_exc_valid), .exc_cause_W(wb_cause), .exc_class_W(2'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>33</td>
+<td class='lineTable'> <pre class='codegrey'>    .exc_tval_W(32'b0), .exc_pc_W(32'b0), .is_mret_W(1'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>34</td>
+<td class='lineTable'> <pre class='codegrey'>    .mtvec_i(32'b0), .mepc_i(32'b0), .mstatus_i(32'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>35</td>
+<td class='lineTable'> <pre class='codegrey'>    .clear_gateway_o(wb_clear), .wb_commit_irq_o(wb_irq));</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>36</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>37</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [11:0] csr_addr = 0, csr_write_addr = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>38</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [31:0] csr_write_data = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>39</td>
+<td class='lineTable'> <pre class='codegrey'>  reg csr_write = 0, csr_trap = 0, csr_mret = 0;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>40</td>
+<td class='lineTable'> <pre class='codegrey'>  wire [31:0] csr_read, csr_mip, csr_mie;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>41</td>
+<td class='lineTable'> <pre class='codegrey'>  wire [1:0] csr_threshold;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>42</td>
+<td class='lineTable'> <pre class='codegrey'>  csr_regfile csr (.clk_i(clk), .rst_n_i(rst_n), .csr_raddr_i(csr_addr),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>43</td>
+<td class='lineTable'> <pre class='codegrey'>    .csr_rdata_o(csr_read), .csr_waddr_normal_i(csr_write_addr),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>44</td>
+<td class='lineTable'> <pre class='codegrey'>    .csr_wdata_normal_i(csr_write_data), .csr_write_en_normal_i(csr_write),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>45</td>
+<td class='lineTable'> <pre class='codegrey'>    .csr_waddr_mret_i(12'b0), .csr_wdata_mret_i(32'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>46</td>
+<td class='lineTable'> <pre class='codegrey'>    .csr_write_en_mret_i(1'b0), .mret_commit_i(csr_mret), .trap_valid_i(csr_trap),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>47</td>
+<td class='lineTable'> <pre class='codegrey'>    .trap_cause_i(31'b0), .trap_pc_i(32'b0), .trap_addr_i(32'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>48</td>
+<td class='lineTable'> <pre class='codegrey'>    .trap_addr_valid_i(1'b0), .trap_is_interrupt_i(1'b0), .instr_retired_i(1'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>49</td>
+<td class='lineTable'> <pre class='codegrey'>    .timer_intr_i(pending[0]), .ext_intr_i(1'b0), .msft_intr_i(1'b0),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>50</td>
+<td class='lineTable'> <pre class='codegrey'>    .fast_intr_i({4'b0,pending[12:1]}), .mip_out_o(csr_mip),</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>51</td>
+<td class='lineTable'> <pre class='codegrey'>    .mie_out_o(csr_mie), .mintprio_out_o(csr_threshold));</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>52</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>53</td>
+<td class='lineTable'> <pre class='codegrey'>  integer fixed_order [0:7];</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>54</td>
+<td class='lineTable'> <pre class='codegrey'>  integer stream_order [0:2];</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>55</td>
+<td class='lineTable'> <pre class='codegrey'>  integer i, j, v, t, ptr, bgptr, expected_id, expected_class, idx, snapshots;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>56</td>
+<td class='lineTable'> <pre class='codegrey'>  integer en, glob, operation, next_id, upper_pattern, pair_bin, mask_value;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>57</td>
+<td class='lineTable'> <pre class='codegrey'>  reg [31:0] csr_test_data;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>58</td>
+<td class='lineTable'> <pre class='codegrey'>  reg found;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>59</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>60</td>
+<td class='lineTable'> <pre class='codegrey'>  // Samples are taken only after the corresponding expected behavior is checked.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>61</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup eligibility_cg with function sample(int source, int prio, bit en, bit global_en);</pre> </td>
+<td class='lineTable'>2719</td>
+<td class='lineTable'>27</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>62</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>63</td>
+<td class='lineTable'> <pre class='codegrey'>    source_cp: coverpoint source { bins sources[] = {[0:12]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>64</td>
+<td class='lineTable'> <pre class='codegrey'>    threshold_cp: coverpoint prio { bins levels[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>65</td>
+<td class='lineTable'> <pre class='codegrey'>    enable_cp: coverpoint en { bins disabled = {0}; bins enabled = {1}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>66</td>
+<td class='lineTable'> <pre class='codegrey'>    global_cp: coverpoint global_en { bins disabled = {0}; bins enabled = {1}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>67</td>
+<td class='lineTable'> <pre class='codegrey'>    source_gates: cross source_cp, threshold_cp, enable_cp, global_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>68</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>69</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>70</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup rr_cg with function sample(int which, int event_kind);</pre> </td>
+<td class='lineTable'>144</td>
+<td class='lineTable'>17</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>71</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>72</td>
+<td class='lineTable'> <pre class='codegrey'>    // 0..2: class-1 winner 19/18/27; 3..4: class-0 winner 17/16.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>73</td>
+<td class='lineTable'> <pre class='codegrey'>    winner_cp: coverpoint which { bins winners[] = {[0:4]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>74</td>
+<td class='lineTable'> <pre class='codegrey'>    // 0 = matching commit, 1 = no commit, 2 = other-class commit.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>75</td>
+<td class='lineTable'> <pre class='codegrey'>    operation_cp: coverpoint event_kind { bins operations[] = {[0:2]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>76</td>
+<td class='lineTable'> <pre class='codegrey'>    winner_operation: cross winner_cp, operation_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>77</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>78</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>79</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup stream_choice_cg with function sample(int pointer, int mask);</pre> </td>
+<td class='lineTable'>441</td>
+<td class='lineTable'>17</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>80</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>81</td>
+<td class='lineTable'> <pre class='codegrey'>    pointer_cp: coverpoint pointer { bins values[] = {[0:2]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>82</td>
+<td class='lineTable'> <pre class='codegrey'>    mask_cp: coverpoint mask { bins values[] = {[0:7]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>83</td>
+<td class='lineTable'> <pre class='codegrey'>    choices: cross pointer_cp, mask_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>84</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>85</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>86</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup background_choice_cg with function sample(int pointer, int mask);</pre> </td>
+<td class='lineTable'>225</td>
+<td class='lineTable'>17</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>87</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>88</td>
+<td class='lineTable'> <pre class='codegrey'>    pointer_cp: coverpoint pointer { bins values[] = {[0:1]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>89</td>
+<td class='lineTable'> <pre class='codegrey'>    mask_cp: coverpoint mask { bins values[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>90</td>
+<td class='lineTable'> <pre class='codegrey'>    choices: cross pointer_cp, mask_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>91</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>92</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>93</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup fixed_pair_cg with function sample(int pair_index);</pre> </td>
+<td class='lineTable'>173</td>
+<td class='lineTable'>10</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>94</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>95</td>
+<td class='lineTable'> <pre class='codegrey'>    pair_cp: coverpoint pair_index { bins pairs[] = {[0:27]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>96</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>97</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>98</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup event_gateway_cg with function sample(int source, int scenario);</pre> </td>
+<td class='lineTable'>369</td>
+<td class='lineTable'>17</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>99</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>100</td>
+<td class='lineTable'> <pre class='codegrey'>    source_cp: coverpoint source { bins events[] = {0,3,[5:12]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>101</td>
+<td class='lineTable'> <pre class='codegrey'>    scenario_cp: coverpoint scenario { bins cases[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>102</td>
+<td class='lineTable'> <pre class='codegrey'>    source_scenario: cross source_cp, scenario_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>103</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>104</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>105</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup gpio_gateway_cg with function sample(int scenario);</pre> </td>
+<td class='lineTable'>29</td>
+<td class='lineTable'>10</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>106</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>107</td>
+<td class='lineTable'> <pre class='codegrey'>    scenario_cp: coverpoint scenario { bins cases[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>108</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>109</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>110</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup level_gateway_cg with function sample(int source, int scenario);</pre> </td>
+<td class='lineTable'>63</td>
+<td class='lineTable'>17</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>111</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>112</td>
+<td class='lineTable'> <pre class='codegrey'>    source_cp: coverpoint source { bins levels[] = {2,4}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>113</td>
+<td class='lineTable'> <pre class='codegrey'>    scenario_cp: coverpoint scenario { bins cases[] = {[0:2]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>114</td>
+<td class='lineTable'> <pre class='codegrey'>    source_scenario: cross source_cp, scenario_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>115</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>116</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>117</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup csr_cg with function sample(int old_value, int new_value, int upper_pattern);</pre> </td>
+<td class='lineTable'>189</td>
+<td class='lineTable'>23</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>118</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>119</td>
+<td class='lineTable'> <pre class='codegrey'>    old_cp: coverpoint old_value { bins values[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>120</td>
+<td class='lineTable'> <pre class='codegrey'>    new_cp: coverpoint new_value { bins values[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>121</td>
+<td class='lineTable'> <pre class='codegrey'>    upper_cp: coverpoint upper_pattern { bins zero = {0}; bins mixed = {1}; bins ones = {2}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>122</td>
+<td class='lineTable'> <pre class='codegrey'>    transitions: cross old_cp, new_cp;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>123</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>124</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>125</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup commit_cg with function sample(int source);</pre> </td>
+<td class='lineTable'>83</td>
+<td class='lineTable'>10</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>126</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>127</td>
+<td class='lineTable'> <pre class='codegrey'>    source_cp: coverpoint source { bins sources[] = {[0:12]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>128</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>129</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>130</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup commit_control_cg with function sample(int scenario);</pre> </td>
+<td class='lineTable'>29</td>
+<td class='lineTable'>10</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>131</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>132</td>
+<td class='lineTable'> <pre class='codegrey'>    // No valid packet, no exception, synchronous exception, unsupported IRQ.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>133</td>
+<td class='lineTable'> <pre class='codegrey'>    scenario_cp: coverpoint scenario { bins cases[] = {[0:3]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>134</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>135</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>136</td>
+<td class='lineTable'> <pre class='codegreen'>  covergroup csr_control_cg with function sample(int scenario);</pre> </td>
+<td class='lineTable'>23</td>
+<td class='lineTable'>10</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>137</td>
+<td class='lineTable'> <pre class='codegrey'>    option.per_instance = 1;</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>138</td>
+<td class='lineTable'> <pre class='codegrey'>    // Reset, trap-priority write suppression, MRET-priority write suppression.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>139</td>
+<td class='lineTable'> <pre class='codegrey'>    scenario_cp: coverpoint scenario { bins cases[] = {[0:2]}; }</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>140</td>
+<td class='lineTable'> <pre class='codegrey'>  endgroup</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>141</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>142</td>
+<td class='lineTable'> <pre class='codegrey'>  eligibility_cg eligibility_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>143</td>
+<td class='lineTable'> <pre class='codegrey'>  rr_cg rr_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>144</td>
+<td class='lineTable'> <pre class='codegrey'>  stream_choice_cg stream_choice_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>145</td>
+<td class='lineTable'> <pre class='codegrey'>  background_choice_cg background_choice_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>146</td>
+<td class='lineTable'> <pre class='codegrey'>  fixed_pair_cg fixed_pair_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>147</td>
+<td class='lineTable'> <pre class='codegrey'>  event_gateway_cg event_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>148</td>
+<td class='lineTable'> <pre class='codegrey'>  gpio_gateway_cg gpio_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>149</td>
+<td class='lineTable'> <pre class='codegrey'>  level_gateway_cg level_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>150</td>
+<td class='lineTable'> <pre class='codegrey'>  csr_cg csr_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>151</td>
+<td class='lineTable'> <pre class='codegrey'>  commit_cg commit_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>152</td>
+<td class='lineTable'> <pre class='codegrey'>  commit_control_cg commit_control_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>153</td>
+<td class='lineTable'> <pre class='codegrey'>  csr_control_cg csr_control_cov = new();</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>154</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>155</td>
+<td class='lineTable'> <pre class='codegrey'>  function automatic integer bit_for_id(input integer id);</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>156</td>
+<td class='lineTable'> <pre class='codegreen'>    if (id == 7) bit_for_id = 0;</pre> </td>
+<td class='lineTable'>589695</td>
+<td class='lineTable'>6</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>157</td>
+<td class='lineTable'> <pre class='codegreen'>    else bit_for_id = id - 15;</pre> </td>
+<td class='lineTable'>196465</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>158</td>
+<td class='lineTable'> <pre class='codegrey'>  endfunction</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>159</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>160</td>
+<td class='lineTable'> <pre class='codegrey'>  task automatic write_csr(input [11:0] addr, input [31:0] data);</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>161</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); csr_write_addr = addr; csr_write_data = data; csr_write = 1;</pre> </td>
+<td class='lineTable'>102</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>162</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); csr_write = 0;</pre> </td>
+<td class='lineTable'>34</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>163</td>
+<td class='lineTable'> <pre class='codegrey'>  endtask</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>164</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>165</td>
+<td class='lineTable'> <pre class='codegrey'>  task automatic set_stream_ptr(input integer p);</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>166</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); commit = 1;</pre> </td>
+<td class='lineTable'>9</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>167</td>
+<td class='lineTable'> <pre class='codegreen'>    case (p)</pre> </td>
+<td class='lineTable'>9</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>168</td>
+<td class='lineTable'> <pre class='codegreen'>      0: committed_id = 27;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>169</td>
+<td class='lineTable'> <pre class='codegreen'>      1: committed_id = 19;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>170</td>
+<td class='lineTable'> <pre class='codegreen'>      2: committed_id = 18;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>171</td>
+<td class='lineTable'> <pre class='codegrey'>    endcase</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>172</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); commit = 0;</pre> </td>
+<td class='lineTable'>9</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>173</td>
+<td class='lineTable'> <pre class='codegrey'>  endtask</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>174</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>175</td>
+<td class='lineTable'> <pre class='codegrey'>  task automatic set_background_ptr(input integer p);</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>176</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); commit = 1; committed_id = p ? 17 : 16;</pre> </td>
+<td class='lineTable'>8</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>177</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); commit = 0;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>178</td>
+<td class='lineTable'> <pre class='codegrey'>  endtask</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>179</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>180</td>
+<td class='lineTable'> <pre class='codegrey'>  initial begin</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>181</td>
+<td class='lineTable'> <pre class='codegreen'>    fixed_order[0]=7; fixed_order[1]=22; fixed_order[2]=24; fixed_order[3]=26;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>182</td>
+<td class='lineTable'> <pre class='codegreen'>    fixed_order[4]=20; fixed_order[5]=21; fixed_order[6]=23; fixed_order[7]=25;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>183</td>
+<td class='lineTable'> <pre class='codegreen'>    stream_order[0]=19; stream_order[1]=18; stream_order[2]=27;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>184</td>
+<td class='lineTable'> <pre class='codegreen'>    repeat (2) @(negedge clk); rst_n = 1;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>185</td>
+<td class='lineTable'> <pre class='codegreen'>    #1; if (csr_threshold !== 0 || csr_mie !== 0 || pending !== 0)</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverRed'>
+<td class='lineTable'>186</td>
+<td class='lineTable'> <pre class='codered'>      $fatal(1,"reset state mismatch");</pre> </td>
+<td class='lineTable'> 0 </td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>187</td>
+<td class='lineTable'> <pre class='codegreen'>    csr_control_cov.sample(0);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>188</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>189</td>
+<td class='lineTable'> <pre class='codegrey'>    // Exhaustive request vectors at all thresholds and both RR pointer states.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>190</td>
+<td class='lineTable'> <pre class='codegreen'>    snapshots = 0;</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>191</td>
+<td class='lineTable'> <pre class='codegreen'>    for (bgptr=0; bgptr&lt2; bgptr=bgptr+1) begin</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>192</td>
+<td class='lineTable'> <pre class='codegreen'>    set_background_ptr(bgptr);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>193</td>
+<td class='lineTable'> <pre class='codegreen'>    for (ptr=0; ptr&lt3; ptr=ptr+1) begin</pre> </td>
+<td class='lineTable'>6</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>194</td>
+<td class='lineTable'> <pre class='codegreen'>      set_stream_ptr(ptr);</pre> </td>
+<td class='lineTable'>6</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>195</td>
+<td class='lineTable'> <pre class='codegreen'>      for (v=0; v&lt8192; v=v+1) begin</pre> </td>
+<td class='lineTable'>49152</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>196</td>
+<td class='lineTable'> <pre class='codegreen'>        arb_pending = v;</pre> </td>
+<td class='lineTable'>49152</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>197</td>
+<td class='lineTable'> <pre class='codegreen'>        for (t=0; t&lt4; t=t+1) begin</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>198</td>
+<td class='lineTable'> <pre class='codegreen'>          threshold = t; #1;</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>199</td>
+<td class='lineTable'> <pre class='codegreen'>          found=0; expected_id=0; expected_class=0;</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>200</td>
+<td class='lineTable'> <pre class='codegreen'>          for (j=0; j&lt8; j=j+1)</pre> </td>
+<td class='lineTable'>1572864</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>201</td>
+<td class='lineTable'> <pre class='codegreen'>            if (!found && arb_pending[bit_for_id(fixed_order[j])]) begin</pre> </td>
+<td class='lineTable'>1572864</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>202</td>
+<td class='lineTable'> <pre class='codegreen'>              found=1; expected_id=fixed_order[j]; expected_class=2;</pre> </td>
+<td class='lineTable'>195840</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>203</td>
+<td class='lineTable'> <pre class='codegrey'>            end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>204</td>
+<td class='lineTable'> <pre class='codegreen'>          for (j=0; j&lt3; j=j+1) begin</pre> </td>
+<td class='lineTable'>589824</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>205</td>
+<td class='lineTable'> <pre class='codegreen'>            idx=(ptr+j)%3;</pre> </td>
+<td class='lineTable'>589824</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>206</td>
+<td class='lineTable'> <pre class='codegreen'>            if (!found && arb_pending[bit_for_id(stream_order[idx])]) begin</pre> </td>
+<td class='lineTable'>589824</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>207</td>
+<td class='lineTable'> <pre class='codegreen'>              found=1; expected_id=stream_order[idx]; expected_class=1;</pre> </td>
+<td class='lineTable'>672</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>208</td>
+<td class='lineTable'> <pre class='codegrey'>            end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>209</td>
+<td class='lineTable'> <pre class='codegrey'>          end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>210</td>
+<td class='lineTable'> <pre class='codegreen'>          if (!found && arb_pending[bgptr ? 1 : 2]) begin</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>211</td>
+<td class='lineTable'> <pre class='codegreen'>            found=1; expected_id=bgptr ? 16 : 17; expected_class=0;</pre> </td>
+<td class='lineTable'>48</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>212</td>
+<td class='lineTable'> <pre class='codegrey'>          end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>213</td>
+<td class='lineTable'> <pre class='codegreen'>          if (!found && arb_pending[bgptr ? 2 : 1]) begin</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>214</td>
+<td class='lineTable'> <pre class='codegreen'>            found=1; expected_id=bgptr ? 17 : 16; expected_class=0;</pre> </td>
+<td class='lineTable'>24</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>215</td>
+<td class='lineTable'> <pre class='codegrey'>          end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>216</td>
+<td class='lineTable'> <pre class='codegreen'>          if (irq_valid !== (found && expected_class+1 &gt t) ||</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>217</td>
+<td class='lineTable'> <pre class='codegrey'>              (irq_valid && (irq_id !== expected_id || irq_class !== expected_class)))</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverRed'>
+<td class='lineTable'>218</td>
+<td class='lineTable'> <pre class='codered'>            $fatal(1,"arbiter mismatch vector=%h ptr=%0d threshold=%0d got=%b/%0d/%0d expected=%0d/%0d/%0d",</pre> </td>
+<td class='lineTable'> 0 </td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>219</td>
+<td class='lineTable'> <pre class='codegrey'>              arb_pending,ptr,t,irq_valid,irq_id,irq_class,found && expected_class+1 &gt t,expected_id,expected_class);</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>220</td>
+<td class='lineTable'> <pre class='codegreen'>          if (t==0 && (arb_pending & ~13'h1018)==0) begin</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>221</td>
+<td class='lineTable'> <pre class='codegreen'>            mask_value={arb_pending[12],arb_pending[3],arb_pending[4]};</pre> </td>
+<td class='lineTable'>48</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>222</td>
+<td class='lineTable'> <pre class='codegreen'>            stream_choice_cov.sample(ptr,mask_value);</pre> </td>
+<td class='lineTable'>48</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>223</td>
+<td class='lineTable'> <pre class='codegrey'>          end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>224</td>
+<td class='lineTable'> <pre class='codegreen'>          if (t==0 && (arb_pending & ~13'h0006)==0)</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>225</td>
+<td class='lineTable'> <pre class='codegreen'>            background_choice_cov.sample(bgptr,arb_pending[2:1]);</pre> </td>
+<td class='lineTable'>24</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>226</td>
+<td class='lineTable'> <pre class='codegreen'>          snapshots=snapshots+1;</pre> </td>
+<td class='lineTable'>196608</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>227</td>
+<td class='lineTable'> <pre class='codegrey'>        end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>228</td>
+<td class='lineTable'> <pre class='codegrey'>      end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>229</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>230</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>231</td>
+<td class='lineTable'> <pre class='codegreen'>    arb_pending=13'h1fff; threshold=0; mie=0; #1;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>232</td>
+<td class='lineTable'> <pre class='codegreen'>    if (irq_valid) $fatal(1,"mie mask did not block interrupt");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>233</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt13; i=i+1) begin</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>234</td>
+<td class='lineTable'> <pre class='codegreen'>      expected_id = (i == 0) ? 7 : i+15;</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>235</td>
+<td class='lineTable'> <pre class='codegreen'>      mie=32'b1 &lt&lt expected_id; #1;</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>236</td>
+<td class='lineTable'> <pre class='codegreen'>      if (!irq_valid || irq_id != expected_id)</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverRed'>
+<td class='lineTable'>237</td>
+<td class='lineTable'> <pre class='codered'>        $fatal(1,"individual mie mask mismatch cause=%0d",expected_id);</pre> </td>
+<td class='lineTable'> 0 </td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>238</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>239</td>
+<td class='lineTable'> <pre class='codegreen'>    global_mie=0; #1; if (irq_valid) $fatal(1,"global MIE did not block interrupt");</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>240</td>
+<td class='lineTable'> <pre class='codegreen'>    global_mie=1;</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>241</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>242</td>
+<td class='lineTable'> <pre class='codegrey'>    // Every pair of fixed-priority sources: compare wins over the later entry.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>243</td>
+<td class='lineTable'> <pre class='codegreen'>    pair_bin=0; threshold=0; mie=32'hffff_ffff;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>244</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt8; i=i+1)</pre> </td>
+<td class='lineTable'>8</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>245</td>
+<td class='lineTable'> <pre class='codegreen'>      for (j=i+1; j&lt8; j=j+1) begin</pre> </td>
+<td class='lineTable'>28</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>246</td>
+<td class='lineTable'> <pre class='codegreen'>        arb_pending=(13'b1 &lt&lt bit_for_id(fixed_order[i])) |</pre> </td>
+<td class='lineTable'>28</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>247</td>
+<td class='lineTable'> <pre class='codegreen'>                    (13'b1 &lt&lt bit_for_id(fixed_order[j])); #1;</pre> </td>
+<td class='lineTable'>28</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>248</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!irq_valid || irq_id != fixed_order[i]) $fatal(1,"fixed pair mismatch");</pre> </td>
+<td class='lineTable'>28</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>249</td>
+<td class='lineTable'> <pre class='codegreen'>        fixed_pair_cov.sample(pair_bin); pair_bin=pair_bin+1;</pre> </td>
+<td class='lineTable'>28</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>250</td>
+<td class='lineTable'> <pre class='codegrey'>      end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>251</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>252</td>
+<td class='lineTable'> <pre class='codegrey'>    // Single-source eligibility: all source/threshold/mie/MIE combinations.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>253</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt13; i=i+1) begin</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>254</td>
+<td class='lineTable'> <pre class='codegreen'>      expected_id=(i==0) ? 7 : i+15;</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>255</td>
+<td class='lineTable'> <pre class='codegreen'>      expected_class=(i==1 || i==2) ? 0 : ((i==3 || i==4 || i==12) ? 1 : 2);</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>256</td>
+<td class='lineTable'> <pre class='codegreen'>      arb_pending=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>257</td>
+<td class='lineTable'> <pre class='codegreen'>      for (t=0; t&lt4; t=t+1)</pre> </td>
+<td class='lineTable'>52</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>258</td>
+<td class='lineTable'> <pre class='codegreen'>        for (en=0; en&lt2; en=en+1)</pre> </td>
+<td class='lineTable'>104</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>259</td>
+<td class='lineTable'> <pre class='codegreen'>          for (glob=0; glob&lt2; glob=glob+1) begin</pre> </td>
+<td class='lineTable'>208</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>260</td>
+<td class='lineTable'> <pre class='codegreen'>            threshold=t; mie=en ? (32'b1 &lt&lt expected_id) : 0; global_mie=glob; #1;</pre> </td>
+<td class='lineTable'>208</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>261</td>
+<td class='lineTable'> <pre class='codegreen'>            found=en && glob && (expected_class+1 &gt t);</pre> </td>
+<td class='lineTable'>208</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>262</td>
+<td class='lineTable'> <pre class='codegreen'>            if (irq_valid !== found || (found && (irq_id != expected_id || irq_class != expected_class)))</pre> </td>
+<td class='lineTable'>208</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverRed'>
+<td class='lineTable'>263</td>
+<td class='lineTable'> <pre class='codered'>              $fatal(1,"eligibility mismatch source=%0d threshold=%0d enable=%0d MIE=%0d",expected_id,t,en,glob);</pre> </td>
+<td class='lineTable'> 0 </td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>264</td>
+<td class='lineTable'> <pre class='codegreen'>            eligibility_cov.sample(i,t,en,glob);</pre> </td>
+<td class='lineTable'>208</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>265</td>
+<td class='lineTable'> <pre class='codegrey'>          end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>266</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>267</td>
+<td class='lineTable'> <pre class='codegreen'>    threshold=0; mie=32'hffff_ffff; global_mie=1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>268</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>269</td>
+<td class='lineTable'> <pre class='codegrey'>    // Each RR winner: no commit, other-class commit, then matching commit.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>270</td>
+<td class='lineTable'> <pre class='codegrey'>    // Keep all members requested so pointer movement is observable at output.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>271</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt5; i=i+1) begin</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>272</td>
+<td class='lineTable'> <pre class='codegreen'>      if (i&lt3) begin</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>273</td>
+<td class='lineTable'> <pre class='codegreen'>        set_stream_ptr(i); arb_pending=(13'b1&lt&lt4)|(13'b1&lt&lt3)|(13'b1&lt&lt12);</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>274</td>
+<td class='lineTable'> <pre class='codegreen'>        expected_id=stream_order[i]; next_id=stream_order[(i+1)%3];</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>275</td>
+<td class='lineTable'> <pre class='codegrey'>      end else begin</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>276</td>
+<td class='lineTable'> <pre class='codegreen'>        set_background_ptr(i-3); arb_pending=(13'b1&lt&lt2)|(13'b1&lt&lt1);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>277</td>
+<td class='lineTable'> <pre class='codegreen'>        expected_id=(i==3) ? 17 : 16; next_id=(i==3) ? 16 : 17;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>278</td>
+<td class='lineTable'> <pre class='codegrey'>      end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>279</td>
+<td class='lineTable'> <pre class='codegreen'>      #1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch");</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>280</td>
+<td class='lineTable'> <pre class='codegreen'>      for (operation=1; operation&lt=2; operation=operation+1) begin</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>281</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); commit=(operation==2); committed_id=(i&lt3) ? 17 : 19;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>282</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); commit=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>283</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!irq_valid || irq_id != expected_id) $fatal(1,"RR changed without matching commit");</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>284</td>
+<td class='lineTable'> <pre class='codegreen'>        rr_cov.sample(i,operation);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>285</td>
+<td class='lineTable'> <pre class='codegrey'>      end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>286</td>
+<td class='lineTable'> <pre class='codegreen'>      @(negedge clk); commit=1; committed_id=expected_id;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>287</td>
+<td class='lineTable'> <pre class='codegreen'>      @(negedge clk); commit=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>288</td>
+<td class='lineTable'> <pre class='codegreen'>      if (!irq_valid || irq_id != next_id) $fatal(1,"RR did not advance after commit");</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>289</td>
+<td class='lineTable'> <pre class='codegreen'>      rr_cov.sample(i,0);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>290</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>291</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>292</td>
+<td class='lineTable'> <pre class='codegrey'>    // Commit decoding must use the committed packet cause, not a live winner.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>293</td>
+<td class='lineTable'> <pre class='codegreen'>    wb_valid=1; wb_exc_valid=1;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>294</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt13; i=i+1) begin</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>295</td>
+<td class='lineTable'> <pre class='codegreen'>      wb_cause = 6'h20 | ((i==0) ? 7 : i+15); #1;</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>296</td>
+<td class='lineTable'> <pre class='codegreen'>      if (wb_clear !== (13'b1 &lt&lt i) || !wb_irq) $fatal(1,"commit clear mismatch bit=%0d",i);</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>297</td>
+<td class='lineTable'> <pre class='codegreen'>      commit_cov.sample(i);</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>298</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>299</td>
+<td class='lineTable'> <pre class='codegreen'>    wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ");</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>300</td>
+<td class='lineTable'> <pre class='codegreen'>    commit_control_cov.sample(2);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>301</td>
+<td class='lineTable'> <pre class='codegreen'>    wb_cause=6'h20 | 6'd3; #1;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>302</td>
+<td class='lineTable'> <pre class='codegreen'>    if (wb_clear || !wb_irq) $fatal(1,"unsupported IRQ clear mismatch");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>303</td>
+<td class='lineTable'> <pre class='codegreen'>    commit_control_cov.sample(3);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>304</td>
+<td class='lineTable'> <pre class='codegreen'>    wb_cause=6'h20 | 6'd7; wb_exc_valid=0; #1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>305</td>
+<td class='lineTable'> <pre class='codegreen'>    if (wb_clear || wb_irq) $fatal(1,"invalid exception packet acknowledged");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>306</td>
+<td class='lineTable'> <pre class='codegreen'>    commit_control_cov.sample(1);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>307</td>
+<td class='lineTable'> <pre class='codegreen'>    wb_exc_valid=1; wb_valid=0; #1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>308</td>
+<td class='lineTable'> <pre class='codegreen'>    if (wb_clear || wb_irq) $fatal(1,"invalid WB packet acknowledged");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>309</td>
+<td class='lineTable'> <pre class='codegreen'>    commit_control_cov.sample(0);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>310</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>311</td>
+<td class='lineTable'> <pre class='codegrey'>    // Pending/mip capture is independent of enables; an event on ack wins.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>312</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=13'h1fe9;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>313</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=0;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>314</td>
+<td class='lineTable'> <pre class='codegreen'>    #1; if ((pending & 13'h1fe9) !== 13'h1fe9) $fatal(1,"event capture failed");</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>315</td>
+<td class='lineTable'> <pre class='codegreen'>    if (csr_mip !== ({4'b0,pending[12:1],16'b0} | (pending[0] &lt&lt 7)))</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverRed'>
+<td class='lineTable'>316</td>
+<td class='lineTable'> <pre class='codered'>      $fatal(1,"mip mapping failed: %h",csr_mip);</pre> </td>
+<td class='lineTable'> 0 </td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>317</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=13'h1fe9; raw=13'h0008;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>318</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=0; raw=0; #1;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>319</td>
+<td class='lineTable'> <pre class='codegreen'>    if (pending !== 13'h0008) $fatal(1,"event/ack coincidence failed: %h",pending);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>320</td>
+<td class='lineTable'> <pre class='codegrey'>    // Back-to-back event samples with ack on the second sample remain pending.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>321</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=13'h0008;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>322</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=13'h0008;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>323</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=0; clear=0; #1;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>324</td>
+<td class='lineTable'> <pre class='codegreen'>    if (!pending[3]) $fatal(1,"adjacent event samples lost");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>325</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=13'h0008;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>326</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=0; #1; if (pending) $fatal(1,"ack failed");</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>5</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>327</td>
+<td class='lineTable'> <pre class='codegrey'>    // Level sources pass through; GPIO rising edge is sticky until ack.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>328</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=13'h0016; #1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>329</td>
+<td class='lineTable'> <pre class='codegreen'>    if ((pending & 13'h0014) !== 13'h0014) $fatal(1,"level passthrough failed");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>330</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=0; #1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>331</td>
+<td class='lineTable'> <pre class='codegreen'>    if (pending !== 13'h0002) $fatal(1,"GPIO edge capture failed");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>332</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=13'h0002;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>333</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=0;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>334</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>335</td>
+<td class='lineTable'> <pre class='codegrey'>    // Exercise every configured per-cycle event input separately.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>336</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt13; i=i+1) begin</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>337</td>
+<td class='lineTable'> <pre class='codegreen'>      if ((13'h1fe9 & (13'b1 &lt&lt i)) != 0) begin</pre> </td>
+<td class='lineTable'>13</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>338</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>339</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>340</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!pending[i]) $fatal(1,"event capture missing bit %0d",i);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>341</td>
+<td class='lineTable'> <pre class='codegreen'>        expected_id=(i==0) ? 7 : i+15;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>342</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!csr_mip[expected_id]) $fatal(1,"mip mapping missing source %0d",expected_id);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>343</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>344</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>345</td>
+<td class='lineTable'> <pre class='codegreen'>        if (pending[i]) $fatal(1,"event clear missing bit %0d",i);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>346</td>
+<td class='lineTable'> <pre class='codegreen'>        event_cov.sample(i,0);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>347</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>348</td>
+<td class='lineTable'> <pre class='codegrey'>        // 1,0,1: clear the first event, then capture a new event with ack.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>349</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>350</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=0; clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>351</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>352</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=0; clear=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>353</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!pending[i]) $fatal(1,"separated event lost bit %0d",i);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>354</td>
+<td class='lineTable'> <pre class='codegreen'>        event_cov.sample(i,1);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>355</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>356</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=0;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>357</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>358</td>
+<td class='lineTable'> <pre class='codegrey'>        // Consecutive asserted cycles, with ack at the second sample.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>359</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>360</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>361</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=0; clear=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>362</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!pending[i]) $fatal(1,"consecutive event lost bit %0d",i);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>363</td>
+<td class='lineTable'> <pre class='codegreen'>        event_cov.sample(i,2);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>364</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>365</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=0;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>366</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>367</td>
+<td class='lineTable'> <pre class='codegrey'>        // Held-high event is treated as an event each sampled cycle.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>368</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>369</td>
+<td class='lineTable'> <pre class='codegreen'>        repeat (3) @(negedge clk);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>370</td>
+<td class='lineTable'> <pre class='codegreen'>        clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>371</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); raw=0; clear=0; #1;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>372</td>
+<td class='lineTable'> <pre class='codegreen'>        if (!pending[i]) $fatal(1,"held event/ack lost bit %0d",i);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>373</td>
+<td class='lineTable'> <pre class='codegreen'>        event_cov.sample(i,3);</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>374</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>375</td>
+<td class='lineTable'> <pre class='codegreen'>        @(negedge clk); clear=0;</pre> </td>
+<td class='lineTable'>10</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>376</td>
+<td class='lineTable'> <pre class='codegrey'>      end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>377</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>378</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>379</td>
+<td class='lineTable'> <pre class='codegrey'>    // GPIO edge: capture, held high with ack, coincident new edge, rearm.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>380</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=13'h002;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>381</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0);</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>5</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>382</td>
+<td class='lineTable'> <pre class='codegreen'>    clear=13'h002;</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>383</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=0; #1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>384</td>
+<td class='lineTable'> <pre class='codegreen'>    if (pending[1]) $fatal(1,"GPIO held level retriggered"); gpio_cov.sample(1);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>385</td>
+<td class='lineTable'> <pre class='codegreen'>    raw=0;</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>386</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=13'h002; clear=13'h002;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>387</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=0; clear=0; #1;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>388</td>
+<td class='lineTable'> <pre class='codegreen'>    if (!pending[1]) $fatal(1,"GPIO edge did not win ack"); gpio_cov.sample(2);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>389</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=13'h002;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>390</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=0; raw=13'h002;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>391</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); raw=0; #1;</pre> </td>
+<td class='lineTable'>3</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>392</td>
+<td class='lineTable'> <pre class='codegreen'>    if (!pending[1]) $fatal(1,"GPIO rearm failed"); gpio_cov.sample(3);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>393</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=13'h002;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>394</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); clear=0;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>395</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>396</td>
+<td class='lineTable'> <pre class='codegrey'>    // I2C and UART are level pass-through; ack does not clear a held level.</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>397</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=2; i&lt=4; i=i+2) begin</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>398</td>
+<td class='lineTable'> <pre class='codegreen'>      @(negedge clk); raw=13'b1 &lt&lt i; #1;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>399</td>
+<td class='lineTable'> <pre class='codegreen'>      if (!pending[i]) $fatal(1,"level assertion missing bit %0d",i); level_cov.sample(i,0);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>400</td>
+<td class='lineTable'> <pre class='codegreen'>      clear=13'b1 &lt&lt i;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>401</td>
+<td class='lineTable'> <pre class='codegreen'>      @(negedge clk); #1;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>402</td>
+<td class='lineTable'> <pre class='codegreen'>      if (!pending[i]) $fatal(1,"level ack changed output bit %0d",i); level_cov.sample(i,1);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>403</td>
+<td class='lineTable'> <pre class='codegreen'>      raw=0; clear=0; #1;</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>404</td>
+<td class='lineTable'> <pre class='codegreen'>      if (pending[i]) $fatal(1,"level deassertion missing bit %0d",i); level_cov.sample(i,2);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>405</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>406</td>
+<td class='lineTable'> <pre class='codegrey'> </pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>407</td>
+<td class='lineTable'> <pre class='codegreen'>    write_csr(12'h304,32'h0fff0080);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>408</td>
+<td class='lineTable'> <pre class='codegreen'>    if (csr_mie !== 32'h0fff0080) $fatal(1,"mie CSR fast bits mismatch");</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>409</td>
+<td class='lineTable'> <pre class='codegreen'>    for (i=0; i&lt4; i=i+1) begin</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>410</td>
+<td class='lineTable'> <pre class='codegreen'>      for (j=0; j&lt4; j=j+1) begin</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>411</td>
+<td class='lineTable'> <pre class='codegreen'>        write_csr(12'h7c0,i);</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>412</td>
+<td class='lineTable'> <pre class='codegreen'>        upper_pattern=(i*4+j)%3;</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>413</td>
+<td class='lineTable'> <pre class='codegreen'>        case (upper_pattern)</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>414</td>
+<td class='lineTable'> <pre class='codegreen'>          0: csr_test_data=j;</pre> </td>
+<td class='lineTable'>6</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>415</td>
+<td class='lineTable'> <pre class='codegreen'>          1: csr_test_data=32'ha5a5_a5a4 | j;</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>416</td>
+<td class='lineTable'> <pre class='codegreen'>          default: csr_test_data=32'hffff_fffc | j;</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>417</td>
+<td class='lineTable'> <pre class='codegrey'>        endcase</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>418</td>
+<td class='lineTable'> <pre class='codegreen'>        write_csr(12'h7c0,csr_test_data);</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>419</td>
+<td class='lineTable'> <pre class='codegreen'>        csr_addr=12'h7c0; #1;</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>420</td>
+<td class='lineTable'> <pre class='codegreen'>        if (csr_read !== j || csr_threshold !== j) $fatal(1,"mintprio CSR transition mismatch");</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>2</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>421</td>
+<td class='lineTable'> <pre class='codegreen'>        csr_cov.sample(i,j,upper_pattern);</pre> </td>
+<td class='lineTable'>16</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>422</td>
+<td class='lineTable'> <pre class='codegrey'>      end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>423</td>
+<td class='lineTable'> <pre class='codegrey'>    end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>424</td>
+<td class='lineTable'> <pre class='codegreen'>    write_csr(12'h7c0,2);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>425</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); csr_write=1; csr_write_addr=12'h7c0; csr_write_data=1; csr_trap=1;</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>5</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>426</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); csr_write=0; csr_trap=0; #1;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>427</td>
+<td class='lineTable'> <pre class='codegreen'>    if (csr_threshold !== 2) $fatal(1,"trap changed mintprio"); csr_control_cov.sample(1);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>428</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); csr_write=1; csr_write_addr=12'h7c0; csr_write_data=1; csr_mret=1;</pre> </td>
+<td class='lineTable'>5</td>
+<td class='lineTable'>5</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>429</td>
+<td class='lineTable'> <pre class='codegreen'>    @(negedge clk); csr_write=0; csr_mret=0; #1;</pre> </td>
+<td class='lineTable'>4</td>
+<td class='lineTable'>4</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>430</td>
+<td class='lineTable'> <pre class='codegreen'>    if (csr_threshold !== 2) $fatal(1,"MRET changed mintprio"); csr_control_cov.sample(2);</pre> </td>
+<td class='lineTable'>2</td>
+<td class='lineTable'>3</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>431</td>
+<td class='lineTable'> <pre class='codegreen'>    $display("PASS: %0d arbitration snapshots plus gateway, mip/mie, mintprio and commit checks",snapshots);</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGreen'>
+<td class='lineTable'>432</td>
+<td class='lineTable'> <pre class='codegreen'>    $finish;</pre> </td>
+<td class='lineTable'>1</td>
+<td class='lineTable'>1</td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>433</td>
+<td class='lineTable'> <pre class='codegrey'>  end</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+<tr class='lineTableHoverGrey'>
+<td class='lineTable'>434</td>
+<td class='lineTable'> <pre class='codegrey'>endmodule</pre> </td>
+<td class='lineTable'> </td>
+<td class='lineTable'> </td>
+</tr>
+</table>
+</div>
+<br clear=all>
+</div>
+<br clear=all>
+</div>
+</font>
+</div>

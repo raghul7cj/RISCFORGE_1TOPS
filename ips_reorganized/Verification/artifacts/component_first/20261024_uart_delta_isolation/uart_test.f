@@ -1,0 +1,38 @@
+-sv
+-access +rwc
+-timescale 1ns/1ps
+
+-top tb_apb_uart_thorough
+
+../../ips/SOC_FILES/include/common_cells/cf_math_pkg.sv
+../../ips/SOC_FILES/include/obi/obi_pkg.sv
+../../ips/SOC_FILES/include/obi/obi_uart_pkg.sv
+../../ips/SOC_FILES/include/apb/apb_pkg.sv
+
+../../ips/SOC_FILES/include/common_cells/sync.sv
+../../ips/SOC_FILES/include/common_cells/counter.sv
+../../ips/SOC_FILES/include/common_cells/fifo_v3.sv
+../../ips/SOC_FILES/include/common_cells/fall_through_register.sv
+../../ips/SOC_FILES/include/common_cells/shift_reg.sv
+../../ips/SOC_FILES/include/common_cells/lzc.sv
+../../ips/SOC_FILES/include/common_cells/delta_counter.sv  
+../../ips/SOC_FILES/include/common_cells/shift_reg_gated.sv
+../../ips/SOC_FILES/include/register_interface/reg_to_apb.sv
+
+../../ips/SOC_FILES/include/obi/apb_to_obi.sv
+../../ips/SOC_FILES/include/obi/obi_uart.sv
+../../ips/SOC_FILES/include/obi/obi_uart_register.sv
+../../ips/SOC_FILES/include/obi/obi_uart_modem.sv
+../../ips/SOC_FILES/include/obi/obi_uart_baudgen.sv
+../../ips/SOC_FILES/include/obi/obi_uart_rx.sv
+../../ips/SOC_FILES/include/obi/obi_uart_tx.sv
+../../ips/SOC_FILES/include/obi/obi_uart_interrupts.sv
+
+
+../../ips/apb_uart-main/rtl/apb_uart.sv
+../../ips/apb_uart-main/rtl/apb_uart_wrap.sv
+../../ips/apb_uart-main/rtl/reg_uart_wrap.sv
+../../ips/apb_uart-main/rtl/tb_apb_uart_thorough.sv
+
++incdir+../../ips/SOC_FILES/include
++incdir+../../ips/SOC_FILES/include/common_cells
