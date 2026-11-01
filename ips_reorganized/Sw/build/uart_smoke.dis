@@ -1,0 +1,260 @@
+
+build/uart_smoke.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010000 <_start>:
+  .global _start
+  .type _start, @function
+
+_start:
+  /* 1. Disable interrupts globally during boot */
+  csrci mstatus, 0x8
+   10000:	30047073          	csrci	mstatus,8
+
+  /* 2. Initialize Stack Pointer (sp) and Global Pointer (gp) */
+  .option push
+  .option norelax
+  la gp, __global_pointer$
+   10004:	00011197          	auipc	gp,0x11
+   10008:	92c18193          	addi	gp,gp,-1748 # 20930 <__global_pointer$>
+  .option pop
+  la sp, _stack_top
+   1000c:	00018117          	auipc	sp,0x18
+   10010:	ff410113          	addi	sp,sp,-12 # 28000 <_stack_top>
+
+  /* 3. Zero General-Purpose Registers */
+  li x1,  0
+   10014:	00000093          	li	ra,0
+  li x4,  0
+   10018:	00000213          	li	tp,0
+  li x5,  0
+   1001c:	00000293          	li	t0,0
+  li x6,  0
+   10020:	00000313          	li	t1,0
+  li x7,  0
+   10024:	00000393          	li	t2,0
+  li x8,  0
+   10028:	00000413          	li	s0,0
+  li x9,  0
+   1002c:	00000493          	li	s1,0
+  li x10, 0
+   10030:	00000513          	li	a0,0
+  li x11, 0
+   10034:	00000593          	li	a1,0
+  li x12, 0
+   10038:	00000613          	li	a2,0
+  li x13, 0
+   1003c:	00000693          	li	a3,0
+  li x14, 0
+   10040:	00000713          	li	a4,0
+  li x15, 0
+   10044:	00000793          	li	a5,0
+  li x16, 0
+   10048:	00000813          	li	a6,0
+  li x17, 0
+   1004c:	00000893          	li	a7,0
+  li x18, 0
+   10050:	00000913          	li	s2,0
+  li x19, 0
+   10054:	00000993          	li	s3,0
+  li x20, 0
+   10058:	00000a13          	li	s4,0
+  li x21, 0
+   1005c:	00000a93          	li	s5,0
+  li x22, 0
+   10060:	00000b13          	li	s6,0
+  li x23, 0
+   10064:	00000b93          	li	s7,0
+  li x24, 0
+   10068:	00000c13          	li	s8,0
+  li x25, 0
+   1006c:	00000c93          	li	s9,0
+  li x26, 0
+   10070:	00000d13          	li	s10,0
+  li x27, 0
+   10074:	00000d93          	li	s11,0
+  li x28, 0
+   10078:	00000e13          	li	t3,0
+  li x29, 0
+   1007c:	00000e93          	li	t4,0
+  li x30, 0
+   10080:	00000f13          	li	t5,0
+  li x31, 0
+   10084:	00000f93          	li	t6,0
+
+  /* 4. Zero .bss section in DSRAM */
+  la a0, _sbss
+   10088:	00010517          	auipc	a0,0x10
+   1008c:	0a850513          	addi	a0,a0,168 # 20130 <_ebss>
+  la a1, _ebss
+   10090:	00010597          	auipc	a1,0x10
+   10094:	0a058593          	addi	a1,a1,160 # 20130 <_ebss>
+  bge a0, a1, .Lzero_bss_done
+   10098:	00b55863          	bge	a0,a1,100a8 <_start+0xa8>
+.Lzero_bss_loop:
+  sw zero, 0(a0)
+   1009c:	00052023          	sw	zero,0(a0)
+  addi a0, a0, 4
+   100a0:	00450513          	addi	a0,a0,4
+  blt a0, a1, .Lzero_bss_loop
+   100a4:	feb54ce3          	blt	a0,a1,1009c <_start+0x9c>
+.Lzero_bss_done:
+
+  /* 5. Initialize mintprio CSR (0x7C0) to 0 */
+  csrw 0x7C0, zero
+   100a8:	7c001073          	csrw	0x7c0,zero
+
+  /* 6. Jump to main */
+  call main
+   100ac:	0fc000ef          	jal	101a8 <main>
+
+000100b0 <_exit>:
+
+  /* 7. Halt loop */
+_exit:
+  j _exit
+   100b0:	0000006f          	j	100b0 <_exit>
+
+000100b4 <uart_puts>:
+   100b4:	00054783          	lbu	a5,0(a0)
+   100b8:	02078e63          	beqz	a5,100f4 <uart_puts+0x40>
+   100bc:	40002737          	lui	a4,0x40002
+   100c0:	00a00593          	li	a1,10
+   100c4:	40002637          	lui	a2,0x40002
+   100c8:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+   100cc:	00d00813          	li	a6,13
+   100d0:	02b78463          	beq	a5,a1,100f8 <uart_puts+0x44>
+   100d4:	00054683          	lbu	a3,0(a0)
+   100d8:	00150513          	addi	a0,a0,1
+   100dc:	00072783          	lw	a5,0(a4)
+   100e0:	0207f793          	andi	a5,a5,32
+   100e4:	fe078ce3          	beqz	a5,100dc <uart_puts+0x28>
+   100e8:	00d62023          	sw	a3,0(a2) # 40002000 <_stack_top+0x3ffda000>
+   100ec:	00054783          	lbu	a5,0(a0)
+   100f0:	fe0790e3          	bnez	a5,100d0 <uart_puts+0x1c>
+   100f4:	00008067          	ret
+   100f8:	00072783          	lw	a5,0(a4)
+   100fc:	0207f793          	andi	a5,a5,32
+   10100:	fe078ce3          	beqz	a5,100f8 <uart_puts+0x44>
+   10104:	01062023          	sw	a6,0(a2)
+   10108:	fcdff06f          	j	100d4 <uart_puts+0x20>
+
+0001010c <uart_puthex>:
+   1010c:	000207b7          	lui	a5,0x20
+   10110:	00878793          	addi	a5,a5,8 # 20008 <_srodata+0x8>
+   10114:	fd010113          	addi	sp,sp,-48
+   10118:	0007a583          	lw	a1,0(a5)
+   1011c:	0087a683          	lw	a3,8(a5)
+   10120:	00c7a703          	lw	a4,12(a5)
+   10124:	0047a603          	lw	a2,4(a5)
+   10128:	0107c783          	lbu	a5,16(a5)
+   1012c:	02812423          	sw	s0,40(sp)
+   10130:	00050413          	mv	s0,a0
+   10134:	00020537          	lui	a0,0x20
+   10138:	00050513          	mv	a0,a0
+   1013c:	00b12623          	sw	a1,12(sp)
+   10140:	00d12a23          	sw	a3,20(sp)
+   10144:	00e12c23          	sw	a4,24(sp)
+   10148:	02112623          	sw	ra,44(sp)
+   1014c:	00c12823          	sw	a2,16(sp)
+   10150:	00f10e23          	sb	a5,28(sp)
+   10154:	f61ff0ef          	jal	100b4 <uart_puts>
+   10158:	40002737          	lui	a4,0x40002
+   1015c:	01c00693          	li	a3,28
+   10160:	40002537          	lui	a0,0x40002
+   10164:	01470713          	addi	a4,a4,20 # 40002014 <_stack_top+0x3ffda014>
+   10168:	ffc00593          	li	a1,-4
+   1016c:	00d457b3          	srl	a5,s0,a3
+   10170:	00f7f793          	andi	a5,a5,15
+   10174:	02078793          	addi	a5,a5,32
+   10178:	002787b3          	add	a5,a5,sp
+   1017c:	fec7c603          	lbu	a2,-20(a5)
+   10180:	00072783          	lw	a5,0(a4)
+   10184:	0207f793          	andi	a5,a5,32
+   10188:	fe078ce3          	beqz	a5,10180 <uart_puthex+0x74>
+   1018c:	00c52023          	sw	a2,0(a0) # 40002000 <_stack_top+0x3ffda000>
+   10190:	ffc68693          	addi	a3,a3,-4
+   10194:	fcb69ce3          	bne	a3,a1,1016c <uart_puthex+0x60>
+   10198:	02c12083          	lw	ra,44(sp)
+   1019c:	02812403          	lw	s0,40(sp)
+   101a0:	03010113          	addi	sp,sp,48
+   101a4:	00008067          	ret
+
+000101a8 <main>:
+int main(void) {
+   101a8:	ff010113          	addi	sp,sp,-16
+   101ac:	00112623          	sw	ra,12(sp)
+#define UART_LCR_8BIT     (3 << 0)  /* 8 data bits, 1 stop bit, no parity */
+#define UART_LCR_DLAB     (1 << 7)  /* Divisor Latch Access Bit */
+
+static inline void uart_init(void) {
+    /* 1. Disable all interrupts */
+    UART_IER = 0x00;
+   101b0:	400027b7          	lui	a5,0x40002
+   101b4:	0007a223          	sw	zero,4(a5) # 40002004 <_stack_top+0x3ffda004>
+
+    /* 2. Set 8-bit word length (8N1) */
+    UART_LCR = UART_LCR_8BIT;
+   101b8:	00300613          	li	a2,3
+   101bc:	400026b7          	lui	a3,0x40002
+   101c0:	00c6a623          	sw	a2,12(a3) # 4000200c <_stack_top+0x3ffda00c>
+
+    /* 3. Enable and reset FIFOs */
+    UART_FCR = 0x07;
+   101c4:	40002737          	lui	a4,0x40002
+   101c8:	00700693          	li	a3,7
+    uart_puts("\n==============================================\n");
+   101cc:	00020537          	lui	a0,0x20
+   101d0:	00d72423          	sw	a3,8(a4) # 40002008 <_stack_top+0x3ffda008>
+   101d4:	01c50513          	addi	a0,a0,28 # 2001c <_srodata+0x1c>
+   101d8:	eddff0ef          	jal	100b4 <uart_puts>
+    uart_puts("   RISCFORGE SoC UART Verification Smoke Test  \n");
+   101dc:	00020537          	lui	a0,0x20
+   101e0:	05050513          	addi	a0,a0,80 # 20050 <_srodata+0x50>
+   101e4:	ed1ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("==============================================\n");
+   101e8:	00020537          	lui	a0,0x20
+   101ec:	08450513          	addi	a0,a0,132 # 20084 <_srodata+0x84>
+   101f0:	ec5ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("[INFO] Testing MMIO & ALU:\n");
+   101f4:	00020537          	lui	a0,0x20
+   101f8:	0b450513          	addi	a0,a0,180 # 200b4 <_srodata+0xb4>
+   101fc:	eb9ff0ef          	jal	100b4 <uart_puts>
+    uart_puts("  Value A   : ");
+   10200:	00020537          	lui	a0,0x20
+   10204:	0d050513          	addi	a0,a0,208 # 200d0 <_srodata+0xd0>
+   10208:	eadff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(a);
+   1020c:	12340537          	lui	a0,0x12340
+   10210:	efdff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n  Value B   : ");
+   10214:	00020537          	lui	a0,0x20
+   10218:	0e050513          	addi	a0,a0,224 # 200e0 <_srodata+0xe0>
+   1021c:	e99ff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(b);
+   10220:	00005537          	lui	a0,0x5
+   10224:	67850513          	addi	a0,a0,1656 # 5678 <_start-0xa988>
+   10228:	ee5ff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n  A | B     : ");
+   1022c:	00020537          	lui	a0,0x20
+   10230:	0f050513          	addi	a0,a0,240 # 200f0 <_srodata+0xf0>
+   10234:	e81ff0ef          	jal	100b4 <uart_puts>
+    uart_puthex(sum);
+   10238:	12345537          	lui	a0,0x12345
+   1023c:	67850513          	addi	a0,a0,1656 # 12345678 <_stack_top+0x1231d678>
+   10240:	ecdff0ef          	jal	1010c <uart_puthex>
+    uart_puts("\n");
+   10244:	00020537          	lui	a0,0x20
+   10248:	10050513          	addi	a0,a0,256 # 20100 <_srodata+0x100>
+   1024c:	e69ff0ef          	jal	100b4 <uart_puts>
+        uart_puts("\n>>> UART & DATAPATH TEST: [ PASSED ] <<<\n\n");
+   10250:	00020537          	lui	a0,0x20
+   10254:	10450513          	addi	a0,a0,260 # 20104 <_srodata+0x104>
+   10258:	e5dff0ef          	jal	100b4 <uart_puts>
+}
+   1025c:	00c12083          	lw	ra,12(sp)
+   10260:	00000513          	li	a0,0
+   10264:	01010113          	addi	sp,sp,16
+   10268:	00008067          	ret

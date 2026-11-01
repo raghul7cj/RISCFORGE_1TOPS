@@ -1,0 +1,54 @@
+**************************************************
+  Title: Jasper(TM) - Superlint Violation Report  
+**************************************************
+
+  Date: Sep 18 16:08:18 IST 2026  
+  Tool Version: 2025.06 FCS 64 bits  
+  Top Module: gpio_lint_top  
+
+
+********************************************************************************************
+      Section 1: LINT DOMAIN
+********************************************************************************************
+
+============================================================================================
+      Section 1.1: VIOLATIONS SUMMARY
+============================================================================================
+-------------------------------------------------------
+ Category   | Error | Warning | Info | Waived | Total 
+-------------------------------------------------------
+  FILEFORMAT   0       1         0      0        1     
+  STRUCTURAL   0       8         0      0        8     
+  Total        0       9         0      0        9     
+
+
+============================================================================================
+      Section 1.2: VIOLATIONS DETAILS  -  FILEFORMAT
+============================================================================================
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Num  | Severity | Tag         | Message                                                         | Source Location                                          | Instance-Module | Grouping Status 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[1]     Warning    FIL_MS_DUNM   "Interface name 'REG_BUS' differs from file name 'reg_intf.sv'"   ../SOC_FILES/include/register_interface/reg_intf.sv :22    *-REG_BUS         -               
+
+
+============================================================================================
+      Section 1.3: VIOLATIONS DETAILS  -  STRUCTURAL
+============================================================================================
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Num  | Severity | Tag         | Message                                                                                                | Source Location       | Instance-Module             | Grouping Status 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[1]     Warning    CMB_NR_TLIO   "Combinational path detected between top-level input 'paddr_i[10:0]' and top-level output 'prdata_o'"    gpio_lint_top.sv :26    gpio_lint_top-gpio_lint_top   -               
+[2]     Warning    CMB_NR_TLIO   "Combinational path detected between top-level input 'paddr_i[10:0]' and top-level output 'pslverr_o'"   gpio_lint_top.sv :27    gpio_lint_top-gpio_lint_top   Grouped         
+[3]     Warning    MOD_NO_IPRG   "Input port 'paddr_i[10:0]' of top-level design-unit is not registered"                                  gpio_lint_top.sv :19    gpio_lint_top-gpio_lint_top   -               
+[4]     Warning    MOD_NO_IPRG   "Input port 'penable_i' of top-level design-unit is not registered"                                      gpio_lint_top.sv :21    gpio_lint_top-gpio_lint_top   -               
+[5]     Warning    MOD_NO_IPRG   "Input port 'psel_i' of top-level design-unit is not registered"                                         gpio_lint_top.sv :20    gpio_lint_top-gpio_lint_top   -               
+[6]     Warning    MOD_NO_IPRG   "Input port 'pstrb_i' of top-level design-unit is not registered"                                        gpio_lint_top.sv :24    gpio_lint_top-gpio_lint_top   -               
+[7]     Warning    MOD_NO_IPRG   "Input port 'pwdata_i' of top-level design-unit is not registered"                                       gpio_lint_top.sv :23    gpio_lint_top-gpio_lint_top   -               
+[8]     Warning    MOD_NO_IPRG   "Input port 'pwrite_i' of top-level design-unit is not registered"                                       gpio_lint_top.sv :22    gpio_lint_top-gpio_lint_top   -               
+
+
+********************************************************************************************
+
+
+
+

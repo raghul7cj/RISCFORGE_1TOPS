@@ -1,0 +1,66 @@
+
+build/datapath_asm.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010000 <_start>:
+  .global _start
+  .type _start, @function
+
+_start:
+  /* 1. Setup Stack Pointer in DSRAM */
+  lui sp, 0x28          /* sp = 0x0002_8000 */
+   10000:	00028137          	lui	sp,0x28
+
+  /* 2. UART Base Address */
+  lui s0, 0x40002       /* s0 = 0x4000_2000 (UART Base) */
+   10004:	40002437          	lui	s0,0x40002
+
+  /* 3. Configure UART (8-bit word length, FCR enable) */
+  li t0, 0x03           /* 8N1 */
+   10008:	00300293          	li	t0,3
+  sw t0, 0x0C(s0)       /* UART_LCR = 0x03 */
+   1000c:	00542623          	sw	t0,12(s0) # 4000200c <_stack_top+0x3ffda00c>
+  li t0, 0x07           /* FIFO enable & clear */
+   10010:	00700293          	li	t0,7
+  sw t0, 0x08(s0)       /* UART_FCR = 0x07 */
+   10014:	00542423          	sw	t0,8(s0)
+
+  /* 4. Transmit String over UART */
+  la s1, msg_start
+   10018:	00010497          	auipc	s1,0x10
+   1001c:	fe848493          	addi	s1,s1,-24 # 20000 <_srodata>
+
+00010020 <tx_loop>:
+
+tx_loop:
+  lbu a0, 0(s1)
+   10020:	0004c503          	lbu	a0,0(s1)
+  beqz a0, test_done
+   10024:	00050e63          	beqz	a0,10040 <test_done>
+
+00010028 <wait_thre>:
+
+  /* Poll LSR THRE (bit 5) */
+wait_thre:
+  lw t1, 0x14(s0)       /* Read UART_LSR */
+   10028:	01442303          	lw	t1,20(s0)
+  andi t1, t1, 0x20     /* Test THRE bit (0x20) */
+   1002c:	02037313          	andi	t1,t1,32
+  beqz t1, wait_thre
+   10030:	fe030ce3          	beqz	t1,10028 <wait_thre>
+
+  /* Write byte to THR */
+  sw a0, 0(s0)
+   10034:	00a42023          	sw	a0,0(s0)
+  addi s1, s1, 1
+   10038:	00148493          	addi	s1,s1,1
+  j tx_loop
+   1003c:	fe5ff06f          	j	10020 <tx_loop>
+
+00010040 <test_done>:
+
+test_done:
+  j test_done
+   10040:	0000006f          	j	10040 <test_done>
