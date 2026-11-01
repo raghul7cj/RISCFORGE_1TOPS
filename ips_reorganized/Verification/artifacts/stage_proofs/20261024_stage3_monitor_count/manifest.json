@@ -1,0 +1,43 @@
+{
+  "test_name": "stage3_monitor_count",
+  "stage": 3,
+  "description": "Exact Bus Transaction Counts & Monitor Observation Proof",
+  "verdict": "PASSED",
+  "timestamp": "2026-10-24T23:57:36+05:30",
+  "git_commit": "f1e46615bdd7688ebf5e7fca3ff8f0a8fd05fa3a",
+  "git_branch": "Raghul",
+  "environment": {
+    "host_os": "Windows 11 (DESKTOP-BSAEVVC)",
+    "simulator": "AMD Vivado XSim v2022.2 (64-bit, SW Build 3671981)",
+    "compiler": "GNU RISC-V GCC 13.2.0 (riscv64-unknown-elf-gcc via WSL Ubuntu)",
+    "python": "CPython 3.12"
+  },
+  "parameters": {
+    "boot_mode": "WARM",
+    "timeout_cycles": 1000000,
+    "simulation_time_ns": 75405.0
+  },
+  "metrics": {
+    "retired_instructions": 5551,
+    "minstret": 5551,
+    "axi_writes": 4,
+    "axi_reads": 14,
+    "apb_transfers": 18,
+    "apb_reads": 14,
+    "apb_writes": 4,
+    "lsu_reads": 520,
+    "lsu_writes": 560,
+    "fw_attestation": "0x0004000e",
+    "dsram_sig": "0xA459670A",
+    "slots_touched": "0x00000023",
+    "vacuity_violations": 0,
+    "fatal_checks": 0
+  },
+  "stimuli_hashes": {
+    "stage3_monitor_count.elf": "14EF8BAA8F0451A7AE682C31898340D943B20CE303F64685840C7B1F1977E44D",
+    "stage3_monitor_count_imem.hex": "497714A8A1F86DDF5AF3709D893839ABC7CA4594629BE23A94C91DCE70305762",
+    "stage3_monitor_count_dmem.hex": "2483233BDCFA77805239E41734C3530A274DE580C2388057435819F87EDC2122",
+    "stage3.dis": "146C5CB14828DB9A9AC7457626932C3FF1319A159D4FF7DF1CDC14207515AF85",
+    "stage3_monitor_count_sim.log": "FD5E658DA1E4F5C3B4116972B68CE562C6FDD44DA53312D6EFB2996D8872916C"
+  }
+}

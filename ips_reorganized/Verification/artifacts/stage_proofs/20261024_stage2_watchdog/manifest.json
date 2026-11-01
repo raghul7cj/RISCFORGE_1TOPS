@@ -1,0 +1,39 @@
+{
+  "test_name": "stage2_watchdog",
+  "stage": 2,
+  "description": "Watchdog / Freeze / Blame Proof (Inverted Negative Proof with Complete Diagnostic Dump)",
+  "verdict": "PASSED",
+  "timestamp": "2026-10-24T23:56:50+05:30",
+  "git_commit": "f1e46615bdd7688ebf5e7fca3ff8f0a8fd05fa3a",
+  "git_branch": "Raghul",
+  "environment": {
+    "host_os": "Windows 11 (DESKTOP-BSAEVVC)",
+    "simulator": "AMD Vivado XSim v2022.2 (64-bit, SW Build 3671981)",
+    "compiler": "GNU RISC-V GCC 13.2.0 (riscv64-unknown-elf-gcc via WSL Ubuntu)",
+    "python": "CPython 3.12"
+  },
+  "parameters": {
+    "boot_mode": "WARM",
+    "timeout_cycles": 50000,
+    "simulation_time_ns": 500765.0,
+    "wall_clock_seconds": 11.0
+  },
+  "metrics": {
+    "retired_instructions": 31735,
+    "axi_writes": 4,
+    "axi_reads": 6,
+    "apb_transfers": 10,
+    "fw_attestation_word": "0x00040006",
+    "blame_layer": "LAYER_FIRMWARE (6)",
+    "blame_kind": "WATCHDOG_TIMEOUT",
+    "freeze_buffers_dumped": true,
+    "fatal_checks": 1
+  },
+  "stimuli_hashes": {
+    "stage2_watchdog.elf": "45B075DF2E6ED37A76BDE750C02E2D56E905DF6564F8BB3211B68CB94042748B",
+    "stage2_watchdog_imem.hex": "4FD25F69E5BB0CFBC85CB7954D148701AB73085691935036EC3383CE8274DBCE",
+    "stage2_watchdog_dmem.hex": "FEFB598421FA3A9E69AF1BD673411379355866184ED1D333405E8F30B1648BC3",
+    "stage2_watchdog.dis": "0C0504ADD45DECAA257E2379C15BB97700F349415BE60E2D5623144488643F48",
+    "stage2_watchdog_sim.log": "BC25AC021D55BCC9CC61268BCB40E234F63E87E4EE735209806B1414DE0DADC0"
+  }
+}

@@ -1,0 +1,3001 @@
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<> User: iiita
+
+Host: vlsi.iiita.ac.in
+
+Report date: Fri 30 Oct 2026 00:34:23 IST
+
+Report options: -detail -metrics code -out code_details.txt -inst *... -both
+
+Coverage database path: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/coverage/scope/irq_unit
+
+Coverage model files: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/coverage/scope/icc_051abd3c_71350b3f.ucm
+
+Coverage data files: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/coverage/scope/irq_unit/icc_051abd3c_71350b3f.ucd
+
+CCF files:  None
+
+
+Coverage database date: Fri 30 Oct 2026 00:33:25 IST
+
+*** There were no refinement files applied ***
+
+  <>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+Coverage Table Legend
+---------------------
+  EXCL       excluded using refinement rule
+  P-EXCL     excluded from parent
+  U-EXCL     excluded and unreachable by IEV
+  T-EXCL     excluded from type
+  S-EXCL     smart excluded using refinement rule
+  EXCL(S)    smart indirect excluded
+  EMPTY      all children are excluded
+  CONST      marked constant during simulation
+  IGN        marked ignored during simulation
+  UNG        marked ungradeable during simulation
+  DES        marked deselected during simulation
+  UNR        marked unreachable by IEV
+  UNG-Expr   expression marked ungradeable during simulation
+  UNG-Toggle toggle marked ungradeable during simulation
+
+
+Covered+Uncovered Block Detail Report, Instance Based
+=====================================================
+
+Instance name: tb_irq_restructure
+Type name: tb_irq_restructure
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv
+Number of covered blocks: 293 of 343
+Number of uncovered blocks: 50 of 343
+
+Count  Block Line  Kind                 Origin Source Code                    
+------------------------------------------------------------------------------
+1      1     6     code block           6      always #5 clk = ~clk;          
+1      2     170   code block           169    if (id == 7) bit_for_id = 0;   
+1      3     170   true part of         170    if (id == 7) bit_for_id = 0;   
+1      4     171   false part of        170    else bit_for_id = id - 15;     
+1      5     175   code block           174    @(negedge clk); csr_write_addr = addr; csr_write_data = data; csr_write = 1; 
+1      6     175   code block           175    @(negedge clk); csr_write_addr = addr; csr_write_data = data; csr_write = 1; 
+1      7     176   code block           176    @(negedge clk); csr_write = 0; 
+1      8     180   code block           179    @(negedge clk); commit = 1;    
+1      9     180   code block           180    @(negedge clk); commit = 1;    
+1      10    182   a case item of       181    0: committed_id = 27;          
+1      11    183   a case item of       181    1: committed_id = 19;          
+1      12    184   a case item of       181    2: committed_id = 18;          
+0      13    181   implicit default     181    case (p)                       
+1      14    186   code block           186    @(negedge clk); commit = 0;    
+1      15    190   code block           189    @(negedge clk); commit = 1; committed_id = p ? 17 : 16; 
+1      16    190   code block           190    @(negedge clk); commit = 1; committed_id = p ? 17 : 16; 
+1      17    191   code block           191    @(negedge clk); commit = 0;    
+1      18    194   code block           194    initial begin                  
+1      19    198   code block           198    repeat (2) @(negedge clk); rst_n = 1; 
+1      20    198   code block           198    repeat (2) @(negedge clk); rst_n = 1; 
+1      21    199   code block           199    #1; if (csr_threshold !== 0 || csr_mie !== 0 || pending !== 0) 
+0      22    200   true part of         199    $fatal(1,"reset state mismatch"); 
+1      23    199   implicit else        199    #1; if (csr_threshold !== 0 || csr_mie !== 0 || pending !== 0) 
+1      24    201   code block           201    csr_control_cov.sample(0);     
+1      25    204   code block           204    snapshots = 0;                 
+1      26    205   code block           205    for (bgptr=0; bgptr<2; bgptr=bgptr+1) begin 
+1      27    207   code block           207    for (ptr=0; ptr<3; ptr=ptr+1) begin 
+1      28    207   code block           207    for (ptr=0; ptr<3; ptr=ptr+1) begin 
+1      29    209   code block           209    for (v=0; v<8192; v=v+1) begin 
+1      30    209   code block           209    for (v=0; v<8192; v=v+1) begin 
+1      31    211   code block           211    for (t=0; t<4; t=t+1) begin    
+1      32    212   code block           212    threshold = t; #1;             
+1      33    215   code block           214    if (!found && arb_pending[bit_for_id(fixed_order[j])]) begin 
+1      34    215   true part of         215    if (!found && arb_pending[bit_for_id(fixed_order[j])]) begin 
+1      35    215   implicit else        215    if (!found && arb_pending[bit_for_id(fixed_order[j])]) begin 
+1      36    218   code block           218    for (j=0; j<3; j=j+1) begin    
+1      37    218   code block           218    for (j=0; j<3; j=j+1) begin    
+1      38    220   true part of         220    if (!found && arb_pending[bit_for_id(stream_order[idx])]) begin 
+1      39    220   implicit else        220    if (!found && arb_pending[bit_for_id(stream_order[idx])]) begin 
+1      40    224   code block           224    if (!found && arb_pending[bgptr ? 1 : 2]) begin 
+1      41    224   true part of         224    if (!found && arb_pending[bgptr ? 1 : 2]) begin 
+1      42    224   implicit else        224    if (!found && arb_pending[bgptr ? 1 : 2]) begin 
+1      43    227   code block           227    if (!found && arb_pending[bgptr ? 2 : 1]) begin 
+1      44    227   true part of         227    if (!found && arb_pending[bgptr ? 2 : 1]) begin 
+1      45    227   implicit else        227    if (!found && arb_pending[bgptr ? 2 : 1]) begin 
+1      46    230   code block           230    if (irq_valid !== (found && expected_class+1 > t) || 
+0      47    232   true part of         230    $fatal(1,"arbiter mismatch vector=%h ptr=%0d threshold=%0d got=%b/%0d/%0d expected=%0d/%0d/%0d", 
+1      48    230   implicit else        230    if (irq_valid !== (found && expected_class+1 > t) || 
+1      49    234   code block           234    if (t==0 && (arb_pending & ~13'h1018)==0) begin 
+1      50    234   true part of         234    if (t==0 && (arb_pending & ~13'h1018)==0) begin 
+1      51    234   implicit else        234    if (t==0 && (arb_pending & ~13'h1018)==0) begin 
+1      52    238   code block           238    if (t==0 && (arb_pending & ~13'h0006)==0) 
+1      53    239   true part of         238    background_choice_cov.sample(bgptr,arb_pending[2:1]); 
+1      54    238   implicit else        238    if (t==0 && (arb_pending & ~13'h0006)==0) 
+1      55    240   code block           240    snapshots=snapshots+1;         
+1      56    245   code block           245    arb_pending=13'h1fff; threshold=0; mie=0; #1; 
+1      57    245   code block           245    arb_pending=13'h1fff; threshold=0; mie=0; #1; 
+0      58    246   true part of         246    if (irq_valid) $fatal(1,"mie mask did not block interrupt"); 
+1      59    246   implicit else        246    if (irq_valid) $fatal(1,"mie mask did not block interrupt"); 
+1      60    247   code block           247    for (i=0; i<13; i=i+1) begin   
+1      61    247   code block           247    for (i=0; i<13; i=i+1) begin   
+1      62    249   code block           249    mie=32'b1 << expected_id; #1;  
+0      63    251   true part of         250    $fatal(1,"individual mie mask mismatch cause=%0d",expected_id); 
+1      64    250   implicit else        250    if (!irq_valid || irq_id != expected_id) 
+1      65    253   code block           253    global_mie=0; #1; if (irq_valid) $fatal(1,"global MIE did not block interrupt"); 
+1      66    253   code block           253    global_mie=0; #1; if (irq_valid) $fatal(1,"global MIE did not block interrupt"); 
+0      67    253   true part of         253    global_mie=0; #1; if (irq_valid) $fatal(1,"global MIE did not block interrupt"); 
+1      68    253   implicit else        253    global_mie=0; #1; if (irq_valid) $fatal(1,"global MIE did not block interrupt"); 
+1      69    254   code block           254    global_mie=1;                  
+1      70    259   code block           258    for (j=i+1; j<8; j=j+1) begin  
+1      71    259   code block           259    for (j=i+1; j<8; j=j+1) begin  
+1      72    261   code block           261    (13'b1 << bit_for_id(fixed_order[j])); #1; 
+0      73    262   true part of         262    if (!irq_valid || irq_id != fixed_order[i]) $fatal(1,"fixed pair mismatch"); 
+1      74    262   implicit else        262    if (!irq_valid || irq_id != fixed_order[i]) $fatal(1,"fixed pair mismatch"); 
+1      75    263   code block           263    fixed_pair_cov.sample(pair_bin); pair_bin=pair_bin+1; 
+1      76    263   code block           263    fixed_pair_cov.sample(pair_bin); pair_bin=pair_bin+1; 
+1      77    267   code block           267    for (i=0; i<13; i=i+1) begin   
+1      78    267   code block           267    for (i=0; i<13; i=i+1) begin   
+1      79    272   code block           271    for (en=0; en<2; en=en+1)      
+1      80    273   code block           272    for (glob=0; glob<2; glob=glob+1) begin 
+1      81    273   code block           273    for (glob=0; glob<2; glob=glob+1) begin 
+1      82    274   code block           274    threshold=t; mie=en ? (32'b1 << expected_id) : 0; global_mie=glob; #1; 
+0      83    277   true part of         276    $fatal(1,"eligibility mismatch source=%0d threshold=%0d enable=%0d MIE=%0d",expected_id,t,en,glob); 
+1      84    276   implicit else        276    if (irq_valid !== found || (found && (irq_id != expected_id || irq_class != expected_class))) 
+1      85    278   code block           278    eligibility_cov.sample(i,t,en,glob); 
+1      86    281   code block           281    threshold=0; mie=32'hffff_ffff; global_mie=1; 
+1      87    285   code block           285    for (i=0; i<5; i=i+1) begin    
+1      88    286   true part of         286    if (i<3) begin                 
+1      89    287   code block           287    set_stream_ptr(i); arb_pending=(13'b1<<4)|(13'b1<<3)|(13'b1<<12); 
+1      90    289   false part of        286    end else begin                 
+1      91    290   code block           290    set_background_ptr(i-3); arb_pending=(13'b1<<2)|(13'b1<<1); 
+1      92    293   code block           293    #1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch"); 
+0      93    293   true part of         293    #1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch"); 
+1      94    293   implicit else        293    #1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch"); 
+1      95    294   code block           294    for (operation=1; operation<=2; operation=operation+1) begin 
+1      96    294   code block           294    for (operation=1; operation<=2; operation=operation+1) begin 
+1      97    295   code block           295    @(negedge clk); commit=(operation==2); committed_id=(i<3) ? 17 : 19; 
+1      98    296   code block           296    @(negedge clk); commit=0; #1;  
+1      99    296   code block           296    @(negedge clk); commit=0; #1;  
+0      100   297   true part of         297    if (!irq_valid || irq_id != expected_id) $fatal(1,"RR changed without matching commit"); 
+1      101   297   implicit else        297    if (!irq_valid || irq_id != expected_id) $fatal(1,"RR changed without matching commit"); 
+1      102   298   code block           298    rr_cov.sample(i,operation);    
+1      103   300   code block           300    @(negedge clk); commit=1; committed_id=expected_id; 
+1      104   301   code block           301    @(negedge clk); commit=0; #1;  
+1      105   301   code block           301    @(negedge clk); commit=0; #1;  
+0      106   302   true part of         302    if (!irq_valid || irq_id != next_id) $fatal(1,"RR did not advance after commit"); 
+1      107   302   implicit else        302    if (!irq_valid || irq_id != next_id) $fatal(1,"RR did not advance after commit"); 
+1      108   303   code block           303    rr_cov.sample(i,0);            
+1      109   307   code block           307    wb_valid=1; wb_exc_valid=1;    
+1      110   308   code block           308    for (i=0; i<13; i=i+1) begin   
+1      111   309   code block           309    wb_cause = 6'h20 | ((i==0) ? 7 : i+15); #1; 
+0      112   310   true part of         310    if (wb_clear !== (13'b1 << i) || !wb_irq) $fatal(1,"commit clear mismatch bit=%0d",i); 
+1      113   310   implicit else        310    if (wb_clear !== (13'b1 << i) || !wb_irq) $fatal(1,"commit clear mismatch bit=%0d",i); 
+1      114   311   code block           311    commit_cov.sample(i);          
+1      115   313   code block           313    wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ"); 
+1      116   313   code block           313    wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ"); 
+0      117   313   true part of         313    wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ"); 
+1      118   313   implicit else        313    wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ"); 
+1      119   314   code block           314    commit_control_cov.sample(2);  
+1      120   315   code block           315    wb_cause=6'h20 | 6'd3; #1;     
+1      121   315   code block           315    wb_cause=6'h20 | 6'd3; #1;     
+0      122   316   true part of         316    if (wb_clear || !wb_irq) $fatal(1,"unsupported IRQ clear mismatch"); 
+1      123   316   implicit else        316    if (wb_clear || !wb_irq) $fatal(1,"unsupported IRQ clear mismatch"); 
+1      124   317   code block           317    commit_control_cov.sample(3);  
+1      125   318   code block           318    wb_cause=6'h20 | 6'd7; wb_exc_valid=0; #1; 
+1      126   318   code block           318    wb_cause=6'h20 | 6'd7; wb_exc_valid=0; #1; 
+0      127   319   true part of         319    if (wb_clear || wb_irq) $fatal(1,"invalid exception packet acknowledged"); 
+1      128   319   implicit else        319    if (wb_clear || wb_irq) $fatal(1,"invalid exception packet acknowledged"); 
+1      129   320   code block           320    commit_control_cov.sample(1);  
+1      130   321   code block           321    wb_exc_valid=1; wb_valid=0; #1; 
+1      131   321   code block           321    wb_exc_valid=1; wb_valid=0; #1; 
+0      132   322   true part of         322    if (wb_clear || wb_irq) $fatal(1,"invalid WB packet acknowledged"); 
+1      133   322   implicit else        322    if (wb_clear || wb_irq) $fatal(1,"invalid WB packet acknowledged"); 
+1      134   323   code block           323    commit_control_cov.sample(0);  
+1      135   326   code block           326    @(negedge clk); raw=13'h1fe9;  
+1      136   327   code block           327    @(negedge clk); raw=0;         
+1      137   328   code block           328    #1; if ((pending & 13'h1fe9) !== 13'h1fe9) $fatal(1,"event capture failed"); 
+0      138   328   true part of         328    #1; if ((pending & 13'h1fe9) !== 13'h1fe9) $fatal(1,"event capture failed"); 
+1      139   328   implicit else        328    #1; if ((pending & 13'h1fe9) !== 13'h1fe9) $fatal(1,"event capture failed"); 
+1      140   329   code block           329    if (csr_mip !== ({4'b0,pending[12:1],16'b0} | (pending[0] << 7))) 
+0      141   330   true part of         329    $fatal(1,"mip mapping failed: %h",csr_mip); 
+1      142   329   implicit else        329    if (csr_mip !== ({4'b0,pending[12:1],16'b0} | (pending[0] << 7))) 
+1      143   331   code block           331    @(negedge clk); clear=13'h1fe9; raw=13'h0008; 
+1      144   332   code block           332    @(negedge clk); clear=0; raw=0; #1; 
+1      145   332   code block           332    @(negedge clk); clear=0; raw=0; #1; 
+0      146   333   true part of         333    if (pending !== 13'h0008) $fatal(1,"event/ack coincidence failed: %h",pending); 
+1      147   333   implicit else        333    if (pending !== 13'h0008) $fatal(1,"event/ack coincidence failed: %h",pending); 
+1      148   335   code block           335    @(negedge clk); raw=13'h0008;  
+1      149   336   code block           336    @(negedge clk); clear=13'h0008; 
+1      150   337   code block           337    @(negedge clk); raw=0; clear=0; #1; 
+1      151   337   code block           337    @(negedge clk); raw=0; clear=0; #1; 
+0      152   338   true part of         338    if (!pending[3]) $fatal(1,"adjacent event samples lost"); 
+1      153   338   implicit else        338    if (!pending[3]) $fatal(1,"adjacent event samples lost"); 
+1      154   339   code block           339    @(negedge clk); clear=13'h0008; 
+1      155   340   code block           340    @(negedge clk); clear=0; #1; if (pending) $fatal(1,"ack failed"); 
+1      156   340   code block           340    @(negedge clk); clear=0; #1; if (pending) $fatal(1,"ack failed"); 
+0      157   340   true part of         340    @(negedge clk); clear=0; #1; if (pending) $fatal(1,"ack failed"); 
+1      158   340   implicit else        340    @(negedge clk); clear=0; #1; if (pending) $fatal(1,"ack failed"); 
+1      159   342   code block           342    @(negedge clk); raw=13'h0016; #1; 
+1      160   342   code block           342    @(negedge clk); raw=13'h0016; #1; 
+0      161   343   true part of         343    if ((pending & 13'h0014) !== 13'h0014) $fatal(1,"level passthrough failed"); 
+1      162   343   implicit else        343    if ((pending & 13'h0014) !== 13'h0014) $fatal(1,"level passthrough failed"); 
+1      163   344   code block           344    @(negedge clk); raw=0; #1;     
+1      164   344   code block           344    @(negedge clk); raw=0; #1;     
+0      165   345   true part of         345    if (pending !== 13'h0002) $fatal(1,"GPIO edge capture failed"); 
+1      166   345   implicit else        345    if (pending !== 13'h0002) $fatal(1,"GPIO edge capture failed"); 
+1      167   346   code block           346    @(negedge clk); clear=13'h0002; 
+1      168   347   code block           347    @(negedge clk); clear=0;       
+1      169   350   code block           350    for (i=0; i<13; i=i+1) begin   
+1      170   351   true part of         351    if ((13'h1fe9 & (13'b1 << i)) != 0) begin 
+1      171   352   code block           352    @(negedge clk); raw=13'b1 << i; 
+1      172   353   code block           353    @(negedge clk); raw=0; #1;     
+1      173   353   code block           353    @(negedge clk); raw=0; #1;     
+0      174   354   true part of         354    if (!pending[i]) $fatal(1,"event capture missing bit %0d",i); 
+1      175   354   implicit else        354    if (!pending[i]) $fatal(1,"event capture missing bit %0d",i); 
+1      176   355   code block           355    expected_id=(i==0) ? 7 : i+15; 
+0      177   356   true part of         356    if (!csr_mip[expected_id]) $fatal(1,"mip mapping missing source %0d",expected_id); 
+1      178   356   implicit else        356    if (!csr_mip[expected_id]) $fatal(1,"mip mapping missing source %0d",expected_id); 
+1      179   357   code block           357    @(negedge clk); clear=13'b1 << i; 
+1      180   358   code block           358    @(negedge clk); clear=0; #1;   
+1      181   358   code block           358    @(negedge clk); clear=0; #1;   
+0      182   359   true part of         359    if (pending[i]) $fatal(1,"event clear missing bit %0d",i); 
+1      183   359   implicit else        359    if (pending[i]) $fatal(1,"event clear missing bit %0d",i); 
+1      184   360   code block           360    event_cov.sample(i,0);         
+1      185   363   code block           363    @(negedge clk); raw=13'b1 << i; 
+1      186   364   code block           364    @(negedge clk); raw=0; clear=13'b1 << i; 
+1      187   365   code block           365    @(negedge clk); raw=13'b1 << i; 
+1      188   366   code block           366    @(negedge clk); raw=0; clear=0; #1; 
+1      189   366   code block           366    @(negedge clk); raw=0; clear=0; #1; 
+0      190   367   true part of         367    if (!pending[i]) $fatal(1,"separated event lost bit %0d",i); 
+1      191   367   implicit else        367    if (!pending[i]) $fatal(1,"separated event lost bit %0d",i); 
+1      192   368   code block           368    event_cov.sample(i,1);         
+1      193   369   code block           369    @(negedge clk); clear=13'b1 << i; 
+1      194   370   code block           370    @(negedge clk); clear=0;       
+1      195   373   code block           373    @(negedge clk); raw=13'b1 << i; 
+1      196   374   code block           374    @(negedge clk); clear=13'b1 << i; 
+1      197   375   code block           375    @(negedge clk); raw=0; clear=0; #1; 
+1      198   375   code block           375    @(negedge clk); raw=0; clear=0; #1; 
+0      199   376   true part of         376    if (!pending[i]) $fatal(1,"consecutive event lost bit %0d",i); 
+1      200   376   implicit else        376    if (!pending[i]) $fatal(1,"consecutive event lost bit %0d",i); 
+1      201   377   code block           377    event_cov.sample(i,2);         
+1      202   378   code block           378    @(negedge clk); clear=13'b1 << i; 
+1      203   379   code block           379    @(negedge clk); clear=0;       
+1      204   382   code block           382    @(negedge clk); raw=13'b1 << i; 
+1      205   383   code block           383    repeat (3) @(negedge clk);     
+1      206   384   code block           384    clear=13'b1 << i;              
+1      207   385   code block           385    @(negedge clk); raw=0; clear=0; #1; 
+1      208   385   code block           385    @(negedge clk); raw=0; clear=0; #1; 
+0      209   386   true part of         386    if (!pending[i]) $fatal(1,"held event/ack lost bit %0d",i); 
+1      210   386   implicit else        386    if (!pending[i]) $fatal(1,"held event/ack lost bit %0d",i); 
+1      211   387   code block           387    event_cov.sample(i,3);         
+1      212   388   code block           388    @(negedge clk); clear=13'b1 << i; 
+1      213   389   code block           389    @(negedge clk); clear=0;       
+1      214   351   implicit else        351    if ((13'h1fe9 & (13'b1 << i)) != 0) begin 
+1      215   394   code block           394    @(negedge clk); raw=13'h002;   
+1      216   395   code block           395    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0); 
+1      217   395   code block           395    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0); 
+0      218   395   true part of         395    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0); 
+1      219   395   implicit else        395    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0); 
+1      220   395   code block           395    @(negedge clk); #1; if (!pending[1]) $fatal(1,"GPIO edge missing"); gpio_cov.sample(0); 
+1      221   396   code block           396    clear=13'h002;                 
+1      222   397   code block           397    @(negedge clk); clear=0; #1;   
+1      223   397   code block           397    @(negedge clk); clear=0; #1;   
+0      224   398   true part of         398    if (pending[1]) $fatal(1,"GPIO held level retriggered"); gpio_cov.sample(1); 
+1      225   398   implicit else        398    if (pending[1]) $fatal(1,"GPIO held level retriggered"); gpio_cov.sample(1); 
+1      226   398   code block           398    if (pending[1]) $fatal(1,"GPIO held level retriggered"); gpio_cov.sample(1); 
+1      227   399   code block           399    raw=0;                         
+1      228   400   code block           400    @(negedge clk); raw=13'h002; clear=13'h002; 
+1      229   401   code block           401    @(negedge clk); raw=0; clear=0; #1; 
+1      230   401   code block           401    @(negedge clk); raw=0; clear=0; #1; 
+0      231   402   true part of         402    if (!pending[1]) $fatal(1,"GPIO edge did not win ack"); gpio_cov.sample(2); 
+1      232   402   implicit else        402    if (!pending[1]) $fatal(1,"GPIO edge did not win ack"); gpio_cov.sample(2); 
+1      233   402   code block           402    if (!pending[1]) $fatal(1,"GPIO edge did not win ack"); gpio_cov.sample(2); 
+1      234   403   code block           403    @(negedge clk); clear=13'h002; 
+1      235   404   code block           404    @(negedge clk); clear=0; raw=13'h002; 
+1      236   405   code block           405    @(negedge clk); raw=0; #1;     
+1      237   405   code block           405    @(negedge clk); raw=0; #1;     
+0      238   406   true part of         406    if (!pending[1]) $fatal(1,"GPIO rearm failed"); gpio_cov.sample(3); 
+1      239   406   implicit else        406    if (!pending[1]) $fatal(1,"GPIO rearm failed"); gpio_cov.sample(3); 
+1      240   406   code block           406    if (!pending[1]) $fatal(1,"GPIO rearm failed"); gpio_cov.sample(3); 
+1      241   407   code block           407    @(negedge clk); clear=13'h002; 
+1      242   408   code block           408    @(negedge clk); clear=0;       
+1      243   411   code block           411    for (i=2; i<=4; i=i+2) begin   
+1      244   412   code block           412    @(negedge clk); raw=13'b1 << i; #1; 
+1      245   412   code block           412    @(negedge clk); raw=13'b1 << i; #1; 
+0      246   413   true part of         413    if (!pending[i]) $fatal(1,"level assertion missing bit %0d",i); level_cov.sample(i,0); 
+1      247   413   implicit else        413    if (!pending[i]) $fatal(1,"level assertion missing bit %0d",i); level_cov.sample(i,0); 
+1      248   413   code block           413    if (!pending[i]) $fatal(1,"level assertion missing bit %0d",i); level_cov.sample(i,0); 
+1      249   414   code block           414    clear=13'b1 << i;              
+1      250   415   code block           415    @(negedge clk); #1;            
+1      251   415   code block           415    @(negedge clk); #1;            
+0      252   416   true part of         416    if (!pending[i]) $fatal(1,"level ack changed output bit %0d",i); level_cov.sample(i,1); 
+1      253   416   implicit else        416    if (!pending[i]) $fatal(1,"level ack changed output bit %0d",i); level_cov.sample(i,1); 
+1      254   416   code block           416    if (!pending[i]) $fatal(1,"level ack changed output bit %0d",i); level_cov.sample(i,1); 
+1      255   417   code block           417    raw=0; clear=0; #1;            
+1      256   417   code block           417    raw=0; clear=0; #1;            
+0      257   418   true part of         418    if (pending[i]) $fatal(1,"level deassertion missing bit %0d",i); level_cov.sample(i,2); 
+1      258   418   implicit else        418    if (pending[i]) $fatal(1,"level deassertion missing bit %0d",i); level_cov.sample(i,2); 
+1      259   418   code block           418    if (pending[i]) $fatal(1,"level deassertion missing bit %0d",i); level_cov.sample(i,2); 
+1      260   421   code block           421    write_csr(12'h304,32'h0fff0080); 
+1      261   422   code block           422    if (csr_mie !== 32'h0fff0080) $fatal(1,"mie CSR fast bits mismatch"); 
+0      262   422   true part of         422    if (csr_mie !== 32'h0fff0080) $fatal(1,"mie CSR fast bits mismatch"); 
+1      263   422   implicit else        422    if (csr_mie !== 32'h0fff0080) $fatal(1,"mie CSR fast bits mismatch"); 
+1      264   423   code block           423    for (i=0; i<4; i=i+1) begin    
+1      265   423   code block           423    for (i=0; i<4; i=i+1) begin    
+1      266   424   code block           424    for (j=0; j<4; j=j+1) begin    
+1      267   426   code block           426    upper_pattern=(i*4+j)%3;       
+1      268   428   a case item of       427    0: csr_test_data=j;            
+1      269   429   a case item of       427    1: csr_test_data=32'ha5a5_a5a4 | j; 
+1      270   430   a case item of       427    default: csr_test_data=32'hffff_fffc | j; 
+1      271   432   code block           432    write_csr(12'h7c0,csr_test_data); 
+1      272   433   code block           433    csr_addr=12'h7c0; #1;          
+1      273   433   code block           433    csr_addr=12'h7c0; #1;          
+0      274   434   true part of         434    if (csr_read !== j || csr_threshold !== j) $fatal(1,"mintprio CSR transition mismatch"); 
+1      275   434   implicit else        434    if (csr_read !== j || csr_threshold !== j) $fatal(1,"mintprio CSR transition mismatch"); 
+1      276   435   code block           435    csr_cov.sample(i,j,upper_pattern); 
+1      277   438   code block           438    write_csr(12'h7c0,2);          
+1      278   439   code block           439    @(negedge clk); csr_write=1; csr_write_addr=12'h7c0; csr_write_data=1; csr_trap=1; 
+1      279   440   code block           440    @(negedge clk); csr_write=0; csr_trap=0; #1; 
+1      280   440   code block           440    @(negedge clk); csr_write=0; csr_trap=0; #1; 
+0      281   441   true part of         441    if (csr_threshold !== 2) $fatal(1,"trap changed mintprio"); csr_control_cov.sample(1); 
+1      282   441   implicit else        441    if (csr_threshold !== 2) $fatal(1,"trap changed mintprio"); csr_control_cov.sample(1); 
+1      283   441   code block           441    if (csr_threshold !== 2) $fatal(1,"trap changed mintprio"); csr_control_cov.sample(1); 
+1      284   442   code block           442    @(negedge clk); csr_write=1; csr_write_addr=12'h7c0; csr_write_data=1; csr_mret=1; 
+1      285   443   code block           443    @(negedge clk); csr_write=0; csr_mret=0; #1; 
+1      286   443   code block           443    @(negedge clk); csr_write=0; csr_mret=0; #1; 
+0      287   444   true part of         444    if (csr_threshold !== 2) $fatal(1,"MRET changed mintprio"); csr_control_cov.sample(2); 
+1      288   444   implicit else        444    if (csr_threshold !== 2) $fatal(1,"MRET changed mintprio"); csr_control_cov.sample(2); 
+1      289   444   code block           444    if (csr_threshold !== 2) $fatal(1,"MRET changed mintprio"); csr_control_cov.sample(2); 
+1      290   447   code block           447    for (i=0; i<32; i=i+1) begin   
+1      291   447   code block           447    for (i=0; i<32; i=i+1) begin   
+1      292   448   true part of         448    if ((i==3) || (i==7) || (i==11) || (i>=16)) begin 
+1      293   450   code block           450    if (csr_mie !== (32'b1 << i)) $fatal(1,"mie CSR bit %0d failed",i); 
+0      294   450   true part of         450    if (csr_mie !== (32'b1 << i)) $fatal(1,"mie CSR bit %0d failed",i); 
+1      295   450   implicit else        450    if (csr_mie !== (32'b1 << i)) $fatal(1,"mie CSR bit %0d failed",i); 
+1      296   451   code block           451    mie_bits_cov.sample(i);        
+1      297   448   implicit else        448    if ((i==3) || (i==7) || (i==11) || (i>=16)) begin 
+1      298   454   code block           454    write_csr(12'h304,32'hffff_ffff); 
+1      299   455   code block           455    if (csr_mie !== 32'hffff_0888) $fatal(1,"mie implemented-bit mask failed"); 
+0      300   455   true part of         455    if (csr_mie !== 32'hffff_0888) $fatal(1,"mie implemented-bit mask failed"); 
+1      301   455   implicit else        455    if (csr_mie !== 32'hffff_0888) $fatal(1,"mie implemented-bit mask failed"); 
+1      302   457   code block           457    for (i=0; i<2; i=i+1) begin    
+1      303   457   code block           457    for (i=0; i<2; i=i+1) begin    
+1      304   459   code block           459    @(negedge clk); csr_trap=1;    
+1      305   460   code block           460    @(negedge clk); csr_trap=0; #1; 
+1      306   460   code block           460    @(negedge clk); csr_trap=0; #1; 
+0      307   463   true part of         461    $fatal(1,"trap CSR capture mismatch MIE=%0d",i); 
+1      308   461   implicit else        461    if (csr_mstatus[3] !== 0 || csr_mstatus[7] !== i || 
+1      309   464   code block           464    csr_irq_cov.sample(i);         
+1      310   465   code block           465    @(negedge clk); csr_mret=1;    
+1      311   466   code block           466    @(negedge clk); csr_mret=0; #1; 
+1      312   466   code block           466    @(negedge clk); csr_mret=0; #1; 
+0      313   468   true part of         467    $fatal(1,"MRET CSR restore mismatch MPIE=%0d",i); 
+1      314   467   implicit else        467    if (csr_mstatus[3] !== i || csr_mstatus[7] !== 1 || csr_threshold !== 2) 
+1      315   469   code block           469    csr_irq_cov.sample(i+2);       
+1      316   471   code block           471    write_csr(12'h344,32'h8); #1;  
+1      317   471   code block           471    write_csr(12'h344,32'h8); #1;  
+0      318   472   true part of         472    if (!csr_mip[3]) $fatal(1,"software MSIP write missing"); 
+1      319   472   implicit else        472    if (!csr_mip[3]) $fatal(1,"software MSIP write missing"); 
+1      320   473   code block           473    write_csr(12'h344,0); #1;      
+1      321   473   code block           473    write_csr(12'h344,0); #1;      
+0      322   474   true part of         474    if (csr_mip[3]) $fatal(1,"software MSIP clear failed"); csr_irq_cov.sample(4); 
+1      323   474   implicit else        474    if (csr_mip[3]) $fatal(1,"software MSIP clear failed"); csr_irq_cov.sample(4); 
+1      324   474   code block           474    if (csr_mip[3]) $fatal(1,"software MSIP clear failed"); csr_irq_cov.sample(4); 
+1      325   475   code block           475    csr_sw=1; #1; if (!csr_mip[3]) $fatal(1,"MSIP input missing"); 
+1      326   475   code block           475    csr_sw=1; #1; if (!csr_mip[3]) $fatal(1,"MSIP input missing"); 
+0      327   475   true part of         475    csr_sw=1; #1; if (!csr_mip[3]) $fatal(1,"MSIP input missing"); 
+1      328   475   implicit else        475    csr_sw=1; #1; if (!csr_mip[3]) $fatal(1,"MSIP input missing"); 
+1      329   476   code block           476    csr_sw=0; #1; if (csr_mip[3]) $fatal(1,"MSIP input clear failed"); csr_irq_cov.sample(5); 
+1      330   476   code block           476    csr_sw=0; #1; if (csr_mip[3]) $fatal(1,"MSIP input clear failed"); csr_irq_cov.sample(5); 
+0      331   476   true part of         476    csr_sw=0; #1; if (csr_mip[3]) $fatal(1,"MSIP input clear failed"); csr_irq_cov.sample(5); 
+1      332   476   implicit else        476    csr_sw=0; #1; if (csr_mip[3]) $fatal(1,"MSIP input clear failed"); csr_irq_cov.sample(5); 
+1      333   476   code block           476    csr_sw=0; #1; if (csr_mip[3]) $fatal(1,"MSIP input clear failed"); csr_irq_cov.sample(5); 
+1      334   477   code block           477    csr_ext=1; #1; if (!csr_mip[11]) $fatal(1,"MEIP input missing"); 
+1      335   477   code block           477    csr_ext=1; #1; if (!csr_mip[11]) $fatal(1,"MEIP input missing"); 
+0      336   477   true part of         477    csr_ext=1; #1; if (!csr_mip[11]) $fatal(1,"MEIP input missing"); 
+1      337   477   implicit else        477    csr_ext=1; #1; if (!csr_mip[11]) $fatal(1,"MEIP input missing"); 
+1      338   478   code block           478    csr_ext=0; #1; if (csr_mip[11]) $fatal(1,"MEIP input clear failed"); csr_irq_cov.sample(6); 
+1      339   478   code block           478    csr_ext=0; #1; if (csr_mip[11]) $fatal(1,"MEIP input clear failed"); csr_irq_cov.sample(6); 
+0      340   478   true part of         478    csr_ext=0; #1; if (csr_mip[11]) $fatal(1,"MEIP input clear failed"); csr_irq_cov.sample(6); 
+1      341   478   implicit else        478    csr_ext=0; #1; if (csr_mip[11]) $fatal(1,"MEIP input clear failed"); csr_irq_cov.sample(6); 
+1      342   478   code block           478    csr_ext=0; #1; if (csr_mip[11]) $fatal(1,"MEIP input clear failed"); csr_irq_cov.sample(6); 
+1      343   479   code block           479    $display("PASS: %0d arbitration snapshots plus gateway, mip/mie, mintprio and commit checks",snapshots); 
+
+Instance name: tb_irq_restructure.gw
+Type name: irq_gateway
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/irq_gateway.v
+Number of covered blocks: 3 of 3
+Number of uncovered blocks: 0 of 3
+
+Count  Block Line  Kind                 Origin Source Code                    
+------------------------------------------------------------------------------
+1      1     19    code block           19     always @(posedge clk_i or negedge rst_ni) begin 
+1      2     20    true part of         20     if (!rst_ni) begin             
+1      3     23    false part of        20     end else begin                 
+
+Instance name: tb_irq_restructure.arb
+Type name: irq_arbiter
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/irq_arbiter.v
+Number of covered blocks: 55 of 56
+Number of uncovered blocks: 1 of 56
+
+Count  Block Line  Kind                 Origin Source Code                    
+------------------------------------------------------------------------------
+1      1     26    code block           26     always @(posedge clk_i or negedge rst_ni) begin 
+1      2     27    true part of         27     if (!rst_ni) begin             
+1      3     30    false part of        27     end else if (wb_commit_i) begin 
+1      4     30    true part of         30     end else if (wb_commit_i) begin 
+1      5     32    a case item of       31     5'd19: rr_ptr_c1 <= 2'd1;      
+1      6     33    a case item of       31     5'd18: rr_ptr_c1 <= 2'd2;      
+1      7     34    a case item of       31     5'd27: rr_ptr_c1 <= 2'd0;      
+1      8     35    a case item of       31     5'd17: rr_ptr_c0 <= 1'b1;      
+1      9     36    a case item of       31     5'd16: rr_ptr_c0 <= 1'b0;      
+0      10    37    a case item of       31     default: ;                     
+1      11    30    implicit else        30     end else if (wb_commit_i) begin 
+1      12    44    code block           44     always @(*) begin              
+1      13    48    a case item of       47     2'd0: begin                    
+1      14    49    true part of         49     if      (active[4])  c1_id = 5'd19; 
+1      15    50    false part of        49     else if (active[3])  c1_id = 5'd18; 
+1      16    50    true part of         50     else if (active[3])  c1_id = 5'd18; 
+1      17    51    false part of        50     else if (active[12]) c1_id = 5'd27; 
+1      18    51    true part of         51     else if (active[12]) c1_id = 5'd27; 
+1      19    52    false part of        51     else c1_valid = 1'b0;          
+1      20    54    a case item of       47     2'd1: begin                    
+1      21    55    true part of         55     if      (active[3])  c1_id = 5'd18; 
+1      22    56    false part of        55     else if (active[12]) c1_id = 5'd27; 
+1      23    56    true part of         56     else if (active[12]) c1_id = 5'd27; 
+1      24    57    false part of        56     else if (active[4])  c1_id = 5'd19; 
+1      25    57    true part of         57     else if (active[4])  c1_id = 5'd19; 
+1      26    58    false part of        57     else c1_valid = 1'b0;          
+1      27    60    a case item of       47     default: begin                 
+1      28    61    true part of         61     if      (active[12]) c1_id = 5'd27; 
+1      29    62    false part of        61     else if (active[4])  c1_id = 5'd19; 
+1      30    62    true part of         62     else if (active[4])  c1_id = 5'd19; 
+1      31    63    false part of        62     else if (active[3])  c1_id = 5'd18; 
+1      32    63    true part of         63     else if (active[3])  c1_id = 5'd18; 
+1      33    64    false part of        63     else c1_valid = 1'b0;          
+1      34    72    code block           72     always @(*) begin              
+1      35    75    true part of         75     if      (active[0])  winner_id = 5'd7; 
+1      36    76    false part of        75     else if (active[7])  winner_id = 5'd22; 
+1      37    76    true part of         76     else if (active[7])  winner_id = 5'd22; 
+1      38    77    false part of        76     else if (active[9])  winner_id = 5'd24; 
+1      39    77    true part of         77     else if (active[9])  winner_id = 5'd24; 
+1      40    78    false part of        77     else if (active[11]) winner_id = 5'd26; 
+1      41    78    true part of         78     else if (active[11]) winner_id = 5'd26; 
+1      42    79    false part of        78     else if (active[5])  winner_id = 5'd20; 
+1      43    79    true part of         79     else if (active[5])  winner_id = 5'd20; 
+1      44    80    false part of        79     else if (active[6])  winner_id = 5'd21; 
+1      45    80    true part of         80     else if (active[6])  winner_id = 5'd21; 
+1      46    81    false part of        80     else if (active[8])  winner_id = 5'd23; 
+1      47    81    true part of         81     else if (active[8])  winner_id = 5'd23; 
+1      48    82    false part of        81     else if (active[10]) winner_id = 5'd25; 
+1      49    82    true part of         82     else if (active[10]) winner_id = 5'd25; 
+1      50    83    false part of        82     else if (c1_valid) begin       
+1      51    83    true part of         83     else if (c1_valid) begin       
+1      52    86    false part of        83     end else if (active[2] || active[1]) begin 
+1      53    86    true part of         86     end else if (active[2] || active[1]) begin 
+1      54    89    true part of         88     winner_id = active[2] ? 5'd17 : 5'd16; 
+1      55    91    false part of        88     winner_id = active[1] ? 5'd16 : 5'd17; 
+1      56    92    false part of        86     end else begin                 
+
+Instance name: tb_irq_restructure.wb
+Type name: wb_trap_mret_commit_controller
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/wb_trap_mret_commit_controller.v
+Number of covered blocks: 7 of 7
+Number of uncovered blocks: 0 of 7
+
+Count  Block Line  Kind                 Origin Source Code                    
+------------------------------------------------------------------------------
+1      1     82    code block           82     always @(*) begin              
+1      2     84    true part of         84     if (trap_commit && trap_is_interrupt_o) begin 
+1      3     86    true part of         85     clear_gateway_r[0] = 1'b1;     
+1      4     87    false part of        85     else if ((exc_cause_W[4:0] >= 5'd16) && 
+1      5     89    true part of         87     clear_gateway_r[exc_cause_W[4:0] - 5'd15] = 1'b1; 
+1      6     87    implicit else        87     else if ((exc_cause_W[4:0] >= 5'd16) && 
+1      7     84    implicit else        84     if (trap_commit && trap_is_interrupt_o) begin 
+
+Instance name: tb_irq_restructure.csr
+Type name: csr_regfile
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/csr_regfile.v
+Number of covered blocks: 25 of 49
+Number of uncovered blocks: 24 of 49
+
+Count  Block Line  Kind                 Origin Source Code                    
+------------------------------------------------------------------------------
+1      1     116   code block           116    always @(*) begin : read_mux   
+0      2     118   a case item of       117    MSTATUS_ADDR:   csr_rdata_o = mstatus_r; 
+0      3     119   a case item of       117    MIE_ADDR:       csr_rdata_o = mie_r; 
+0      4     120   a case item of       117    MTVEC_ADDR:     csr_rdata_o = mtvec_r; 
+0      5     121   a case item of       117    MSCRATCH_ADDR:  csr_rdata_o = mscratch_r; 
+0      6     122   a case item of       117    MEPC_ADDR:      csr_rdata_o = mepc_r; 
+0      7     123   a case item of       117    MCAUSE_ADDR:    csr_rdata_o = mcause_r; 
+0      8     124   a case item of       117    MTVAL_ADDR:     csr_rdata_o = mtval_r; 
+0      9     125   a case item of       117    MIP_ADDR:       csr_rdata_o = mip_w; 
+1      10    126   a case item of       117    MINTPRIO_ADDR:  csr_rdata_o = {30'b0, mintprio_r}; 
+0      11    127   a case item of       117    MCYCLE_ADDR:    csr_rdata_o = mcycle_r[31:0]; 
+0      12    128   a case item of       117    MCYCLEH_ADDR:   csr_rdata_o = mcycle_r[63:32]; 
+0      13    129   a case item of       117    MINSTRET_ADDR:  csr_rdata_o = minstret_r[31:0]; 
+0      14    130   a case item of       117    MINSTRETH_ADDR: csr_rdata_o = minstret_r[63:32]; 
+1      15    131   a case item of       117    default:        csr_rdata_o = 32'h0; 
+1      16    138   code block           138    always @(posedge clk_i or negedge rst_n_i) begin : write_ports 
+1      17    139   true part of         139    if (!rst_n_i) begin            
+1      18    151   false part of        139    else begin                     
+0      19    154   true part of         154    if (instr_retired_i) minstret_r <= minstret_r + 1'b1; 
+1      20    154   implicit else        154    if (instr_retired_i) minstret_r <= minstret_r + 1'b1; 
+1      21    159   code block           159    if (trap_valid_i) begin        
+1      22    159   true part of         159    if (trap_valid_i) begin        
+1      23    172   false part of        159    else if (csr_write_en_mret_i || mret_commit_i) begin 
+1      24    172   true part of         172    else if (csr_write_en_mret_i || mret_commit_i) begin 
+0      25    176   true part of         176    if (csr_write_en_mret_i && (csr_waddr_mret_i == MSTATUS_ADDR)) begin 
+1      26    176   implicit else        176    if (csr_write_en_mret_i && (csr_waddr_mret_i == MSTATUS_ADDR)) begin 
+1      27    184   false part of        172    else if (csr_write_en_normal_i) begin 
+1      28    184   true part of         184    else if (csr_write_en_normal_i) begin 
+1      29    186   a case item of       185    MSTATUS_ADDR:  mstatus_r  <= (csr_wdata_normal_i & 32'h0000188A) | (mstatus_r & ~32'h0000188A); 
+1      30    187   a case item of       185    MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'hFFFF0888) | (mie_r & ~32'hFFFF0888); 
+0      31    188   a case item of       185    MTVEC_ADDR:    mtvec_r    <= (csr_wdata_normal_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC); 
+0      32    189   a case item of       185    MSCRATCH_ADDR: mscratch_r <= csr_wdata_normal_i; 
+0      33    190   a case item of       185    MEPC_ADDR:     mepc_r     <= csr_wdata_normal_i; 
+0      34    191   a case item of       185    MCAUSE_ADDR:   mcause_r   <= csr_wdata_normal_i; 
+0      35    192   a case item of       185    MTVAL_ADDR:    mtval_r    <= csr_wdata_normal_i; 
+1      36    193   a case item of       185    MINTPRIO_ADDR: mintprio_r <= csr_wdata_normal_i[1:0]; // [31:2] ignored 
+0      37    194   a case item of       185    MCYCLE_ADDR:   mcycle_r[31:0]   <= csr_wdata_normal_i; 
+0      38    195   a case item of       185    MCYCLEH_ADDR:  mcycle_r[63:32]  <= csr_wdata_normal_i; 
+0      39    196   a case item of       185    MINSTRET_ADDR: minstret_r[31:0]  <= csr_wdata_normal_i; 
+0      40    197   a case item of       185    MINSTRETH_ADDR:minstret_r[63:32] <= csr_wdata_normal_i; 
+1      41    198   a case item of       185    default: ;                     
+1      42    184   implicit else        184    else if (csr_write_en_normal_i) begin 
+1      43    208   code block           208    always @(posedge clk_i or negedge rst_n_i) begin : msip_storage 
+1      44    210   true part of         209    msip_r <= 1'b0;                
+1      45    211   false part of        209    else if (csr_write_en_mret_i && (csr_waddr_mret_i == MIP_ADDR)) 
+0      46    212   true part of         211    msip_r <= csr_wdata_mret_i[3]; 
+1      47    213   false part of        211    else if (csr_write_en_normal_i && (csr_waddr_normal_i == MIP_ADDR)) 
+1      48    214   true part of         213    msip_r <= csr_wdata_normal_i[3]; 
+1      49    213   implicit else        213    else if (csr_write_en_normal_i && (csr_waddr_normal_i == MIP_ADDR)) 
+
+Covered+Uncovered Expression Detail Report, Instance Based
+==========================================================
+
+Expression coverage Table Legend
+---------------------
+  -      don't care
+  e      event for event-or expressions
+  O (odd), E (even), B (both), X (not scored),
+         I (marked ignore) for parity trees
+  Y (covered), N (not covered), C (constant), 
+  P (one or more inputs for this bit have been padded) for vector scoring, 
+  d=== , b=== shows which bit differs in vector scoring 
+  rval   Resulting value of the expression for coverage purposes given
+         the input values
+  <-n->  Shows the n-th term composition
+
+
+Instance name: tb_irq_restructure
+Type name: tb_irq_restructure
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv
+Number of covered expressions: 49 of 88
+Number of uncovered expressions: 39 of 88
+
+index  | grade         | line   | expression                                         
+-------------------------------------------------------------------------------------
+1.1    | 25.00% (1/4)  | 199    | ((csr_threshold !== 0) || (csr_mie !== 0)) || (pending !== 0) 
+2.1    | 100.00% (3/3) | 215    | (! found) && arb_pending[bit_for_id()]             
+3.1    | 100.00% (3/3) | 220    | (! found) && arb_pending[bit_for_id()]             
+4.1    | 100.00% (3/3) | 224    | (! found) && (arb_pending[(bgptr ? 1 : 2)])        
+5.1    | 100.00% (3/3) | 227    | (! found) && (arb_pending[(bgptr ? 2 : 1)])        
+6.1    | 40.00% (2/5)  | 230    | (irq_valid !== (found && ((expected_class + 1) > t))) || (irq_valid && ((irq_id !== expected_id) || (irq_class !== expected_class))) 
+6.2    | 100.00% (3/3) | 230    | (found && ((expected_class + 1) > t))              
+7.1    | 100.00% (2/2) | 234    | (t == 0) && ((arb_pending & (~ 13'h1018)) == 0)    
+8.1    | 100.00% (2/2) | 238    | (t == 0) && ((arb_pending & (~ 13'h0006)) == 0)    
+9.1    | 33.33% (1/3)  | 250    | (! irq_valid) || (irq_id != expected_id)           
+10.1   | 33.33% (1/3)  | 262    | (! irq_valid) || (irq_id != fixed_order[i])        
+11.1   | 100.00% (3/3) | 269    | ((i == 1) || (i == 2))                             
+11.2   | 100.00% (4/4) | 269    | (((i == 3) || (i == 4)) || (i == 12))              
+12.1   | 40.00% (2/5)  | 276    | (irq_valid !== found) || (found && ((irq_id != expected_id) || (irq_class != expected_class))) 
+13.1   | 33.33% (1/3)  | 293    | (! irq_valid) || (irq_id != expected_id)           
+14.1   | 33.33% (1/3)  | 297    | (! irq_valid) || (irq_id != expected_id)           
+15.1   | 33.33% (1/3)  | 302    | (! irq_valid) || (irq_id != next_id)               
+16.1   | 33.33% (1/3)  | 310    | (wb_clear !== (13'b0000000000001 << i)) || (! wb_irq) 
+17.1   | 33.33% (1/3)  | 313    | wb_clear || wb_irq                                 
+18.1   | 33.33% (1/3)  | 316    | wb_clear || (! wb_irq)                             
+19.1   | 33.33% (1/3)  | 319    | wb_clear || wb_irq                                 
+20.1   | 33.33% (1/3)  | 322    | wb_clear || wb_irq                                 
+21.1   | 33.33% (1/3)  | 434    | (csr_read !== j) || (csr_threshold !== j)          
+22.1   | 100.00% (5/5) | 448    | (((i == 3) || (i == 7)) || (i == 11)) || (i >= 16) 
+23.1   | 16.67% (1/6)  | 462    | ((((csr_mstatus[3] !== 0) || (csr_mstatus[7] !== i)) || (csr_mepc !== 32'h00000120)) || (csr_mcause !== 32'h80000013)) || (csr_threshold !== 2) 
+24.1   | 25.00% (1/4)  | 467    | ((csr_mstatus[3] !== i) || (csr_mstatus[7] !== 1)) || (csr_threshold !== 2) 
+
+index: 1.1 grade: 25.00% (1/4) line: 199 source: #1; if (csr_threshold !== 0 || csr_mie !== 0 || pending !== 0)
+
+((csr_threshold !== 0) || (csr_mie !== 0)) || (pending !== 0)
+ <---------1--------->    <------2------>     <------3------>
+
+index     | hit   | <1> <2> <3> 
+-------------------------------- '||'
+1.1.1     | 0     | 1   -   -   
+1.1.2     | 0     | -   1   -   
+1.1.3     | 0     | -   -   1   
+1.1.4     | 1     | 0   0   0   
+
+index: 2.1 grade: 100.00% (3/3) line: 215 source: if (!found && arb_pending[bit_for_id(fixed_order[j])]) begin
+
+(! found) && arb_pending[bit_for_id()]
+   <-1->     <-----------2----------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+2.1.1     | 1     | 1    | 0   1   
+2.1.2     | 1     | 0    | -   0   
+2.1.3     | 1     | 0    | 1   -   
+
+index: 3.1 grade: 100.00% (3/3) line: 220 source: if (!found && arb_pending[bit_for_id(stream_order[idx])]) begin
+
+(! found) && arb_pending[bit_for_id()]
+   <-1->     <-----------2----------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+3.1.1     | 1     | 1    | 0   1   
+3.1.2     | 1     | 0    | -   0   
+3.1.3     | 1     | 0    | 1   -   
+
+index: 4.1 grade: 100.00% (3/3) line: 224 source: if (!found && arb_pending[bgptr ? 1 : 2]) begin
+
+(! found) && (arb_pending[(bgptr ? 1 : 2)])
+   <-1->     <-------------2-------------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+4.1.1     | 1     | 1    | 0   1   
+4.1.2     | 1     | 0    | -   0   
+4.1.3     | 1     | 0    | 1   -   
+
+index: 5.1 grade: 100.00% (3/3) line: 227 source: if (!found && arb_pending[bgptr ? 2 : 1]) begin
+
+(! found) && (arb_pending[(bgptr ? 2 : 1)])
+   <-1->     <-------------2-------------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+5.1.1     | 1     | 1    | 0   1   
+5.1.2     | 1     | 0    | -   0   
+5.1.3     | 1     | 0    | 1   -   
+
+index: 6.1 grade: 40.00% (2/5) line: 230 source: if (irq_valid !== (found && expected_class+1 > t) ||
+
+(irq_valid !== (found && ((expected_class + 1) > t))) || (irq_valid && ((irq_id !== expected_id) || (irq_class !== expected_class)))
+<-------------------------1------------------------->     <---2--->     <----------3----------->    <-------------4-------------->
+
+index     | hit   | rval | <1> <2> <3> <4> 
+-------------------------------------------
+6.1.1     | 0     | 1    | -   1   -   1   
+6.1.2     | 0     | 1    | -   1   1   -   
+6.1.3     | 0     | 1    | 1   -   -   -   
+6.1.4     | 1     | 0    | 0   -   0   0   
+6.1.5     | 1     | 0    | 0   0   -   -   
+
+index: 6.2 grade: 100.00% (3/3) line: 230 source: if (irq_valid !== (found && expected_class+1 > t) ||
+
+(found && ((expected_class + 1) > t))
+ <-5->    <-----------6------------>
+
+index     | hit   | <5> <6> 
+---------------------------- '&&'
+6.2.1     | 1     | 0   -   
+6.2.2     | 1     | -   0   
+6.2.3     | 1     | 1   1   
+
+index: 7.1 grade: 100.00% (2/2) line: 234 source: if (t==0 && (arb_pending & ~13'h1018)==0) begin
+
+(t == 0) && ((arb_pending & (~ 13'h1018)) == 0)
+ <1>          <----3---->
+
+index     | hit   | rval | <1> <3> 
+-----------------------------------
+7.1.1     | 1     | 1    | 0   -   
+7.1.2     | 1     | 0    | 1   -   
+
+index: 8.1 grade: 100.00% (2/2) line: 238 source: if (t==0 && (arb_pending & ~13'h0006)==0)
+
+(t == 0) && ((arb_pending & (~ 13'h0006)) == 0)
+ <1>          <----3---->
+
+index     | hit   | rval | <1> <3> 
+-----------------------------------
+8.1.1     | 1     | 1    | 0   -   
+8.1.2     | 1     | 0    | 1   -   
+
+index: 9.1 grade: 33.33% (1/3) line: 250 source: if (!irq_valid || irq_id != expected_id)
+
+(! irq_valid) || (irq_id != expected_id)
+   <---1--->     <----------2---------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+9.1.1     | 0     | 1    | -   1   
+9.1.2     | 0     | 1    | 0   -   
+9.1.3     | 1     | 0    | 1   0   
+
+index: 10.1 grade: 33.33% (1/3) line: 262 source: if (!irq_valid || irq_id != fixed_order[i]) $fatal(1,"fixed pair mismatch");
+
+(! irq_valid) || (irq_id != fixed_order[i])
+   <---1--->     <-----------2------------>
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+10.1.1    | 0     | 1    | -   1   
+10.1.2    | 0     | 1    | 0   -   
+10.1.3    | 1     | 0    | 1   0   
+
+index: 11.1 grade: 100.00% (3/3) line: 269 source: expected_class=(i==1 || i==2) ? 0 : ((i==3 || i==4 || i==12) ? 1 : 2);
+
+((i == 1) || (i == 2))
+ <--1--->    <--2--->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+11.1.1    | 1     | 1   -   
+11.1.2    | 1     | -   1   
+11.1.3    | 1     | 0   0   
+
+index: 11.2 grade: 100.00% (4/4) line: 269 source: expected_class=(i==1 || i==2) ? 0 : ((i==3 || i==4 || i==12) ? 1 : 2);
+
+(((i == 3) || (i == 4)) || (i == 12))
+  <--3--->    <--4--->     <---5--->
+
+index     | hit   | <3> <4> <5> 
+-------------------------------- '||'
+11.2.1    | 1     | 1   -   -   
+11.2.2    | 1     | -   1   -   
+11.2.3    | 1     | -   -   1   
+11.2.4    | 1     | 0   0   0   
+
+index: 12.1 grade: 40.00% (2/5) line: 276 source: if (irq_valid !== found || (found && (irq_id != expected_id || irq_class != expected_class)))
+
+(irq_valid !== found) || (found && ((irq_id != expected_id) || (irq_class != expected_class)))
+<---------1--------->     <-2->     <----------3---------->    <-------------4------------->
+
+index     | hit   | rval | <1> <2> <3> <4> 
+-------------------------------------------
+12.1.1    | 0     | 1    | -   1   -   1   
+12.1.2    | 0     | 1    | -   1   1   -   
+12.1.3    | 0     | 1    | 1   -   -   -   
+12.1.4    | 1     | 0    | 0   -   0   0   
+12.1.5    | 1     | 0    | 0   0   -   -   
+
+index: 13.1 grade: 33.33% (1/3) line: 293 source: #1; if (!irq_valid || irq_id != expected_id) $fatal(1,"RR initial winner mismatch");
+
+(! irq_valid) || (irq_id != expected_id)
+   <---1--->     <----------2---------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+13.1.1    | 0     | 1    | -   1   
+13.1.2    | 0     | 1    | 0   -   
+13.1.3    | 1     | 0    | 1   0   
+
+index: 14.1 grade: 33.33% (1/3) line: 297 source: if (!irq_valid || irq_id != expected_id) $fatal(1,"RR changed without matching commit");
+
+(! irq_valid) || (irq_id != expected_id)
+   <---1--->     <----------2---------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+14.1.1    | 0     | 1    | -   1   
+14.1.2    | 0     | 1    | 0   -   
+14.1.3    | 1     | 0    | 1   0   
+
+index: 15.1 grade: 33.33% (1/3) line: 302 source: if (!irq_valid || irq_id != next_id) $fatal(1,"RR did not advance after commit");
+
+(! irq_valid) || (irq_id != next_id)
+   <---1--->     <--------2-------->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+15.1.1    | 0     | 1    | -   1   
+15.1.2    | 0     | 1    | 0   -   
+15.1.3    | 1     | 0    | 1   0   
+
+index: 16.1 grade: 33.33% (1/3) line: 310 source: if (wb_clear !== (13'b1 << i) || !wb_irq) $fatal(1,"commit clear mismatch bit=%0d",i);
+
+(wb_clear !== (13'b0000000000001 << i)) || (! wb_irq)
+<------------------1------------------>       <-2-->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+16.1.1    | 0     | 1    | -   0   
+16.1.2    | 0     | 1    | 1   -   
+16.1.3    | 1     | 0    | 0   1   
+
+index: 17.1 grade: 33.33% (1/3) line: 313 source: wb_cause=6'd7; #1; if (wb_clear || wb_irq) $fatal(1,"exception cleared an IRQ");
+
+wb_clear || wb_irq
+<--1--->    <-2-->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+17.1.1    | 0     | 1   -   
+17.1.2    | 0     | -   1   
+17.1.3    | 1     | 0   0   
+
+index: 18.1 grade: 33.33% (1/3) line: 316 source: if (wb_clear || !wb_irq) $fatal(1,"unsupported IRQ clear mismatch");
+
+wb_clear || (! wb_irq)
+<--1--->       <-2-->
+
+index     | hit   | rval | <1> <2> 
+-----------------------------------
+18.1.1    | 0     | 1    | -   0   
+18.1.2    | 0     | 1    | 1   -   
+18.1.3    | 1     | 0    | 0   1   
+
+index: 19.1 grade: 33.33% (1/3) line: 319 source: if (wb_clear || wb_irq) $fatal(1,"invalid exception packet acknowledged");
+
+wb_clear || wb_irq
+<--1--->    <-2-->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+19.1.1    | 0     | 1   -   
+19.1.2    | 0     | -   1   
+19.1.3    | 1     | 0   0   
+
+index: 20.1 grade: 33.33% (1/3) line: 322 source: if (wb_clear || wb_irq) $fatal(1,"invalid WB packet acknowledged");
+
+wb_clear || wb_irq
+<--1--->    <-2-->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+20.1.1    | 0     | 1   -   
+20.1.2    | 0     | -   1   
+20.1.3    | 1     | 0   0   
+
+index: 21.1 grade: 33.33% (1/3) line: 434 source: if (csr_read !== j || csr_threshold !== j) $fatal(1,"mintprio CSR transition mismatch");
+
+(csr_read !== j) || (csr_threshold !== j)
+<------1------->    <---------2--------->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+21.1.1    | 0     | 1   -   
+21.1.2    | 0     | -   1   
+21.1.3    | 1     | 0   0   
+
+index: 22.1 grade: 100.00% (5/5) line: 448 source: if ((i==3) || (i==7) || (i==11) || (i>=16)) begin
+
+(((i == 3) || (i == 7)) || (i == 11)) || (i >= 16)
+  <--1--->    <--2--->     <---3--->     <---4--->
+
+index     | hit   | <1> <2> <3> <4> 
+------------------------------------ '||'
+22.1.1    | 1     | 1   -   -   -   
+22.1.2    | 1     | -   1   -   -   
+22.1.3    | 1     | -   -   1   -   
+22.1.4    | 1     | -   -   -   1   
+22.1.5    | 1     | 0   0   0   0   
+
+index: 23.1 grade: 16.67% (1/6) line: 462 source: csr_mepc !== 32'h120 || csr_mcause !== 32'h8000_0013 || csr_threshold !== 2)
+
+((((csr_mstatus[3] !== 0) || (csr_mstatus[7] !== i)) || (csr_mepc !== 32'h00000120)) || (csr_mcause !== 32'h80000013)) || (csr_threshold !== 2)
+   <---------1---------->    <---------2---------->     <------------3------------>     <-------------4------------->     <---------5--------->
+
+index     | hit   | <1> <2> <3> <4> <5> 
+---------------------------------------- '||'
+23.1.1    | 0     | 1   -   -   -   -   
+23.1.2    | 0     | -   1   -   -   -   
+23.1.3    | 0     | -   -   1   -   -   
+23.1.4    | 0     | -   -   -   1   -   
+23.1.5    | 0     | -   -   -   -   1   
+23.1.6    | 1     | 0   0   0   0   0   
+
+index: 24.1 grade: 25.00% (1/4) line: 467 source: if (csr_mstatus[3] !== i || csr_mstatus[7] !== 1 || csr_threshold !== 2)
+
+((csr_mstatus[3] !== i) || (csr_mstatus[7] !== 1)) || (csr_threshold !== 2)
+ <---------1---------->    <---------2---------->     <---------3--------->
+
+index     | hit   | <1> <2> <3> 
+-------------------------------- '||'
+24.1.1    | 0     | 1   -   -   
+24.1.2    | 0     | -   1   -   
+24.1.3    | 0     | -   -   1   
+24.1.4    | 1     | 0   0   0   
+
+
+Instance name: tb_irq_restructure.arb
+Type name: irq_arbiter
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/irq_arbiter.v
+Number of covered expressions: 3 of 3
+Number of uncovered expressions: 0 of 3
+
+index  | grade         | line   | expression                                         
+-------------------------------------------------------------------------------------
+1.1    | 100.00% (3/3) | 86     | active[2] || active[1]                             
+
+index: 1.1 grade: 100.00% (3/3) line: 86 source: end else if (active[2] || active[1]) begin
+
+active[2] || active[1]
+<---1--->    <---2--->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+1.1.1     | 1     | 1   -   
+1.1.2     | 1     | -   1   
+1.1.3     | 1     | 0   0   
+
+
+Instance name: tb_irq_restructure.wb
+Type name: wb_trap_mret_commit_controller
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/wb_trap_mret_commit_controller.v
+Number of covered expressions: 5 of 6
+Number of uncovered expressions: 1 of 6
+
+index  | grade         | line   | expression                                         
+-------------------------------------------------------------------------------------
+1.1    | 100.00% (3/3) | 84     | trap_commit && trap_is_interrupt_o                 
+2.1    | 66.67% (2/3)  | 87     | (exc_cause_W[4:0] >= 5'd16) && (exc_cause_W[4:0] <= 5'd27) 
+
+index: 1.1 grade: 100.00% (3/3) line: 84 source: if (trap_commit && trap_is_interrupt_o) begin
+
+trap_commit && trap_is_interrupt_o
+<----1---->    <--------2-------->
+
+index     | hit   | <1> <2> 
+---------------------------- '&&'
+1.1.1     | 1     | 0   -   
+1.1.2     | 1     | -   0   
+1.1.3     | 1     | 1   1   
+
+index: 2.1 grade: 66.67% (2/3) line: 87 source: else if ((exc_cause_W[4:0] >= 5'd16) &&
+
+(exc_cause_W[4:0] >= 5'd16) && (exc_cause_W[4:0] <= 5'd27)
+<------------1------------>    <------------2------------>
+
+index     | hit   | <1> <2> 
+---------------------------- '&&'
+2.1.1     | 1     | 0   -   
+2.1.2     | 0     | -   0   
+2.1.3     | 1     | 1   1   
+
+
+Instance name: tb_irq_restructure.csr
+Type name: csr_regfile
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/csr_regfile.v
+Number of covered expressions: 9 of 12
+Number of uncovered expressions: 3 of 12
+
+index  | grade         | line   | expression                                         
+-------------------------------------------------------------------------------------
+1.1    | 66.67% (2/3)  | 172    | csr_write_en_mret_i || mret_commit_i               
+2.1    | 66.67% (2/3)  | 176    | csr_write_en_mret_i && (csr_waddr_mret_i == MSTATUS_ADDR) 
+3.1    | 66.67% (2/3)  | 211    | csr_write_en_mret_i && (csr_waddr_mret_i == MIP_ADDR) 
+4.1    | 100.00% (3/3) | 213    | csr_write_en_normal_i && (csr_waddr_normal_i == MIP_ADDR) 
+
+index: 1.1 grade: 66.67% (2/3) line: 172 source: else if (csr_write_en_mret_i || mret_commit_i) begin
+
+csr_write_en_mret_i || mret_commit_i
+<--------1-------->    <-----2----->
+
+index     | hit   | <1> <2> 
+---------------------------- '||'
+1.1.1     | 0     | 1   -   
+1.1.2     | 1     | -   1   
+1.1.3     | 1     | 0   0   
+
+index: 2.1 grade: 66.67% (2/3) line: 176 source: if (csr_write_en_mret_i && (csr_waddr_mret_i == MSTATUS_ADDR)) begin
+
+csr_write_en_mret_i && (csr_waddr_mret_i == MSTATUS_ADDR)
+<--------1-------->    <---------------2---------------->
+
+index     | hit   | <1> <2> 
+---------------------------- '&&'
+2.1.1     | 1     | 0   -   
+2.1.2     | 1     | -   0   
+2.1.3     | 0     | 1   1   
+
+index: 3.1 grade: 66.67% (2/3) line: 211 source: else if (csr_write_en_mret_i && (csr_waddr_mret_i == MIP_ADDR))
+
+csr_write_en_mret_i && (csr_waddr_mret_i == MIP_ADDR)
+<--------1-------->    <-------------2-------------->
+
+index     | hit   | <1> <2> 
+---------------------------- '&&'
+3.1.1     | 1     | 0   -   
+3.1.2     | 1     | -   0   
+3.1.3     | 0     | 1   1   
+
+index: 4.1 grade: 100.00% (3/3) line: 213 source: else if (csr_write_en_normal_i && (csr_waddr_normal_i == MIP_ADDR))
+
+csr_write_en_normal_i && (csr_waddr_normal_i == MIP_ADDR)
+<---------1--------->    <--------------2--------------->
+
+index     | hit   | <1> <2> 
+---------------------------- '&&'
+4.1.1     | 1     | 0   -   
+4.1.2     | 1     | -   0   
+4.1.3     | 1     | 1   1   
+
+
+Covered+Uncovered Toggle Detail Report, Instance Based
+======================================================
+
+Instance name: tb_irq_restructure
+Type name: tb_irq_restructure
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/tb_irq_restructure.sv
+Number of covered signal bits: 237 of 413
+Number of uncovered signal bits: 176 of 413
+Number of signal bits partially toggled(rise): 16 of 413
+Number of signal bits partially toggled(fall): 0 of 413
+
+Hit(Full)  Hit(Rise)  Hit(Fall)  Signal                    
+-----------------------------------------------------------
+1          1          1          clk                       
+0          1          0          rst_n                     
+1          1          1          raw[12]                   
+1          1          1          raw[11]                   
+1          1          1          raw[10]                   
+1          1          1          raw[9]                    
+1          1          1          raw[8]                    
+1          1          1          raw[7]                    
+1          1          1          raw[6]                    
+1          1          1          raw[5]                    
+1          1          1          raw[4]                    
+1          1          1          raw[3]                    
+1          1          1          raw[2]                    
+1          1          1          raw[1]                    
+1          1          1          raw[0]                    
+1          1          1          clear[12]                 
+1          1          1          clear[11]                 
+1          1          1          clear[10]                 
+1          1          1          clear[9]                  
+1          1          1          clear[8]                  
+1          1          1          clear[7]                  
+1          1          1          clear[6]                  
+1          1          1          clear[5]                  
+1          1          1          clear[4]                  
+1          1          1          clear[3]                  
+1          1          1          clear[2]                  
+1          1          1          clear[1]                  
+1          1          1          clear[0]                  
+1          1          1          pending[12]               
+1          1          1          pending[11]               
+1          1          1          pending[10]               
+1          1          1          pending[9]                
+1          1          1          pending[8]                
+1          1          1          pending[7]                
+1          1          1          pending[6]                
+1          1          1          pending[5]                
+1          1          1          pending[4]                
+1          1          1          pending[3]                
+1          1          1          pending[2]                
+1          1          1          pending[1]                
+1          1          1          pending[0]                
+1          1          1          arb_pending[12]           
+1          1          1          arb_pending[11]           
+1          1          1          arb_pending[10]           
+1          1          1          arb_pending[9]            
+1          1          1          arb_pending[8]            
+1          1          1          arb_pending[7]            
+1          1          1          arb_pending[6]            
+1          1          1          arb_pending[5]            
+1          1          1          arb_pending[4]            
+1          1          1          arb_pending[3]            
+1          1          1          arb_pending[2]            
+1          1          1          arb_pending[1]            
+1          1          1          arb_pending[0]            
+1          1          1          mie[31]                   
+1          1          1          mie[30]                   
+1          1          1          mie[29]                   
+1          1          1          mie[28]                   
+1          1          1          mie[27]                   
+1          1          1          mie[26]                   
+1          1          1          mie[25]                   
+1          1          1          mie[24]                   
+1          1          1          mie[23]                   
+1          1          1          mie[22]                   
+1          1          1          mie[21]                   
+1          1          1          mie[20]                   
+1          1          1          mie[19]                   
+1          1          1          mie[18]                   
+1          1          1          mie[17]                   
+1          1          1          mie[16]                   
+1          1          1          mie[15]                   
+1          1          1          mie[14]                   
+1          1          1          mie[13]                   
+1          1          1          mie[12]                   
+1          1          1          mie[11]                   
+1          1          1          mie[10]                   
+1          1          1          mie[9]                    
+1          1          1          mie[8]                    
+1          1          1          mie[7]                    
+1          1          1          mie[6]                    
+1          1          1          mie[5]                    
+1          1          1          mie[4]                    
+1          1          1          mie[3]                    
+1          1          1          mie[2]                    
+1          1          1          mie[1]                    
+1          1          1          mie[0]                    
+1          1          1          global_mie                
+1          1          1          threshold[1]              
+1          1          1          threshold[0]              
+1          1          1          commit                    
+0          1          0          committed_id[4]           
+1          1          1          committed_id[3]           
+0          0          0          committed_id[2]           
+1          1          1          committed_id[1]           
+1          1          1          committed_id[0]           
+1          1          1          irq_valid                 
+1          1          1          irq_id[4]                 
+1          1          1          irq_id[3]                 
+1          1          1          irq_id[2]                 
+1          1          1          irq_id[1]                 
+1          1          1          irq_id[0]                 
+1          1          1          irq_class[1]              
+1          1          1          irq_class[0]              
+1          1          1          wb_valid                  
+1          1          1          wb_exc_valid              
+1          1          1          wb_cause[5]               
+1          1          1          wb_cause[4]               
+1          1          1          wb_cause[3]               
+1          1          1          wb_cause[2]               
+1          1          1          wb_cause[1]               
+1          1          1          wb_cause[0]               
+1          1          1          wb_clear[12]              
+1          1          1          wb_clear[11]              
+1          1          1          wb_clear[10]              
+1          1          1          wb_clear[9]               
+1          1          1          wb_clear[8]               
+1          1          1          wb_clear[7]               
+1          1          1          wb_clear[6]               
+1          1          1          wb_clear[5]               
+1          1          1          wb_clear[4]               
+1          1          1          wb_clear[3]               
+1          1          1          wb_clear[2]               
+1          1          1          wb_clear[1]               
+1          1          1          wb_clear[0]               
+1          1          1          wb_irq                    
+0          0          0          csr_addr[11]              
+0          1          0          csr_addr[10]              
+0          1          0          csr_addr[9]               
+0          1          0          csr_addr[8]               
+0          1          0          csr_addr[7]               
+0          1          0          csr_addr[6]               
+0          0          0          csr_addr[5]               
+0          0          0          csr_addr[4]               
+0          0          0          csr_addr[3]               
+0          0          0          csr_addr[2]               
+0          0          0          csr_addr[1]               
+0          0          0          csr_addr[0]               
+0          0          0          csr_write_addr[11]        
+1          1          1          csr_write_addr[10]        
+0          1          0          csr_write_addr[9]         
+0          1          0          csr_write_addr[8]         
+1          1          1          csr_write_addr[7]         
+1          1          1          csr_write_addr[6]         
+0          0          0          csr_write_addr[5]         
+0          0          0          csr_write_addr[4]         
+0          0          0          csr_write_addr[3]         
+1          1          1          csr_write_addr[2]         
+0          0          0          csr_write_addr[1]         
+0          0          0          csr_write_addr[0]         
+1          1          1          csr_write_data[31]        
+1          1          1          csr_write_data[30]        
+1          1          1          csr_write_data[29]        
+1          1          1          csr_write_data[28]        
+1          1          1          csr_write_data[27]        
+1          1          1          csr_write_data[26]        
+1          1          1          csr_write_data[25]        
+1          1          1          csr_write_data[24]        
+1          1          1          csr_write_data[23]        
+1          1          1          csr_write_data[22]        
+1          1          1          csr_write_data[21]        
+1          1          1          csr_write_data[20]        
+1          1          1          csr_write_data[19]        
+1          1          1          csr_write_data[18]        
+1          1          1          csr_write_data[17]        
+1          1          1          csr_write_data[16]        
+1          1          1          csr_write_data[15]        
+1          1          1          csr_write_data[14]        
+1          1          1          csr_write_data[13]        
+1          1          1          csr_write_data[12]        
+1          1          1          csr_write_data[11]        
+1          1          1          csr_write_data[10]        
+1          1          1          csr_write_data[9]         
+1          1          1          csr_write_data[8]         
+1          1          1          csr_write_data[7]         
+1          1          1          csr_write_data[6]         
+1          1          1          csr_write_data[5]         
+1          1          1          csr_write_data[4]         
+1          1          1          csr_write_data[3]         
+1          1          1          csr_write_data[2]         
+1          1          1          csr_write_data[1]         
+1          1          1          csr_write_data[0]         
+1          1          1          csr_write                 
+1          1          1          csr_trap                  
+1          1          1          csr_mret                  
+1          1          1          csr_ext                   
+1          1          1          csr_sw                    
+0          0          0          csr_read[31]              
+0          0          0          csr_read[30]              
+0          0          0          csr_read[29]              
+0          0          0          csr_read[28]              
+0          0          0          csr_read[27]              
+0          0          0          csr_read[26]              
+0          0          0          csr_read[25]              
+0          0          0          csr_read[24]              
+0          0          0          csr_read[23]              
+0          0          0          csr_read[22]              
+0          0          0          csr_read[21]              
+0          0          0          csr_read[20]              
+0          0          0          csr_read[19]              
+0          0          0          csr_read[18]              
+0          0          0          csr_read[17]              
+0          0          0          csr_read[16]              
+0          0          0          csr_read[15]              
+0          0          0          csr_read[14]              
+0          0          0          csr_read[13]              
+0          0          0          csr_read[12]              
+0          0          0          csr_read[11]              
+0          0          0          csr_read[10]              
+0          0          0          csr_read[9]               
+0          0          0          csr_read[8]               
+0          0          0          csr_read[7]               
+0          0          0          csr_read[6]               
+0          0          0          csr_read[5]               
+0          0          0          csr_read[4]               
+0          0          0          csr_read[3]               
+0          0          0          csr_read[2]               
+1          1          1          csr_read[1]               
+1          1          1          csr_read[0]               
+0          0          0          csr_mip[31]               
+0          0          0          csr_mip[30]               
+0          0          0          csr_mip[29]               
+0          0          0          csr_mip[28]               
+1          1          1          csr_mip[27]               
+1          1          1          csr_mip[26]               
+1          1          1          csr_mip[25]               
+1          1          1          csr_mip[24]               
+1          1          1          csr_mip[23]               
+1          1          1          csr_mip[22]               
+1          1          1          csr_mip[21]               
+1          1          1          csr_mip[20]               
+1          1          1          csr_mip[19]               
+1          1          1          csr_mip[18]               
+1          1          1          csr_mip[17]               
+1          1          1          csr_mip[16]               
+0          0          0          csr_mip[15]               
+0          0          0          csr_mip[14]               
+0          0          0          csr_mip[13]               
+0          0          0          csr_mip[12]               
+1          1          1          csr_mip[11]               
+0          0          0          csr_mip[10]               
+0          0          0          csr_mip[9]                
+0          0          0          csr_mip[8]                
+1          1          1          csr_mip[7]                
+0          0          0          csr_mip[6]                
+0          0          0          csr_mip[5]                
+0          0          0          csr_mip[4]                
+1          1          1          csr_mip[3]                
+0          0          0          csr_mip[2]                
+0          0          0          csr_mip[1]                
+0          0          0          csr_mip[0]                
+0          1          0          csr_mie[31]               
+1          1          1          csr_mie[30]               
+1          1          1          csr_mie[29]               
+1          1          1          csr_mie[28]               
+1          1          1          csr_mie[27]               
+1          1          1          csr_mie[26]               
+1          1          1          csr_mie[25]               
+1          1          1          csr_mie[24]               
+1          1          1          csr_mie[23]               
+1          1          1          csr_mie[22]               
+1          1          1          csr_mie[21]               
+1          1          1          csr_mie[20]               
+1          1          1          csr_mie[19]               
+1          1          1          csr_mie[18]               
+1          1          1          csr_mie[17]               
+1          1          1          csr_mie[16]               
+0          0          0          csr_mie[15]               
+0          0          0          csr_mie[14]               
+0          0          0          csr_mie[13]               
+0          0          0          csr_mie[12]               
+1          1          1          csr_mie[11]               
+0          0          0          csr_mie[10]               
+0          0          0          csr_mie[9]                
+0          0          0          csr_mie[8]                
+1          1          1          csr_mie[7]                
+0          0          0          csr_mie[6]                
+0          0          0          csr_mie[5]                
+0          0          0          csr_mie[4]                
+1          1          1          csr_mie[3]                
+0          0          0          csr_mie[2]                
+0          0          0          csr_mie[1]                
+0          0          0          csr_mie[0]                
+0          0          0          csr_mstatus[31]           
+0          0          0          csr_mstatus[30]           
+0          0          0          csr_mstatus[29]           
+0          0          0          csr_mstatus[28]           
+0          0          0          csr_mstatus[27]           
+0          0          0          csr_mstatus[26]           
+0          0          0          csr_mstatus[25]           
+0          0          0          csr_mstatus[24]           
+0          0          0          csr_mstatus[23]           
+0          0          0          csr_mstatus[22]           
+0          0          0          csr_mstatus[21]           
+0          0          0          csr_mstatus[20]           
+0          0          0          csr_mstatus[19]           
+0          0          0          csr_mstatus[18]           
+0          0          0          csr_mstatus[17]           
+0          0          0          csr_mstatus[16]           
+0          0          0          csr_mstatus[15]           
+0          0          0          csr_mstatus[14]           
+0          0          0          csr_mstatus[13]           
+1          1          1          csr_mstatus[12]           
+1          1          1          csr_mstatus[11]           
+0          0          0          csr_mstatus[10]           
+0          0          0          csr_mstatus[9]            
+0          0          0          csr_mstatus[8]            
+1          1          1          csr_mstatus[7]            
+0          0          0          csr_mstatus[6]            
+0          0          0          csr_mstatus[5]            
+0          0          0          csr_mstatus[4]            
+1          1          1          csr_mstatus[3]            
+0          0          0          csr_mstatus[2]            
+0          0          0          csr_mstatus[1]            
+0          0          0          csr_mstatus[0]            
+0          0          0          csr_mepc[31]              
+0          0          0          csr_mepc[30]              
+0          0          0          csr_mepc[29]              
+0          0          0          csr_mepc[28]              
+0          0          0          csr_mepc[27]              
+0          0          0          csr_mepc[26]              
+0          0          0          csr_mepc[25]              
+0          0          0          csr_mepc[24]              
+0          0          0          csr_mepc[23]              
+0          0          0          csr_mepc[22]              
+0          0          0          csr_mepc[21]              
+0          0          0          csr_mepc[20]              
+0          0          0          csr_mepc[19]              
+0          0          0          csr_mepc[18]              
+0          0          0          csr_mepc[17]              
+0          0          0          csr_mepc[16]              
+0          0          0          csr_mepc[15]              
+0          0          0          csr_mepc[14]              
+0          0          0          csr_mepc[13]              
+0          0          0          csr_mepc[12]              
+0          0          0          csr_mepc[11]              
+0          0          0          csr_mepc[10]              
+0          0          0          csr_mepc[9]               
+0          1          0          csr_mepc[8]               
+0          0          0          csr_mepc[7]               
+0          0          0          csr_mepc[6]               
+0          1          0          csr_mepc[5]               
+0          0          0          csr_mepc[4]               
+0          0          0          csr_mepc[3]               
+0          0          0          csr_mepc[2]               
+0          0          0          csr_mepc[1]               
+0          0          0          csr_mepc[0]               
+0          1          0          csr_mcause[31]            
+0          0          0          csr_mcause[30]            
+0          0          0          csr_mcause[29]            
+0          0          0          csr_mcause[28]            
+0          0          0          csr_mcause[27]            
+0          0          0          csr_mcause[26]            
+0          0          0          csr_mcause[25]            
+0          0          0          csr_mcause[24]            
+0          0          0          csr_mcause[23]            
+0          0          0          csr_mcause[22]            
+0          0          0          csr_mcause[21]            
+0          0          0          csr_mcause[20]            
+0          0          0          csr_mcause[19]            
+0          0          0          csr_mcause[18]            
+0          0          0          csr_mcause[17]            
+0          0          0          csr_mcause[16]            
+0          0          0          csr_mcause[15]            
+0          0          0          csr_mcause[14]            
+0          0          0          csr_mcause[13]            
+0          0          0          csr_mcause[12]            
+0          0          0          csr_mcause[11]            
+0          0          0          csr_mcause[10]            
+0          0          0          csr_mcause[9]             
+0          0          0          csr_mcause[8]             
+0          0          0          csr_mcause[7]             
+0          0          0          csr_mcause[6]             
+0          0          0          csr_mcause[5]             
+0          1          0          csr_mcause[4]             
+0          0          0          csr_mcause[3]             
+0          0          0          csr_mcause[2]             
+0          1          0          csr_mcause[1]             
+0          1          0          csr_mcause[0]             
+1          1          1          csr_threshold[1]          
+1          1          1          csr_threshold[0]          
+1          1          1          csr_test_data[31]         
+1          1          1          csr_test_data[30]         
+1          1          1          csr_test_data[29]         
+1          1          1          csr_test_data[28]         
+1          1          1          csr_test_data[27]         
+1          1          1          csr_test_data[26]         
+1          1          1          csr_test_data[25]         
+1          1          1          csr_test_data[24]         
+1          1          1          csr_test_data[23]         
+1          1          1          csr_test_data[22]         
+1          1          1          csr_test_data[21]         
+1          1          1          csr_test_data[20]         
+1          1          1          csr_test_data[19]         
+1          1          1          csr_test_data[18]         
+1          1          1          csr_test_data[17]         
+1          1          1          csr_test_data[16]         
+1          1          1          csr_test_data[15]         
+1          1          1          csr_test_data[14]         
+1          1          1          csr_test_data[13]         
+1          1          1          csr_test_data[12]         
+1          1          1          csr_test_data[11]         
+1          1          1          csr_test_data[10]         
+1          1          1          csr_test_data[9]          
+1          1          1          csr_test_data[8]          
+1          1          1          csr_test_data[7]          
+1          1          1          csr_test_data[6]          
+1          1          1          csr_test_data[5]          
+1          1          1          csr_test_data[4]          
+1          1          1          csr_test_data[3]          
+1          1          1          csr_test_data[2]          
+1          1          1          csr_test_data[1]          
+1          1          1          csr_test_data[0]          
+1          1          1          found                     
+
+Instance name: tb_irq_restructure.gw
+Type name: irq_gateway
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/irq_gateway.v
+Number of covered signal bits: 75 of 106
+Number of uncovered signal bits: 31 of 106
+Number of signal bits partially toggled(rise): 1 of 106
+Number of signal bits partially toggled(fall): 0 of 106
+
+Hit(Full)  Hit(Rise)  Hit(Fall)  Signal                    
+-----------------------------------------------------------
+1          1          1          clk_i                     
+0          1          0          rst_ni                    
+1          1          1          irq_raw_i[12]             
+1          1          1          irq_raw_i[11]             
+1          1          1          irq_raw_i[10]             
+1          1          1          irq_raw_i[9]              
+1          1          1          irq_raw_i[8]              
+1          1          1          irq_raw_i[7]              
+1          1          1          irq_raw_i[6]              
+1          1          1          irq_raw_i[5]              
+1          1          1          irq_raw_i[4]              
+1          1          1          irq_raw_i[3]              
+1          1          1          irq_raw_i[2]              
+1          1          1          irq_raw_i[1]              
+1          1          1          irq_raw_i[0]              
+0          0          0          edge_mode_i[12]           
+0          0          0          edge_mode_i[11]           
+0          0          0          edge_mode_i[10]           
+0          0          0          edge_mode_i[9]            
+0          0          0          edge_mode_i[8]            
+0          0          0          edge_mode_i[7]            
+0          0          0          edge_mode_i[6]            
+0          0          0          edge_mode_i[5]            
+0          0          0          edge_mode_i[4]            
+0          0          0          edge_mode_i[3]            
+0          0          0          edge_mode_i[2]            
+0          0          0          edge_mode_i[1]            
+0          0          0          edge_mode_i[0]            
+0          0          0          event_mode_i[12]          
+0          0          0          event_mode_i[11]          
+0          0          0          event_mode_i[10]          
+0          0          0          event_mode_i[9]           
+0          0          0          event_mode_i[8]           
+0          0          0          event_mode_i[7]           
+0          0          0          event_mode_i[6]           
+0          0          0          event_mode_i[5]           
+0          0          0          event_mode_i[4]           
+0          0          0          event_mode_i[3]           
+0          0          0          event_mode_i[2]           
+0          0          0          event_mode_i[1]           
+0          0          0          event_mode_i[0]           
+1          1          1          clear_i[12]               
+1          1          1          clear_i[11]               
+1          1          1          clear_i[10]               
+1          1          1          clear_i[9]                
+1          1          1          clear_i[8]                
+1          1          1          clear_i[7]                
+1          1          1          clear_i[6]                
+1          1          1          clear_i[5]                
+1          1          1          clear_i[4]                
+1          1          1          clear_i[3]                
+1          1          1          clear_i[2]                
+1          1          1          clear_i[1]                
+1          1          1          clear_i[0]                
+1          1          1          pend_o[12]                
+1          1          1          pend_o[11]                
+1          1          1          pend_o[10]                
+1          1          1          pend_o[9]                 
+1          1          1          pend_o[8]                 
+1          1          1          pend_o[7]                 
+1          1          1          pend_o[6]                 
+1          1          1          pend_o[5]                 
+1          1          1          pend_o[4]                 
+1          1          1          pend_o[3]                 
+1          1          1          pend_o[2]                 
+1          1          1          pend_o[1]                 
+1          1          1          pend_o[0]                 
+1          1          1          irq_raw_q[12]             
+1          1          1          irq_raw_q[11]             
+1          1          1          irq_raw_q[10]             
+1          1          1          irq_raw_q[9]              
+1          1          1          irq_raw_q[8]              
+1          1          1          irq_raw_q[7]              
+1          1          1          irq_raw_q[6]              
+1          1          1          irq_raw_q[5]              
+1          1          1          irq_raw_q[4]              
+1          1          1          irq_raw_q[3]              
+1          1          1          irq_raw_q[2]              
+1          1          1          irq_raw_q[1]              
+1          1          1          irq_raw_q[0]              
+1          1          1          pend_q[12]                
+1          1          1          pend_q[11]                
+1          1          1          pend_q[10]                
+1          1          1          pend_q[9]                 
+1          1          1          pend_q[8]                 
+1          1          1          pend_q[7]                 
+1          1          1          pend_q[6]                 
+1          1          1          pend_q[5]                 
+0          0          0          pend_q[4]                 
+1          1          1          pend_q[3]                 
+0          0          0          pend_q[2]                 
+1          1          1          pend_q[1]                 
+1          1          1          pend_q[0]                 
+1          1          1          capture[12]               
+1          1          1          capture[11]               
+1          1          1          capture[10]               
+1          1          1          capture[9]                
+1          1          1          capture[8]                
+1          1          1          capture[7]                
+1          1          1          capture[6]                
+1          1          1          capture[5]                
+0          0          0          capture[4]                
+1          1          1          capture[3]                
+0          0          0          capture[2]                
+1          1          1          capture[1]                
+1          1          1          capture[0]                
+
+Instance name: tb_irq_restructure.arb
+Type name: irq_arbiter
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/irq_arbiter.v
+Number of covered signal bits: 90 of 94
+Number of uncovered signal bits: 4 of 94
+Number of signal bits partially toggled(rise): 2 of 94
+Number of signal bits partially toggled(fall): 0 of 94
+
+Hit(Full)  Hit(Rise)  Hit(Fall)  Signal                    
+-----------------------------------------------------------
+1          1          1          clk_i                     
+0          1          0          rst_ni                    
+1          1          1          pend_i[12]                
+1          1          1          pend_i[11]                
+1          1          1          pend_i[10]                
+1          1          1          pend_i[9]                 
+1          1          1          pend_i[8]                 
+1          1          1          pend_i[7]                 
+1          1          1          pend_i[6]                 
+1          1          1          pend_i[5]                 
+1          1          1          pend_i[4]                 
+1          1          1          pend_i[3]                 
+1          1          1          pend_i[2]                 
+1          1          1          pend_i[1]                 
+1          1          1          pend_i[0]                 
+1          1          1          mie_i[31]                 
+1          1          1          mie_i[30]                 
+1          1          1          mie_i[29]                 
+1          1          1          mie_i[28]                 
+1          1          1          mie_i[27]                 
+1          1          1          mie_i[26]                 
+1          1          1          mie_i[25]                 
+1          1          1          mie_i[24]                 
+1          1          1          mie_i[23]                 
+1          1          1          mie_i[22]                 
+1          1          1          mie_i[21]                 
+1          1          1          mie_i[20]                 
+1          1          1          mie_i[19]                 
+1          1          1          mie_i[18]                 
+1          1          1          mie_i[17]                 
+1          1          1          mie_i[16]                 
+1          1          1          mie_i[15]                 
+1          1          1          mie_i[14]                 
+1          1          1          mie_i[13]                 
+1          1          1          mie_i[12]                 
+1          1          1          mie_i[11]                 
+1          1          1          mie_i[10]                 
+1          1          1          mie_i[9]                  
+1          1          1          mie_i[8]                  
+1          1          1          mie_i[7]                  
+1          1          1          mie_i[6]                  
+1          1          1          mie_i[5]                  
+1          1          1          mie_i[4]                  
+1          1          1          mie_i[3]                  
+1          1          1          mie_i[2]                  
+1          1          1          mie_i[1]                  
+1          1          1          mie_i[0]                  
+1          1          1          mstatus_mie_i             
+1          1          1          mintprio_i[1]             
+1          1          1          mintprio_i[0]             
+1          1          1          wb_commit_i               
+0          1          0          wb_trap_cause_i[4]        
+1          1          1          wb_trap_cause_i[3]        
+0          0          0          wb_trap_cause_i[2]        
+1          1          1          wb_trap_cause_i[1]        
+1          1          1          wb_trap_cause_i[0]        
+1          1          1          irq_pending_o             
+1          1          1          irq_id_o[4]               
+1          1          1          irq_id_o[3]               
+1          1          1          irq_id_o[2]               
+1          1          1          irq_id_o[1]               
+1          1          1          irq_id_o[0]               
+1          1          1          irq_class_o[1]            
+1          1          1          irq_class_o[0]            
+1          1          1          active[12]                
+1          1          1          active[11]                
+1          1          1          active[10]                
+1          1          1          active[9]                 
+1          1          1          active[8]                 
+1          1          1          active[7]                 
+1          1          1          active[6]                 
+1          1          1          active[5]                 
+1          1          1          active[4]                 
+1          1          1          active[3]                 
+1          1          1          active[2]                 
+1          1          1          active[1]                 
+1          1          1          active[0]                 
+1          1          1          rr_ptr_c1[1]              
+1          1          1          rr_ptr_c1[0]              
+1          1          1          rr_ptr_c0                 
+1          1          1          c1_valid                  
+1          1          1          c1_id[4]                  
+1          1          1          c1_id[3]                  
+0          0          0          c1_id[2]                  
+1          1          1          c1_id[1]                  
+1          1          1          c1_id[0]                  
+1          1          1          winner_valid              
+1          1          1          winner_id[4]              
+1          1          1          winner_id[3]              
+1          1          1          winner_id[2]              
+1          1          1          winner_id[1]              
+1          1          1          winner_id[0]              
+1          1          1          winner_class[1]           
+1          1          1          winner_class[0]           
+
+Instance name: tb_irq_restructure.wb
+Type name: wb_trap_mret_commit_controller
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/wb_trap_mret_commit_controller.v
+Number of covered signal bits: 49 of 480
+Number of uncovered signal bits: 431 of 480
+Number of signal bits partially toggled(rise): 0 of 480
+Number of signal bits partially toggled(fall): 0 of 480
+
+Hit(Full)  Hit(Rise)  Hit(Fall)  Signal                    
+-----------------------------------------------------------
+1          1          1          valid_W                   
+1          1          1          exc_valid_W               
+1          1          1          exc_cause_W[5]            
+1          1          1          exc_cause_W[4]            
+1          1          1          exc_cause_W[3]            
+1          1          1          exc_cause_W[2]            
+1          1          1          exc_cause_W[1]            
+1          1          1          exc_cause_W[0]            
+0          0          0          exc_class_W[1]            
+0          0          0          exc_class_W[0]            
+0          0          0          exc_tval_W[31]            
+0          0          0          exc_tval_W[30]            
+0          0          0          exc_tval_W[29]            
+0          0          0          exc_tval_W[28]            
+0          0          0          exc_tval_W[27]            
+0          0          0          exc_tval_W[26]            
+0          0          0          exc_tval_W[25]            
+0          0          0          exc_tval_W[24]            
+0          0          0          exc_tval_W[23]            
+0          0          0          exc_tval_W[22]            
+0          0          0          exc_tval_W[21]            
+0          0          0          exc_tval_W[20]            
+0          0          0          exc_tval_W[19]            
+0          0          0          exc_tval_W[18]            
+0          0          0          exc_tval_W[17]            
+0          0          0          exc_tval_W[16]            
+0          0          0          exc_tval_W[15]            
+0          0          0          exc_tval_W[14]            
+0          0          0          exc_tval_W[13]            
+0          0          0          exc_tval_W[12]            
+0          0          0          exc_tval_W[11]            
+0          0          0          exc_tval_W[10]            
+0          0          0          exc_tval_W[9]             
+0          0          0          exc_tval_W[8]             
+0          0          0          exc_tval_W[7]             
+0          0          0          exc_tval_W[6]             
+0          0          0          exc_tval_W[5]             
+0          0          0          exc_tval_W[4]             
+0          0          0          exc_tval_W[3]             
+0          0          0          exc_tval_W[2]             
+0          0          0          exc_tval_W[1]             
+0          0          0          exc_tval_W[0]             
+0          0          0          exc_pc_W[31]              
+0          0          0          exc_pc_W[30]              
+0          0          0          exc_pc_W[29]              
+0          0          0          exc_pc_W[28]              
+0          0          0          exc_pc_W[27]              
+0          0          0          exc_pc_W[26]              
+0          0          0          exc_pc_W[25]              
+0          0          0          exc_pc_W[24]              
+0          0          0          exc_pc_W[23]              
+0          0          0          exc_pc_W[22]              
+0          0          0          exc_pc_W[21]              
+0          0          0          exc_pc_W[20]              
+0          0          0          exc_pc_W[19]              
+0          0          0          exc_pc_W[18]              
+0          0          0          exc_pc_W[17]              
+0          0          0          exc_pc_W[16]              
+0          0          0          exc_pc_W[15]              
+0          0          0          exc_pc_W[14]              
+0          0          0          exc_pc_W[13]              
+0          0          0          exc_pc_W[12]              
+0          0          0          exc_pc_W[11]              
+0          0          0          exc_pc_W[10]              
+0          0          0          exc_pc_W[9]               
+0          0          0          exc_pc_W[8]               
+0          0          0          exc_pc_W[7]               
+0          0          0          exc_pc_W[6]               
+0          0          0          exc_pc_W[5]               
+0          0          0          exc_pc_W[4]               
+0          0          0          exc_pc_W[3]               
+0          0          0          exc_pc_W[2]               
+0          0          0          exc_pc_W[1]               
+0          0          0          exc_pc_W[0]               
+0          0          0          is_mret_W                 
+0          0          0          mtvec_i[31]               
+0          0          0          mtvec_i[30]               
+0          0          0          mtvec_i[29]               
+0          0          0          mtvec_i[28]               
+0          0          0          mtvec_i[27]               
+0          0          0          mtvec_i[26]               
+0          0          0          mtvec_i[25]               
+0          0          0          mtvec_i[24]               
+0          0          0          mtvec_i[23]               
+0          0          0          mtvec_i[22]               
+0          0          0          mtvec_i[21]               
+0          0          0          mtvec_i[20]               
+0          0          0          mtvec_i[19]               
+0          0          0          mtvec_i[18]               
+0          0          0          mtvec_i[17]               
+0          0          0          mtvec_i[16]               
+0          0          0          mtvec_i[15]               
+0          0          0          mtvec_i[14]               
+0          0          0          mtvec_i[13]               
+0          0          0          mtvec_i[12]               
+0          0          0          mtvec_i[11]               
+0          0          0          mtvec_i[10]               
+0          0          0          mtvec_i[9]                
+0          0          0          mtvec_i[8]                
+0          0          0          mtvec_i[7]                
+0          0          0          mtvec_i[6]                
+0          0          0          mtvec_i[5]                
+0          0          0          mtvec_i[4]                
+0          0          0          mtvec_i[3]                
+0          0          0          mtvec_i[2]                
+0          0          0          mtvec_i[1]                
+0          0          0          mtvec_i[0]                
+0          0          0          mepc_i[31]                
+0          0          0          mepc_i[30]                
+0          0          0          mepc_i[29]                
+0          0          0          mepc_i[28]                
+0          0          0          mepc_i[27]                
+0          0          0          mepc_i[26]                
+0          0          0          mepc_i[25]                
+0          0          0          mepc_i[24]                
+0          0          0          mepc_i[23]                
+0          0          0          mepc_i[22]                
+0          0          0          mepc_i[21]                
+0          0          0          mepc_i[20]                
+0          0          0          mepc_i[19]                
+0          0          0          mepc_i[18]                
+0          0          0          mepc_i[17]                
+0          0          0          mepc_i[16]                
+0          0          0          mepc_i[15]                
+0          0          0          mepc_i[14]                
+0          0          0          mepc_i[13]                
+0          0          0          mepc_i[12]                
+0          0          0          mepc_i[11]                
+0          0          0          mepc_i[10]                
+0          0          0          mepc_i[9]                 
+0          0          0          mepc_i[8]                 
+0          0          0          mepc_i[7]                 
+0          0          0          mepc_i[6]                 
+0          0          0          mepc_i[5]                 
+0          0          0          mepc_i[4]                 
+0          0          0          mepc_i[3]                 
+0          0          0          mepc_i[2]                 
+0          0          0          mepc_i[1]                 
+0          0          0          mepc_i[0]                 
+0          0          0          mstatus_i[31]             
+0          0          0          mstatus_i[30]             
+0          0          0          mstatus_i[29]             
+0          0          0          mstatus_i[28]             
+0          0          0          mstatus_i[27]             
+0          0          0          mstatus_i[26]             
+0          0          0          mstatus_i[25]             
+0          0          0          mstatus_i[24]             
+0          0          0          mstatus_i[23]             
+0          0          0          mstatus_i[22]             
+0          0          0          mstatus_i[21]             
+0          0          0          mstatus_i[20]             
+0          0          0          mstatus_i[19]             
+0          0          0          mstatus_i[18]             
+0          0          0          mstatus_i[17]             
+0          0          0          mstatus_i[16]             
+0          0          0          mstatus_i[15]             
+0          0          0          mstatus_i[14]             
+0          0          0          mstatus_i[13]             
+0          0          0          mstatus_i[12]             
+0          0          0          mstatus_i[11]             
+0          0          0          mstatus_i[10]             
+0          0          0          mstatus_i[9]              
+0          0          0          mstatus_i[8]              
+0          0          0          mstatus_i[7]              
+0          0          0          mstatus_i[6]              
+0          0          0          mstatus_i[5]              
+0          0          0          mstatus_i[4]              
+0          0          0          mstatus_i[3]              
+0          0          0          mstatus_i[2]              
+0          0          0          mstatus_i[1]              
+0          0          0          mstatus_i[0]              
+1          1          1          wb_trap_redirect_o        
+0          0          0          trap_target_o[31]         
+0          0          0          trap_target_o[30]         
+0          0          0          trap_target_o[29]         
+0          0          0          trap_target_o[28]         
+0          0          0          trap_target_o[27]         
+0          0          0          trap_target_o[26]         
+0          0          0          trap_target_o[25]         
+0          0          0          trap_target_o[24]         
+0          0          0          trap_target_o[23]         
+0          0          0          trap_target_o[22]         
+0          0          0          trap_target_o[21]         
+0          0          0          trap_target_o[20]         
+0          0          0          trap_target_o[19]         
+0          0          0          trap_target_o[18]         
+0          0          0          trap_target_o[17]         
+0          0          0          trap_target_o[16]         
+0          0          0          trap_target_o[15]         
+0          0          0          trap_target_o[14]         
+0          0          0          trap_target_o[13]         
+0          0          0          trap_target_o[12]         
+0          0          0          trap_target_o[11]         
+0          0          0          trap_target_o[10]         
+0          0          0          trap_target_o[9]          
+0          0          0          trap_target_o[8]          
+0          0          0          trap_target_o[7]          
+0          0          0          trap_target_o[6]          
+0          0          0          trap_target_o[5]          
+0          0          0          trap_target_o[4]          
+0          0          0          trap_target_o[3]          
+0          0          0          trap_target_o[2]          
+0          0          0          trap_target_o[1]          
+0          0          0          trap_target_o[0]          
+1          1          1          flush_pipeline_onehot_o[3] 
+1          1          1          flush_pipeline_onehot_o[2] 
+1          1          1          flush_pipeline_onehot_o[1] 
+1          1          1          flush_pipeline_onehot_o[0] 
+1          1          1          trap_valid_o              
+0          0          0          trap_cause_o[30]          
+0          0          0          trap_cause_o[29]          
+0          0          0          trap_cause_o[28]          
+0          0          0          trap_cause_o[27]          
+0          0          0          trap_cause_o[26]          
+0          0          0          trap_cause_o[25]          
+0          0          0          trap_cause_o[24]          
+0          0          0          trap_cause_o[23]          
+0          0          0          trap_cause_o[22]          
+0          0          0          trap_cause_o[21]          
+0          0          0          trap_cause_o[20]          
+0          0          0          trap_cause_o[19]          
+0          0          0          trap_cause_o[18]          
+0          0          0          trap_cause_o[17]          
+0          0          0          trap_cause_o[16]          
+0          0          0          trap_cause_o[15]          
+0          0          0          trap_cause_o[14]          
+0          0          0          trap_cause_o[13]          
+0          0          0          trap_cause_o[12]          
+0          0          0          trap_cause_o[11]          
+0          0          0          trap_cause_o[10]          
+0          0          0          trap_cause_o[9]           
+0          0          0          trap_cause_o[8]           
+0          0          0          trap_cause_o[7]           
+0          0          0          trap_cause_o[6]           
+0          0          0          trap_cause_o[5]           
+1          1          1          trap_cause_o[4]           
+1          1          1          trap_cause_o[3]           
+1          1          1          trap_cause_o[2]           
+1          1          1          trap_cause_o[1]           
+1          1          1          trap_cause_o[0]           
+0          0          0          trap_class_o[1]           
+0          0          0          trap_class_o[0]           
+0          0          0          trap_pc_o[31]             
+0          0          0          trap_pc_o[30]             
+0          0          0          trap_pc_o[29]             
+0          0          0          trap_pc_o[28]             
+0          0          0          trap_pc_o[27]             
+0          0          0          trap_pc_o[26]             
+0          0          0          trap_pc_o[25]             
+0          0          0          trap_pc_o[24]             
+0          0          0          trap_pc_o[23]             
+0          0          0          trap_pc_o[22]             
+0          0          0          trap_pc_o[21]             
+0          0          0          trap_pc_o[20]             
+0          0          0          trap_pc_o[19]             
+0          0          0          trap_pc_o[18]             
+0          0          0          trap_pc_o[17]             
+0          0          0          trap_pc_o[16]             
+0          0          0          trap_pc_o[15]             
+0          0          0          trap_pc_o[14]             
+0          0          0          trap_pc_o[13]             
+0          0          0          trap_pc_o[12]             
+0          0          0          trap_pc_o[11]             
+0          0          0          trap_pc_o[10]             
+0          0          0          trap_pc_o[9]              
+0          0          0          trap_pc_o[8]              
+0          0          0          trap_pc_o[7]              
+0          0          0          trap_pc_o[6]              
+0          0          0          trap_pc_o[5]              
+0          0          0          trap_pc_o[4]              
+0          0          0          trap_pc_o[3]              
+0          0          0          trap_pc_o[2]              
+0          0          0          trap_pc_o[1]              
+0          0          0          trap_pc_o[0]              
+0          0          0          trap_addr_o[31]           
+0          0          0          trap_addr_o[30]           
+0          0          0          trap_addr_o[29]           
+0          0          0          trap_addr_o[28]           
+0          0          0          trap_addr_o[27]           
+0          0          0          trap_addr_o[26]           
+0          0          0          trap_addr_o[25]           
+0          0          0          trap_addr_o[24]           
+0          0          0          trap_addr_o[23]           
+0          0          0          trap_addr_o[22]           
+0          0          0          trap_addr_o[21]           
+0          0          0          trap_addr_o[20]           
+0          0          0          trap_addr_o[19]           
+0          0          0          trap_addr_o[18]           
+0          0          0          trap_addr_o[17]           
+0          0          0          trap_addr_o[16]           
+0          0          0          trap_addr_o[15]           
+0          0          0          trap_addr_o[14]           
+0          0          0          trap_addr_o[13]           
+0          0          0          trap_addr_o[12]           
+0          0          0          trap_addr_o[11]           
+0          0          0          trap_addr_o[10]           
+0          0          0          trap_addr_o[9]            
+0          0          0          trap_addr_o[8]            
+0          0          0          trap_addr_o[7]            
+0          0          0          trap_addr_o[6]            
+0          0          0          trap_addr_o[5]            
+0          0          0          trap_addr_o[4]            
+0          0          0          trap_addr_o[3]            
+0          0          0          trap_addr_o[2]            
+0          0          0          trap_addr_o[1]            
+0          0          0          trap_addr_o[0]            
+1          1          1          trap_addr_valid_o         
+1          1          1          trap_is_interrupt_o       
+1          1          1          clear_gateway_o[12]       
+1          1          1          clear_gateway_o[11]       
+1          1          1          clear_gateway_o[10]       
+1          1          1          clear_gateway_o[9]        
+1          1          1          clear_gateway_o[8]        
+1          1          1          clear_gateway_o[7]        
+1          1          1          clear_gateway_o[6]        
+1          1          1          clear_gateway_o[5]        
+1          1          1          clear_gateway_o[4]        
+1          1          1          clear_gateway_o[3]        
+1          1          1          clear_gateway_o[2]        
+1          1          1          clear_gateway_o[1]        
+1          1          1          clear_gateway_o[0]        
+1          1          1          wb_commit_irq_o           
+0          0          0          csr_write_en_mret_o       
+0          0          0          csr_waddr_mret_o[11]      
+0          0          0          csr_waddr_mret_o[10]      
+0          0          0          csr_waddr_mret_o[9]       
+0          0          0          csr_waddr_mret_o[8]       
+0          0          0          csr_waddr_mret_o[7]       
+0          0          0          csr_waddr_mret_o[6]       
+0          0          0          csr_waddr_mret_o[5]       
+0          0          0          csr_waddr_mret_o[4]       
+0          0          0          csr_waddr_mret_o[3]       
+0          0          0          csr_waddr_mret_o[2]       
+0          0          0          csr_waddr_mret_o[1]       
+0          0          0          csr_waddr_mret_o[0]       
+0          0          0          csr_wdata_mret_o[31]      
+0          0          0          csr_wdata_mret_o[30]      
+0          0          0          csr_wdata_mret_o[29]      
+0          0          0          csr_wdata_mret_o[28]      
+0          0          0          csr_wdata_mret_o[27]      
+0          0          0          csr_wdata_mret_o[26]      
+0          0          0          csr_wdata_mret_o[25]      
+0          0          0          csr_wdata_mret_o[24]      
+0          0          0          csr_wdata_mret_o[23]      
+0          0          0          csr_wdata_mret_o[22]      
+0          0          0          csr_wdata_mret_o[21]      
+0          0          0          csr_wdata_mret_o[20]      
+0          0          0          csr_wdata_mret_o[19]      
+0          0          0          csr_wdata_mret_o[18]      
+0          0          0          csr_wdata_mret_o[17]      
+0          0          0          csr_wdata_mret_o[16]      
+0          0          0          csr_wdata_mret_o[15]      
+0          0          0          csr_wdata_mret_o[14]      
+0          0          0          csr_wdata_mret_o[13]      
+0          0          0          csr_wdata_mret_o[12]      
+0          0          0          csr_wdata_mret_o[11]      
+0          0          0          csr_wdata_mret_o[10]      
+0          0          0          csr_wdata_mret_o[9]       
+0          0          0          csr_wdata_mret_o[8]       
+0          0          0          csr_wdata_mret_o[7]       
+0          0          0          csr_wdata_mret_o[6]       
+0          0          0          csr_wdata_mret_o[5]       
+0          0          0          csr_wdata_mret_o[4]       
+0          0          0          csr_wdata_mret_o[3]       
+0          0          0          csr_wdata_mret_o[2]       
+0          0          0          csr_wdata_mret_o[1]       
+0          0          0          csr_wdata_mret_o[0]       
+0          0          0          mret_commit_o             
+1          1          1          trap_commit               
+0          0          0          mret_commit               
+1          1          1          clear_gateway_r[12]       
+1          1          1          clear_gateway_r[11]       
+1          1          1          clear_gateway_r[10]       
+1          1          1          clear_gateway_r[9]        
+1          1          1          clear_gateway_r[8]        
+1          1          1          clear_gateway_r[7]        
+1          1          1          clear_gateway_r[6]        
+1          1          1          clear_gateway_r[5]        
+1          1          1          clear_gateway_r[4]        
+1          1          1          clear_gateway_r[3]        
+1          1          1          clear_gateway_r[2]        
+1          1          1          clear_gateway_r[1]        
+1          1          1          clear_gateway_r[0]        
+0          0          0          is_vectored_interrupt     
+0          0          0          trap_base_addr[31]        
+0          0          0          trap_base_addr[30]        
+0          0          0          trap_base_addr[29]        
+0          0          0          trap_base_addr[28]        
+0          0          0          trap_base_addr[27]        
+0          0          0          trap_base_addr[26]        
+0          0          0          trap_base_addr[25]        
+0          0          0          trap_base_addr[24]        
+0          0          0          trap_base_addr[23]        
+0          0          0          trap_base_addr[22]        
+0          0          0          trap_base_addr[21]        
+0          0          0          trap_base_addr[20]        
+0          0          0          trap_base_addr[19]        
+0          0          0          trap_base_addr[18]        
+0          0          0          trap_base_addr[17]        
+0          0          0          trap_base_addr[16]        
+0          0          0          trap_base_addr[15]        
+0          0          0          trap_base_addr[14]        
+0          0          0          trap_base_addr[13]        
+0          0          0          trap_base_addr[12]        
+0          0          0          trap_base_addr[11]        
+0          0          0          trap_base_addr[10]        
+0          0          0          trap_base_addr[9]         
+0          0          0          trap_base_addr[8]         
+0          0          0          trap_base_addr[7]         
+0          0          0          trap_base_addr[6]         
+0          0          0          trap_base_addr[5]         
+0          0          0          trap_base_addr[4]         
+0          0          0          trap_base_addr[3]         
+0          0          0          trap_base_addr[2]         
+0          0          0          trap_base_addr[1]         
+0          0          0          trap_base_addr[0]         
+0          0          0          trap_target_addr[31]      
+0          0          0          trap_target_addr[30]      
+0          0          0          trap_target_addr[29]      
+0          0          0          trap_target_addr[28]      
+0          0          0          trap_target_addr[27]      
+0          0          0          trap_target_addr[26]      
+0          0          0          trap_target_addr[25]      
+0          0          0          trap_target_addr[24]      
+0          0          0          trap_target_addr[23]      
+0          0          0          trap_target_addr[22]      
+0          0          0          trap_target_addr[21]      
+0          0          0          trap_target_addr[20]      
+0          0          0          trap_target_addr[19]      
+0          0          0          trap_target_addr[18]      
+0          0          0          trap_target_addr[17]      
+0          0          0          trap_target_addr[16]      
+0          0          0          trap_target_addr[15]      
+0          0          0          trap_target_addr[14]      
+0          0          0          trap_target_addr[13]      
+0          0          0          trap_target_addr[12]      
+0          0          0          trap_target_addr[11]      
+0          0          0          trap_target_addr[10]      
+0          0          0          trap_target_addr[9]       
+0          0          0          trap_target_addr[8]       
+0          0          0          trap_target_addr[7]       
+0          0          0          trap_target_addr[6]       
+0          0          0          trap_target_addr[5]       
+0          0          0          trap_target_addr[4]       
+0          0          0          trap_target_addr[3]       
+0          0          0          trap_target_addr[2]       
+0          0          0          trap_target_addr[1]       
+0          0          0          trap_target_addr[0]       
+0          0          0          new_mstatus[31]           
+0          0          0          new_mstatus[30]           
+0          0          0          new_mstatus[29]           
+0          0          0          new_mstatus[28]           
+0          0          0          new_mstatus[27]           
+0          0          0          new_mstatus[26]           
+0          0          0          new_mstatus[25]           
+0          0          0          new_mstatus[24]           
+0          0          0          new_mstatus[23]           
+0          0          0          new_mstatus[22]           
+0          0          0          new_mstatus[21]           
+0          0          0          new_mstatus[20]           
+0          0          0          new_mstatus[19]           
+0          0          0          new_mstatus[18]           
+0          0          0          new_mstatus[17]           
+0          0          0          new_mstatus[16]           
+0          0          0          new_mstatus[15]           
+0          0          0          new_mstatus[14]           
+0          0          0          new_mstatus[13]           
+0          0          0          new_mstatus[12]           
+0          0          0          new_mstatus[11]           
+0          0          0          new_mstatus[10]           
+0          0          0          new_mstatus[9]            
+0          0          0          new_mstatus[8]            
+0          0          0          new_mstatus[7]            
+0          0          0          new_mstatus[6]            
+0          0          0          new_mstatus[5]            
+0          0          0          new_mstatus[4]            
+0          0          0          new_mstatus[3]            
+0          0          0          new_mstatus[2]            
+0          0          0          new_mstatus[1]            
+0          0          0          new_mstatus[0]            
+
+Instance name: tb_irq_restructure.csr
+Type name: csr_regfile
+File name: /home/iiita/Documents/raghulcj/irq_unit_coverage_20261030_004317/inputs/csr_regfile.v
+Number of covered signal bits: 151 of 838
+Number of uncovered signal bits: 687 of 838
+Number of signal bits partially toggled(rise): 24 of 838
+Number of signal bits partially toggled(fall): 0 of 838
+
+Hit(Full)  Hit(Rise)  Hit(Fall)  Signal                    
+-----------------------------------------------------------
+1          1          1          clk_i                     
+0          1          0          rst_n_i                   
+0          1          0          csr_valid_o               
+0          0          0          csr_raddr_i[11]           
+0          1          0          csr_raddr_i[10]           
+0          1          0          csr_raddr_i[9]            
+0          1          0          csr_raddr_i[8]            
+0          1          0          csr_raddr_i[7]            
+0          1          0          csr_raddr_i[6]            
+0          0          0          csr_raddr_i[5]            
+0          0          0          csr_raddr_i[4]            
+0          0          0          csr_raddr_i[3]            
+0          0          0          csr_raddr_i[2]            
+0          0          0          csr_raddr_i[1]            
+0          0          0          csr_raddr_i[0]            
+0          0          0          csr_rdata_o[31]           
+0          0          0          csr_rdata_o[30]           
+0          0          0          csr_rdata_o[29]           
+0          0          0          csr_rdata_o[28]           
+0          0          0          csr_rdata_o[27]           
+0          0          0          csr_rdata_o[26]           
+0          0          0          csr_rdata_o[25]           
+0          0          0          csr_rdata_o[24]           
+0          0          0          csr_rdata_o[23]           
+0          0          0          csr_rdata_o[22]           
+0          0          0          csr_rdata_o[21]           
+0          0          0          csr_rdata_o[20]           
+0          0          0          csr_rdata_o[19]           
+0          0          0          csr_rdata_o[18]           
+0          0          0          csr_rdata_o[17]           
+0          0          0          csr_rdata_o[16]           
+0          0          0          csr_rdata_o[15]           
+0          0          0          csr_rdata_o[14]           
+0          0          0          csr_rdata_o[13]           
+0          0          0          csr_rdata_o[12]           
+0          0          0          csr_rdata_o[11]           
+0          0          0          csr_rdata_o[10]           
+0          0          0          csr_rdata_o[9]            
+0          0          0          csr_rdata_o[8]            
+0          0          0          csr_rdata_o[7]            
+0          0          0          csr_rdata_o[6]            
+0          0          0          csr_rdata_o[5]            
+0          0          0          csr_rdata_o[4]            
+0          0          0          csr_rdata_o[3]            
+0          0          0          csr_rdata_o[2]            
+1          1          1          csr_rdata_o[1]            
+1          1          1          csr_rdata_o[0]            
+0          0          0          csr_waddr_normal_i[11]    
+1          1          1          csr_waddr_normal_i[10]    
+0          1          0          csr_waddr_normal_i[9]     
+0          1          0          csr_waddr_normal_i[8]     
+1          1          1          csr_waddr_normal_i[7]     
+1          1          1          csr_waddr_normal_i[6]     
+0          0          0          csr_waddr_normal_i[5]     
+0          0          0          csr_waddr_normal_i[4]     
+0          0          0          csr_waddr_normal_i[3]     
+1          1          1          csr_waddr_normal_i[2]     
+0          0          0          csr_waddr_normal_i[1]     
+0          0          0          csr_waddr_normal_i[0]     
+1          1          1          csr_wdata_normal_i[31]    
+1          1          1          csr_wdata_normal_i[30]    
+1          1          1          csr_wdata_normal_i[29]    
+1          1          1          csr_wdata_normal_i[28]    
+1          1          1          csr_wdata_normal_i[27]    
+1          1          1          csr_wdata_normal_i[26]    
+1          1          1          csr_wdata_normal_i[25]    
+1          1          1          csr_wdata_normal_i[24]    
+1          1          1          csr_wdata_normal_i[23]    
+1          1          1          csr_wdata_normal_i[22]    
+1          1          1          csr_wdata_normal_i[21]    
+1          1          1          csr_wdata_normal_i[20]    
+1          1          1          csr_wdata_normal_i[19]    
+1          1          1          csr_wdata_normal_i[18]    
+1          1          1          csr_wdata_normal_i[17]    
+1          1          1          csr_wdata_normal_i[16]    
+1          1          1          csr_wdata_normal_i[15]    
+1          1          1          csr_wdata_normal_i[14]    
+1          1          1          csr_wdata_normal_i[13]    
+1          1          1          csr_wdata_normal_i[12]    
+1          1          1          csr_wdata_normal_i[11]    
+1          1          1          csr_wdata_normal_i[10]    
+1          1          1          csr_wdata_normal_i[9]     
+1          1          1          csr_wdata_normal_i[8]     
+1          1          1          csr_wdata_normal_i[7]     
+1          1          1          csr_wdata_normal_i[6]     
+1          1          1          csr_wdata_normal_i[5]     
+1          1          1          csr_wdata_normal_i[4]     
+1          1          1          csr_wdata_normal_i[3]     
+1          1          1          csr_wdata_normal_i[2]     
+1          1          1          csr_wdata_normal_i[1]     
+1          1          1          csr_wdata_normal_i[0]     
+1          1          1          csr_write_en_normal_i     
+0          0          0          csr_waddr_mret_i[11]      
+0          0          0          csr_waddr_mret_i[10]      
+0          0          0          csr_waddr_mret_i[9]       
+0          0          0          csr_waddr_mret_i[8]       
+0          0          0          csr_waddr_mret_i[7]       
+0          0          0          csr_waddr_mret_i[6]       
+0          0          0          csr_waddr_mret_i[5]       
+0          0          0          csr_waddr_mret_i[4]       
+0          0          0          csr_waddr_mret_i[3]       
+0          0          0          csr_waddr_mret_i[2]       
+0          0          0          csr_waddr_mret_i[1]       
+0          0          0          csr_waddr_mret_i[0]       
+0          0          0          csr_wdata_mret_i[31]      
+0          0          0          csr_wdata_mret_i[30]      
+0          0          0          csr_wdata_mret_i[29]      
+0          0          0          csr_wdata_mret_i[28]      
+0          0          0          csr_wdata_mret_i[27]      
+0          0          0          csr_wdata_mret_i[26]      
+0          0          0          csr_wdata_mret_i[25]      
+0          0          0          csr_wdata_mret_i[24]      
+0          0          0          csr_wdata_mret_i[23]      
+0          0          0          csr_wdata_mret_i[22]      
+0          0          0          csr_wdata_mret_i[21]      
+0          0          0          csr_wdata_mret_i[20]      
+0          0          0          csr_wdata_mret_i[19]      
+0          0          0          csr_wdata_mret_i[18]      
+0          0          0          csr_wdata_mret_i[17]      
+0          0          0          csr_wdata_mret_i[16]      
+0          0          0          csr_wdata_mret_i[15]      
+0          0          0          csr_wdata_mret_i[14]      
+0          0          0          csr_wdata_mret_i[13]      
+0          0          0          csr_wdata_mret_i[12]      
+0          0          0          csr_wdata_mret_i[11]      
+0          0          0          csr_wdata_mret_i[10]      
+0          0          0          csr_wdata_mret_i[9]       
+0          0          0          csr_wdata_mret_i[8]       
+0          0          0          csr_wdata_mret_i[7]       
+0          0          0          csr_wdata_mret_i[6]       
+0          0          0          csr_wdata_mret_i[5]       
+0          0          0          csr_wdata_mret_i[4]       
+0          0          0          csr_wdata_mret_i[3]       
+0          0          0          csr_wdata_mret_i[2]       
+0          0          0          csr_wdata_mret_i[1]       
+0          0          0          csr_wdata_mret_i[0]       
+0          0          0          csr_write_en_mret_i       
+1          1          1          mret_commit_i             
+1          1          1          trap_valid_i              
+0          0          0          trap_cause_i[30]          
+0          0          0          trap_cause_i[29]          
+0          0          0          trap_cause_i[28]          
+0          0          0          trap_cause_i[27]          
+0          0          0          trap_cause_i[26]          
+0          0          0          trap_cause_i[25]          
+0          0          0          trap_cause_i[24]          
+0          0          0          trap_cause_i[23]          
+0          0          0          trap_cause_i[22]          
+0          0          0          trap_cause_i[21]          
+0          0          0          trap_cause_i[20]          
+0          0          0          trap_cause_i[19]          
+0          0          0          trap_cause_i[18]          
+0          0          0          trap_cause_i[17]          
+0          0          0          trap_cause_i[16]          
+0          0          0          trap_cause_i[15]          
+0          0          0          trap_cause_i[14]          
+0          0          0          trap_cause_i[13]          
+0          0          0          trap_cause_i[12]          
+0          0          0          trap_cause_i[11]          
+0          0          0          trap_cause_i[10]          
+0          0          0          trap_cause_i[9]           
+0          0          0          trap_cause_i[8]           
+0          0          0          trap_cause_i[7]           
+0          0          0          trap_cause_i[6]           
+0          0          0          trap_cause_i[5]           
+0          0          0          trap_cause_i[4]           
+0          0          0          trap_cause_i[3]           
+0          0          0          trap_cause_i[2]           
+0          0          0          trap_cause_i[1]           
+0          0          0          trap_cause_i[0]           
+0          0          0          trap_pc_i[31]             
+0          0          0          trap_pc_i[30]             
+0          0          0          trap_pc_i[29]             
+0          0          0          trap_pc_i[28]             
+0          0          0          trap_pc_i[27]             
+0          0          0          trap_pc_i[26]             
+0          0          0          trap_pc_i[25]             
+0          0          0          trap_pc_i[24]             
+0          0          0          trap_pc_i[23]             
+0          0          0          trap_pc_i[22]             
+0          0          0          trap_pc_i[21]             
+0          0          0          trap_pc_i[20]             
+0          0          0          trap_pc_i[19]             
+0          0          0          trap_pc_i[18]             
+0          0          0          trap_pc_i[17]             
+0          0          0          trap_pc_i[16]             
+0          0          0          trap_pc_i[15]             
+0          0          0          trap_pc_i[14]             
+0          0          0          trap_pc_i[13]             
+0          0          0          trap_pc_i[12]             
+0          0          0          trap_pc_i[11]             
+0          0          0          trap_pc_i[10]             
+0          0          0          trap_pc_i[9]              
+0          0          0          trap_pc_i[8]              
+0          0          0          trap_pc_i[7]              
+0          0          0          trap_pc_i[6]              
+0          0          0          trap_pc_i[5]              
+0          0          0          trap_pc_i[4]              
+0          0          0          trap_pc_i[3]              
+0          0          0          trap_pc_i[2]              
+0          0          0          trap_pc_i[1]              
+0          0          0          trap_pc_i[0]              
+0          0          0          trap_addr_i[31]           
+0          0          0          trap_addr_i[30]           
+0          0          0          trap_addr_i[29]           
+0          0          0          trap_addr_i[28]           
+0          0          0          trap_addr_i[27]           
+0          0          0          trap_addr_i[26]           
+0          0          0          trap_addr_i[25]           
+0          0          0          trap_addr_i[24]           
+0          0          0          trap_addr_i[23]           
+0          0          0          trap_addr_i[22]           
+0          0          0          trap_addr_i[21]           
+0          0          0          trap_addr_i[20]           
+0          0          0          trap_addr_i[19]           
+0          0          0          trap_addr_i[18]           
+0          0          0          trap_addr_i[17]           
+0          0          0          trap_addr_i[16]           
+0          0          0          trap_addr_i[15]           
+0          0          0          trap_addr_i[14]           
+0          0          0          trap_addr_i[13]           
+0          0          0          trap_addr_i[12]           
+0          0          0          trap_addr_i[11]           
+0          0          0          trap_addr_i[10]           
+0          0          0          trap_addr_i[9]            
+0          0          0          trap_addr_i[8]            
+0          0          0          trap_addr_i[7]            
+0          0          0          trap_addr_i[6]            
+0          0          0          trap_addr_i[5]            
+0          0          0          trap_addr_i[4]            
+0          0          0          trap_addr_i[3]            
+0          0          0          trap_addr_i[2]            
+0          0          0          trap_addr_i[1]            
+0          0          0          trap_addr_i[0]            
+0          0          0          trap_addr_valid_i         
+0          0          0          trap_is_interrupt_i       
+0          0          0          instr_retired_i           
+1          1          1          timer_intr_i              
+1          1          1          ext_intr_i                
+1          1          1          msft_intr_i               
+0          0          0          fast_intr_i[15]           
+0          0          0          fast_intr_i[14]           
+0          0          0          fast_intr_i[13]           
+0          0          0          fast_intr_i[12]           
+1          1          1          fast_intr_i[11]           
+1          1          1          fast_intr_i[10]           
+1          1          1          fast_intr_i[9]            
+1          1          1          fast_intr_i[8]            
+1          1          1          fast_intr_i[7]            
+1          1          1          fast_intr_i[6]            
+1          1          1          fast_intr_i[5]            
+1          1          1          fast_intr_i[4]            
+1          1          1          fast_intr_i[3]            
+1          1          1          fast_intr_i[2]            
+1          1          1          fast_intr_i[1]            
+1          1          1          fast_intr_i[0]            
+0          0          0          mtvec_out_o[31]           
+0          0          0          mtvec_out_o[30]           
+0          0          0          mtvec_out_o[29]           
+0          0          0          mtvec_out_o[28]           
+0          0          0          mtvec_out_o[27]           
+0          0          0          mtvec_out_o[26]           
+0          0          0          mtvec_out_o[25]           
+0          0          0          mtvec_out_o[24]           
+0          0          0          mtvec_out_o[23]           
+0          0          0          mtvec_out_o[22]           
+0          0          0          mtvec_out_o[21]           
+0          0          0          mtvec_out_o[20]           
+0          0          0          mtvec_out_o[19]           
+0          0          0          mtvec_out_o[18]           
+0          0          0          mtvec_out_o[17]           
+0          0          0          mtvec_out_o[16]           
+0          0          0          mtvec_out_o[15]           
+0          0          0          mtvec_out_o[14]           
+0          0          0          mtvec_out_o[13]           
+0          0          0          mtvec_out_o[12]           
+0          0          0          mtvec_out_o[11]           
+0          0          0          mtvec_out_o[10]           
+0          0          0          mtvec_out_o[9]            
+0          0          0          mtvec_out_o[8]            
+0          0          0          mtvec_out_o[7]            
+0          0          0          mtvec_out_o[6]            
+0          0          0          mtvec_out_o[5]            
+0          0          0          mtvec_out_o[4]            
+0          0          0          mtvec_out_o[3]            
+0          0          0          mtvec_out_o[2]            
+0          0          0          mtvec_out_o[1]            
+0          0          0          mtvec_out_o[0]            
+0          1          0          mie_out_o[31]             
+1          1          1          mie_out_o[30]             
+1          1          1          mie_out_o[29]             
+1          1          1          mie_out_o[28]             
+1          1          1          mie_out_o[27]             
+1          1          1          mie_out_o[26]             
+1          1          1          mie_out_o[25]             
+1          1          1          mie_out_o[24]             
+1          1          1          mie_out_o[23]             
+1          1          1          mie_out_o[22]             
+1          1          1          mie_out_o[21]             
+1          1          1          mie_out_o[20]             
+1          1          1          mie_out_o[19]             
+1          1          1          mie_out_o[18]             
+1          1          1          mie_out_o[17]             
+1          1          1          mie_out_o[16]             
+0          0          0          mie_out_o[15]             
+0          0          0          mie_out_o[14]             
+0          0          0          mie_out_o[13]             
+0          0          0          mie_out_o[12]             
+1          1          1          mie_out_o[11]             
+0          0          0          mie_out_o[10]             
+0          0          0          mie_out_o[9]              
+0          0          0          mie_out_o[8]              
+1          1          1          mie_out_o[7]              
+0          0          0          mie_out_o[6]              
+0          0          0          mie_out_o[5]              
+0          0          0          mie_out_o[4]              
+1          1          1          mie_out_o[3]              
+0          0          0          mie_out_o[2]              
+0          0          0          mie_out_o[1]              
+0          0          0          mie_out_o[0]              
+0          0          0          mip_out_o[31]             
+0          0          0          mip_out_o[30]             
+0          0          0          mip_out_o[29]             
+0          0          0          mip_out_o[28]             
+1          1          1          mip_out_o[27]             
+1          1          1          mip_out_o[26]             
+1          1          1          mip_out_o[25]             
+1          1          1          mip_out_o[24]             
+1          1          1          mip_out_o[23]             
+1          1          1          mip_out_o[22]             
+1          1          1          mip_out_o[21]             
+1          1          1          mip_out_o[20]             
+1          1          1          mip_out_o[19]             
+1          1          1          mip_out_o[18]             
+1          1          1          mip_out_o[17]             
+1          1          1          mip_out_o[16]             
+0          0          0          mip_out_o[15]             
+0          0          0          mip_out_o[14]             
+0          0          0          mip_out_o[13]             
+0          0          0          mip_out_o[12]             
+1          1          1          mip_out_o[11]             
+0          0          0          mip_out_o[10]             
+0          0          0          mip_out_o[9]              
+0          0          0          mip_out_o[8]              
+1          1          1          mip_out_o[7]              
+0          0          0          mip_out_o[6]              
+0          0          0          mip_out_o[5]              
+0          0          0          mip_out_o[4]              
+1          1          1          mip_out_o[3]              
+0          0          0          mip_out_o[2]              
+0          0          0          mip_out_o[1]              
+0          0          0          mip_out_o[0]              
+1          1          1          mstatus_mie_out_o         
+0          0          0          mepc_out_o[31]            
+0          0          0          mepc_out_o[30]            
+0          0          0          mepc_out_o[29]            
+0          0          0          mepc_out_o[28]            
+0          0          0          mepc_out_o[27]            
+0          0          0          mepc_out_o[26]            
+0          0          0          mepc_out_o[25]            
+0          0          0          mepc_out_o[24]            
+0          0          0          mepc_out_o[23]            
+0          0          0          mepc_out_o[22]            
+0          0          0          mepc_out_o[21]            
+0          0          0          mepc_out_o[20]            
+0          0          0          mepc_out_o[19]            
+0          0          0          mepc_out_o[18]            
+0          0          0          mepc_out_o[17]            
+0          0          0          mepc_out_o[16]            
+0          0          0          mepc_out_o[15]            
+0          0          0          mepc_out_o[14]            
+0          0          0          mepc_out_o[13]            
+0          0          0          mepc_out_o[12]            
+0          0          0          mepc_out_o[11]            
+0          0          0          mepc_out_o[10]            
+0          0          0          mepc_out_o[9]             
+0          1          0          mepc_out_o[8]             
+0          0          0          mepc_out_o[7]             
+0          0          0          mepc_out_o[6]             
+0          1          0          mepc_out_o[5]             
+0          0          0          mepc_out_o[4]             
+0          0          0          mepc_out_o[3]             
+0          0          0          mepc_out_o[2]             
+0          0          0          mepc_out_o[1]             
+0          0          0          mepc_out_o[0]             
+0          1          0          mcause_out_o[31]          
+0          0          0          mcause_out_o[30]          
+0          0          0          mcause_out_o[29]          
+0          0          0          mcause_out_o[28]          
+0          0          0          mcause_out_o[27]          
+0          0          0          mcause_out_o[26]          
+0          0          0          mcause_out_o[25]          
+0          0          0          mcause_out_o[24]          
+0          0          0          mcause_out_o[23]          
+0          0          0          mcause_out_o[22]          
+0          0          0          mcause_out_o[21]          
+0          0          0          mcause_out_o[20]          
+0          0          0          mcause_out_o[19]          
+0          0          0          mcause_out_o[18]          
+0          0          0          mcause_out_o[17]          
+0          0          0          mcause_out_o[16]          
+0          0          0          mcause_out_o[15]          
+0          0          0          mcause_out_o[14]          
+0          0          0          mcause_out_o[13]          
+0          0          0          mcause_out_o[12]          
+0          0          0          mcause_out_o[11]          
+0          0          0          mcause_out_o[10]          
+0          0          0          mcause_out_o[9]           
+0          0          0          mcause_out_o[8]           
+0          0          0          mcause_out_o[7]           
+0          0          0          mcause_out_o[6]           
+0          0          0          mcause_out_o[5]           
+0          1          0          mcause_out_o[4]           
+0          0          0          mcause_out_o[3]           
+0          0          0          mcause_out_o[2]           
+0          1          0          mcause_out_o[1]           
+0          1          0          mcause_out_o[0]           
+0          0          0          mstatus_out_o[31]         
+0          0          0          mstatus_out_o[30]         
+0          0          0          mstatus_out_o[29]         
+0          0          0          mstatus_out_o[28]         
+0          0          0          mstatus_out_o[27]         
+0          0          0          mstatus_out_o[26]         
+0          0          0          mstatus_out_o[25]         
+0          0          0          mstatus_out_o[24]         
+0          0          0          mstatus_out_o[23]         
+0          0          0          mstatus_out_o[22]         
+0          0          0          mstatus_out_o[21]         
+0          0          0          mstatus_out_o[20]         
+0          0          0          mstatus_out_o[19]         
+0          0          0          mstatus_out_o[18]         
+0          0          0          mstatus_out_o[17]         
+0          0          0          mstatus_out_o[16]         
+0          0          0          mstatus_out_o[15]         
+0          0          0          mstatus_out_o[14]         
+0          0          0          mstatus_out_o[13]         
+1          1          1          mstatus_out_o[12]         
+1          1          1          mstatus_out_o[11]         
+0          0          0          mstatus_out_o[10]         
+0          0          0          mstatus_out_o[9]          
+0          0          0          mstatus_out_o[8]          
+1          1          1          mstatus_out_o[7]          
+0          0          0          mstatus_out_o[6]          
+0          0          0          mstatus_out_o[5]          
+0          0          0          mstatus_out_o[4]          
+1          1          1          mstatus_out_o[3]          
+0          0          0          mstatus_out_o[2]          
+0          0          0          mstatus_out_o[1]          
+0          0          0          mstatus_out_o[0]          
+1          1          1          mintprio_out_o[1]         
+1          1          1          mintprio_out_o[0]         
+0          0          0          mstatus_r[31]             
+0          0          0          mstatus_r[30]             
+0          0          0          mstatus_r[29]             
+0          0          0          mstatus_r[28]             
+0          0          0          mstatus_r[27]             
+0          0          0          mstatus_r[26]             
+0          0          0          mstatus_r[25]             
+0          0          0          mstatus_r[24]             
+0          0          0          mstatus_r[23]             
+0          0          0          mstatus_r[22]             
+0          0          0          mstatus_r[21]             
+0          0          0          mstatus_r[20]             
+0          0          0          mstatus_r[19]             
+0          0          0          mstatus_r[18]             
+0          0          0          mstatus_r[17]             
+0          0          0          mstatus_r[16]             
+0          0          0          mstatus_r[15]             
+0          0          0          mstatus_r[14]             
+0          0          0          mstatus_r[13]             
+1          1          1          mstatus_r[12]             
+1          1          1          mstatus_r[11]             
+0          0          0          mstatus_r[10]             
+0          0          0          mstatus_r[9]              
+0          0          0          mstatus_r[8]              
+1          1          1          mstatus_r[7]              
+0          0          0          mstatus_r[6]              
+0          0          0          mstatus_r[5]              
+0          0          0          mstatus_r[4]              
+1          1          1          mstatus_r[3]              
+0          0          0          mstatus_r[2]              
+0          0          0          mstatus_r[1]              
+0          0          0          mstatus_r[0]              
+0          1          0          mie_r[31]                 
+1          1          1          mie_r[30]                 
+1          1          1          mie_r[29]                 
+1          1          1          mie_r[28]                 
+1          1          1          mie_r[27]                 
+1          1          1          mie_r[26]                 
+1          1          1          mie_r[25]                 
+1          1          1          mie_r[24]                 
+1          1          1          mie_r[23]                 
+1          1          1          mie_r[22]                 
+1          1          1          mie_r[21]                 
+1          1          1          mie_r[20]                 
+1          1          1          mie_r[19]                 
+1          1          1          mie_r[18]                 
+1          1          1          mie_r[17]                 
+1          1          1          mie_r[16]                 
+0          0          0          mie_r[15]                 
+0          0          0          mie_r[14]                 
+0          0          0          mie_r[13]                 
+0          0          0          mie_r[12]                 
+1          1          1          mie_r[11]                 
+0          0          0          mie_r[10]                 
+0          0          0          mie_r[9]                  
+0          0          0          mie_r[8]                  
+1          1          1          mie_r[7]                  
+0          0          0          mie_r[6]                  
+0          0          0          mie_r[5]                  
+0          0          0          mie_r[4]                  
+1          1          1          mie_r[3]                  
+0          0          0          mie_r[2]                  
+0          0          0          mie_r[1]                  
+0          0          0          mie_r[0]                  
+0          0          0          mtvec_r[31]               
+0          0          0          mtvec_r[30]               
+0          0          0          mtvec_r[29]               
+0          0          0          mtvec_r[28]               
+0          0          0          mtvec_r[27]               
+0          0          0          mtvec_r[26]               
+0          0          0          mtvec_r[25]               
+0          0          0          mtvec_r[24]               
+0          0          0          mtvec_r[23]               
+0          0          0          mtvec_r[22]               
+0          0          0          mtvec_r[21]               
+0          0          0          mtvec_r[20]               
+0          0          0          mtvec_r[19]               
+0          0          0          mtvec_r[18]               
+0          0          0          mtvec_r[17]               
+0          0          0          mtvec_r[16]               
+0          0          0          mtvec_r[15]               
+0          0          0          mtvec_r[14]               
+0          0          0          mtvec_r[13]               
+0          0          0          mtvec_r[12]               
+0          0          0          mtvec_r[11]               
+0          0          0          mtvec_r[10]               
+0          0          0          mtvec_r[9]                
+0          0          0          mtvec_r[8]                
+0          0          0          mtvec_r[7]                
+0          0          0          mtvec_r[6]                
+0          0          0          mtvec_r[5]                
+0          0          0          mtvec_r[4]                
+0          0          0          mtvec_r[3]                
+0          0          0          mtvec_r[2]                
+0          0          0          mtvec_r[1]                
+0          0          0          mtvec_r[0]                
+0          0          0          mepc_r[31]                
+0          0          0          mepc_r[30]                
+0          0          0          mepc_r[29]                
+0          0          0          mepc_r[28]                
+0          0          0          mepc_r[27]                
+0          0          0          mepc_r[26]                
+0          0          0          mepc_r[25]                
+0          0          0          mepc_r[24]                
+0          0          0          mepc_r[23]                
+0          0          0          mepc_r[22]                
+0          0          0          mepc_r[21]                
+0          0          0          mepc_r[20]                
+0          0          0          mepc_r[19]                
+0          0          0          mepc_r[18]                
+0          0          0          mepc_r[17]                
+0          0          0          mepc_r[16]                
+0          0          0          mepc_r[15]                
+0          0          0          mepc_r[14]                
+0          0          0          mepc_r[13]                
+0          0          0          mepc_r[12]                
+0          0          0          mepc_r[11]                
+0          0          0          mepc_r[10]                
+0          0          0          mepc_r[9]                 
+0          1          0          mepc_r[8]                 
+0          0          0          mepc_r[7]                 
+0          0          0          mepc_r[6]                 
+0          1          0          mepc_r[5]                 
+0          0          0          mepc_r[4]                 
+0          0          0          mepc_r[3]                 
+0          0          0          mepc_r[2]                 
+0          0          0          mepc_r[1]                 
+0          0          0          mepc_r[0]                 
+0          1          0          mcause_r[31]              
+0          0          0          mcause_r[30]              
+0          0          0          mcause_r[29]              
+0          0          0          mcause_r[28]              
+0          0          0          mcause_r[27]              
+0          0          0          mcause_r[26]              
+0          0          0          mcause_r[25]              
+0          0          0          mcause_r[24]              
+0          0          0          mcause_r[23]              
+0          0          0          mcause_r[22]              
+0          0          0          mcause_r[21]              
+0          0          0          mcause_r[20]              
+0          0          0          mcause_r[19]              
+0          0          0          mcause_r[18]              
+0          0          0          mcause_r[17]              
+0          0          0          mcause_r[16]              
+0          0          0          mcause_r[15]              
+0          0          0          mcause_r[14]              
+0          0          0          mcause_r[13]              
+0          0          0          mcause_r[12]              
+0          0          0          mcause_r[11]              
+0          0          0          mcause_r[10]              
+0          0          0          mcause_r[9]               
+0          0          0          mcause_r[8]               
+0          0          0          mcause_r[7]               
+0          0          0          mcause_r[6]               
+0          0          0          mcause_r[5]               
+0          1          0          mcause_r[4]               
+0          0          0          mcause_r[3]               
+0          0          0          mcause_r[2]               
+0          1          0          mcause_r[1]               
+0          1          0          mcause_r[0]               
+0          0          0          mtval_r[31]               
+0          0          0          mtval_r[30]               
+0          0          0          mtval_r[29]               
+0          0          0          mtval_r[28]               
+0          0          0          mtval_r[27]               
+0          0          0          mtval_r[26]               
+0          0          0          mtval_r[25]               
+0          0          0          mtval_r[24]               
+0          0          0          mtval_r[23]               
+0          0          0          mtval_r[22]               
+0          0          0          mtval_r[21]               
+0          0          0          mtval_r[20]               
+0          0          0          mtval_r[19]               
+0          0          0          mtval_r[18]               
+0          0          0          mtval_r[17]               
+0          0          0          mtval_r[16]               
+0          0          0          mtval_r[15]               
+0          0          0          mtval_r[14]               
+0          0          0          mtval_r[13]               
+0          0          0          mtval_r[12]               
+0          0          0          mtval_r[11]               
+0          0          0          mtval_r[10]               
+0          0          0          mtval_r[9]                
+0          0          0          mtval_r[8]                
+0          0          0          mtval_r[7]                
+0          0          0          mtval_r[6]                
+0          0          0          mtval_r[5]                
+0          0          0          mtval_r[4]                
+0          0          0          mtval_r[3]                
+0          0          0          mtval_r[2]                
+0          0          0          mtval_r[1]                
+0          0          0          mtval_r[0]                
+0          0          0          mscratch_r[31]            
+0          0          0          mscratch_r[30]            
+0          0          0          mscratch_r[29]            
+0          0          0          mscratch_r[28]            
+0          0          0          mscratch_r[27]            
+0          0          0          mscratch_r[26]            
+0          0          0          mscratch_r[25]            
+0          0          0          mscratch_r[24]            
+0          0          0          mscratch_r[23]            
+0          0          0          mscratch_r[22]            
+0          0          0          mscratch_r[21]            
+0          0          0          mscratch_r[20]            
+0          0          0          mscratch_r[19]            
+0          0          0          mscratch_r[18]            
+0          0          0          mscratch_r[17]            
+0          0          0          mscratch_r[16]            
+0          0          0          mscratch_r[15]            
+0          0          0          mscratch_r[14]            
+0          0          0          mscratch_r[13]            
+0          0          0          mscratch_r[12]            
+0          0          0          mscratch_r[11]            
+0          0          0          mscratch_r[10]            
+0          0          0          mscratch_r[9]             
+0          0          0          mscratch_r[8]             
+0          0          0          mscratch_r[7]             
+0          0          0          mscratch_r[6]             
+0          0          0          mscratch_r[5]             
+0          0          0          mscratch_r[4]             
+0          0          0          mscratch_r[3]             
+0          0          0          mscratch_r[2]             
+0          0          0          mscratch_r[1]             
+0          0          0          mscratch_r[0]             
+0          0          0          mcycle_r[63]              
+0          0          0          mcycle_r[62]              
+0          0          0          mcycle_r[61]              
+0          0          0          mcycle_r[60]              
+0          0          0          mcycle_r[59]              
+0          0          0          mcycle_r[58]              
+0          0          0          mcycle_r[57]              
+0          0          0          mcycle_r[56]              
+0          0          0          mcycle_r[55]              
+0          0          0          mcycle_r[54]              
+0          0          0          mcycle_r[53]              
+0          0          0          mcycle_r[52]              
+0          0          0          mcycle_r[51]              
+0          0          0          mcycle_r[50]              
+0          0          0          mcycle_r[49]              
+0          0          0          mcycle_r[48]              
+0          0          0          mcycle_r[47]              
+0          0          0          mcycle_r[46]              
+0          0          0          mcycle_r[45]              
+0          0          0          mcycle_r[44]              
+0          0          0          mcycle_r[43]              
+0          0          0          mcycle_r[42]              
+0          0          0          mcycle_r[41]              
+0          0          0          mcycle_r[40]              
+0          0          0          mcycle_r[39]              
+0          0          0          mcycle_r[38]              
+0          0          0          mcycle_r[37]              
+0          0          0          mcycle_r[36]              
+0          0          0          mcycle_r[35]              
+0          0          0          mcycle_r[34]              
+0          0          0          mcycle_r[33]              
+0          0          0          mcycle_r[32]              
+0          0          0          mcycle_r[31]              
+0          0          0          mcycle_r[30]              
+0          0          0          mcycle_r[29]              
+0          0          0          mcycle_r[28]              
+0          0          0          mcycle_r[27]              
+0          0          0          mcycle_r[26]              
+0          0          0          mcycle_r[25]              
+0          0          0          mcycle_r[24]              
+0          0          0          mcycle_r[23]              
+0          0          0          mcycle_r[22]              
+0          0          0          mcycle_r[21]              
+0          0          0          mcycle_r[20]              
+0          0          0          mcycle_r[19]              
+0          0          0          mcycle_r[18]              
+0          0          0          mcycle_r[17]              
+0          0          0          mcycle_r[16]              
+0          0          0          mcycle_r[15]              
+0          1          0          mcycle_r[14]              
+1          1          1          mcycle_r[13]              
+1          1          1          mcycle_r[12]              
+1          1          1          mcycle_r[11]              
+1          1          1          mcycle_r[10]              
+1          1          1          mcycle_r[9]               
+1          1          1          mcycle_r[8]               
+1          1          1          mcycle_r[7]               
+1          1          1          mcycle_r[6]               
+1          1          1          mcycle_r[5]               
+1          1          1          mcycle_r[4]               
+1          1          1          mcycle_r[3]               
+1          1          1          mcycle_r[2]               
+1          1          1          mcycle_r[1]               
+1          1          1          mcycle_r[0]               
+0          0          0          minstret_r[63]            
+0          0          0          minstret_r[62]            
+0          0          0          minstret_r[61]            
+0          0          0          minstret_r[60]            
+0          0          0          minstret_r[59]            
+0          0          0          minstret_r[58]            
+0          0          0          minstret_r[57]            
+0          0          0          minstret_r[56]            
+0          0          0          minstret_r[55]            
+0          0          0          minstret_r[54]            
+0          0          0          minstret_r[53]            
+0          0          0          minstret_r[52]            
+0          0          0          minstret_r[51]            
+0          0          0          minstret_r[50]            
+0          0          0          minstret_r[49]            
+0          0          0          minstret_r[48]            
+0          0          0          minstret_r[47]            
+0          0          0          minstret_r[46]            
+0          0          0          minstret_r[45]            
+0          0          0          minstret_r[44]            
+0          0          0          minstret_r[43]            
+0          0          0          minstret_r[42]            
+0          0          0          minstret_r[41]            
+0          0          0          minstret_r[40]            
+0          0          0          minstret_r[39]            
+0          0          0          minstret_r[38]            
+0          0          0          minstret_r[37]            
+0          0          0          minstret_r[36]            
+0          0          0          minstret_r[35]            
+0          0          0          minstret_r[34]            
+0          0          0          minstret_r[33]            
+0          0          0          minstret_r[32]            
+0          0          0          minstret_r[31]            
+0          0          0          minstret_r[30]            
+0          0          0          minstret_r[29]            
+0          0          0          minstret_r[28]            
+0          0          0          minstret_r[27]            
+0          0          0          minstret_r[26]            
+0          0          0          minstret_r[25]            
+0          0          0          minstret_r[24]            
+0          0          0          minstret_r[23]            
+0          0          0          minstret_r[22]            
+0          0          0          minstret_r[21]            
+0          0          0          minstret_r[20]            
+0          0          0          minstret_r[19]            
+0          0          0          minstret_r[18]            
+0          0          0          minstret_r[17]            
+0          0          0          minstret_r[16]            
+0          0          0          minstret_r[15]            
+0          0          0          minstret_r[14]            
+0          0          0          minstret_r[13]            
+0          0          0          minstret_r[12]            
+0          0          0          minstret_r[11]            
+0          0          0          minstret_r[10]            
+0          0          0          minstret_r[9]             
+0          0          0          minstret_r[8]             
+0          0          0          minstret_r[7]             
+0          0          0          minstret_r[6]             
+0          0          0          minstret_r[5]             
+0          0          0          minstret_r[4]             
+0          0          0          minstret_r[3]             
+0          0          0          minstret_r[2]             
+0          0          0          minstret_r[1]             
+0          0          0          minstret_r[0]             
+1          1          1          mintprio_r[1]             
+1          1          1          mintprio_r[0]             
+0          0          0          mip_w[31]                 
+0          0          0          mip_w[30]                 
+0          0          0          mip_w[29]                 
+0          0          0          mip_w[28]                 
+1          1          1          mip_w[27]                 
+1          1          1          mip_w[26]                 
+1          1          1          mip_w[25]                 
+1          1          1          mip_w[24]                 
+1          1          1          mip_w[23]                 
+1          1          1          mip_w[22]                 
+1          1          1          mip_w[21]                 
+1          1          1          mip_w[20]                 
+1          1          1          mip_w[19]                 
+1          1          1          mip_w[18]                 
+1          1          1          mip_w[17]                 
+1          1          1          mip_w[16]                 
+0          0          0          mip_w[15]                 
+0          0          0          mip_w[14]                 
+0          0          0          mip_w[13]                 
+0          0          0          mip_w[12]                 
+1          1          1          mip_w[11]                 
+0          0          0          mip_w[10]                 
+0          0          0          mip_w[9]                  
+0          0          0          mip_w[8]                  
+1          1          1          mip_w[7]                  
+0          0          0          mip_w[6]                  
+0          0          0          mip_w[5]                  
+0          0          0          mip_w[4]                  
+1          1          1          mip_w[3]                  
+0          0          0          mip_w[2]                  
+0          0          0          mip_w[1]                  
+0          0          0          mip_w[0]                  
+1          1          1          msip_r                    
+
