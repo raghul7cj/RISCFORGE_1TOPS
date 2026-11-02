@@ -54,12 +54,17 @@ module timer
     begin
         irq_o = 2'b0;
 
+        // Both IRQs are qualified with TIMER_CTRL.EN: a disabled timer must not
+        // interrupt, and must not auto-clear REG_TIMER (the clear below is
+        // driven by irq_o), when software writes TIMER_VAL = 0xFFFF_FFFF or
+        // TIMER_VAL == TIMER_CMP.
+
         // overlow irq
-        if (regs_q[`REG_TIMER] == 32'hffff_ffff && prescaler_int == cycle_counter_q)
+        if (regs_q[`REG_TIMER_CTRL][`ENABLE_BIT] && regs_q[`REG_TIMER] == 32'hffff_ffff && prescaler_int == cycle_counter_q)
             irq_o[0] = 1'b1;
 
         // compare match irq if compare reg ist set
-        if (regs_q[`REG_CMP] != 'b0 && regs_q[`REG_TIMER] == regs_q[`REG_CMP] && prescaler_int == cycle_counter_q)
+        if (regs_q[`REG_TIMER_CTRL][`ENABLE_BIT] && regs_q[`REG_CMP] != 'b0 && regs_q[`REG_TIMER] == regs_q[`REG_CMP] && prescaler_int == cycle_counter_q)
             irq_o[1] = 1'b1;
 
     end
@@ -143,3 +148,6 @@ module timer
 
 
 endmodule
+
+
+

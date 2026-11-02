@@ -19,28 +19,34 @@ module Instruction_Memory_new #(
     localparam [29:0] IMEM_BASE_WORD = IMEM_BASE_BYTE[31:2];
     localparam ADDR_W = $clog2(MEM_DEPTH);
 
-    (* ram_style = "block" *)
     reg [31:0] mem_array [0:MEM_DEPTH-1];
 
     wire [29:0] local_addr_full = sram_addr - IMEM_BASE_WORD;
     wire [ADDR_W-1:0] local_addr = local_addr_full[ADDR_W-1:0];
 
-    reg [31:0] rdata_q;
+    // No reset on raddr_q: a block RAM cannot reset its internal read-address
+    // register, and with one Vivado maps mem_array to distributed LUT RAM
+    // (RAM128X1D x 2048 for 8K x 32). The read data is still forced to 0 in
+    // reset below; the core fetches from the boot ROM out of reset and only
+    // reads this memory after raddr_q has been loaded.
+    reg [ADDR_W-1:0] raddr_q;
 
-    // Synchronous Read / Write (Canonical Block RAM template, Read-First)
     always @(posedge clk) begin
         if (sram_en) begin
-            rdata_q <= mem_array[local_addr];
-            if (sram_we) begin
-                if (sram_wmask[0]) mem_array[local_addr][ 7: 0] <= sram_wdata[ 7: 0];
-                if (sram_wmask[1]) mem_array[local_addr][15: 8] <= sram_wdata[15: 8];
-                if (sram_wmask[2]) mem_array[local_addr][23:16] <= sram_wdata[23:16];
-                if (sram_wmask[3]) mem_array[local_addr][31:24] <= sram_wdata[31:24];
-            end
+            raddr_q <= local_addr;
         end
     end
 
-    assign sram_rdata = rdata_q;
+    always @(posedge clk) begin
+        if (rst_n && sram_en && sram_we) begin
+            if (sram_wmask[0]) mem_array[local_addr][ 7: 0] <= sram_wdata[ 7: 0];
+            if (sram_wmask[1]) mem_array[local_addr][15: 8] <= sram_wdata[15: 8];
+            if (sram_wmask[2]) mem_array[local_addr][23:16] <= sram_wdata[23:16];
+            if (sram_wmask[3]) mem_array[local_addr][31:24] <= sram_wdata[31:24];
+        end
+    end
+
+    assign sram_rdata = (!rst_n) ? 32'd0 : mem_array[raddr_q];
 
 `ifndef SYNTHESIS
     initial begin : init_mem

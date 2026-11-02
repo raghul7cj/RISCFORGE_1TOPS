@@ -216,7 +216,9 @@
 // Reset Topology:
 //   hard_rst_ni  → cold boot, resets everything including bootloader
 //   soft_rst_ni  → warm boot, SRAM preserved, bootloader runs clean-slate only
-//   sys_rst_n    = sync(hard_rst_ni & soft_rst_ni) → crossbar, bridges, muxes
+//   soft_rst_n_filt_q = 2-FF sync + SoftRstFiltCycles noise filter of
+//                  soft_rst_ni; the only form of soft_rst_ni used internally
+//   sys_rst_n    = sync(hard_rst_ni & soft_rst_n_filt_q) → crossbar, bridges, muxes
 //                  Async assert (instant), sync de-assert (local 4-FF chain)
 //   core_rst_n   ← bootloader output → RISC-V core
 //   periph_rst_n ← bootloader output → non-boot peripherals (I2C, Timer 0,
@@ -242,6 +244,10 @@ module riscforge_soc_subsystem
   parameter int unsigned FLASH_POWERUP_CYCLES = 30_000,
   // Number of APB slave ports (also sizes apb_timeout_sticky_o below)
   parameter int unsigned NUM_APB_SLAVES = 6,
+  // soft_rst_ni noise filter: the synchronized pin must hold a new level for
+  // this many consecutive clk_i cycles before it is accepted (16 = 160 ns at
+  // 100 MHz). Real button presses are >= 10 ms; shorter pulses are noise.
+  parameter int unsigned SoftRstFiltCycles = 16,
   // Derived — do not override
   localparam int unsigned AXI_STRB_WIDTH   = AXI_DATA_WIDTH / 8,
   localparam int unsigned NR_GPIOS         = GPIOCount,
@@ -505,14 +511,47 @@ module riscforge_soc_subsystem
   // flops leave reset on a single clean clock edge instead of during their
   // recovery/removal window.
   //
-  // sys_rst_n     : sourced from BOTH external resets ANDed together; feeds
+  // sys_rst_n     : sourced from hard_rst_ni ANDed with the filtered soft
+  //                 reset (soft_rst_n_filt_q, below); feeds
   //                 the crossbar, AXI bridges, SRAM muxes, SRAM wrappers.
   // hard_rst_sync_n: sourced from hard_rst_ni only; feeds the bootloader, so
   //                 it leaves reset on the same edge as sys_rst_n (otherwise
   //                 the bootloader drives the crossbar while it is still in
   //                 reset). Warm boot leaves the bootloader clocked and lets
   //                 its own synchronous soft-reset handling take effect.
-  assign sys_rst_n_raw = hard_rst_ni & soft_rst_ni;
+  //
+  // soft_rst_ni is a board push button and is never used raw. It is 2-FF
+  // synchronized (soft_rst_meta_q), then soft_rst_n_filt_q only changes after
+  // the synchronized level has differed from it for SoftRstFiltCycles
+  // consecutive cycles, so noise/ESD spikes never reach sys_rst_sync_q, the
+  // SRAM WE clamps or the bootloader. soft_rst_n_filt_q is a flop output, so
+  // the AND below has no glitching input (lint RST_IS_DCMB waived on this basis).
+  localparam int unsigned SoftRstCntW = $clog2(SoftRstFiltCycles + 1);
+
+  logic [1:0]             soft_rst_meta_q;    // 2-FF synchronizer
+  logic                   soft_rst_n_filt_q;  // filtered soft reset (active-low)
+  logic [SoftRstCntW-1:0] soft_rst_cnt_q;     // consecutive-mismatch counter
+
+  always_ff @(posedge clk_i or negedge hard_rst_ni) begin
+    if (!hard_rst_ni) soft_rst_meta_q <= 2'b11;
+    else              soft_rst_meta_q <= {soft_rst_meta_q[0], soft_rst_ni};
+  end
+
+  always_ff @(posedge clk_i or negedge hard_rst_ni) begin
+    if (!hard_rst_ni) begin
+      soft_rst_n_filt_q <= 1'b1;
+      soft_rst_cnt_q    <= '0;
+    end else if (soft_rst_meta_q[1] == soft_rst_n_filt_q) begin
+      soft_rst_cnt_q    <= '0;                                  // no change pending
+    end else if (soft_rst_cnt_q == SoftRstCntW'(SoftRstFiltCycles - 1)) begin
+      soft_rst_n_filt_q <= soft_rst_meta_q[1];                  // stable: accept
+      soft_rst_cnt_q    <= '0;
+    end else begin
+      soft_rst_cnt_q    <= soft_rst_cnt_q + 1'b1;               // still counting
+    end
+  end
+
+  assign sys_rst_n_raw = hard_rst_ni & soft_rst_n_filt_q;
 
   always_ff @(posedge clk_i or negedge sys_rst_n_raw) begin
     if (!sys_rst_n_raw) sys_rst_sync_q  <= 4'b0000;
@@ -772,7 +811,7 @@ module riscforge_soc_subsystem
   ) i_isram_axi_if (
     .clk_i      ( clk_i              ),
     .rst_ni     ( sys_rst_n          ),
-    .soft_rst_ni( soft_rst_ni        ),
+    .soft_rst_ni( soft_rst_n_filt_q  ),
     // Runtime lockout: once boot completes, ISRAM belongs to the core's fetch
     // port alone. AXI traffic is answered with SLVERR instead of contending
     // with (and being starved by) the every-cycle instruction fetch.
@@ -859,7 +898,7 @@ module riscforge_soc_subsystem
   ) i_dsram_axi_if (
     .clk_i      ( clk_i              ),
     .rst_ni     ( sys_rst_n          ),
-    .soft_rst_ni( soft_rst_ni        ),
+    .soft_rst_ni( soft_rst_n_filt_q  ),
     .reject_i   ( 1'b0               ),  // DSRAM stays AXI-accessible at runtime
     .axi_req_i  ( xbar_mst_req[1]    ),
     .axi_resp_o ( xbar_mst_resp[1]   ),
@@ -1353,7 +1392,7 @@ module riscforge_soc_subsystem
   ) i_bootloader (
     .clk_i           ( clk_i             ),
     .hard_rst_ni     ( hard_rst_sync_n   ),
-    .soft_rst_ni     ( soft_rst_ni       ),
+    .soft_rst_ni     ( soft_rst_n_filt_q ),
     // AXI-Lite master (struct, not flat wires) — SRAM writes only
     .axi_req_o       ( xbar_slv_req[1]   ),
     .axi_resp_i      ( xbar_slv_resp[1]  ),
