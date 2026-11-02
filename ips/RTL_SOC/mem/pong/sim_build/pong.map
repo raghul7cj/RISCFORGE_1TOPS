@@ -1,0 +1,127 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+ISRAM            0x00010000         0x00008000         xr
+DSRAM            0x00020000         0x00008000         rw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+LOAD C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+LOAD D:/riscv-toolchain/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/rv32i/ilp32\libgcc.a
+
+.text           0x00010000      0xe68
+ *(.text.init)
+ .text.init     0x00010000       0x3c C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+                0x00010000                _start
+ *(.text .text.*)
+ .text          0x0001003c       0x74 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+                0x0001003c                trap_entry
+ .text          0x000100b0      0x6a4 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+ .text.startup  0x00010754      0x714 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                0x00010754                main
+
+.results        0x00020000       0x40
+                0x00020040                        . = (. + 0x40)
+ *fill*         0x00020000       0x40 
+
+.rodata         0x00020040      0x258
+ *(.rodata .rodata.* .srodata .srodata.*)
+ .rodata.str1.4
+                0x00020040      0x20a C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                                0x20e (size before relaxing)
+ *fill*         0x0002024a        0x2 
+ .rodata        0x0002024c       0x4c C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.rela.dyn       0x00020298        0x0
+ .rela.text.init
+                0x00020298        0x0 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+
+.data           0x00020298        0x4
+ *(.data .data.* .sdata .sdata.*)
+ .data          0x00020298        0x0 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .data          0x00020298        0x0 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+ .sdata         0x00020298        0x4 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.bss            0x0002029c       0x70
+                0x0002029c                        _bss_start = .
+ *(.bss .bss.* .sbss .sbss.* COMMON)
+ .bss           0x0002029c        0x0 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .bss           0x0002029c       0x48 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                0x000202d0                g_trap
+ .sbss          0x000202e4       0x28 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                0x0002030c                        . = ALIGN (0x4)
+                0x0002030c                        _bss_end = .
+                0x00028000                        _stack_top = (ORIGIN (DSRAM) + LENGTH (DSRAM))
+                0x00000001                        ASSERT ((ADDR (.text) == 0x10000), _start must be at the ISRAM base (BootROM jump target))
+                0x00000001                        ASSERT ((ADDR (.results) == 0x20000), result words must sit at the DSRAM base (soc_regtest_tb.sv))
+                0x00000001                        ASSERT ((_bss_end <= (_stack_top - 0x800)), less than 2 KB left for the stack)
+OUTPUT(D:\College\Projects\RISCV\RISCFORGE_1TOPS\ips\RTL_SOC\mem\pong\sim_build\pong.elf elf32-littleriscv)
+
+.riscv.attributes
+                0x00000000       0x29
+ .riscv.attributes
+                0x00000000       0x27 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .riscv.attributes
+                0x00000027       0x25 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.comment        0x00000000       0x33
+ .comment       0x00000000       0x33 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                                 0x34 (size before relaxing)
+
+.note.GNU-stack
+                0x00000000        0x0
+ .note.GNU-stack
+                0x00000000        0x0 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_line     0x00000000     0x19d0
+ .debug_line    0x00000000      0x156 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .debug_line    0x00000156     0x187a C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_line_str
+                0x00000000       0xfa
+ .debug_line_str
+                0x00000000       0xfa C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+                                 0x8b (size before relaxing)
+ .debug_line_str
+                0x000000fa        0x0 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                                 0xae (size before relaxing)
+
+.debug_info     0x00000000     0x157a
+ .debug_info    0x00000000       0x23 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .debug_info    0x00000023     0x1557 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_abbrev   0x00000000      0x4c6
+ .debug_abbrev  0x00000000       0x12 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .debug_abbrev  0x00000012      0x4b4 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_aranges  0x00000000       0x50
+ .debug_aranges
+                0x00000000       0x28 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .debug_aranges
+                0x00000028       0x28 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_str      0x00000000      0x3f1
+ .debug_str     0x00000000      0x3f1 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+                                 0x97 (size before relaxing)
+ .debug_str     0x000003f1        0x0 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+                                0x3b1 (size before relaxing)
+
+.debug_rnglists
+                0x00000000      0x1fa
+ .debug_rnglists
+                0x00000000       0x19 C:\Users\chaotic\AppData\Local\Temp\cc8rAa22.o
+ .debug_rnglists
+                0x00000019      0x1e1 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_loclists
+                0x00000000      0x8e6
+ .debug_loclists
+                0x00000000      0x8e6 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o
+
+.debug_frame    0x00000000      0x1e8
+ .debug_frame   0x00000000      0x1e8 C:\Users\chaotic\AppData\Local\Temp\cclKIvra.o

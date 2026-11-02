@@ -24,12 +24,15 @@ module Instruction_Memory_new #(
     wire [29:0] local_addr_full = sram_addr - IMEM_BASE_WORD;
     wire [ADDR_W-1:0] local_addr = local_addr_full[ADDR_W-1:0];
 
+    // No reset on raddr_q: a block RAM cannot reset its internal read-address
+    // register, and with one Vivado maps mem_array to distributed LUT RAM
+    // (RAM128X1D x 2048 for 8K x 32). The read data is still forced to 0 in
+    // reset below; the core fetches from the boot ROM out of reset and only
+    // reads this memory after raddr_q has been loaded.
     reg [ADDR_W-1:0] raddr_q;
 
     always @(posedge clk) begin
-        if (!rst_n) begin
-            raddr_q <= 'b0;
-        end else if (sram_en) begin
+        if (sram_en) begin
             raddr_q <= local_addr;
         end
     end

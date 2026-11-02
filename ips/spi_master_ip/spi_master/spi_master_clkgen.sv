@@ -8,6 +8,17 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+// RISCFORGE NOTE - minimum clock divider (firmware rule): program CLKDIV
+// (APB offset 0x004) with clk_div >= 2.
+// Each spi_clk half-period is (clk_div + 1) clk cycles. MISO (spi_sdi1) is
+// launched by the slave after spi_fall and captured into spi_master_rx.data_int
+// on clk at the next spi_rise, so the whole round trip (spi_clk pad out ->
+// board -> slave clock-to-output tV -> board -> sdi pad in) must settle within
+// (clk_div + 1) clk cycles. clk_div = 0 or 1 (10 / 20 ns at 100 MHz) leaves no
+// margin and can capture a wrong or metastable bit. clk_div >= 2 (30 ns) is an
+// estimate; re-check it against the IO pad library and the tV of every slave
+// sharing MISO (S25FS512S flash on CS0, CS1 device) before sign-off.
+
 module spi_master_clkgen
 (
     input  logic                        clk,

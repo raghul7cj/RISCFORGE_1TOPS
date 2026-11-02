@@ -106,14 +106,6 @@ module tb_uart0;
     .uart_sin_i               ( uart_sin_i               ),
     .uart_sout_o              ( uart_sout_o              ),
     .uart_int_o               ( uart_int_o               ),
-    .uart_out1n_o             ( uart_out1n_o             ),
-    .uart_out2n_o             ( uart_out2n_o             ),
-    .uart_rtsn_o              ( uart_rtsn_o              ),
-    .uart_dtrn_o              ( uart_dtrn_o              ),
-    .uart_ctsn_i              ( uart_ctsn_i              ),
-    .uart_dsrn_i              ( uart_dsrn_i              ),
-    .uart_dcdn_i              ( uart_dcdn_i              ),
-    .uart_rin_i               ( uart_rin_i               ),
 
     // GPIO
     .gpio_in_i                ( gpio_in_i                ),
@@ -127,17 +119,8 @@ module tb_uart0;
     .spi_clk_o                ( spi_clk_o                ),
     .spi_csn0_o               ( spi_csn0_o               ),
     .spi_csn1_o               ( spi_csn1_o               ),
-    .spi_csn2_o               ( spi_csn2_o               ),
-    .spi_csn3_o               ( spi_csn3_o               ),
-    .spi_mode_o               ( spi_mode_o               ),
     .spi_sdo0_o               ( spi_sdo0_o               ),
-    .spi_sdo1_o               ( spi_sdo1_o               ),
-    .spi_sdo2_o               ( spi_sdo2_o               ),
-    .spi_sdo3_o               ( spi_sdo3_o               ),
-    .spi_sdi0_i               ( spi_sdi0_i               ),
     .spi_sdi1_i               ( spi_sdi1_i               ),
-    .spi_sdi2_i               ( spi_sdi2_i               ),
-    .spi_sdi3_i               ( spi_sdi3_i               ),
     .spi_events_o             ( spi_events_o             )
   );
 
@@ -257,7 +240,18 @@ module tb_uart0;
     hard_rst_ni = 1'b1;
     soft_rst_ni = 1'b0;
 
-    repeat (20) @(posedge clk);
+    // hard_rst_ni is never asserted here, so the SoC soft-reset filter flops
+    // (async-reset by hard_rst_ni only) would start X and stay X. Give them the
+    // state they hold after power-up with soft_rst_ni low, then let them run.
+    force dut.soft_rst_meta_q   = 2'b00;
+    force dut.soft_rst_cnt_q    = '0;
+    force dut.soft_rst_n_filt_q = 1'b0;
+    @(posedge clk);
+    release dut.soft_rst_meta_q;
+    release dut.soft_rst_cnt_q;
+    release dut.soft_rst_n_filt_q;
+
+    repeat (19) @(posedge clk);
     soft_rst_ni = 1'b1;
     $display("[TB] Warm reset de-asserted at t = %0t ns", $time);
 
