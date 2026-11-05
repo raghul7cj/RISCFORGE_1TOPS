@@ -299,6 +299,21 @@ module execute_cycle (
     end
     wire start_M = is_M_instruction_E && !m_started;
 
+    reg [31:0] pc_me;
+    reg [31:0] pcplus4_me;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            pc_me      <= 32'h00000000;
+            pcplus4_me <= 32'h00000000;
+        end else if (start_M) begin
+            pc_me      <= PCE;
+            pcplus4_me <= PCPlus4E;
+        end
+    end
+    wire        valid_E1   = m_valid_out ? 1'b1       : valid_E;
+    wire [31:0] PCE1       = m_valid_out ? pc_me      : PCE;
+    wire [31:0] PCPlus4E1  = m_valid_out ? pcplus4_me : PCPlus4E;
+
     rv32m_unit m_unit (
         .clk(clk),
         .rst_n(rst_n),
@@ -396,15 +411,15 @@ module execute_cycle (
             ResultSrcE_r <= ResultSrcE;
             RD_E_r <= RD_E1;
             lsunitE_r <= lsunitE;
-            PCE_r <= PCE;
-            PCPlus4E_r <= PCPlus4E;
+            PCE_r <= PCE1;
+            PCPlus4E_r <= PCPlus4E1;
             RD2_E_r <= Src_B_interim;
             ResultE_r <= ResultE;
             csr_write_en_E_r <= next_exc_valid_E ? 1'b0 : csr_write_en_E;
             csr_addr_E_r <= csr_addr_E;
             new_csr_E_r <= csr_new_val_E;
             old_csr_E_r <= csr_rdata_i;
-            valid_M_r <= valid_E;
+            valid_M_r <= valid_E1;
             exc_valid_r <= next_exc_valid_E;
             exc_cause_r <= next_exc_cause_E;
             exc_tval_r <= next_exc_tval_E;

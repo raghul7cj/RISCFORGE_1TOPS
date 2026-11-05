@@ -186,7 +186,7 @@ module hazard_unit(
 
     // FlushE: kill ID/EX when we have a data hazard bubble, branch taken, or
     //         CSR hazard, or M-extension stall (multiplier busy).
-    assign FlushE = lwstall | (csr_gpr_stall & ~mem_stall_i) | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL;
+    assign FlushE = (lwstall & ~mem_stall_i) | (csr_gpr_stall & ~mem_stall_i) | PCSrcE | (csr_stall & ~mem_stall_i) | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL;
     // FlushD: kill IF/ID when branch taken, exception in-flight, or wb redirect.
     //         exc_inflight_E included so that the wrongly-fetched instruction after
     //         a misaligned-branch exception (where PCSrcE was suppressed) is removed.

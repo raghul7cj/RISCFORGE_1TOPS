@@ -282,7 +282,7 @@ module obi_uart_tx #()
       //--Keep-FIFO-cleared-----------------------------------------------------------------------
       fifo_clear = 1'b1;
       //--Set-LSR---------------------------------------------------------------------------------
-      if (~thr_full_q) begin
+      if (~thr_full_q & ~reg_read_i.obi_write_thr) begin
         reg_write_o.thr_empty = 1'b1;
         reg_write_o.thr_valid = 1'b1;
         if (tsr_empty) begin

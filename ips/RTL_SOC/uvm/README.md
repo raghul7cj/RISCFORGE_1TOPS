@@ -67,11 +67,14 @@ Results: `logs/<test>_<prog>.log`, `logs/summary.txt`, `rtl_trace.log`.
 
 Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 
-## Known RTL bugs found by this bench
+## RTL bugs found by this bench (fixed on this branch)
 
-| Test | Bug |
-| --- | --- |
-| `mext` | `mul`/`div` result reaches WB with `valid_W=0`, so `RegWriteW_gated` (`top.v`) drops it. M results never reach the register file. |
-| `lsu_hazard`, `i2c` | A load right after a stalled MMIO store is dropped (no bus access, no commit). Polling loops exit early. |
-| `uart_nofifo` | `obi_uart_tx.sv`: with FIFO off, a THR write does not clear LSR.THRE (the later `~thr_full_q` block overrides it), so characters are overwritten. |
-| `irq` (note) | GPIO global interrupt defaults to a 1-cycle pulse and the core does not latch `mip` (`csr_regfile.v`), so a pulse can be missed while the core stalls. Firmware sets GPIO `CFG=1` (level mode). |
+| Test | Bug | Fix |
+| --- | --- | --- |
+| `mext` | `mul`/`div` result reached WB in a bubble slot (`valid_W=0`, `PC_W=0`), so `RegWriteW_gated` dropped it | `riscv_core/rtl/execute_cycle.v`: keep the M instruction PC at start, mark the result slot valid |
+| `lsu_hazard`, `i2c` | Load waiting in EX behind a stalled MMIO store was flushed by `lwstall` (flush beats stall in ID/EX) | `riscv_core/rtl/hazard_unit.v`: gate `lwstall` and `csr_stall` in `FlushE` with `~mem_stall_i` |
+| `uart_nofifo` | With FIFO off, THR write did not clear LSR.THRE (later `~thr_full_q` block overrode it), characters overwritten | `SOC_FILES_CENTOS/obi/obi_uart_tx.sv`: do not set THRE in the cycle THR is written |
+
+Notes:
+- GPIO global interrupt defaults to a 1-cycle pulse and the core does not latch `mip` (`csr_regfile.v`), so a pulse can be missed while the core stalls. Firmware sets GPIO `CFG=1` (level mode).
+- The UART scratch register (`0x1C`) is not implemented in `obi_uart` (reads 0).
