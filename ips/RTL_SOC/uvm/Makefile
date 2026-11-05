@@ -58,6 +58,7 @@ run: sw
 	xrun $(SIM_OPTS) -f soc_ip.f -f tb.f \
 	  +UVM_TESTNAME=$(TEST) +HEX=sw/$(PROG).hex $(ARGS) -l logs/$(NAME).log
 
+flash: TEST = soc_flash_boot_test
 flash: sw
 	mkdir -p logs
 	awk '{print substr($$0,7,2); print substr($$0,5,2); print substr($$0,3,2); print substr($$0,1,2)}' sw/$(PROG).hex > flash.mem
