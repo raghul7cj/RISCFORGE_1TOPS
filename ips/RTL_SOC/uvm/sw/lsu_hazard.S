@@ -74,4 +74,32 @@ _start:
   lw   a4, 12(s1)
   add  a5, a4, a3
   CHECK a5, 0x15151515, 14
+
+  li   s5, 0
+  sw   t1, TIMER_CMP(s0)
+  jal  ra, bump
+  CHECK s5, 1, 15
+  lw   t2, TIMER_CMP(s0)
+  jal  ra, bump
+  CHECK s5, 2, 16
+  lw   t2, 8(s1)
+  jal  ra, bump
+  CHECK s5, 3, 17
+  sw   t1, 8(s1)
+  jal  ra, bump
+  CHECK s5, 4, 18
+  lw   t2, 8(s1)
+  la   t3, bump
+  lw   t2, 8(s1)
+  jalr ra, 0(t3)
+  CHECK s5, 5, 19
+  lw   t2, 8(s1)
+  beq  zero, zero, 3f
+  li   s5, 99
+3:
+  CHECK s5, 5, 20
   PASS
+
+bump:
+  addi s5, s5, 1
+  ret
