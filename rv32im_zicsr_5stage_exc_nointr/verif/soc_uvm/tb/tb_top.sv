@@ -4,8 +4,6 @@ module tb_top;
   import uvm_pkg::*;
   import soc_pkg::*;
 
-  localparam int NR_GPIOS = 32;
-
   logic clk = 1'b0;
   always #5 clk = ~clk;
 
@@ -17,9 +15,7 @@ module tb_top;
   wire        i2c_scl = i2c_scl_oen ? 1'b1 : i2c_scl_o;
   wire        i2c_sda = i2c_sda_oen ? 1'b1 : i2c_sda_o;
 
-  riscforge_soc_subsystem #(
-    .NR_GPIOS (NR_GPIOS)
-  ) dut (
+  riscforge_soc_subsystem dut (
     .clk_i                       (clk),
     .hard_rst_ni                 (ctrl.hard_rst_n),
     .soft_rst_ni                 (ctrl.soft_rst_n),
