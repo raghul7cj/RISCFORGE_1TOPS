@@ -99,19 +99,21 @@ regress: sw_all
 	  n=$$((n+1)); test=$${t%%:*}; prog=$${t##*:}; \
 	  if [ $$test = flash ]; then log=logs/flash_$${prog}.log; tgt="flash PROG=$$prog"; \
 	  else log=logs/$${test}_$${prog}.log; tgt="run TEST=$$test PROG=$$prog"; fi; \
+	  out=logs/$${test}_$${prog}.make; rm -f $$log $$out; \
 	  echo "[$$n/$$total] START $$test $$prog  (`date +%H:%M:%S`)"; \
 	  t0=`date +%s`; \
 	  if [ "$(VERBOSE)" = 1 ]; then \
-	    $(MAKE) --no-print-directory $$tgt SEED=$(SEED) COV=$(COV) CROSS=$(CROSS) ARGS="$(ARGS)" < /dev/null 2>&1 | grep -E "UVM_(INFO|ERROR|FATAL|WARNING) |\*E,|\*F,"; \
+	    $(MAKE) --no-print-directory $$tgt SEED=$(SEED) COV=$(COV) CROSS=$(CROSS) ARGS="$(ARGS)" < /dev/null 2>&1 | tee $$out | grep -E "UVM_(INFO|ERROR|FATAL|WARNING) |\*E,|\*F,|Error"; \
 	  else \
-	    $(MAKE) --no-print-directory $$tgt SEED=$(SEED) COV=$(COV) CROSS=$(CROSS) ARGS="$(ARGS)" < /dev/null > /dev/null 2>&1; \
+	    $(MAKE) --no-print-directory $$tgt SEED=$(SEED) COV=$(COV) CROSS=$(CROSS) ARGS="$(ARGS)" < /dev/null > $$out 2>&1; \
 	  fi; \
 	  dt=$$(( `date +%s` - t0 )); \
 	  if [ -f $$log ] && grep -q "UVM_ERROR :    0" $$log && grep -q "UVM_FATAL :    0" $$log; then res=PASS; else res=FAIL; fi; \
 	  echo "$$res $$test $$prog" >> logs/summary.txt; \
 	  echo "[$$n/$$total] $$res  $$test $$prog  ($${dt}s)  log: $$log"; \
 	  if [ $$res = FAIL ]; then \
-	    if [ -f $$log ]; then grep -E "UVM_(ERROR|FATAL) .*@|\*E,|\*F," $$log | head -3; else echo "  no log created"; fi; \
+	    if [ -f $$log ]; then grep -E "UVM_(ERROR|FATAL) .*@|\*E,|\*F," $$log | head -3; fi; \
+	    tail -5 $$out; \
 	  fi; \
 	done; \
 	echo "DONE: `grep -c PASS logs/summary.txt` PASS, `grep -c FAIL logs/summary.txt` FAIL of $$total"
