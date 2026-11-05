@@ -10,7 +10,7 @@ class soc_coverage extends uvm_component;
   bit [4:0]    rd;
   bit [31:0]   wdata;
   bit [7:0]    uart_data;
-  bit [8:0]    irq_rise;
+  bit [12:0]   irq_rise;
   bit          i2c_rw;
   int unsigned spi_bits;
 
@@ -33,11 +33,12 @@ class soc_coverage extends uvm_component;
   endgroup
 
   covergroup cg_irq;
-    cp_timer : coverpoint irq_rise[3:0] { bins hit = {[1:15]}; }
-    cp_uart  : coverpoint irq_rise[4]   { bins hit = {1}; }
-    cp_gpio  : coverpoint irq_rise[5]   { bins hit = {1}; }
-    cp_i2c   : coverpoint irq_rise[6]   { bins hit = {1}; }
-    cp_spi   : coverpoint irq_rise[8:7] { bins hit = {[1:3]}; }
+    cp_timer0 : coverpoint irq_rise[3:0]   { bins hit = {[1:15]}; }
+    cp_timer1 : coverpoint irq_rise[7:4]   { bins hit = {[1:15]}; }
+    cp_uart   : coverpoint irq_rise[8]     { bins hit = {1}; }
+    cp_gpio   : coverpoint irq_rise[9]     { bins hit = {1}; }
+    cp_i2c    : coverpoint irq_rise[10]    { bins hit = {1}; }
+    cp_spi    : coverpoint irq_rise[12:11] { bins hit = {[1:3]}; }
   endgroup
 
   covergroup cg_bus;

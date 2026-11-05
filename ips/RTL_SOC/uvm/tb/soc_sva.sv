@@ -28,7 +28,10 @@ module core_sva (
   input logic [31:0] pc,
   input logic        lsu_req,
   input logic        lsu_err,
-  input logic        uart_sout
+  input logic        uart_sout,
+  input logic [5:0]  apb_timeout,
+  input logic        axi_wr_timeout,
+  input logic        axi_rd_timeout
 );
   import uvm_pkg::*;
   `include "uvm_macros.svh"
@@ -47,4 +50,12 @@ module core_sva (
   a_sout: assert property (@(posedge clk) disable iff (!rst_n)
     !$isunknown(uart_sout))
     else `uvm_error("CORE_SVA", "uart_sout is X")
+
+  a_apb_timeout: assert property (@(posedge clk) disable iff (!rst_n)
+    apb_timeout == '0)
+    else `uvm_error("CORE_SVA", $sformatf("APB timeout on slave mask 0x%02h", apb_timeout))
+
+  a_axi_timeout: assert property (@(posedge clk) disable iff (!rst_n)
+    !axi_wr_timeout && !axi_rd_timeout)
+    else `uvm_error("CORE_SVA", "AXI timeout")
 endmodule

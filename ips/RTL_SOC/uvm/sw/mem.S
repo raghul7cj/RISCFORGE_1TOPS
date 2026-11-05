@@ -3,7 +3,7 @@
 .section .text.init
 .globl _start
 _start:
-  li   s1, DSRAM_BASE
+  li   s1, DSRAM_BASE + 0x100
 
   li   t0, 0x12345678
   sw   t0, 0(s1)

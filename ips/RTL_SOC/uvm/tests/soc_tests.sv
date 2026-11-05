@@ -64,7 +64,7 @@ class soc_timer_test extends soc_base_test;
   endfunction
 
   function void set_cfg();
-    cfg.irq_expect = 9'h001;
+    cfg.irq_expect = 13'h0002;
   endfunction
 endclass
 

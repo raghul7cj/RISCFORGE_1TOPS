@@ -16,9 +16,11 @@ module tb_top;
   trace_if    trace (clk);
 
   logic       i2c_scl_o, i2c_scl_oen, i2c_sda_o, i2c_sda_oen;
-  logic [3:0] timer_irq;
+  logic [3:0] timer0_irq, timer1_irq;
   logic       uart_int, gpio_int, i2c_int;
   logic [1:0] spi_events;
+  logic [5:0] apb_timeout;
+  logic       axi_wr_timeout, axi_rd_timeout;
 
   assign i2c.scl = (i2c_scl_oen ? 1'b1 : i2c_scl_o) & i2c.scl_drv;
   assign i2c.sda = (i2c_sda_oen ? 1'b1 : i2c_sda_o) & i2c.sda_drv;
@@ -38,18 +40,11 @@ module tb_top;
     .i2c_sda_o                   (i2c_sda_o),
     .i2c_sda_oen_o               (i2c_sda_oen),
     .i2c_interrupt_o             (i2c_int),
-    .timer_irq_o                 (timer_irq),
+    .timer0_irq_o                (timer0_irq),
+    .timer1_irq_o                (timer1_irq),
     .uart_sin_i                  (uart.sin),
     .uart_sout_o                 (uart.sout),
     .uart_int_o                  (uart_int),
-    .uart_out1n_o                (),
-    .uart_out2n_o                (),
-    .uart_rtsn_o                 (),
-    .uart_dtrn_o                 (),
-    .uart_ctsn_i                 (1'b0),
-    .uart_dsrn_i                 (1'b0),
-    .uart_dcdn_i                 (1'b0),
-    .uart_rin_i                  (1'b1),
     .gpio_in_i                   (gpio.gpio_in),
     .gpio_out_o                  (gpio.gpio_out),
     .gpio_tx_en_o                (gpio.gpio_tx_en),
@@ -57,30 +52,25 @@ module tb_top;
     .gpio_global_interrupt_o     (gpio_int),
     .gpio_pin_level_interrupts_o (),
     .spi_clk_o                   (spi.sck),
-    .spi_csn0_o                  (spi.csn),
-    .spi_csn1_o                  (),
-    .spi_csn2_o                  (),
-    .spi_csn3_o                  (),
-    .spi_mode_o                  (),
+    .spi_csn0_o                  (),
+    .spi_csn1_o                  (spi.csn),
     .spi_sdo0_o                  (spi.sdo),
-    .spi_sdo1_o                  (),
-    .spi_sdo2_o                  (),
-    .spi_sdo3_o                  (),
-    .spi_sdi0_i                  (spi.sdi),
     .spi_sdi1_i                  (spi.sdi),
-    .spi_sdi2_i                  (1'b0),
-    .spi_sdi3_i                  (1'b0),
-    .spi_events_o                (spi_events)
+    .spi_events_o                (spi_events),
+    .apb_timeout_sticky_o        (apb_timeout),
+    .axi_wr_timeout_sticky_o     (axi_wr_timeout),
+    .axi_rd_timeout_sticky_o     (axi_rd_timeout)
   );
 
   assign ctrl.core_rst_n = dut.core_rst_n;
 
-  assign irq.rst_n = dut.core_rst_n;
-  assign irq.timer = timer_irq;
-  assign irq.uart  = uart_int;
-  assign irq.gpio  = gpio_int;
-  assign irq.i2c   = i2c_int;
-  assign irq.spi   = spi_events;
+  assign irq.rst_n  = dut.core_rst_n;
+  assign irq.timer0 = timer0_irq;
+  assign irq.timer1 = timer1_irq;
+  assign irq.uart   = uart_int;
+  assign irq.gpio   = gpio_int;
+  assign irq.i2c    = i2c_int;
+  assign irq.spi    = spi_events;
 
   assign trace.rst_n     = dut.core_rst_n;
   assign trace.wb_en     = dut.i_riscv_core.RegWriteW_gated;
@@ -93,15 +83,18 @@ module tb_top;
   assign trace.mem_wdata = dut.core_lsu_wdata;
 
   core_sva u_core_sva (
-    .clk       (clk),
-    .rst_n     (dut.core_rst_n),
-    .pc        (dut.i_riscv_core.PC_W),
-    .lsu_req   (dut.core_lsu_req),
-    .lsu_err   (dut.core_lsu_err),
-    .uart_sout (uart.sout)
+    .clk            (clk),
+    .rst_n          (dut.core_rst_n),
+    .pc             (dut.i_riscv_core.PC_W),
+    .lsu_req        (dut.core_lsu_req),
+    .lsu_err        (dut.core_lsu_err),
+    .uart_sout      (uart.sout),
+    .apb_timeout    (apb_timeout),
+    .axi_wr_timeout (axi_wr_timeout),
+    .axi_rd_timeout (axi_rd_timeout)
   );
 
-  for (genvar i = 0; i < 5; i++) begin : g_apb_sva
+  for (genvar i = 0; i < 6; i++) begin : g_apb_sva
     apb_sva u_apb_sva (
       .clk     (clk),
       .rst_n   (dut.sys_rst_n),
@@ -115,25 +108,11 @@ module tb_top;
   initial begin
     string hex = "imem.hex";
     void'($value$plusargs("HEX=%s", hex));
-    if ($test$plusargs("SKIP_BOOT")) begin
-      force dut.core_rst_n   = 1'b0;
-      force dut.periph_rst_n = 1'b0;
-      wait (ctrl.hard_rst_n === 1'b0);
-      wait (ctrl.hard_rst_n === 1'b1);
-      $readmemh(hex, dut.i_isram.mem_array);
-      repeat (5) @(posedge clk);
-      force dut.periph_rst_n = 1'b1;
-      force dut.core_rst_n   = 1'b1;
-    end else begin
-      force dut.core_rst_n = 1'b0;
-      wait (ctrl.hard_rst_n === 1'b0);
-      wait (ctrl.hard_rst_n === 1'b1);
-      wait (ctrl.boot_done === 1'b1);
-      $readmemh(hex, dut.i_isram.mem_array);
-      @(posedge clk);
-      release dut.core_rst_n;
-    end
-    $display("[TB] loaded %s", hex);
+    wait (ctrl.hard_rst_n === 1'b0);
+    wait (ctrl.hard_rst_n === 1'b1);
+    wait (ctrl.soft_rst_n === 1'b1);
+    $readmemh(hex, dut.i_isram.u_imem.mem_array);
+    $display("[TB] loaded %s into ISRAM", hex);
   end
 
   initial begin

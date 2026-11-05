@@ -45,13 +45,23 @@ class soc_base_test extends uvm_test;
 
   task reset_dut();
     ctrl.hard_rst_n <= 1'b0;
-    ctrl.soft_rst_n <= 1'b1;
+    ctrl.soft_rst_n <= 1'b0;
     ctrl.test_mode  <= 1'b0;
     ctrl.fetch_en   <= 1'b1;
     ctrl.boot_addr  <= 32'h0;
     repeat (20) @(posedge ctrl.clk);
     ctrl.hard_rst_n <= 1'b1;
-    `uvm_info("TEST", "reset released", UVM_LOW)
+    repeat (100) @(posedge ctrl.clk);
+    ctrl.soft_rst_n <= 1'b1;
+    fork
+      wait (ctrl.boot_done === 1'b1);
+      begin
+        repeat (5000) @(posedge ctrl.clk);
+        `uvm_fatal("BOOT", "boot_done not seen after warm boot")
+      end
+    join_any
+    disable fork;
+    `uvm_info("TEST", "warm boot done, core running", UVM_LOW)
   endtask
 
   task wait_core_run(int unsigned clks = 200);

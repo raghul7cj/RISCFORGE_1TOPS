@@ -3,15 +3,17 @@
 .equ UART_BASE,   0x40002000
 .equ GPIO_BASE,   0x40003000
 .equ SPI_BASE,    0x40004000
-.equ DSRAM_BASE,  0x00010000
-.equ TOHOST,      0x00010FFC
+.equ DSRAM_BASE,  0x00020000
+.equ TOHOST,      0x00020000
 
 .equ UART_RBR,    0x00
 .equ UART_THR,    0x00
 .equ UART_DLL,    0x00
 .equ UART_DLM,    0x04
+.equ UART_FCR,    0x08
 .equ UART_LCR,    0x0C
 .equ UART_LSR,    0x14
+.equ UART_SCR,    0x1C
 
 .equ TIMER_VAL,   0x00
 .equ TIMER_CTRL,  0x04
@@ -28,8 +30,8 @@
 .equ SPI_LEN,     0x10
 .equ SPI_TXFIFO,  0x18
 .equ SPI_RXFIFO,  0x20
-.equ SPI_CMD_RD,  0x101
-.equ SPI_CMD_WR,  0x102
+.equ SPI_CMD_RD,  0x201
+.equ SPI_CMD_WR,  0x202
 
 .equ I2C_PRE,     0x00
 .equ I2C_CTRL,    0x04
@@ -47,11 +49,25 @@
   li   s0, UART_BASE
   li   t0, 0x83
   sw   t0, UART_LCR(s0)
-  li   t0, 1
+  li   t0, 2
   sw   t0, UART_DLL(s0)
   sw   zero, UART_DLM(s0)
   li   t0, 0x03
   sw   t0, UART_LCR(s0)
+  li   t0, 0x07
+  sw   t0, UART_FCR(s0)
+.endm
+
+.macro UART_INIT_NOFIFO
+  li   s0, UART_BASE
+  li   t0, 0x83
+  sw   t0, UART_LCR(s0)
+  li   t0, 2
+  sw   t0, UART_DLL(s0)
+  sw   zero, UART_DLM(s0)
+  li   t0, 0x03
+  sw   t0, UART_LCR(s0)
+  sw   zero, UART_FCR(s0)
 .endm
 
 .macro PUTC reg

@@ -1,9 +1,8 @@
 TEST     ?= soc_hello_test
 PROG     ?= hello
 SEED     ?= 1
-VENDOR_F ?= vendor.f
 CROSS    ?= riscv64-unknown-elf-
-ARGS     ?= +SKIP_BOOT
+ARGS     ?=
 COV      ?= 0
 GUI      ?= 0
 
@@ -20,6 +19,7 @@ endif
 
 REGRESS = \
   soc_hello_test:hello \
+  soc_hello_test:uart_nofifo \
   soc_uart_echo_test:uart_echo \
   soc_gpio_test:gpio \
   soc_timer_test:timer \
@@ -27,7 +27,8 @@ REGRESS = \
   soc_i2c_test:i2c \
   soc_core_test:mem \
   soc_core_test:mext \
-  soc_core_test:trap
+  soc_core_test:trap \
+  soc_core_test:lsu_hazard
 
 all: run
 
@@ -35,16 +36,16 @@ sw:
 	$(MAKE) -C sw PROG=$(PROG) CROSS=$(CROSS)
 
 sw_all:
-	for p in hello uart_echo gpio timer spi i2c mem mext trap; do \
+	for p in hello uart_nofifo uart_echo gpio timer spi i2c mem mext trap lsu_hazard; do \
 	  $(MAKE) -C sw PROG=$$p CROSS=$(CROSS) || exit 1; \
 	done
 
 compile:
-	xrun $(SIM_OPTS) -elaborate -f $(VENDOR_F) -f rtl.f -f tb.f -l compile.log
+	xrun $(SIM_OPTS) -elaborate -f soc_ip.f -f tb.f -l compile.log
 
 run: sw
 	mkdir -p logs
-	xrun $(SIM_OPTS) -f $(VENDOR_F) -f rtl.f -f tb.f \
+	xrun $(SIM_OPTS) -f soc_ip.f -f tb.f \
 	  +UVM_TESTNAME=$(TEST) +HEX=sw/$(PROG).hex $(ARGS) -l logs/$(NAME).log
 
 regress: sw_all

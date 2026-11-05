@@ -23,7 +23,7 @@ class soc_scoreboard extends uvm_scoreboard;
   bit          gpio_ok;
   spi_item     spi_frames[$];
   bit [7:0]    i2c_writes[$];
-  bit [8:0]    irq_seen;
+  bit [12:0]   irq_seen;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -97,11 +97,11 @@ class soc_scoreboard extends uvm_scoreboard;
       `uvm_error("SCB", $sformatf("i2c write 0x%02h never seen", cfg.i2c_expect))
 
     if ((irq_seen & cfg.irq_expect) != cfg.irq_expect)
-      `uvm_error("SCB", $sformatf("irq seen 0x%03h expected 0x%03h", irq_seen, cfg.irq_expect))
+      `uvm_error("SCB", $sformatf("irq seen 0x%04h expected 0x%04h", irq_seen, cfg.irq_expect))
   endfunction
 
   function void report_phase(uvm_phase phase);
-    `uvm_info("SCB", $sformatf("commits=%0d uart=\"%s\" spi_frames=%0d i2c_writes=%0d irq=0x%03h",
+    `uvm_info("SCB", $sformatf("commits=%0d uart=\"%s\" spi_frames=%0d i2c_writes=%0d irq=0x%04h",
               commits, uart_text, spi_frames.size(), i2c_writes.size(), irq_seen), UVM_LOW)
   endfunction
 endclass

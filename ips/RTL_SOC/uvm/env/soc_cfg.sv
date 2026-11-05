@@ -1,8 +1,8 @@
 class soc_cfg extends uvm_object;
   `uvm_object_utils(soc_cfg)
 
-  int unsigned uart_bit_clks = 16;
-  bit [31:0]   tohost_addr   = 32'h0001_0FFC;
+  int unsigned uart_bit_clks = 32;
+  bit [31:0]   tohost_addr   = 32'h0002_0000;
   int unsigned timeout_clks  = 500_000;
   string       uart_expect   = "";
 
@@ -18,7 +18,7 @@ class soc_cfg extends uvm_object;
   bit [7:0]    i2c_expect;
   bit [7:0]    i2c_rdata     = 8'h96;
 
-  bit [8:0]    irq_expect;
+  bit [12:0]   irq_expect;
 
   uvm_event    done_ev;
 
