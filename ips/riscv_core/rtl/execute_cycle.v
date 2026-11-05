@@ -278,9 +278,8 @@ module execute_cycle (
     wire target_misaligned_E = (PCTarget_tentative[1:0] != 2'b00);
 
     assign PCTargetE = PCTarget_tentative;
-    // PCSrcE suppressed only when target is misaligned (exception takes over)
-    // Do NOT gate with StallM — branch redirect must fire even if MEM is stalled
-    assign PCSrcE = branch_taken_raw & ~target_misaligned_E;
+    // PCSrcE suppressed when target is misaligned (exception takes over) or MEM is stalled
+    assign PCSrcE = branch_taken_raw & ~target_misaligned_E & ~StallM;
 
     assign LUI_result_E = (LUISrcE) ? Imm_Ext_E : PCTarget_jb;
 

@@ -8,7 +8,7 @@ RISCFORGE 1TOPS - flash preload file for soc_nexys4ddr_tb.sv.
 Writes pong_flash_at_400000.mem next to this script: the same bytes as the
 firmware's flash.mem, preceded by an "@0400000" address line so the
 S25FS512S model preloads them at the board's image offset (FLASH_IMAGE_ADDR
-in nexys4ddr_top.sv). Everything below 0x400000 stays erased (0xFF), as the
+in top_pong.sv). Everything below 0x400000 stays erased (0xFF), as the
 bitstream area would look to the bootloader if it read the wrong address.
 
 Use the SIMULATION build (mem/pong/sim_build), which the testbench decodes at
@@ -20,7 +20,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 IMAGE_ADDR = 0x40_0000
-DEFAULT_SRC = HERE.parents[2] / "mem" / "pong" / "sim_build" / "pong_flash.mem"
+DEFAULT_SRC = HERE.parents[3] / "mem" / "pong" / "sim_build" / "pong_flash.mem"
 
 
 def main():

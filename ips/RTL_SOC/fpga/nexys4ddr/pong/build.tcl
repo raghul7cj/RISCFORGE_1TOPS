@@ -1,17 +1,20 @@
 # =============================================================================
 # RISCFORGE 1TOPS — Nexys 4 DDR build (Vivado, non-project batch flow)
 # =============================================================================
-#   build.bat                     # Pong (default), from any folder
+#   build.bat                     # Pong, firmware mem/pong (from any folder)
 #   build.bat <fw_dir>            # other firmware, relative to ips/RTL_SOC/mem
 # or by hand:
 #   vivado -mode batch -source build.tcl [-tclargs <fw_dir> [win|linux]]
+#
+# This folder is self-contained for the Pong board test: top_pong.sv,
+# pong.xdc, these scripts, win_sources.f, tb/, and its own out/ and work/.
 #
 # Sources are taken from the same filelists the Xcelium flow uses
 # (filelists/inc.f, ip.f, core.f, soc_rtl.f, in that order, so `define order
 # matches the simulation). Those paths are relative to ips/RTL_SOC/sim/.
 #
 # Outputs in out/:
-#   nexys4ddr_top.bit        bitstream (JTAG load, lost at power-off)
+#   top_pong.bit             bitstream (JTAG load, lost at power-off)
 #   <fw>.bin                 firmware image, raw bytes of <fw>_flash.mem
 #   nexys4ddr_<fw>.mcs       flash image: bitstream @0x000000, firmware @0x400000
 #   reports: utilization, timing summary, DRC
@@ -26,12 +29,13 @@
 # =============================================================================
 
 set here    [file normalize [file dirname [info script]]]
-set soc     [file normalize $here/../..]
+set soc     [file normalize $here/../../..]
 set simdir  $soc/sim
 set out     $here/out
 set work    $here/work
 set part    xc7a100tcsg324-1
-set top     nexys4ddr_top
+set test    pong
+set top     top_pong
 
 set fw_rel  [expr {[llength $argv] > 0 ? [lindex $argv 0] : "pong"}]
 set fw_dir  [file normalize $soc/mem/$fw_rel]
@@ -72,7 +76,7 @@ proc read_f {path} {
 # Override with a second -tclargs word: "linux" or "win".
 set srcset [expr {[llength $argv] > 1 ? [lindex $argv 1] :
                   ($::tcl_platform(platform) eq "windows" ? "win" : "linux")}]
-puts "build.tcl: firmware '$fw_rel', source set '$srcset'"
+puts "build.tcl: test '$test', firmware '$fw_rel', source set '$srcset'"
 if {$srcset eq "win"} {
     read_f $here/win_sources.f
 } else {
@@ -80,7 +84,7 @@ if {$srcset eq "win"} {
         read_f $soc/filelists/$f
     }
 }
-lappend srcs    $here/nexys4ddr_top.sv
+lappend srcs    $here/$top.sv
 lappend incdirs $fw_dir
 
 foreach f $srcs {
@@ -91,7 +95,7 @@ foreach f $srcs {
         read_verilog -sv $f
     }
 }
-read_xdc $here/nexys4ddr.xdc
+read_xdc $here/$test.xdc
 
 # -----------------------------------------------------------------------------
 # Firmware image -> raw binary for write_cfgmem
@@ -118,7 +122,7 @@ if {![file exists $bootrom]} { error "build.tcl: boot ROM image $bootrom not fou
 # -----------------------------------------------------------------------------
 # Synthesis and implementation
 # -----------------------------------------------------------------------------
-# FLASH_IMAGE_ADDR keeps its default (24'h40_0000 in nexys4ddr_top.sv), which
+# FLASH_IMAGE_ADDR keeps its default (24'h40_0000 in top_pong.sv), which
 # must equal image_addr above. The defparam'd values appear in the log as
 #   Parameter FLASH_START_ADDR bound to: 24'b010000000000000000000000
 # under "Synthesizing module 'bootloader'" - check it after the first build.
@@ -155,9 +159,9 @@ write_cfgmem -force -format mcs -size 16 -interface SPIx1 \
     -file $out/nexys4ddr_${fw_name}.mcs
 
 puts "============================================================"
-puts " Nexys 4 DDR build done"
+puts " Nexys 4 DDR build done (test $test)"
 puts "   bitstream : $out/$top.bit"
 puts "   flash     : $out/nexys4ddr_${fw_name}.mcs  (bit @0x0, $fw_name @$image_addr)"
 puts "   timing    : WNS $wns ns"
-puts " Program with: vivado -mode batch -source program.tcl"
+puts " Program with: program.bat"
 puts "============================================================"
