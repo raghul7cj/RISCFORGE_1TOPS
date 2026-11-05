@@ -193,7 +193,7 @@ module hazard_unit(
     assign FlushD = PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | flush_pipeline_onehot[0];
     // FlushM: insert NOP into EX/MEM when M-ext stall completes or wb redirect.
     //         mem_stall_i excluded — EX/MEM is HELD via StallM, not flushed.
-    assign FlushM = wb_redirect | flush_pipeline_onehot[2] | stallMUL;
+    assign FlushM = wb_redirect | flush_pipeline_onehot[2] | (stallMUL & ~mem_stall_i);
     // FlushW: insert NOP into MEM/WB on wb redirect or pipeline flush.
     //         mem_stall_i excluded — memory_cycle self-holds via lsu_core_stall instead.
     assign FlushW = wb_redirect | flush_pipeline_onehot[3];

@@ -3,6 +3,9 @@ class commit_item extends uvm_sequence_item;
   bit [4:0]  rd;
   bit [31:0] data;
   bit        tohost;
+  bit        trap;
+  bit        irq;
+  bit [30:0] cause;
 
   `uvm_object_utils_begin(commit_item)
     `uvm_field_int(pc,     UVM_ALL_ON)
@@ -48,6 +51,15 @@ class trace_monitor extends uvm_monitor;
         item.rd   = vif.wb_rd;
         item.data = vif.wb_data;
         $fdisplay(fd, "0x%08h x%0d 0x%08h", item.pc, item.rd, item.data);
+        ap.write(item);
+      end
+      if (vif.trap_valid === 1'b1) begin
+        item = commit_item::type_id::create("item");
+        item.trap  = 1'b1;
+        item.irq   = vif.trap_irq;
+        item.cause = vif.trap_cause;
+        item.pc    = vif.wb_pc;
+        `uvm_info("TRACE", $sformatf("%s cause %0d", item.irq ? "interrupt" : "exception", item.cause), UVM_MEDIUM)
         ap.write(item);
       end
       if (vif.mem_req && vif.mem_we && !vif.mem_stall && vif.mem_addr == cfg.phase_addr) begin

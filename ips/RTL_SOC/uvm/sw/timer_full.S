@@ -52,6 +52,27 @@ _start:
   sw   t1, CH1+TIMER_CTRL(s1)
   DELAY 100
   sw   zero, CH1+TIMER_CTRL(s1)
+
+  li   s1, TIMER1_BASE
+  sw   zero, TIMER_CTRL(s1)
+  li   t1, 0x0BADF00D
+  sw   t1, TIMER_VAL(s1)
+  lw   t2, TIMER_VAL(s1)
+  CHECK t2, 0x0BADF00D, 7
+  li   t1, 0xFFFFFFF8
+  sw   t1, TIMER_VAL(s1)
+  li   t1, 0x09
+  sw   t1, TIMER_CTRL(s1)
+  DELAY 40
+  sw   zero, TIMER_CTRL(s1)
+  sw   zero, CH1+TIMER_CTRL(s1)
+  sw   zero, CH1+TIMER_VAL(s1)
+  li   t1, 30
+  sw   t1, CH1+TIMER_CMP(s1)
+  li   t1, 1
+  sw   t1, CH1+TIMER_CTRL(s1)
+  DELAY 80
+  sw   zero, CH1+TIMER_CTRL(s1)
   PASS
 
 bad_pre:

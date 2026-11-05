@@ -42,9 +42,16 @@ class soc_scoreboard extends uvm_scoreboard;
 
   function void write_uart(uart_item item);
     uart_text = {uart_text, string'(item.data)};
+    if (item.par_err)
+      `uvm_error("SCB", $sformatf("uart tx parity error on 0x%02h", item.data))
+    if (item.frame_err)
+      `uvm_error("SCB", $sformatf("uart tx stop bit missing on 0x%02h", item.data))
+    if (item.stop2_err)
+      `uvm_error("SCB", $sformatf("uart tx second stop bit missing on 0x%02h", item.data))
   endfunction
 
   function void write_commit(commit_item item);
+    if (item.trap) return;
     if (!item.tohost) begin
       commits++;
       return;

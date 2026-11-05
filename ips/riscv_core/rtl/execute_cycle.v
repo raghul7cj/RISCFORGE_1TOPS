@@ -283,7 +283,6 @@ module execute_cycle (
     assign PCSrcE = branch_taken_raw & ~target_misaligned_E;
 
     assign LUI_result_E = (LUISrcE) ? Imm_Ext_E : PCTarget_jb;
-    assign ResultE = (m_valid_out) ? result_M : ((isLUIE) ? LUI_result_E : alu_r);
 
 
 
@@ -310,9 +309,32 @@ module execute_cycle (
             pcplus4_me <= PCPlus4E;
         end
     end
-    wire        valid_E1   = m_valid_out ? 1'b1       : valid_E;
-    wire [31:0] PCE1       = m_valid_out ? pc_me      : PCE;
-    wire [31:0] PCPlus4E1  = m_valid_out ? pcplus4_me : PCPlus4E;
+    reg        m_hold;
+    reg [31:0] m_hold_res;
+    reg [4:0]  m_hold_rd;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            m_hold     <= 1'b0;
+            m_hold_res <= 32'h00000000;
+            m_hold_rd  <= 5'h00;
+        end else if (FlushM) begin
+            m_hold     <= 1'b0;
+        end else if (m_valid_out && StallM) begin
+            m_hold     <= 1'b1;
+            m_hold_res <= result_M;
+            m_hold_rd  <= rd_me;
+        end else if (!StallM) begin
+            m_hold     <= 1'b0;
+        end
+    end
+    wire        m_out      = m_valid_out | m_hold;
+    wire [31:0] m_res      = m_hold ? m_hold_res : result_M;
+    wire [4:0]  m_rd       = m_hold ? m_hold_rd  : rd_me;
+    assign ResultE = (m_out) ? m_res : ((isLUIE) ? LUI_result_E : alu_r);
+
+    wire        valid_E1   = m_out ? 1'b1       : valid_E;
+    wire [31:0] PCE1       = m_out ? pc_me      : PCE;
+    wire [31:0] PCPlus4E1  = m_out ? pcplus4_me : PCPlus4E;
 
     rv32m_unit m_unit (
         .clk(clk),
@@ -330,9 +352,9 @@ module execute_cycle (
 
     assign stallMUL = stallM_internal;
 
-    wire [4:0]  RD_E1        = (m_valid_out) ? rd_me : RD_E;
-    wire        RegWriteE1   = (is_M_instruction_E && !m_valid_out) ? 1'b0 : 
-                               (m_valid_out) ? 1'b1 : RegWriteE;
+    wire [4:0]  RD_E1        = (m_out) ? m_rd : RD_E;
+    wire        RegWriteE1   = (is_M_instruction_E && !m_out) ? 1'b0 :
+                               (m_out) ? 1'b1 : RegWriteE;
 
     wire [31:0] csr_op_val = csr_imm_mode_E ? {27'b0, csr_rs1_uimm_E} : Src_A;
     assign csr_new_val_E = (csr_op_E == 2'b01) ? csr_op_val :

@@ -14,9 +14,11 @@
 .equ UART_DLM,    0x04
 .equ UART_IER,    0x04
 .equ UART_FCR,    0x08
+.equ UART_IIR,    0x08
 .equ UART_LCR,    0x0C
 .equ UART_MCR,    0x10
 .equ UART_LSR,    0x14
+.equ UART_MSR,    0x18
 .equ UART_SCR,    0x1C
 
 .equ TIMER_VAL,   0x00
@@ -29,9 +31,19 @@
 .equ GPIO_EN,     0x080
 .equ GPIO_IN,     0x100
 .equ GPIO_OUT,    0x180
+.equ GPIO_INFO,   0x000
+.equ GPIO_SET,    0x200
+.equ GPIO_CLEAR,  0x280
+.equ GPIO_TOGGLE, 0x300
 .equ GPIO_RISE_EN, 0x380
+.equ GPIO_FALL_EN, 0x400
+.equ GPIO_LVLH_EN, 0x480
+.equ GPIO_LVLL_EN, 0x500
 .equ GPIO_INT_STS, 0x580
 .equ GPIO_RISE_STS, 0x600
+.equ GPIO_FALL_STS, 0x680
+.equ GPIO_LVLH_STS, 0x700
+.equ GPIO_LVLL_STS, 0x780
 
 .equ SPI_STATUS,  0x00
 .equ SPI_CLKDIV,  0x04
@@ -41,6 +53,8 @@
 .equ SPI_DUM,     0x14
 .equ SPI_TXFIFO,  0x18
 .equ SPI_RXFIFO,  0x20
+.equ SPI_INTCFG,  0x24
+.equ SPI_INTSTA,  0x28
 .equ SPI_CMD_RD,  0x201
 .equ SPI_CMD_WR,  0x202
 
@@ -171,4 +185,39 @@
   lw   t0, SPI_STATUS(s1)
   andi t0, t0, 1
   beqz t0, 1b
+.endm
+
+.macro WAIT_DR code
+  li   a7, 60000
+1:
+  lw   t0, UART_LSR(s0)
+  andi t0, t0, 1
+  bnez t0, 2f
+  addi a7, a7, -1
+  bnez a7, 1b
+  FAIL \code
+2:
+.endm
+
+.macro WAIT_IIR id, code
+  li   a7, 60000
+1:
+  lw   t0, UART_IIR(s0)
+  andi t0, t0, 0x0F
+  li   t1, \id
+  beq  t0, t1, 2f
+  addi a7, a7, -1
+  bnez a7, 1b
+  FAIL \code
+2:
+.endm
+
+.macro UART_DRAIN
+1:
+  lw   t0, UART_LSR(s0)
+  andi t0, t0, 1
+  beqz t0, 2f
+  lw   t0, UART_RBR(s0)
+  j    1b
+2:
 .endm

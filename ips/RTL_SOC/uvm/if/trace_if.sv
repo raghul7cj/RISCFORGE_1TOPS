@@ -9,4 +9,7 @@ interface trace_if (input logic clk);
   logic        mem_stall;
   logic [31:0] mem_addr;
   logic [31:0] mem_wdata;
+  logic        trap_valid;
+  logic [30:0] trap_cause;
+  logic        trap_irq;
 endinterface

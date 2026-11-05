@@ -113,6 +113,9 @@ module tb_top;
   assign trace.mem_stall = dut.core_lsu_stall;
   assign trace.mem_addr  = dut.core_lsu_addr;
   assign trace.mem_wdata = dut.core_lsu_wdata;
+  assign trace.trap_valid = dut.i_riscv_core.trap_commit_valid;
+  assign trace.trap_cause = dut.i_riscv_core.trap_commit_cause;
+  assign trace.trap_irq   = dut.i_riscv_core.trap_commit_is_interrupt;
 
   core_sva u_core_sva (
     .clk            (clk),

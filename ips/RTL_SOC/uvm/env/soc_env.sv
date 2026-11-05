@@ -38,5 +38,6 @@ class soc_env extends uvm_env;
     i2c.ap.connect(cov.i2c_imp);
     irq.ap.connect(cov.irq_imp);
     trace.ap.connect(cov.commit_imp);
+    gpio.mon.ap.connect(cov.gpio_imp);
   endfunction
 endclass

@@ -80,7 +80,14 @@ class i2c_slave extends uvm_component;
   task send_ack();
     vif.sda_drv <= 1'b0;
     @(negedge vif.scl);
-    vif.sda_drv <= 1'b1;
+    if (cfg.i2c_stretch != 0) begin
+      vif.scl_drv <= 1'b0;
+      repeat (cfg.i2c_stretch) @(posedge vif.clk);
+      vif.sda_drv <= 1'b1;
+      vif.scl_drv <= 1'b1;
+    end else begin
+      vif.sda_drv <= 1'b1;
+    end
   endtask
 
   task send_byte(bit [7:0] data, output bit nack);

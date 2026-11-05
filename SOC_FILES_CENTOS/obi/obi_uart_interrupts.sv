@@ -46,8 +46,8 @@ module obi_uart_interrupts import obi_uart_pkg::*; #()
   ////////////////////////////////////////////////////////////////////////////////////////////////
   always_comb begin
     //--Receive-Line-Status-Interrupt-------------------------------------------------------------
-    intrpt_reg_d.rls = reg_read_i.ier.rlstat & (reg_write_i.rx.overrun | reg_write_i.rx.par_err |
-                        reg_write_i.rx.frame_err | reg_write_i.rx.break_ind);
+    intrpt_reg_d.rls = reg_read_i.ier.rlstat & (intrpt_reg_q.rls | reg_write_i.rx.overrun |
+                        reg_write_i.rx.par_err | reg_write_i.rx.frame_err | reg_write_i.rx.break_ind);
 
     //--Receive-Data-Ready-Interrupt--------------------------------------------------------------
     if (reg_read_i.fcr.fifo_en) begin
@@ -63,7 +63,7 @@ module obi_uart_interrupts import obi_uart_pkg::*; #()
     intrpt_reg_d.thr_empty = reg_read_i.ier.thr_empty & reg_write_i.tx.thr_empty;
 
     //--Modem-Status-Interrupt--------------------------------------------------------------------
-    intrpt_reg_d.mstat = reg_read_i.ier.mstat & (reg_write_i.modem.d_cts |
+    intrpt_reg_d.mstat = reg_read_i.ier.mstat & (intrpt_reg_q.mstat | reg_write_i.modem.d_cts |
       reg_write_i.modem.d_dsr | reg_write_i.modem.te_ri | reg_write_i.modem.d_cd);
 
     //////////////////////////////////////////////////////////////////////////////////////////////

@@ -289,10 +289,10 @@ module obi_uart_rx import obi_uart_pkg::*; #()
       reg_write_o.par_err       = 1'b0;
       reg_write_o.frame_err     = 1'b0;
       reg_write_o.break_ind  = 1'b0;
-      reg_write_o.overrun_valid = 1'b0;
-      reg_write_o.par_valid     = 1'b0;
-      reg_write_o.frame_valid   = 1'b0;
-      reg_write_o.break_valid   = 1'b0;
+      reg_write_o.overrun_valid = 1'b1;
+      reg_write_o.par_valid     = 1'b1;
+      reg_write_o.frame_valid   = 1'b1;
+      reg_write_o.break_valid   = 1'b1;
       if (fifo_error_index_q == 4'b0000) begin
         reg_write_o.fifo_err       = 1'b0;
         reg_write_o.fifo_err_valid = 1'b1;
@@ -473,7 +473,6 @@ module obi_uart_rx import obi_uart_pkg::*; #()
         // BUGFIX: framing_err_d (see FIFO push) — _q is one cycle stale at write_init.
         reg_write_o.frame_err    = framing_err_d;
         reg_write_o.break_ind    = break_interrupt;
-        reg_write_o.break_ind    = 1'b1;
         reg_write_o.break_valid  = 1'b1;
         reg_write_o.par_valid    = 1'b1;
         reg_write_o.frame_valid  = 1'b1;
