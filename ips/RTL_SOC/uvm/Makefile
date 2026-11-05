@@ -70,7 +70,7 @@ sw:
 	$(MAKE) -C sw PROG=$(PROG) CROSS=$(CROSS)
 
 sw_all:
-	for p in $(PROGS); do \
+	@for p in $(PROGS); do \
 	  $(MAKE) -C sw PROG=$$p CROSS=$(CROSS) || exit 1; \
 	done
 
@@ -80,7 +80,7 @@ compile:
 run: sw
 	mkdir -p logs
 	xrun $(SIM_OPTS) -f soc_ip.f -f tb.f \
-	  +UVM_TESTNAME=$(TEST) +HEX=sw/$(PROG).hex $(ARGS) -l logs/$(NAME).log
+	  +UVM_TESTNAME=$(TEST) +HEX=sw/$(PROG).hex $(ARGS) -l logs/$(NAME).log < /dev/null
 
 flash: TEST = soc_flash_boot_test
 flash: sw
@@ -89,25 +89,32 @@ flash: sw
 	xrun $(SIM_OPTS) +define+FLASH_BOOT +define+FW_WORDS=$$(wc -l < sw/$(PROG).hex) \
 	  +define+FW_DATA=$$(test -f sw/$(PROG).dhex && wc -l < sw/$(PROG).dhex || echo 0) \
 	  -f soc_ip.f $(FLASH_MODEL) -f tb.f \
-	  +UVM_TESTNAME=soc_flash_boot_test $(ARGS) -l logs/flash_$(PROG).log
+	  +UVM_TESTNAME=soc_flash_boot_test $(ARGS) -l logs/flash_$(PROG).log < /dev/null
 
 regress: sw_all
-	mkdir -p logs
-	rm -f logs/summary.txt
+	@mkdir -p logs
+	@rm -f logs/summary.txt
+	@total=`echo $(REGRESS) | wc -w`; n=0; \
 	for t in $(REGRESS); do \
-	  test=$${t%%:*}; prog=$${t##*:}; \
-	  if [ $$test = flash ]; then \
-	    $(MAKE) --no-print-directory flash PROG=$$prog SEED=$(SEED) COV=$(COV) ARGS="$(ARGS)" > /dev/null 2>&1; \
+	  n=$$((n+1)); test=$${t%%:*}; prog=$${t##*:}; \
+	  if [ $$test = flash ]; then log=logs/flash_$${prog}.log; tgt="flash PROG=$$prog"; \
+	  else log=logs/$${test}_$${prog}.log; tgt="run TEST=$$test PROG=$$prog"; fi; \
+	  echo "[$$n/$$total] START $$test $$prog  (`date +%H:%M:%S`)"; \
+	  t0=`date +%s`; \
+	  if [ "$(VERBOSE)" = 1 ]; then \
+	    $(MAKE) --no-print-directory $$tgt SEED=$(SEED) COV=$(COV) CROSS=$(CROSS) ARGS="$(ARGS)" < /dev/null 2>&1 | grep -E "UVM_(INFO|ERROR|FATAL|WARNING) |\*E,|\*F,"; \
 	  else \
-	    $(MAKE) --no-print-directory run TEST=$$test PROG=$$prog SEED=$(SEED) COV=$(COV) ARGS="$(ARGS)" > /dev/null 2>&1; \
+	    $(MAKE) --no-print-directory $$tgt SEED=$(SEED) COV=$(COV) CROSS=$(CROSS) ARGS="$(ARGS)" < /dev/null > /dev/null 2>&1; \
 	  fi; \
-	  log=logs/$${test}_$${prog}.log; \
-	  if grep -q "UVM_ERROR :    0" $$log && grep -q "UVM_FATAL :    0" $$log; then \
-	    echo "PASS $$test $$prog" | tee -a logs/summary.txt; \
-	  else \
-	    echo "FAIL $$test $$prog" | tee -a logs/summary.txt; \
+	  dt=$$(( `date +%s` - t0 )); \
+	  if [ -f $$log ] && grep -q "UVM_ERROR :    0" $$log && grep -q "UVM_FATAL :    0" $$log; then res=PASS; else res=FAIL; fi; \
+	  echo "$$res $$test $$prog" >> logs/summary.txt; \
+	  echo "[$$n/$$total] $$res  $$test $$prog  ($${dt}s)  log: $$log"; \
+	  if [ $$res = FAIL ]; then \
+	    if [ -f $$log ]; then grep -E "UVM_(ERROR|FATAL) .*@|\*E,|\*F," $$log | head -3; else echo "  no log created"; fi; \
 	  fi; \
-	done
+	done; \
+	echo "DONE: `grep -c PASS logs/summary.txt` PASS, `grep -c FAIL logs/summary.txt` FAIL of $$total"
 
 cov_report:
 	imc -execcmd "merge -overwrite cov_work/scope/* -out all; load -run cov_work/scope/all; report -summary -out logs/cov_summary.txt; exit"

@@ -8,7 +8,7 @@ CFLAGS    = -march=$(MARCH) -mabi=ilp32 -nostdlib -nostartfiles -T link.ld
 ifeq ($(HAVE_GCC),)
 all:
 	@test -f $(PROG).hex || { echo "no $(CROSS)gcc and no prebuilt $(PROG).hex"; exit 1; }
-	@echo "$(CROSS)gcc not found, using prebuilt $(PROG).hex"
+	@true
 else
 all: $(PROG).hex
 endif
