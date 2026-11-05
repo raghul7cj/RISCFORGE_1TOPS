@@ -15,6 +15,7 @@ class soc_coverage extends uvm_component;
   int unsigned spi_bits;
 
   covergroup cg_commit;
+    option.per_instance = 1;
     cp_rd : coverpoint rd;
     cp_data : coverpoint wdata {
       bins zero = {0};
@@ -25,6 +26,7 @@ class soc_coverage extends uvm_component;
   endgroup
 
   covergroup cg_uart;
+    option.per_instance = 1;
     cp_data : coverpoint uart_data {
       bins ctrl  = {[0:31]};
       bins text  = {[32:126]};
@@ -33,6 +35,7 @@ class soc_coverage extends uvm_component;
   endgroup
 
   covergroup cg_irq;
+    option.per_instance = 1;
     cp_timer0 : coverpoint irq_rise[3:0]   { bins hit = {[1:15]}; }
     cp_timer1 : coverpoint irq_rise[7:4]   { bins hit = {[1:15]}; }
     cp_uart   : coverpoint irq_rise[8]     { bins hit = {1}; }
@@ -42,6 +45,7 @@ class soc_coverage extends uvm_component;
   endgroup
 
   covergroup cg_bus;
+    option.per_instance = 1;
     cp_i2c_rw : coverpoint i2c_rw;
     cp_spi    : coverpoint spi_bits { bins b8 = {8}; bins b32 = {32}; bins other = default; }
   endgroup
@@ -79,6 +83,12 @@ class soc_coverage extends uvm_component;
   function void write_i2c(i2c_item item);
     i2c_rw = item.rw;
     cg_bus.sample();
+  endfunction
+
+  function void report_phase(uvm_phase phase);
+    `uvm_info("COV", $sformatf("functional: commit %0.1f%%  uart %0.1f%%  irq %0.1f%%  bus %0.1f%%",
+              cg_commit.get_inst_coverage(), cg_uart.get_inst_coverage(),
+              cg_irq.get_inst_coverage(), cg_bus.get_inst_coverage()), UVM_LOW)
   endfunction
 
   function void write_spi(spi_item item);

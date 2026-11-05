@@ -19,7 +19,7 @@ SIM_OPTS += -gui
 endif
 
 PROGS = hello uart_nofifo uart_echo gpio timer spi i2c mem mext trap lsu_hazard \
-        isa mem_march mem_fault irq warm_reset
+        isa mem_march mem_fault irq warm_reset timer_full uart_full i2c_full spi_full csr
 
 REGRESS = \
   soc_hello_test:hello \
@@ -38,6 +38,11 @@ REGRESS = \
   soc_fault_test:mem_fault \
   soc_irq_test:irq \
   soc_warm_reset_test:warm_reset \
+  soc_timer_full_test:timer_full \
+  soc_uart_full_test:uart_full \
+  soc_i2c_full_test:i2c_full \
+  soc_spi_full_test:spi_full \
+  soc_core_test:csr \
   flash:hello
 
 all: run

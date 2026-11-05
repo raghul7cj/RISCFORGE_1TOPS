@@ -49,7 +49,7 @@ class spi_slave extends uvm_component;
           rx = {rx[30:0], vif.sdo};
           n++;
           @(negedge vif.sck);
-          tx = tx << 1;
+          tx = {tx[30:0], tx[31]};
           vif.sdi <= tx[31];
         end
         @(posedge vif.csn);

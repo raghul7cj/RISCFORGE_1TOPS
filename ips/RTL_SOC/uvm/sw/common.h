@@ -15,6 +15,7 @@
 .equ UART_IER,    0x04
 .equ UART_FCR,    0x08
 .equ UART_LCR,    0x0C
+.equ UART_MCR,    0x10
 .equ UART_LSR,    0x14
 .equ UART_SCR,    0x1C
 
@@ -34,7 +35,10 @@
 
 .equ SPI_STATUS,  0x00
 .equ SPI_CLKDIV,  0x04
+.equ SPI_CMD,     0x08
+.equ SPI_ADR,     0x0C
 .equ SPI_LEN,     0x10
+.equ SPI_DUM,     0x14
 .equ SPI_TXFIFO,  0x18
 .equ SPI_RXFIFO,  0x20
 .equ SPI_CMD_RD,  0x201
@@ -51,6 +55,7 @@
 .equ I2C_RD,      0x20
 .equ I2C_WR,      0x10
 .equ I2C_NACK,    0x08
+.equ I2C_IACK,    0x01
 
 .macro UART_INIT
   li   s0, UART_BASE
@@ -151,4 +156,19 @@
   bnez a7, 3b
   FAIL \code
 4:
+.endm
+
+.macro I2C_WAIT_TIP
+1:
+  lw   t0, I2C_STATUS(s1)
+  andi t0, t0, 2
+  bnez t0, 1b
+.endm
+
+.macro SPI_WAIT_IDLE
+  DELAY 5
+1:
+  lw   t0, SPI_STATUS(s1)
+  andi t0, t0, 1
+  beqz t0, 1b
 .endm

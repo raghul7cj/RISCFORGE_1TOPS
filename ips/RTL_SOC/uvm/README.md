@@ -51,6 +51,11 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | `soc_irq_test` | `irq` | CPU interrupts: timer0 (MTIP), timer1 (fast 24), GPIO rise (fast 16), UART RX (fast 19) |
 | `soc_warm_reset_test` | `warm_reset` | soft reset mid-run, DSRAM retained, core reboots |
 | `soc_flash_boot_test` | `hello` | cold boot from SPI flash through the bootloader |
+| `soc_timer_full_test` | `timer_full` | register read-back, prescaler, overflow wrap, channel 1 compare irq |
+| `soc_uart_full_test` | `uart_full` | IER/MCR/LCR read-back, 8-byte TX burst, 8-byte RX FIFO |
+| `soc_i2c_full_test` | `i2c_full` | 3-byte write, 3-byte read with NACK, unused address NACK, IF/IACK |
+| `soc_spi_full_test` | `spi_full` | cmd+addr+data frame, read with dummy cycles, 8-bit write, clkdiv change |
+| `soc_core_test` | `csr` | all implemented CSRs, mcycle/minstret, mret MPIE->MIE |
 
 ## Run (from this folder)
 

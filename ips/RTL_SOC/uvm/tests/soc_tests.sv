@@ -162,3 +162,63 @@ class soc_flash_boot_test extends soc_base_test;
     if (cfg.uart_expect == "") cfg.uart_expect = "hello\n";
   endfunction
 endclass
+
+class soc_timer_full_test extends soc_base_test;
+  `uvm_component_utils(soc_timer_full_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.irq_expect = 13'h0009;
+  endfunction
+endclass
+
+class soc_uart_full_test extends soc_base_test;
+  `uvm_component_utils(soc_uart_full_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    if (cfg.uart_expect == "") cfg.uart_expect = "ABCDEFGH";
+  endfunction
+
+  task main_stim();
+    uart_send_seq seq = uart_send_seq::type_id::create("seq");
+    wait_phase(1);
+    repeat (50) @(posedge ctrl.clk);
+    seq.text = "12345678";
+    seq.start(env.uart.sqr);
+  endtask
+endclass
+
+class soc_i2c_full_test extends soc_base_test;
+  `uvm_component_utils(soc_i2c_full_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.check_i2c  = 1'b1;
+    cfg.i2c_addr   = 7'h50;
+    cfg.i2c_expect = 8'h33;
+    cfg.i2c_rdata  = 8'h96;
+    cfg.irq_expect = 13'h0400;
+  endfunction
+endclass
+
+class soc_spi_full_test extends soc_base_test;
+  `uvm_component_utils(soc_spi_full_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.spi_rdata = 32'hCAFE_F00D;
+  endfunction
+endclass
