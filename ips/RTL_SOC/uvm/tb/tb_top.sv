@@ -152,6 +152,17 @@ module tb_top;
   end
 `endif
 
+  always @(posedge clk) begin
+    if ($test$plusargs("DEBUG_WB") && dut.core_rst_n === 1'b1 && dut.i_riscv_core.RegWriteW === 1'b1 && dut.i_riscv_core.RDW != 0)
+      $display("[WB] %0t pc=%08h rd=x%0d data=%08h valid_W=%b written=%b", $time,
+               dut.i_riscv_core.PC_W, dut.i_riscv_core.RDW, dut.i_riscv_core.ResultW,
+               dut.i_riscv_core.valid_W, dut.i_riscv_core.RegWriteW_gated);
+    if ($test$plusargs("DEBUG_LSU") && dut.core_rst_n === 1'b1 && dut.core_lsu_req === 1'b1 && dut.core_lsu_stall === 1'b0)
+      $display("[LSU] %0t %s addr=%08h wdata=%08h rdata=%08h err=%b", $time,
+               dut.core_lsu_we ? "ST" : "LD", dut.core_lsu_addr, dut.core_lsu_wdata,
+               dut.core_lsu_rdata, dut.core_lsu_err);
+  end
+
   initial begin
     uvm_config_db #(virtual soc_ctrl_if)::set(null, "uvm_test_top", "ctrl", ctrl);
     uvm_config_db #(virtual uart_if)::set(null, "uvm_test_top.env.uart", "vif", uart);
