@@ -71,7 +71,7 @@ sw:
 
 sw_all:
 	@for p in $(PROGS); do \
-	  $(MAKE) -C sw PROG=$$p CROSS=$(CROSS) || exit 1; \
+	  $(MAKE) --no-print-directory -C sw PROG=$$p CROSS=$(CROSS) || exit 1; \
 	done
 
 compile:
