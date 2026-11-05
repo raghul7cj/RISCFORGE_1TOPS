@@ -262,6 +262,37 @@ module top #(
     wire [31:0] trap_commit_addr;
     wire trap_commit_addr_valid;
     wire trap_commit_is_interrupt;
+
+    reg  [15:0] fast_irq_q;
+    reg         timer_irq_q;
+    wire        irq_taken = trap_commit_valid & trap_commit_is_interrupt;
+    wire [15:0] fast_irq_take;
+    genvar      gi;
+    generate
+        for (gi = 0; gi < 16; gi = gi + 1) begin : g_fast_take
+            assign fast_irq_take[gi] = irq_taken & (trap_commit_cause == (16 + gi));
+        end
+    endgenerate
+    wire        timer_irq_take = irq_taken & (trap_commit_cause == 7);
+    reg  [15:0] fast_irq_prev;
+    reg         timer_irq_prev;
+    wire [15:0] fast_irq_edge  = fast_irq_i & ~fast_irq_prev & csr_mie_sb[31:16];
+    wire        timer_irq_edge = timer_irq_i & ~timer_irq_prev & csr_mie_sb[7];
+    always @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            fast_irq_q     <= 16'h0000;
+            timer_irq_q    <= 1'b0;
+            fast_irq_prev  <= 16'h0000;
+            timer_irq_prev <= 1'b0;
+        end else begin
+            fast_irq_prev  <= fast_irq_i;
+            timer_irq_prev <= timer_irq_i;
+            fast_irq_q     <= (fast_irq_q | fast_irq_edge) & ~fast_irq_take & csr_mie_sb[31:16];
+            timer_irq_q    <= (timer_irq_q | timer_irq_edge) & ~timer_irq_take & csr_mie_sb[7];
+        end
+    end
+    wire [15:0] fast_irq_pend  = fast_irq_q | fast_irq_i;
+    wire        timer_irq_pend = timer_irq_q | timer_irq_i;
     wire mret_commit;
 
     // ✅ PORT C: MRET write signals (from wb_trap_mret_commit_controller)
@@ -568,10 +599,10 @@ module top #(
         
         .instr_retired_i(valid_W & ~exc_valid_W), // Increment minstret on retirement
         
-        .timer_intr_i(timer_irq_i),
+        .timer_intr_i(timer_irq_pend),
         .ext_intr_i(ext_irq_i),
         .msft_intr_i(sw_irq_i),
-        .fast_intr_i(fast_irq_i),
+        .fast_intr_i(fast_irq_pend),
         .mtvec_out_o(csr_mtvec_sb),
         .mie_out_o(csr_mie_sb),
         .mip_out_o(csr_mip_sb),

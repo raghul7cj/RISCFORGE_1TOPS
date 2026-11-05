@@ -51,6 +51,42 @@ _start:
   csrr t2, mcycleh
   csrr t2, minstreth
 
+  li   t1, 0x1000
+  csrw mcycle, t1
+  csrr t2, mcycle
+  li   t1, 0x1000
+  bltu t2, t1, bad_cnt
+  li   t1, 0x2000
+  bgeu t2, t1, bad_cnt
+  csrw mcycleh, zero
+  li   t1, 0x500
+  csrw minstret, t1
+  csrr t2, minstret
+  li   t1, 0x500
+  bltu t2, t1, bad_cnt
+  csrw minstreth, zero
+  csrw 0x7C0, t1
+
+  la   t1, sw_handler
+  csrw mtvec, t1
+  li   s6, 0
+  li   t1, 0x8
+  csrs mie, t1
+  csrsi mstatus, 8
+  csrsi mip, 8
+  li   a7, 1000
+sw_wait:
+  bnez s6, sw_done
+  addi a7, a7, -1
+  bnez a7, sw_wait
+  FAIL 13
+sw_done:
+  csrci mstatus, 8
+  csrw mie, zero
+  CHECK s7, 0x80000003, 14
+  la   t1, handler
+  csrw mtvec, t1
+
   li   t1, 0x80
   csrs mstatus, t1
   la   t1, after_mret
@@ -70,3 +106,10 @@ bad_cnt:
 .align 2
 handler:
   FAIL 12
+
+.align 2
+sw_handler:
+  csrr s7, mcause
+  csrci mip, 8
+  li   s6, 1
+  mret
