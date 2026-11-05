@@ -12,7 +12,7 @@ all: $(PROG).hex
 	$(CROSS)objcopy -O binary -j .text $< $@
 
 %.hex: %.bin
-	hexdump -v -e '1/4 "%08x\n"' $< > $@
+	od -An -v -tx4 -w4 $< | tr -d ' ' > $@
 
 dump: $(PROG).elf
 	$(CROSS)objdump -d $<

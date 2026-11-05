@@ -1,9 +1,9 @@
 class soc_base_test extends uvm_test;
   `uvm_component_utils(soc_base_test)
 
-  soc_env                 env;
-  soc_cfg                 cfg;
-  virtual soc_ctrl_if     ctrl;
+  soc_env             env;
+  soc_cfg             cfg;
+  virtual soc_ctrl_if ctrl;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -52,5 +52,10 @@ class soc_base_test extends uvm_test;
     repeat (20) @(posedge ctrl.clk);
     ctrl.hard_rst_n <= 1'b1;
     `uvm_info("TEST", "reset released", UVM_LOW)
+  endtask
+
+  task wait_core_run(int unsigned clks = 200);
+    wait (ctrl.core_rst_n === 1'b1);
+    repeat (clks) @(posedge ctrl.clk);
   endtask
 endclass

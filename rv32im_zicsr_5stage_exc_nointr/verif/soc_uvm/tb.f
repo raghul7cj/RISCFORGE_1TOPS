@@ -1,6 +1,11 @@
 +incdir+.
 if/soc_ctrl_if.sv
 if/uart_if.sv
+if/gpio_if.sv
+if/spi_if.sv
+if/i2c_if.sv
+if/irq_if.sv
 if/trace_if.sv
 tb/soc_pkg.sv
+tb/soc_sva.sv
 tb/tb_top.sv
