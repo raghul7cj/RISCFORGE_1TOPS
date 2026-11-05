@@ -281,6 +281,33 @@ module obi_uart_register import obi_uart_pkg::*; #(
             rsp_data[RegWidth-1:0] = reg_q.DLM;
           end
 
+          RegAddrISR: begin
+            rsp_data[RegWidth-1:0] = reg_write_i.isr;
+            reg_read_o.obi_read_isr  = 1'b1;
+          end
+
+          RegAddrLCR: begin
+            rsp_data[RegWidth-1:0] = reg_q.LCR;
+          end
+
+          RegAddrMCR: begin
+            rsp_data[RegWidth-1:0] = reg_q.MCR;
+          end
+
+          RegAddrLSR: begin
+            rsp_data[RegWidth-1:0] = reg_q.LSR;
+            reg_read_o.obi_read_lsr  = 1'b1;
+          end
+
+          RegAddrMSR: begin
+            rsp_data[RegWidth-1:0] = reg_q.MSR;
+            reg_d.MSR = reg_write_i.modem;
+          end
+
+          RegAddrSPR: begin
+            rsp_data[RegWidth-1:0] = '0;
+          end
+
           default: begin
             err = 1'b1;
           end

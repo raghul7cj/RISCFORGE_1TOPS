@@ -1,0 +1,15 @@
+interface trace_if (input logic clk);
+  logic        rst_n;
+  logic        wb_en;
+  logic [4:0]  wb_rd;
+  logic [31:0] wb_data;
+  logic [31:0] wb_pc;
+  logic        mem_req;
+  logic        mem_we;
+  logic        mem_stall;
+  logic [31:0] mem_addr;
+  logic [31:0] mem_wdata;
+  logic        trap_valid;
+  logic [30:0] trap_cause;
+  logic        trap_irq;
+endinterface

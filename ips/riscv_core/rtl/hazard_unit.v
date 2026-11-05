@@ -186,14 +186,14 @@ module hazard_unit(
 
     // FlushE: kill ID/EX when we have a data hazard bubble, branch taken, or
     //         CSR hazard, or M-extension stall (multiplier busy).
-    assign FlushE = lwstall | (csr_gpr_stall & ~mem_stall_i) | PCSrcE | csr_stall | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL;
+    assign FlushE = (lwstall & ~mem_stall_i) | (csr_gpr_stall & ~mem_stall_i) | PCSrcE | (csr_stall & ~mem_stall_i) | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL;
     // FlushD: kill IF/ID when branch taken, exception in-flight, or wb redirect.
     //         exc_inflight_E included so that the wrongly-fetched instruction after
     //         a misaligned-branch exception (where PCSrcE was suppressed) is removed.
     assign FlushD = PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | flush_pipeline_onehot[0];
     // FlushM: insert NOP into EX/MEM when M-ext stall completes or wb redirect.
     //         mem_stall_i excluded — EX/MEM is HELD via StallM, not flushed.
-    assign FlushM = wb_redirect | flush_pipeline_onehot[2] | stallMUL;
+    assign FlushM = wb_redirect | flush_pipeline_onehot[2] | (stallMUL & ~mem_stall_i);
     // FlushW: insert NOP into MEM/WB on wb redirect or pipeline flush.
     //         mem_stall_i excluded — memory_cycle self-holds via lsu_core_stall instead.
     assign FlushW = wb_redirect | flush_pipeline_onehot[3];
