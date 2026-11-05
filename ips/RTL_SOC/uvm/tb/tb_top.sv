@@ -1,5 +1,9 @@
 `timescale 1ns/1ps
 
+`ifndef FW_WORDS
+`define FW_WORDS 64
+`endif
+
 module tb_top;
   import uvm_pkg::*;
   import soc_pkg::*;
@@ -21,11 +25,35 @@ module tb_top;
   logic [1:0] spi_events;
   logic [5:0] apb_timeout;
   logic       axi_wr_timeout, axi_rd_timeout;
+  logic       spi_csn0, spi_miso;
+  wire        flash_so;
 
   assign i2c.scl = (i2c_scl_oen ? 1'b1 : i2c_scl_o) & i2c.scl_drv;
   assign i2c.sda = (i2c_sda_oen ? 1'b1 : i2c_sda_o) & i2c.sda_drv;
 
-  riscforge_soc_subsystem dut (
+`ifdef FLASH_BOOT
+  s25fs512s #(
+    .UserPreload   (1),
+    .mem_file_name ("flash.mem"),
+    .otp_file_name ("../../spi_slave_infinion/S25fs512s/model/s25fs512sOTP.mem")
+  ) u_flash (
+    .SI       (spi.sdo),
+    .SO       (flash_so),
+    .SCK      (spi.sck),
+    .CSNeg    (spi_csn0),
+    .WPNeg    (1'b1),
+    .RESETNeg (1'b1)
+  );
+`else
+  assign flash_so = 1'b0;
+`endif
+
+  assign spi_miso = (spi.csn === 1'b0) ? spi.sdi : flash_so;
+
+  riscforge_soc_subsystem #(
+    .NUM_INSTR_WORDS (`FW_WORDS),
+    .NUM_DATA_WORDS  (0)
+  ) dut (
     .clk_i                       (clk),
     .hard_rst_ni                 (ctrl.hard_rst_n),
     .soft_rst_ni                 (ctrl.soft_rst_n),
@@ -52,10 +80,10 @@ module tb_top;
     .gpio_global_interrupt_o     (gpio_int),
     .gpio_pin_level_interrupts_o (),
     .spi_clk_o                   (spi.sck),
-    .spi_csn0_o                  (),
+    .spi_csn0_o                  (spi_csn0),
     .spi_csn1_o                  (spi.csn),
     .spi_sdo0_o                  (spi.sdo),
-    .spi_sdi1_i                  (spi.sdi),
+    .spi_sdi1_i                  (spi_miso),
     .spi_events_o                (spi_events),
     .apb_timeout_sticky_o        (apb_timeout),
     .axi_wr_timeout_sticky_o     (axi_wr_timeout),
@@ -79,6 +107,7 @@ module tb_top;
   assign trace.wb_pc     = dut.i_riscv_core.PC_W;
   assign trace.mem_req   = dut.core_lsu_req;
   assign trace.mem_we    = dut.core_lsu_we;
+  assign trace.mem_stall = dut.core_lsu_stall;
   assign trace.mem_addr  = dut.core_lsu_addr;
   assign trace.mem_wdata = dut.core_lsu_wdata;
 
@@ -91,7 +120,8 @@ module tb_top;
     .uart_sout      (uart.sout),
     .apb_timeout    (apb_timeout),
     .axi_wr_timeout (axi_wr_timeout),
-    .axi_rd_timeout (axi_rd_timeout)
+    .axi_rd_timeout (axi_rd_timeout),
+    .allow_err      (ctrl.allow_lsu_err)
   );
 
   for (genvar i = 0; i < 6; i++) begin : g_apb_sva
@@ -105,6 +135,7 @@ module tb_top;
     );
   end
 
+`ifndef FLASH_BOOT
   initial begin
     string hex = "imem.hex";
     void'($value$plusargs("HEX=%s", hex));
@@ -112,8 +143,11 @@ module tb_top;
     wait (ctrl.hard_rst_n === 1'b1);
     wait (ctrl.soft_rst_n === 1'b1);
     $readmemh(hex, dut.i_isram.u_imem.mem_array);
-    $display("[TB] loaded %s into ISRAM", hex);
+    for (int i = 0; i < $size(dut.i_dsram.mem); i++)
+      dut.i_dsram.mem[i] = '0;
+    $display("[TB] loaded %s into ISRAM, DSRAM cleared", hex);
   end
+`endif
 
   initial begin
     uvm_config_db #(virtual soc_ctrl_if)::set(null, "uvm_test_top", "ctrl", ctrl);

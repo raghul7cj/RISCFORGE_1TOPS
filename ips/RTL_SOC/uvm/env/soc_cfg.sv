@@ -3,7 +3,11 @@ class soc_cfg extends uvm_object;
 
   int unsigned uart_bit_clks = 32;
   bit [31:0]   tohost_addr   = 32'h0002_0000;
+  bit [31:0]   phase_addr    = 32'h0002_0004;
   int unsigned timeout_clks  = 500_000;
+  int unsigned boot_clks     = 5_000;
+  bit          cold_boot;
+  bit          allow_lsu_err;
   string       uart_expect   = "";
 
   bit          check_gpio;
@@ -21,10 +25,13 @@ class soc_cfg extends uvm_object;
   bit [12:0]   irq_expect;
 
   uvm_event    done_ev;
+  uvm_event    phase_ev;
+  int unsigned phase;
 
   function new(string name = "soc_cfg");
     super.new(name);
-    done_ev = new("done_ev");
+    done_ev  = new("done_ev");
+    phase_ev = new("phase_ev");
   endfunction
 
   function void read_plusargs();

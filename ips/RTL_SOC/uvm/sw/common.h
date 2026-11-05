@@ -3,13 +3,16 @@
 .equ UART_BASE,   0x40002000
 .equ GPIO_BASE,   0x40003000
 .equ SPI_BASE,    0x40004000
+.equ TIMER1_BASE, 0x40005000
 .equ DSRAM_BASE,  0x00020000
 .equ TOHOST,      0x00020000
+.equ PHASE_ADDR,  0x00020004
 
 .equ UART_RBR,    0x00
 .equ UART_THR,    0x00
 .equ UART_DLL,    0x00
 .equ UART_DLM,    0x04
+.equ UART_IER,    0x04
 .equ UART_FCR,    0x08
 .equ UART_LCR,    0x0C
 .equ UART_LSR,    0x14
@@ -24,6 +27,9 @@
 .equ GPIO_EN,     0x080
 .equ GPIO_IN,     0x100
 .equ GPIO_OUT,    0x180
+.equ GPIO_RISE_EN, 0x380
+.equ GPIO_INT_STS, 0x580
+.equ GPIO_RISE_STS, 0x600
 
 .equ SPI_STATUS,  0x00
 .equ SPI_CLKDIV,  0x04
@@ -122,4 +128,26 @@
   beq  \reg, t6, 2f
   FAIL \code
 2:
+.endm
+
+.macro CHECKR ra, rb, code
+  beq  \ra, \rb, 2f
+  FAIL \code
+2:
+.endm
+
+.macro PHASE n
+  li   t0, PHASE_ADDR
+  li   t1, \n
+  sw   t1, 0(t0)
+.endm
+
+.macro WAIT_NZ reg, loops, code
+  li   a7, \loops
+3:
+  bnez \reg, 4f
+  addi a7, a7, -1
+  bnez a7, 3b
+  FAIL \code
+4:
 .endm

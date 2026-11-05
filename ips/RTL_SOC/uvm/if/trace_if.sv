@@ -6,6 +6,7 @@ interface trace_if (input logic clk);
   logic [31:0] wb_pc;
   logic        mem_req;
   logic        mem_we;
+  logic        mem_stall;
   logic [31:0] mem_addr;
   logic [31:0] mem_wdata;
 endinterface

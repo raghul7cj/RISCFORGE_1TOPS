@@ -50,7 +50,12 @@ class trace_monitor extends uvm_monitor;
         $fdisplay(fd, "0x%08h x%0d 0x%08h", item.pc, item.rd, item.data);
         ap.write(item);
       end
-      if (vif.mem_req && vif.mem_we && vif.mem_addr == cfg.tohost_addr) begin
+      if (vif.mem_req && vif.mem_we && !vif.mem_stall && vif.mem_addr == cfg.phase_addr) begin
+        cfg.phase = vif.mem_wdata;
+        `uvm_info("TRACE", $sformatf("firmware phase %0d", cfg.phase), UVM_LOW)
+        cfg.phase_ev.trigger();
+      end
+      if (vif.mem_req && vif.mem_we && !vif.mem_stall && vif.mem_addr == cfg.tohost_addr) begin
         item = commit_item::type_id::create("item");
         item.tohost = 1'b1;
         item.data   = vif.mem_wdata;

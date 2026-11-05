@@ -19,7 +19,7 @@ _start:
   li   s1, I2C_BASE
   li   t0, 4
   sw   t0, I2C_PRE(s1)
-  li   t0, 0x80
+  li   t0, 0xC0
   sw   t0, I2C_CTRL(s1)
 
   li   t0, (0x50 << 1)

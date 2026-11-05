@@ -16,5 +16,12 @@ _start:
   bgtu s3, s2, 3f
   FAIL 1
 3:
+  li   s1, TIMER1_BASE
+  sw   zero, TIMER_CTRL(s1)
+  sw   zero, TIMER_VAL(s1)
+  li   t0, 80
+  sw   t0, TIMER_CMP(s1)
+  li   t0, 1
+  sw   t0, TIMER_CTRL(s1)
   DELAY 300
   PASS

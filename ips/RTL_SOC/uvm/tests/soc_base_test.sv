@@ -44,24 +44,44 @@ class soc_base_test extends uvm_test;
   endtask
 
   task reset_dut();
-    ctrl.hard_rst_n <= 1'b0;
-    ctrl.soft_rst_n <= 1'b0;
-    ctrl.test_mode  <= 1'b0;
-    ctrl.fetch_en   <= 1'b1;
-    ctrl.boot_addr  <= 32'h0;
+    ctrl.allow_lsu_err <= cfg.allow_lsu_err;
+    ctrl.hard_rst_n    <= 1'b0;
+    ctrl.soft_rst_n    <= cfg.cold_boot;
+    ctrl.test_mode     <= 1'b0;
+    ctrl.fetch_en      <= 1'b1;
+    ctrl.boot_addr     <= 32'h0;
     repeat (20) @(posedge ctrl.clk);
     ctrl.hard_rst_n <= 1'b1;
-    repeat (100) @(posedge ctrl.clk);
-    ctrl.soft_rst_n <= 1'b1;
+    if (!cfg.cold_boot) begin
+      repeat (100) @(posedge ctrl.clk);
+      ctrl.soft_rst_n <= 1'b1;
+    end
+    wait_boot();
+    `uvm_info("TEST", $sformatf("%s boot done, core running", cfg.cold_boot ? "cold" : "warm"), UVM_LOW)
+  endtask
+
+  task wait_boot();
     fork
       wait (ctrl.boot_done === 1'b1);
       begin
-        repeat (5000) @(posedge ctrl.clk);
-        `uvm_fatal("BOOT", "boot_done not seen after warm boot")
+        repeat (cfg.boot_clks) @(posedge ctrl.clk);
+        `uvm_fatal("BOOT", "boot_done not seen")
       end
     join_any
     disable fork;
-    `uvm_info("TEST", "warm boot done, core running", UVM_LOW)
+  endtask
+
+  task soft_reset();
+    ctrl.soft_rst_n <= 1'b0;
+    repeat (100) @(posedge ctrl.clk);
+    ctrl.soft_rst_n <= 1'b1;
+    repeat (50) @(posedge ctrl.clk);
+    wait_boot();
+    `uvm_info("TEST", "soft reset done", UVM_LOW)
+  endtask
+
+  task wait_phase(int unsigned n);
+    while (cfg.phase < n) cfg.phase_ev.wait_trigger();
   endtask
 
   task wait_core_run(int unsigned clks = 200);

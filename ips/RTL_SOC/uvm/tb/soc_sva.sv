@@ -31,19 +31,17 @@ module core_sva (
   input logic        uart_sout,
   input logic [5:0]  apb_timeout,
   input logic        axi_wr_timeout,
-  input logic        axi_rd_timeout
+  input logic        axi_rd_timeout,
+  input logic        allow_err
 );
   import uvm_pkg::*;
   `include "uvm_macros.svh"
-
-  bit allow_err;
-  initial allow_err = $test$plusargs("ALLOW_LSU_ERR");
 
   a_pc: assert property (@(posedge clk) disable iff (!rst_n)
     !$isunknown(pc))
     else `uvm_error("CORE_SVA", "PC is X")
 
-  a_lsu_err: assert property (@(posedge clk) disable iff (!rst_n || allow_err)
+  a_lsu_err: assert property (@(posedge clk) disable iff (!rst_n || allow_err === 1'b1)
     !(lsu_req && lsu_err))
     else `uvm_error("CORE_SVA", "LSU bus error")
 

@@ -6,4 +6,5 @@ interface soc_ctrl_if (input logic clk);
   logic [31:0] boot_addr;
   logic        boot_done;
   logic        core_rst_n;
+  logic        allow_lsu_err;
 endinterface
