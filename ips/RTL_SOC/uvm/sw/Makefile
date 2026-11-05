@@ -1,8 +1,9 @@
 CROSS ?= riscv64-unknown-elf-
 PROG  ?= hello
 
-CFLAGS = -march=rv32im_zicsr -mabi=ilp32 -nostdlib -nostartfiles -T link.ld
 HAVE_GCC := $(shell command -v $(CROSS)gcc 2> /dev/null)
+MARCH    := $(shell echo | $(CROSS)gcc -march=rv32im_zicsr -mabi=ilp32 -x assembler -c -o /dev/null - 2> /dev/null && echo rv32im_zicsr || echo rv32im)
+CFLAGS    = -march=$(MARCH) -mabi=ilp32 -nostdlib -nostartfiles -T link.ld
 
 ifeq ($(HAVE_GCC),)
 all:
