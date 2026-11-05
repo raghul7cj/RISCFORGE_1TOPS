@@ -25,6 +25,7 @@ class soc_cfg extends uvm_object;
   bit [7:0]    i2c_expect;
   bit [7:0]    i2c_rdata     = 8'h96;
   int unsigned i2c_stretch   = 0;
+  bit          i2c_al_once;
 
   bit [12:0]   irq_expect;
   bit [31:0]   gpio_pins_expect;

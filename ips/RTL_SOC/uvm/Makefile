@@ -20,7 +20,8 @@ endif
 
 PROGS = hello uart_nofifo uart_echo gpio timer spi i2c mem mext trap lsu_hazard \
         isa mem_march mem_fault irq warm_reset timer_full uart_full i2c_full spi_full csr \
-        uart_modes uart_err spi_more gpio_full i2c_more rand1 rand2 rand3 rand4
+        uart_modes uart_err spi_more gpio_full i2c_more rand1 rand2 rand3 rand4 \
+        irq_all uart_more spi_more2 i2c_more2 bus_fault
 
 REGRESS = \
   soc_hello_test:hello \
@@ -53,6 +54,11 @@ REGRESS = \
   soc_core_test:rand2 \
   soc_core_test:rand3 \
   soc_core_test:rand4 \
+  soc_irq_all_test:irq_all \
+  soc_uart_more_test:uart_more \
+  soc_spi_more2_test:spi_more2 \
+  soc_i2c_more2_test:i2c_more2 \
+  soc_bus_fault_test:bus_fault \
   flash:hello
 
 all: run

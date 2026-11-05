@@ -94,4 +94,39 @@ _start:
   sw   t1, GPIO_INT_STS(s1)
   lw   t2, GPIO_INT_STS(s1)
   CHECK t2, 0, 14
+
+  sw   zero, GPIO_CFG(s1)
+  li   t1, -1
+  sw   t1, GPIO_RISE_EN(s1)
+  sw   t1, GPIO_FALL_EN(s1)
+  PHASE 6
+  DELAY 200
+  lw   t2, GPIO_RISE_STS(s1)
+  CHECK t2, 0xFFFFFFFA, 15
+  li   t1, -1
+  sw   t1, GPIO_RISE_STS(s1)
+  sw   t1, GPIO_INT_STS(s1)
+  sw   t1, GPIO_LVLH_EN(s1)
+  DELAY 20
+  lw   t2, GPIO_LVLH_STS(s1)
+  CHECK t2, 0xFFFFFFFF, 16
+  sw   zero, GPIO_LVLH_EN(s1)
+  PHASE 7
+  DELAY 200
+  lw   t2, GPIO_FALL_STS(s1)
+  CHECK t2, 0xFFFFFFFF, 17
+  li   t1, -1
+  sw   t1, GPIO_LVLL_EN(s1)
+  DELAY 20
+  lw   t2, GPIO_LVLL_STS(s1)
+  CHECK t2, 0xFFFFFFFF, 18
+  sw   zero, GPIO_RISE_EN(s1)
+  sw   zero, GPIO_FALL_EN(s1)
+  sw   zero, GPIO_LVLL_EN(s1)
+  li   t1, -1
+  sw   t1, GPIO_RISE_STS(s1)
+  sw   t1, GPIO_FALL_STS(s1)
+  sw   t1, GPIO_INT_STS(s1)
+  lw   t2, GPIO_INT_STS(s1)
+  CHECK t2, 0, 19
   PASS

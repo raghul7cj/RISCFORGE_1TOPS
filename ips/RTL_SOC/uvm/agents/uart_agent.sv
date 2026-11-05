@@ -3,6 +3,7 @@ class uart_item extends uvm_sequence_item;
   bit            bad_parity;
   bit            bad_stop;
   bit            is_break;
+  bit            no_idle;
   bit            par_err;
   bit            frame_err;
   bit            stop2_err;
@@ -71,6 +72,7 @@ class uart_driver extends uvm_driver #(uart_item);
     end
     vif.sin <= it.bad_stop ? 1'b0 : 1'b1;
     wait_bit();
+    if (it.no_idle) return;
     vif.sin <= 1'b1;
     repeat (cfg.uart_stop_bits) wait_bit();
   endtask

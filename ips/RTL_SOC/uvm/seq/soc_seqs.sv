@@ -41,6 +41,7 @@ class uart_byte_seq extends uvm_sequence #(uart_item);
   bit       bad_parity;
   bit       bad_stop;
   bit       is_break;
+  bit       no_idle;
   int       count = 1;
 
   function new(string name = "uart_byte_seq");
@@ -55,6 +56,7 @@ class uart_byte_seq extends uvm_sequence #(uart_item);
       req.bad_parity = bad_parity;
       req.bad_stop   = bad_stop;
       req.is_break   = is_break;
+      req.no_idle    = no_idle;
       finish_item(req);
     end
   endtask

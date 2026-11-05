@@ -42,6 +42,16 @@ class i2c_slave extends uvm_component;
     vif.sda_drv <= 1'b1;
     forever begin
       wait_start();
+      if (cfg.i2c_al_once) begin
+        cfg.i2c_al_once = 1'b0;
+        @(negedge vif.scl);
+        repeat (5) @(posedge vif.clk);
+        vif.sda_drv <= 1'b0;
+        repeat (40) @(posedge vif.clk);
+        vif.sda_drv <= 1'b1;
+        `uvm_info("I2C", "arbitration loss injected", UVM_MEDIUM)
+        continue;
+      end
       do_frame();
     end
   endtask

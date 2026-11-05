@@ -7,4 +7,6 @@ interface soc_ctrl_if (input logic clk);
   logic        boot_done;
   logic        core_rst_n;
   logic        allow_lsu_err;
+  logic        hang_apb;
+  logic        hang_axi;
 endinterface

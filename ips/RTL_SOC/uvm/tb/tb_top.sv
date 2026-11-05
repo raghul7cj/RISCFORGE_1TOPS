@@ -166,6 +166,14 @@ module tb_top;
                dut.core_lsu_rdata, dut.core_lsu_err);
   end
 
+  always @(ctrl.hang_apb)
+    if (ctrl.hang_apb === 1'b1) force dut.timer0_pready = 1'b0;
+    else release dut.timer0_pready;
+
+  always @(ctrl.hang_axi)
+    if (ctrl.hang_axi === 1'b1) force dut.i_axi_lite_to_apb.axi_lite_resp_o = '0;
+    else release dut.i_axi_lite_to_apb.axi_lite_resp_o;
+
   initial begin
     uvm_config_db #(virtual soc_ctrl_if)::set(null, "uvm_test_top", "ctrl", ctrl);
     uvm_config_db #(virtual uart_if)::set(null, "uvm_test_top.env.uart", "vif", uart);

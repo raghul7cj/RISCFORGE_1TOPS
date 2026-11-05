@@ -339,6 +339,8 @@ class soc_gpio_full_test extends soc_base_test;
     drive(3, 32'h5A3C_F069);
     drive(4, 32'h0000_0002);
     drive(5, 32'h0000_0005);
+    drive(6, 32'hFFFF_FFFF);
+    drive(7, 32'h0000_0000);
   endtask
 endclass
 
@@ -356,4 +358,114 @@ class soc_i2c_more_test extends soc_base_test;
     cfg.i2c_rdata   = 8'h96;
     cfg.i2c_stretch = 40;
   endfunction
+endclass
+
+class soc_irq_all_test extends soc_base_test;
+  `uvm_component_utils(soc_irq_all_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.irq_expect = 13'h1CDD;
+  endfunction
+endclass
+
+class soc_uart_more_test extends soc_base_test;
+  `uvm_component_utils(soc_uart_more_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.uart_expect  = {string'(8'h15), string'(8'h0A)};
+    cfg.timeout_clks = 1_000_000;
+  endfunction
+
+  task send(int n, bit [7:0] data, int count, bit badp, bit bads, bit noidle, int dly = 200);
+    uart_byte_seq seq = uart_byte_seq::type_id::create("seq");
+    wait_phase(n);
+    repeat (dly) @(posedge ctrl.clk);
+    seq.data       = data;
+    seq.count      = count;
+    seq.bad_parity = badp;
+    seq.bad_stop   = bads;
+    seq.no_idle    = noidle;
+    seq.start(env.uart.sqr);
+  endtask
+
+  task main_stim();
+    wait_phase(1);
+    cfg.uart_data_bits = 5;
+    cfg.uart_stop_bits = 1;
+    wait_phase(2);
+    cfg.uart_data_bits = 8;
+    send(2, 8'h30, 8, 0, 0, 0);
+    send(3, 8'h41, 14, 0, 0, 0);
+    cfg.uart_parity = 2;
+    send(4, 8'h50, 3, 1, 0, 0);
+    cfg.uart_parity = 0;
+    send(5, 8'h66, 1, 0, 1, 1);
+    send(5, 8'h77, 1, 0, 0, 0, 0);
+    send(6, 8'h21, 2, 0, 0, 0);
+  endtask
+endclass
+
+class soc_spi_more2_test extends soc_base_test;
+  `uvm_component_utils(soc_spi_more2_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.spi_rdata  = 32'hCAFE_F00D;
+    cfg.irq_expect = 13'h1800;
+  endfunction
+endclass
+
+class soc_i2c_more2_test extends soc_base_test;
+  `uvm_component_utils(soc_i2c_more2_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.check_i2c  = 1'b1;
+    cfg.i2c_addr   = 7'h50;
+    cfg.i2c_expect = 8'h42;
+    cfg.irq_expect = 13'h0400;
+  endfunction
+
+  task main_stim();
+    wait_phase(1);
+    cfg.i2c_al_once = 1'b1;
+  endtask
+endclass
+
+class soc_bus_fault_test extends soc_base_test;
+  `uvm_component_utils(soc_bus_fault_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  function void set_cfg();
+    cfg.allow_lsu_err = 1'b1;
+    cfg.timeout_clks  = 1_000_000;
+  endfunction
+
+  task main_stim();
+    wait_phase(1);
+    ctrl.hang_apb <= 1'b1;
+    wait_phase(2);
+    ctrl.hang_apb <= 1'b0;
+    wait_phase(3);
+    ctrl.hang_axi <= 1'b1;
+    wait_phase(4);
+    ctrl.hang_axi <= 1'b0;
+  endtask
 endclass

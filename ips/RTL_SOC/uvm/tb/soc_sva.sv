@@ -49,11 +49,11 @@ module core_sva (
     !$isunknown(uart_sout))
     else `uvm_error("CORE_SVA", "uart_sout is X")
 
-  a_apb_timeout: assert property (@(posedge clk) disable iff (!rst_n)
+  a_apb_timeout: assert property (@(posedge clk) disable iff (!rst_n || allow_err === 1'b1)
     apb_timeout == '0)
     else `uvm_error("CORE_SVA", $sformatf("APB timeout on slave mask 0x%02h", apb_timeout))
 
-  a_axi_timeout: assert property (@(posedge clk) disable iff (!rst_n)
+  a_axi_timeout: assert property (@(posedge clk) disable iff (!rst_n || allow_err === 1'b1)
     !axi_wr_timeout && !axi_rd_timeout)
     else `uvm_error("CORE_SVA", "AXI timeout")
 endmodule

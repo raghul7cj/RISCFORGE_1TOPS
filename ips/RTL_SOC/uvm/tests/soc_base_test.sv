@@ -45,6 +45,8 @@ class soc_base_test extends uvm_test;
 
   task reset_dut();
     ctrl.allow_lsu_err <= cfg.allow_lsu_err;
+    ctrl.hang_apb      <= 1'b0;
+    ctrl.hang_axi      <= 1'b0;
     ctrl.hard_rst_n    <= 1'b0;
     ctrl.soft_rst_n    <= cfg.cold_boot;
     ctrl.test_mode     <= 1'b0;
