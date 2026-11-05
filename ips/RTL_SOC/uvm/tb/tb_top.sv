@@ -140,7 +140,7 @@ module tb_top;
 
 `ifndef FLASH_BOOT
   initial begin
-    string hex = "imem.hex";
+    static string hex = "imem.hex";
     void'($value$plusargs("HEX=%s", hex));
     wait (ctrl.hard_rst_n === 1'b0);
     wait (ctrl.hard_rst_n === 1'b1);
