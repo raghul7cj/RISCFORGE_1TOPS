@@ -74,3 +74,4 @@ Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 | `mext` | `mul`/`div` result reaches WB with `valid_W=0`, so `RegWriteW_gated` (`top.v`) drops it. M results never reach the register file. |
 | `lsu_hazard`, `i2c` | A load right after a stalled MMIO store is dropped (no bus access, no commit). Polling loops exit early. |
 | `uart_nofifo` | `obi_uart_tx.sv`: with FIFO off, a THR write does not clear LSR.THRE (the later `~thr_full_q` block overrides it), so characters are overwritten. |
+| `irq` (note) | GPIO global interrupt defaults to a 1-cycle pulse and the core does not latch `mip` (`csr_regfile.v`), so a pulse can be missed while the core stalls. Firmware sets GPIO `CFG=1` (level mode). |

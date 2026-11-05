@@ -34,6 +34,8 @@ _start:
   WAIT_NZ s8, 5000, 2
 
   li   s1, GPIO_BASE
+  li   t0, 1
+  sw   t0, GPIO_CFG(s1)
   li   t0, -1
   sw   t0, GPIO_EN(s1)
   li   t0, 0x10000

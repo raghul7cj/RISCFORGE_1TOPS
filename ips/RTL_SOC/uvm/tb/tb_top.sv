@@ -27,6 +27,9 @@ module tb_top;
   logic       axi_wr_timeout, axi_rd_timeout;
   logic       spi_csn0, spi_miso;
   wire        flash_so;
+  wire        flash_si    = spi.sdo;
+  wire        flash_wp_n  = 1'b1;
+  wire        flash_rst_n = 1'b1;
 
   assign i2c.scl = (i2c_scl_oen ? 1'b1 : i2c_scl_o) & i2c.scl_drv;
   assign i2c.sda = (i2c_sda_oen ? 1'b1 : i2c_sda_o) & i2c.sda_drv;
@@ -37,12 +40,12 @@ module tb_top;
     .mem_file_name ("flash.mem"),
     .otp_file_name ("../../spi_slave_infinion/S25fs512s/model/s25fs512sOTP.mem")
   ) u_flash (
-    .SI       (spi.sdo),
+    .SI       (flash_si),
     .SO       (flash_so),
     .SCK      (spi.sck),
     .CSNeg    (spi_csn0),
-    .WPNeg    (1'b1),
-    .RESETNeg (1'b1)
+    .WPNeg    (flash_wp_n),
+    .RESETNeg (flash_rst_n)
   );
 `else
   assign flash_so = 1'b0;

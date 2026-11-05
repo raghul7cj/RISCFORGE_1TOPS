@@ -22,6 +22,7 @@
 .equ TIMER_CTRL,  0x04
 .equ TIMER_CMP,   0x08
 
+.equ GPIO_CFG,    0x004
 .equ GPIO_MODE0,  0x008
 .equ GPIO_MODE1,  0x00C
 .equ GPIO_EN,     0x080
