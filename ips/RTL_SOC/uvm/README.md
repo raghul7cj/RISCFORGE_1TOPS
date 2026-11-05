@@ -62,6 +62,11 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | `soc_gpio_full_test` | `gpio_full` | INFO, all 4 pin modes on the pins, SET/CLEAR/TOGGLE, 32-bit input, rise/fall/level-high/level-low interrupts + clear |
 | `soc_i2c_more_test` | `i2c_more` | register read-back, slave clock stretching, repeated start, bus free after stop |
 | `soc_core_test` | `rand1`..`rand4` | 400 random RV32IM instructions each (ALU, M, loads/stores, branches, hazards), self-checked against `tools/gen_rand.py` reference model |
+| `soc_irq_all_test` | `irq_all` | every CPU interrupt: software (MSIP), timer0/1 overflow + compare on both channels, SPI events, SPI end of transfer, I2C |
+| `soc_uart_more_test` | `uart_more` | DLAB-mode register access, 1.5 stop bits, FIFO trigger 8 and 14, several errored chars in FIFO, resync after framing error, non-FIFO overrun |
+| `soc_spi_more2_test` | `spi_more2` | addr-only write, dummy-only read, counter-mode interrupt, RX FIFO full stall, addr+dummy read, TX underrun mid-transfer |
+| `soc_i2c_more2_test` | `i2c_more2` | CMD ignored when core disabled, START+READ, injected arbitration loss, bus recovery |
+| `soc_bus_fault_test` | `bus_fault` | APB slave hang and AXI hang: core gets access fault with correct mtval, bus works again after |
 
 ## Run (from this folder)
 
@@ -90,11 +95,14 @@ Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 | `uart_err` | Line status and modem status interrupts lasted one cycle, IIR never showed them | `obi_uart_interrupts.sv`: hold `rls` until LSR read, `mstat` until MSR read |
 | `uart_err` | Reading LSR never cleared OE/PE/FE/BI (`*_valid` was 0 on the clear) | `obi_uart_rx.sv`: set the `*_valid` strobes on the LSR-read clear |
 | `uart_err` | Non-FIFO RX set the break indicator on every character (`break_ind = 1'b1` overrode the real value) | `obi_uart_rx.sv`: remove the override |
+| `irq_all` | One-cycle interrupt pulses (timer, SPI events) were lost if they landed on a pipeline bubble, because `mip` is not latched | `riscv_core/rtl/top.v`: capture rising edges of enabled interrupt lines, hold until taken or disabled |
+| `uart_more` | With DLAB=1 every read except DLL/DLM returned a bus error (load access fault) | `obi_uart_register.sv`: offsets 2-7 readable with DLAB=1 |
 
 ## Notes and limits
 
-- GPIO global interrupt defaults to a 1-cycle pulse and the core does not latch `mip` (`csr_regfile.v`), so a pulse can be missed while the core stalls. Firmware sets GPIO `CFG=1` (level mode).
 - UART scratch register (`0x1C`) is not implemented in `obi_uart` (reads 0).
+- Writing a non-existent CSR (e.g. `0x7C0`) does not raise an illegal-instruction exception (RISC-V spec says it should); the write is ignored.
+- The SPI interrupt state machine only arms after a read of INTSTA.
 - SPI reads need `CLKDIV >= 2` (documented in `spi_master_clkgen.sv`); at 0 the read gets an extra clock and wrong data. Tests read at 2.
 - Not reachable in this SoC: SPI quad data on `sdi0/2/3` and `sdo1-3` (tied off / not pinned out), UART modem pins (tied off, covered through loopback), I2C arbitration loss (single master).
 - New random programs: `python3 tools/gen_rand.py <seed> <count> > sw/randN.S`, add `soc_core_test:randN` to `REGRESS`.
