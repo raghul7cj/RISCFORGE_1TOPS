@@ -73,6 +73,56 @@ _start:
   sw   t1, CH1+TIMER_CTRL(s1)
   DELAY 80
   sw   zero, CH1+TIMER_CTRL(s1)
+  li   s1, TIMER_BASE
+  li   s2, TIMER1_BASE
+  li   s3, -1
+  sw   zero, TIMER_CTRL(s1)
+  sw   zero, CH1+TIMER_CTRL(s1)
+  sw   zero, TIMER_CTRL(s2)
+  sw   zero, CH1+TIMER_CTRL(s2)
+  sw   s3, TIMER_CMP(s1)
+  sw   s3, TIMER_VAL(s1)
+  sw   s3, CH1+TIMER_CMP(s1)
+  sw   s3, CH1+TIMER_VAL(s1)
+  sw   s3, TIMER_CMP(s2)
+  sw   s3, TIMER_VAL(s2)
+  sw   s3, CH1+TIMER_CMP(s2)
+  sw   s3, CH1+TIMER_VAL(s2)
+  lw   t2, TIMER_VAL(s1)
+  CHECK t2, 0xFFFFFFFF, 8
+  lw   t2, TIMER_CMP(s1)
+  CHECK t2, 0xFFFFFFFF, 9
+  lw   t2, CH1+TIMER_VAL(s1)
+  CHECK t2, 0xFFFFFFFF, 10
+  lw   t2, CH1+TIMER_CMP(s1)
+  CHECK t2, 0xFFFFFFFF, 11
+  lw   t2, TIMER_VAL(s2)
+  CHECK t2, 0xFFFFFFFF, 12
+  lw   t2, TIMER_CMP(s2)
+  CHECK t2, 0xFFFFFFFF, 13
+  lw   t2, CH1+TIMER_VAL(s2)
+  CHECK t2, 0xFFFFFFFF, 14
+  lw   t2, CH1+TIMER_CMP(s2)
+  CHECK t2, 0xFFFFFFFF, 15
+  li   t1, 0x38
+  sw   t1, TIMER_CTRL(s1)
+  sw   t1, CH1+TIMER_CTRL(s1)
+  sw   t1, TIMER_CTRL(s2)
+  sw   t1, CH1+TIMER_CTRL(s2)
+  sw   zero, TIMER_VAL(s1)
+  sw   zero, TIMER_CMP(s1)
+  sw   zero, TIMER_CTRL(s1)
+  sw   zero, CH1+TIMER_VAL(s1)
+  sw   zero, CH1+TIMER_CMP(s1)
+  sw   zero, CH1+TIMER_CTRL(s1)
+  sw   zero, TIMER_VAL(s2)
+  sw   zero, TIMER_CMP(s2)
+  sw   zero, TIMER_CTRL(s2)
+  sw   zero, CH1+TIMER_VAL(s2)
+  sw   zero, CH1+TIMER_CMP(s2)
+  sw   zero, CH1+TIMER_CTRL(s2)
+  lw   t2, TIMER_VAL(s2)
+  CHECK t2, 0, 16
   PASS
 
 bad_pre:

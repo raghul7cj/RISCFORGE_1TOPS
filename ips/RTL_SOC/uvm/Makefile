@@ -21,7 +21,7 @@ endif
 PROGS = hello uart_nofifo uart_echo gpio timer spi i2c mem mext trap lsu_hazard \
         isa mem_march mem_fault irq warm_reset timer_full uart_full i2c_full spi_full csr \
         uart_modes uart_err spi_more gpio_full i2c_more rand1 rand2 rand3 rand4 \
-        irq_all uart_more spi_more2 i2c_more2 bus_fault
+        irq_all uart_more spi_more2 i2c_more2 bus_fault fetch_fault flash_data
 
 REGRESS = \
   soc_hello_test:hello \
@@ -59,7 +59,10 @@ REGRESS = \
   soc_spi_more2_test:spi_more2 \
   soc_i2c_more2_test:i2c_more2 \
   soc_bus_fault_test:bus_fault \
-  flash:hello
+  soc_core_test:fetch_fault \
+  soc_hard_reset_test:warm_reset \
+  flash:hello \
+  flash:flash_data
 
 all: run
 
@@ -82,8 +85,9 @@ run: sw
 flash: TEST = soc_flash_boot_test
 flash: sw
 	mkdir -p logs
-	awk '{print substr($$0,7,2); print substr($$0,5,2); print substr($$0,3,2); print substr($$0,1,2)}' sw/$(PROG).hex > flash.mem
+	cat sw/$(PROG).hex `test -f sw/$(PROG).dhex && echo sw/$(PROG).dhex` | awk '{print substr($$0,7,2); print substr($$0,5,2); print substr($$0,3,2); print substr($$0,1,2)}' > flash.mem
 	xrun $(SIM_OPTS) +define+FLASH_BOOT +define+FW_WORDS=$$(wc -l < sw/$(PROG).hex) \
+	  +define+FW_DATA=$$(test -f sw/$(PROG).dhex && wc -l < sw/$(PROG).dhex || echo 0) \
 	  -f soc_ip.f $(FLASH_MODEL) -f tb.f \
 	  +UVM_TESTNAME=soc_flash_boot_test $(ARGS) -l logs/flash_$(PROG).log
 

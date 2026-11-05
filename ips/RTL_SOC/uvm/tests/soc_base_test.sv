@@ -45,8 +45,7 @@ class soc_base_test extends uvm_test;
 
   task reset_dut();
     ctrl.allow_lsu_err <= cfg.allow_lsu_err;
-    ctrl.hang_apb      <= 1'b0;
-    ctrl.hang_axi      <= 1'b0;
+    ctrl.hang_sel      <= 4'd0;
     ctrl.hard_rst_n    <= 1'b0;
     ctrl.soft_rst_n    <= cfg.cold_boot;
     ctrl.test_mode     <= 1'b0;
@@ -80,6 +79,18 @@ class soc_base_test extends uvm_test;
     repeat (50) @(posedge ctrl.clk);
     wait_boot();
     `uvm_info("TEST", "soft reset done", UVM_LOW)
+  endtask
+
+  task hard_reset();
+    ctrl.hard_rst_n <= 1'b0;
+    ctrl.soft_rst_n <= 1'b0;
+    repeat (20) @(posedge ctrl.clk);
+    ctrl.hard_rst_n <= 1'b1;
+    repeat (100) @(posedge ctrl.clk);
+    ctrl.soft_rst_n <= 1'b1;
+    repeat (50) @(posedge ctrl.clk);
+    wait_boot();
+    `uvm_info("TEST", "hard reset done", UVM_LOW)
   endtask
 
   task wait_phase(int unsigned n);

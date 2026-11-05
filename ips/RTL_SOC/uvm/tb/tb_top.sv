@@ -3,6 +3,9 @@
 `ifndef FW_WORDS
 `define FW_WORDS 64
 `endif
+`ifndef FW_DATA
+`define FW_DATA 0
+`endif
 
 module tb_top;
   import uvm_pkg::*;
@@ -55,7 +58,7 @@ module tb_top;
 
   riscforge_soc_subsystem #(
     .NUM_INSTR_WORDS (`FW_WORDS),
-    .NUM_DATA_WORDS  (0)
+    .NUM_DATA_WORDS  (`FW_DATA)
   ) dut (
     .clk_i                       (clk),
     .hard_rst_ni                 (ctrl.hard_rst_n),
@@ -143,15 +146,20 @@ module tb_top;
 
 `ifndef FLASH_BOOT
   initial begin
-    static string hex = "imem.hex";
+    static string hex   = "imem.hex";
+    static bit    first = 1'b1;
     void'($value$plusargs("HEX=%s", hex));
-    wait (ctrl.hard_rst_n === 1'b0);
-    wait (ctrl.hard_rst_n === 1'b1);
-    wait (ctrl.soft_rst_n === 1'b1);
-    $readmemh(hex, dut.i_isram.u_imem.mem_array);
-    for (int i = 0; i < $size(dut.i_dsram.mem); i++)
-      dut.i_dsram.mem[i] = '0;
-    $display("[TB] loaded %s into ISRAM, DSRAM cleared", hex);
+    forever begin
+      wait (ctrl.hard_rst_n === 1'b0);
+      wait (ctrl.hard_rst_n === 1'b1);
+      wait (ctrl.soft_rst_n === 1'b1);
+      $readmemh(hex, dut.i_isram.u_imem.mem_array);
+      if (first)
+        for (int i = 0; i < $size(dut.i_dsram.mem); i++)
+          dut.i_dsram.mem[i] = '0;
+      $display("[TB] loaded %s into ISRAM%s", hex, first ? ", DSRAM cleared" : "");
+      first = 1'b0;
+    end
   end
 `endif
 
@@ -166,13 +174,25 @@ module tb_top;
                dut.core_lsu_rdata, dut.core_lsu_err);
   end
 
-  always @(ctrl.hang_apb)
-    if (ctrl.hang_apb === 1'b1) force dut.timer0_pready = 1'b0;
-    else release dut.timer0_pready;
-
-  always @(ctrl.hang_axi)
-    if (ctrl.hang_axi === 1'b1) force dut.i_axi_lite_to_apb.axi_lite_resp_o = '0;
-    else release dut.i_axi_lite_to_apb.axi_lite_resp_o;
+  always @(ctrl.hang_sel) begin
+    release dut.timer0_pready;
+    release dut.i_axi_lite_to_apb.axi_lite_resp_o;
+    release dut.i2c_pready;
+    release dut.uart_pready;
+    release dut.i_gpio_apb_wrap.apb_rsp_o;
+    release dut.timer1_pready;
+    release dut.spi_pready;
+    case (ctrl.hang_sel)
+      4'd1: force dut.timer0_pready = 1'b0;
+      4'd2: force dut.i_axi_lite_to_apb.axi_lite_resp_o = '0;
+      4'd3: force dut.i2c_pready = 1'b0;
+      4'd4: force dut.uart_pready = 1'b0;
+      4'd5: force dut.i_gpio_apb_wrap.apb_rsp_o = '0;
+      4'd6: force dut.timer1_pready = 1'b0;
+      4'd7: force dut.spi_pready = 1'b0;
+      default: ;
+    endcase
+  end
 
   initial begin
     uvm_config_db #(virtual soc_ctrl_if)::set(null, "uvm_test_top", "ctrl", ctrl);

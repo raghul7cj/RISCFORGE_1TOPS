@@ -6,6 +6,19 @@
   CHECK s5, \addr, \code
 .endm
 
+.macro HANG_LOAD ph, rel, addr, n, code
+  PHASE \ph
+  DELAY 50
+  li   t1, \addr
+  lw   a0, 0(t1)
+  EXPECT_TRAP \n, 5, \addr, \code
+  PHASE \rel
+  DELAY 100
+  li   t1, \addr
+  lw   a0, 0(t1)
+  CHECK s2, \n, (\code + 1)
+.endm
+
 .section .text.init
 .globl _start
 _start:
@@ -40,8 +53,14 @@ _start:
   li   t1, 0x99
   sw   t1, TIMER_CMP(s9)
   lw   t2, TIMER_CMP(s9)
-  CHECK t2, 0x99, 6
-  CHECK s2, 3, 7
+  CHECK t2, 0x99, 7
+  CHECK s2, 3, 8
+
+  HANG_LOAD 5, 6, I2C_BASE + I2C_PRE, 4, 10
+  HANG_LOAD 7, 8, UART_BASE + UART_LSR, 5, 12
+  HANG_LOAD 9, 10, GPIO_BASE + GPIO_INFO, 6, 14
+  HANG_LOAD 11, 12, TIMER1_BASE + TIMER_VAL, 7, 16
+  HANG_LOAD 13, 14, SPI_BASE + SPI_CLKDIV, 8, 18
   PASS
 
 .align 2

@@ -24,7 +24,11 @@
 module top #(
     // First instruction address fetched out of reset. The RISCFORGE SoC boots
     // from the BootROM, so it overrides this to 32'h0000_0000.
-    parameter [31:0] RESET_PC = 32'h80000000
+    parameter [31:0] RESET_PC = 32'h80000000,
+    parameter [31:0] FETCH_BASE0 = 32'h00000000,
+    parameter [31:0] FETCH_END0  = 32'hFFFFFFFF,
+    parameter [31:0] FETCH_BASE1 = 32'h00000000,
+    parameter [31:0] FETCH_END1  = 32'h00000000
 )(
 
     input clk,
@@ -333,7 +337,11 @@ module top #(
 
     // ---------------- IF ----------------
     fetch_cycle #(
-        .RESET_PC(RESET_PC)
+        .RESET_PC(RESET_PC),
+        .FETCH_BASE0(FETCH_BASE0),
+        .FETCH_END0(FETCH_END0),
+        .FETCH_BASE1(FETCH_BASE1),
+        .FETCH_END1(FETCH_END1)
     ) Fetch (
         .clk(clk),
         .rst(rst),

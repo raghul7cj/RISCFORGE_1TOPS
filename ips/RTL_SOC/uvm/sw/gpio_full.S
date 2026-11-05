@@ -34,6 +34,13 @@ _start:
   CHECK t2, 0xFFFF1231, 6
   PHASE 1
   DELAY 200
+  li   t1, 0x55555555
+  sw   t1, GPIO_MODE1(s1)
+  li   t1, -1
+  sw   t1, GPIO_OUT(s1)
+  DELAY 20
+  sw   zero, GPIO_OUT(s1)
+  DELAY 20
 
   sw   zero, GPIO_MODE0(s1)
   sw   zero, GPIO_MODE1(s1)

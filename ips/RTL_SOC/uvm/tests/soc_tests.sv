@@ -459,13 +459,24 @@ class soc_bus_fault_test extends soc_base_test;
   endfunction
 
   task main_stim();
+    bit [3:0] sel[14] = '{1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0};
+    for (int n = 1; n <= 14; n++) begin
+      wait_phase(n);
+      ctrl.hang_sel <= sel[n-1];
+    end
+  endtask
+endclass
+
+class soc_hard_reset_test extends soc_base_test;
+  `uvm_component_utils(soc_hard_reset_test)
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction
+
+  task main_stim();
     wait_phase(1);
-    ctrl.hang_apb <= 1'b1;
-    wait_phase(2);
-    ctrl.hang_apb <= 1'b0;
-    wait_phase(3);
-    ctrl.hang_axi <= 1'b1;
-    wait_phase(4);
-    ctrl.hang_axi <= 1'b0;
+    repeat (20) @(posedge ctrl.clk);
+    hard_reset();
   endtask
 endclass

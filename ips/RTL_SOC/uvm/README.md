@@ -66,7 +66,10 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | `soc_uart_more_test` | `uart_more` | DLAB-mode register access, 1.5 stop bits, FIFO trigger 8 and 14, several errored chars in FIFO, resync after framing error, non-FIFO overrun |
 | `soc_spi_more2_test` | `spi_more2` | addr-only write, dummy-only read, counter-mode interrupt, RX FIFO full stall, addr+dummy read, TX underrun mid-transfer |
 | `soc_i2c_more2_test` | `i2c_more2` | CMD ignored when core disabled, START+READ, injected arbitration loss, bus recovery |
-| `soc_bus_fault_test` | `bus_fault` | APB slave hang and AXI hang: core gets access fault with correct mtval, bus works again after |
+| `soc_bus_fault_test` | `bus_fault` | each of the 6 APB slaves hung (PREADY stuck) and an AXI hang: core gets access fault with correct mtval, every slot works again after release |
+| `soc_core_test` | `fetch_fault` | jump to unmapped addresses: instruction access fault, mcause 1, mtval/mepc = target |
+| `soc_hard_reset_test` | `warm_reset` | second hard reset mid-run, program reloaded, DSRAM retained, core reboots |
+| `soc_flash_boot_test` | `flash_data` | cold boot from SPI flash with code and a data section copied into DSRAM over AXI |
 
 ## Run (from this folder)
 
@@ -97,6 +100,7 @@ Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 | `uart_err` | Non-FIFO RX set the break indicator on every character (`break_ind = 1'b1` overrode the real value) | `obi_uart_rx.sv`: remove the override |
 | `irq_all` | One-cycle interrupt pulses (timer, SPI events) were lost if they landed on a pipeline bubble, because `mip` is not latched | `riscv_core/rtl/top.v`: capture rising edges of enabled interrupt lines, hold until taken or disabled |
 | `uart_more` | With DLAB=1 every read except DLL/DLM returned a bus error (load access fault) | `obi_uart_register.sv`: offsets 2-7 readable with DLAB=1 |
+| `fetch_fault` | A jump to an unmapped address did not trap; the core fetched garbage and ran away | `fetch_cycle.v`/`top.v`: fetch regions as parameters, instruction access fault (mcause 1) outside them; SoC sets boot ROM + ISRAM |
 
 ## Notes and limits
 
