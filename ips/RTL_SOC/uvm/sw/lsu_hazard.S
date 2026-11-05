@@ -47,4 +47,31 @@ _start:
   sw   t1, TIMER_CMP(s0)
   addi t3, zero, 7
   CHECK t3, 7, 4
+
+  li   t1, 0x0A0A0A0A
+  li   t3, 0x0B0B0B0B
+  sw   t1, 8(s1)
+  sw   t3, 12(s1)
+  lw   a1, 8(s1)
+  lw   a2, 12(s1)
+  addi t5, zero, 12
+  CHECK a1, 0x0A0A0A0A, 8
+  CHECK a2, 0x0B0B0B0B, 9
+  CHECK t5, 12, 10
+
+  mv   s2, s1
+  sw   t3, 16(s2)
+  sw   t1, 20(s2)
+  lw   s3, 20(s2)
+  lw   s4, 16(s2)
+  addi s2, s2, 20
+  CHECK s3, 0x0A0A0A0A, 11
+  CHECK s4, 0x0B0B0B0B, 12
+  li   t6, DSRAM_BASE + 0x214
+  CHECKR s2, t6, 13
+
+  lw   a3, 8(s1)
+  lw   a4, 12(s1)
+  add  a5, a4, a3
+  CHECK a5, 0x15151515, 14
   PASS

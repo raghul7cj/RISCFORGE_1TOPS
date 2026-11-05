@@ -46,7 +46,7 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | `soc_core_test` | `mem` | word/half/byte load-store, sign/zero extend |
 | `soc_core_test` | `mem_march` | full 32 KB DSRAM: address, inverse address, walking ones |
 | `soc_core_test` | `trap` | ecall, illegal, ebreak -> mcause, mepc, mret |
-| `soc_core_test` | `lsu_hazard` | load right after an MMIO store |
+| `soc_core_test` | `lsu_hazard` | load right after an MMIO store, load-load-use with offset bits equal to the second load's rd |
 | `soc_fault_test` | `mem_fault` | misaligned load/store (4/6), access faults (5/7) on ISRAM, unmapped, bad APB slot, mtval |
 | `soc_irq_test` | `irq` | CPU interrupts: timer0 (MTIP), timer1 (fast 24), GPIO rise (fast 16), UART RX (fast 19) |
 | `soc_warm_reset_test` | `warm_reset` | soft reset mid-run, DSRAM retained, core reboots |
@@ -100,6 +100,7 @@ Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 | `uart_err` | Non-FIFO RX set the break indicator on every character (`break_ind = 1'b1` overrode the real value) | `obi_uart_rx.sv`: remove the override |
 | `irq_all` | One-cycle interrupt pulses (timer, SPI events) were lost if they landed on a pipeline bubble, because `mip` is not latched | `riscv_core/rtl/top.v`: capture rising edges of enabled interrupt lines, hold until taken or disabled |
 | `uart_more` | With DLAB=1 every read except DLL/DLM returned a bus error (load access fault) | `obi_uart_register.sv`: offsets 2-7 readable with DLAB=1 |
+| `lsu_hazard` | `RS2_D` was taken from `InstrD[24:20]` for every instruction, so loads and other I-type instructions raised false load-use stalls when `imm[4:0]` matched the previous load's rd | `riscv_core/rtl/decode_cycle.v`: `RS2_D` only for R-type, store and branch |
 | `fetch_fault` | A jump to an unmapped address did not trap; the core fetched garbage and ran away | `fetch_cycle.v`/`top.v`: fetch regions as parameters, instruction access fault (mcause 1) outside them; SoC sets boot ROM + ISRAM |
 
 ## Notes and limits
