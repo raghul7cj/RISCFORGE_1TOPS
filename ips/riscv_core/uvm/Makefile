@@ -34,7 +34,7 @@ regress:
 	  $(MAKE) --no-print-directory run UNIT=$$u TEST=$$tn SEED=$$s N=$(N) > logs/$${tn}_$$s.make 2>&1; \
 	  if [ -f $$log ] && grep -q "UVM_ERROR :    0" $$log && grep -q "UVM_FATAL :    0" $$log; then r=PASS; else r=FAIL; fi; \
 	  echo "$$r $$tn seed $$s" >> logs/summary.txt; \
-	  echo "$$r  $$tn  seed $$s  `grep -hE '\[(ALU|DEC|HAZ)\] (checked|legal:|illegal:)|\[COV\]' $$log 2>/dev/null | sed 's/.*\] //' | tr '\n' ' '`"; \
+	  echo "$$r  $$tn  seed $$s  `grep -hE '\[(ALU|DEC|HAZ)\] (checked|legal:|illegal:)|\[COV\] [a-zA-Z]' $$log 2>/dev/null | sed 's/.*\] //' | tr '\n' ' '`"; \
 	  if [ $$r = FAIL ] && [ ! -f $$log ]; then tail -5 logs/$${tn}_$$s.make; fi; \
 	done; done; \
 	echo "DONE: `grep -c PASS logs/summary.txt` PASS, `grep -c FAIL logs/summary.txt` FAIL"

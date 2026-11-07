@@ -266,7 +266,9 @@ package dec_pkg;
       void'($value$plusargs("N=%d", seq.n));
       phase.raise_objection(this);
       seq.start(env.sqr);
-      repeat (2) @(posedge env.drv.vif.clk);
+      @(posedge env.drv.vif.clk);
+      env.drv.vif.valid <= 1'b0;
+      @(posedge env.drv.vif.clk);
       phase.drop_objection(this);
     endtask
   endclass
