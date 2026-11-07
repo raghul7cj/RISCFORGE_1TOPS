@@ -6,6 +6,7 @@ if/spi_if.sv
 if/i2c_if.sv
 if/irq_if.sv
 if/trace_if.sv
+if/reg_bus_if.sv
 tb/soc_pkg.sv
 tb/soc_sva.sv
 tb/tb_top.sv

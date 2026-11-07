@@ -86,4 +86,31 @@ _start:
   RW   s1, 0x14,          0, 0xFFFFFFFF, 0xFFFFFFFE, 63
   RW   s1, 0x18,          0, 0xFFFFFFFF, 0xFFFFFFFF, 64
   RW   s1, 0x10,          0, 0xFFFFFFFF, 0xFFFFFFFF, 65
+
+  li   s1, GPIO_BASE
+  li   t1, -1
+  sw   zero, GPIO_SET(s1)
+  sw   t1, GPIO_SET(s1)
+  sw   zero, GPIO_TOGGLE(s1)
+  sw   t1, GPIO_TOGGLE(s1)
+  sw   zero, GPIO_CLEAR(s1)
+  sw   t1, GPIO_CLEAR(s1)
+  RO   s1, GPIO_OUT,      0, 70
+
+  li   s1, SPI_BASE
+  li   t1, 0x00000F00
+  sw   t1, 0x00(s1)
+  sw   zero, 0x00(s1)
+  li   t1, -1
+  sw   zero, 0x18(s1)
+  sw   t1, 0x18(s1)
+  li   t1, 0x10
+  sw   t1, 0x00(s1)
+  RO   s1, 0x00,          0x00000001, 71
+
+  UART_INIT
+  sw   zero, UART_THR(s0)
+  li   t1, 0xFF
+  sw   t1, UART_THR(s0)
+  UART_FLUSH
   PASS

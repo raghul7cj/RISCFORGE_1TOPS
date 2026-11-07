@@ -9,6 +9,7 @@ class soc_env extends uvm_env;
   trace_monitor  trace;
   soc_scoreboard scb;
   soc_coverage   cov;
+  reg_cov        regcov;
 
   function new(string name, uvm_component parent);
     super.new(name, parent);
@@ -23,6 +24,7 @@ class soc_env extends uvm_env;
     trace = trace_monitor::type_id::create("trace", this);
     scb   = soc_scoreboard::type_id::create("scb", this);
     cov   = soc_coverage::type_id::create("cov", this);
+    regcov = reg_cov::type_id::create("regcov", this);
   endfunction
 
   function void connect_phase(uvm_phase phase);

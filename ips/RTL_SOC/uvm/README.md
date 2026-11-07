@@ -9,7 +9,7 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | --- | --- |
 | `if/` | ctrl, uart, gpio, spi, i2c, irq, trace interfaces |
 | `agents/` | UART (driver + monitor), GPIO (driver + monitor), SPI slave (on `csn1`), I2C slave (addr `0x50`) |
-| `env/` | config, irq monitor, trace monitor, scoreboard, coverage, env |
+| `env/` | config, irq monitor, trace monitor, scoreboard, coverage, register-field coverage (`reg_cov.sv`, field table in `reg_fields.svh`), env |
 | `seq/` | UART send, GPIO set |
 | `tests/` | base test + one test per block |
 | `tb/` | package, assertions (6 APB slaves, core, bus timeouts), `tb_top` |
@@ -85,6 +85,8 @@ make run TEST=soc_spi_test PROG=spi GUI=1
 ```
 
 Results: `logs/<test>_<prog>.log`, `logs/summary.txt`, `rtl_trace.log`.
+
+Register-field coverage: every software-visible field of GPIO, UART, SPI, I2C and both timers (322 fields) has its own bins (write 0, write all-ones, write other value, read). Each test log ends with a `[REGCOV]` line; with `COV=1` the per-field covergroups are also in the merged `imc` database.
 
 Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 
