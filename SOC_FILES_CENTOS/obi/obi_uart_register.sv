@@ -159,7 +159,7 @@ module obi_uart_register import obi_uart_pkg::*; #(
           end
 
           RegAddrIER: begin
-            reg_d.IER = obi_req_i.a.wdata[RegWidth-1:0];
+            reg_d.IER = obi_req_i.a.wdata[RegWidth-1:0] & 8'h0F;
           end
 
           RegAddrFCR: begin
@@ -171,7 +171,7 @@ module obi_uart_register import obi_uart_pkg::*; #(
           end
 
           RegAddrMCR: begin
-            reg_d.MCR = obi_req_i.a.wdata[RegWidth-1:0];
+            reg_d.MCR = obi_req_i.a.wdata[RegWidth-1:0] & 8'h1F;
           end
 
           RegAddrSPR: begin
@@ -205,7 +205,7 @@ module obi_uart_register import obi_uart_pkg::*; #(
           end
 
           RegAddrMCR: begin
-            reg_d.MCR = obi_req_i.a.wdata[RegWidth-1:0];
+            reg_d.MCR = obi_req_i.a.wdata[RegWidth-1:0] & 8'h1F;
           end
 
           RegAddrSPR: begin
