@@ -43,7 +43,7 @@ cov_report:
 	@mkdir -p logs
 	@for u in $(UNITS); do \
 	  if [ -d cov_work/$$u ]; then \
-	    imc -execcmd "merge -overwrite cov_work/$$u/* -out all; load -run cov_work/$$u/all; report -summary -out logs/cov_$$u.txt; exit" > logs/imc_$$u.log 2>&1; \
+	    imc -execcmd "merge -overwrite cov_work/$$u/* -out all; load -run cov_work/scope/all; report -summary -out logs/cov_$$u.txt; exit" > logs/imc_$$u.log 2>&1; \
 	    echo "== $$u: logs/cov_$$u.txt"; \
 	  fi; \
 	done
