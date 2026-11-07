@@ -12,7 +12,7 @@ FILES_dec = $(RTL)/Control_Unit_Top.v $(RTL)/Main_Decoder.v $(RTL)/ALU_Decoder.v
 FILES_haz = $(RTL)/hazard_unit.v haz/haz_pkg.sv
 
 OPTS = -uvm -sv -timescale 1ns/1ps -access +rwc -incdir $(UNIT) -top $(UNIT)_tb -svseed $(SEED) \
-       -xmlibdirname xcelium.d/$(UNIT) -coverage all -covoverwrite -covscope $(UNIT) -covtest $(TEST)_$(SEED)
+       -xmlibdirname xcelium_$(UNIT).d -coverage all -covoverwrite -covscope $(UNIT) -covtest $(TEST)_$(SEED)
 ifeq ($(GUI),1)
 OPTS += -gui
 endif
@@ -49,6 +49,6 @@ cov_report:
 	done
 
 clean:
-	rm -rf xcelium.d xrun.history xrun.key waves.shm logs cov_work
+	rm -rf xcelium*.d xrun.history xrun.key waves.shm logs cov_work
 
 .PHONY: all run regress cov_report clean
