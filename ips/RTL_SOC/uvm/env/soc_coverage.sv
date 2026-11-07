@@ -24,7 +24,7 @@ class soc_coverage extends uvm_component;
 
   covergroup cg_commit;
     option.per_instance = 1;
-    cp_rd : coverpoint rd;
+    cp_rd : coverpoint rd { ignore_bins x0 = {0}; }
     cp_data : coverpoint wdata {
       bins zero = {0};
       bins one  = {1};

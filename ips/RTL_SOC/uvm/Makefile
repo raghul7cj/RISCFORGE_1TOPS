@@ -121,7 +121,7 @@ regress: sw_all
 	echo "DONE: `grep -c PASS logs/summary.txt` PASS, `grep -c FAIL logs/summary.txt` FAIL of $$total"
 
 cov_report:
-	imc -execcmd "merge -overwrite cov_work/scope/* -out all; load -run cov_work/scope/all; report -summary -out logs/cov_summary.txt; exit"
+	imc -execcmd "merge -overwrite cov_work/scope/* -out all; load -run cov_work/scope/all; report -summary -out logs/cov_summary.txt; report -detail -metrics covergroup -out logs/cov_cg_detail.txt; exit"
 
 clean:
 	rm -rf xcelium.d xrun.history xrun.key waves.shm logs cov_work compile.log rtl_trace.log flash.mem
