@@ -8,20 +8,22 @@
 #
 # Vivado's run files (log, journal, hw_server cache) go to work/.
 #
-# flash : writes out/nexys4ddr_<fw>.mcs into the S25FL128S (bitstream + firmware),
-#         then reconfigures the FPGA from flash. Survives power-off. Set the
-#         board's MODE jumper (JP1) to QSPI so it boots from flash at power-on.
-# jtag  : loads out/nexys4ddr_top.bit over JTAG. The firmware must already be
-#         in the flash at 0x400000 (from an earlier "flash" run), because the
-#         SoC always boots its program from the flash.
+# flash : writes out/nexys4ddr_<fw>.mcs into the S25FL128S (bitstream +
+#         firmware), then reconfigures the FPGA from flash. Survives power-off.
+#         Set the board's MODE jumper (JP1) to QSPI so it boots from flash at
+#         power-on.
+# jtag  : loads out/top_pong.bit over JTAG. The firmware must already
+#         be in the flash at 0x400000 (from an earlier "flash" run), because
+#         the SoC always boots its program from the flash.
 # =============================================================================
 
-set here [file normalize [file dirname [info script]]]
-set out  $here/out
+set here  [file normalize [file dirname [info script]]]
+set top   top_pong
+set mode  [expr {[llength $argv] > 0 ? [lindex $argv 0] : "flash"}]
+set fw    [expr {[llength $argv] > 1 ? [lindex $argv 1] : "pong"}]
+set out   $here/out
 file mkdir $here/work
 cd $here/work
-set mode [expr {[llength $argv] > 0 ? [lindex $argv 0] : "flash"}]
-set fw   [expr {[llength $argv] > 1 ? [lindex $argv 1] : "pong"}]
 
 open_hw_manager
 connect_hw_server
@@ -32,12 +34,14 @@ current_hw_device $dev
 refresh_hw_device -update_hw_probes false $dev
 
 if {$mode eq "jtag"} {
-    set_property PROGRAM.FILE $out/nexys4ddr_top.bit $dev
+    set bit $out/$top.bit
+    if {![file exists $bit]} { error "program.tcl: $bit not found; run build.bat first" }
+    set_property PROGRAM.FILE $bit $dev
     program_hw_devices $dev
-    puts "program.tcl: bitstream loaded over JTAG"
+    puts "program.tcl: bitstream loaded over JTAG ($bit)"
 } else {
     set mcs $out/nexys4ddr_${fw}.mcs
-    if {![file exists $mcs]} { error "program.tcl: $mcs not found; run build.tcl first" }
+    if {![file exists $mcs]} { error "program.tcl: $mcs not found; run build.bat first" }
 
     set mem [create_hw_cfgmem -hw_device $dev \
                 [lindex [get_cfgmem_parts {s25fl128sxxxxxx0-spi-x1_x2_x4}] 0]]

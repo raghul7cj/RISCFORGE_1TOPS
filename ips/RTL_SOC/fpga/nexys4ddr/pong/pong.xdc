@@ -1,5 +1,5 @@
 ## =============================================================================
-## RISCFORGE 1TOPS — Nexys 4 DDR constraints for nexys4ddr_top
+## RISCFORGE 1TOPS — Nexys 4 DDR constraints for test "pong" (top_pong)
 ## =============================================================================
 ## Pin locations from the Digilent Nexys-4-DDR-Master.xdc (Rev. C board).
 ## Check them against the master XDC for your board revision before the first
@@ -20,7 +20,7 @@ set_property -dict { PACKAGE_PIN C4  IOSTANDARD LVCMOS33 } [get_ports UART_TXD_I
 set_property -dict { PACKAGE_PIN D4  IOSTANDARD LVCMOS33 } [get_ports UART_RXD_OUT]
 
 ## Quad SPI configuration flash (S25FL128S). SCK is CCLK (E9), driven through
-## STARTUPE2 in nexys4ddr_top.sv, so it has no port here.
+## STARTUPE2 in top_pong.sv, so it has no port here.
 set_property -dict { PACKAGE_PIN L13 IOSTANDARD LVCMOS33 } [get_ports QSPI_CSN]
 set_property -dict { PACKAGE_PIN K17 IOSTANDARD LVCMOS33 } [get_ports QSPI_DQ0]
 set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS33 } [get_ports QSPI_DQ1]

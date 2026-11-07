@@ -257,7 +257,7 @@ module obi_uart_tx #()
       end
 
       //--Set-LSR---------------------------------------------------------------------------------
-      if (fifo_empty) begin
+      if (fifo_empty & ~reg_read_i.obi_write_thr & ~thr_full_q) begin
         reg_write_o.thr_empty = 1'b1;
         reg_write_o.thr_valid = 1'b1;
         if (tsr_empty) begin

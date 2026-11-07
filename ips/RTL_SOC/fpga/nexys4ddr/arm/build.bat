@@ -1,7 +1,7 @@
 @echo off
 rem ===========================================================================
-rem RISCFORGE 1TOPS - Nexys 4 DDR build: synth -> impl -> .bit -> .mcs
-rem   build.bat              Pong (mem\pong, build it first with python build.py)
+rem RISCFORGE 1TOPS - Nexys 4 DDR build for the robotic arm: synth -> impl -> .bit -> .mcs
+rem   build.bat              arm (mem\arm, build it first with python build.py)
 rem   build.bat <fw_dir>     other firmware, relative to ips\RTL_SOC\mem
 rem Results go to out\ ; Vivado's logs, cache and checkpoints go to work\.
 rem ===========================================================================

@@ -1,7 +1,7 @@
 // =============================================================================
 // RISCFORGE 1TOPS — Nexys 4 DDR board-top testbench
 // =============================================================================
-// Simulates nexys4ddr_top (not the bare SoC) the way the board powers up:
+// Simulates top_pong (not the bare SoC) the way the board powers up:
 // CPU_RESETN is released from time 0, and the flash holds the firmware at the
 // board offset 0x400000 with everything below it erased (where the bitstream
 // would sit). It checks the parts that are new in the board top:
@@ -15,16 +15,16 @@
 //      the title arrives again
 //   E  LED[2] (bus timeout) stays off, no UART framing error
 //
-// STARTUPE2 is not simulated (nexys4ddr_top instantiates it only under
+// STARTUPE2 is not simulated (top_pong instantiates it only under
 // `SYNTHESIS); the flash model is clocked from the internal net dut.flash_sck.
 // -----------------------------------------------------------------------------
 // Prepare (simulation build of Pong, then the offset preload file):
 //     cd ips/RTL_SOC/mem/pong && python build.py --sim
-//     python ../../fpga/nexys4ddr/tb/make_sim_flash.py
+//     python ../../fpga/nexys4ddr/pong/tb/make_sim_flash.py
 // Select in ips/RTL_SOC/run.f:
 //     +incdir+../mem/pong/sim_build
-//     ../fpga/nexys4ddr/nexys4ddr_top.sv
-//     ../fpga/nexys4ddr/tb/soc_nexys4ddr_tb.sv
+//     ../fpga/nexys4ddr/pong/top_pong.sv
+//     ../fpga/nexys4ddr/pong/tb/soc_nexys4ddr_tb.sv
 //     -top soc_nexys4ddr_tb
 // Run from ips/RTL_SOC/sim/:
 //     xrun -f ../run.f -l logs/nexys4ddr.log          (+WAVES for soc_nexys4ddr_tb.shm)
@@ -41,7 +41,7 @@ module soc_nexys4ddr_tb;
   localparam longint unsigned BOOT_TIMEOUT_CYCLES = 300_000 + 400 * (FW_NUM_INSTR_WORDS + FW_NUM_DATA_WORDS);
   localparam longint unsigned TITLE_TIMEOUT_CYCLES = 2_000_000;
 
-  localparam string FLASH_FILE = "../fpga/nexys4ddr/tb/pong_flash_at_400000.mem";
+  localparam string FLASH_FILE = "../fpga/nexys4ddr/pong/tb/pong_flash_at_400000.mem";
   localparam string OTP_FILE   = "../../spi_slave_infinion/S25fs512s/model/s25fs512sOTP.mem";
 
   // ───────────────────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ module soc_nexys4ddr_tb;
     uart_txd_in = 1'b1;
   end
 
-  nexys4ddr_top dut (
+  top_pong dut (
     .CLK100MHZ    ( clk          ),
     .CPU_RESETN   ( cpu_resetn   ),
     .UART_TXD_IN  ( uart_txd_in  ),

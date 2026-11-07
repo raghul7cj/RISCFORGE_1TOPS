@@ -1,10 +1,10 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2023.2 (win64) Build 4029153 Fri Oct 13 20:14:34 MDT 2023
-| Date         : Mon Nov  2 02:20:23 2026
+| Date         : Thu Nov  5 16:42:47 2026
 | Host         : mech running 64-bit major release  (build 9200)
-| Command      : report_utilization -file D:/College/Projects/RISCV/RISCFORGE_1TOPS/ips/RTL_SOC/fpga/nexys4ddr/out/utilization_synth.rpt
-| Design       : nexys4ddr_top
+| Command      : report_utilization -file D:/College/Projects/RISCV/RISCFORGE_1TOPS/ips/RTL_SOC/fpga/nexys4ddr/arm/out/utilization_synth.rpt
+| Design       : top_arm
 | Device       : xc7a100tcsg324-1
 | Speed File   : -1
 | Design State : Synthesized
@@ -31,16 +31,16 @@ Table of Contents
 +----------------------------+------+-------+------------+-----------+-------+
 |          Site Type         | Used | Fixed | Prohibited | Available | Util% |
 +----------------------------+------+-------+------------+-----------+-------+
-| Slice LUTs*                | 9292 |     0 |          0 |     63400 | 14.66 |
-|   LUT as Logic             | 9287 |     0 |          0 |     63400 | 14.65 |
+| Slice LUTs*                | 9490 |     0 |          0 |     63400 | 14.97 |
+|   LUT as Logic             | 9485 |     0 |          0 |     63400 | 14.96 |
 |   LUT as Memory            |    5 |     0 |          0 |     19000 |  0.03 |
 |     LUT as Distributed RAM |    0 |     0 |            |           |       |
 |     LUT as Shift Register  |    5 |     0 |            |           |       |
-| Slice Registers            | 7294 |     0 |          0 |    126800 |  5.75 |
-|   Register as Flip Flop    | 7294 |     0 |          0 |    126800 |  5.75 |
+| Slice Registers            | 7428 |     0 |          0 |    126800 |  5.86 |
+|   Register as Flip Flop    | 7428 |     0 |          0 |    126800 |  5.86 |
 |   Register as Latch        |    0 |     0 |          0 |    126800 |  0.00 |
-| F7 Muxes                   |  264 |     0 |          0 |     31700 |  0.83 |
-| F8 Muxes                   |  112 |     0 |          0 |     15850 |  0.71 |
+| F7 Muxes                   |  247 |     0 |          0 |     31700 |  0.78 |
+| F8 Muxes                   |  107 |     0 |          0 |     15850 |  0.68 |
 +----------------------------+------+-------+------------+-----------+-------+
 * Warning! The Final LUT count, after physical optimizations and full implementation, is typically lower. Run opt_design after synthesis, if not already completed, for a more realistic count.
 Warning! LUT value is adjusted to account for LUT combining.
@@ -58,8 +58,8 @@ Warning! LUT value is adjusted to account for LUT combining.
 | 0     |            _ |         Set |            - |
 | 0     |            _ |       Reset |            - |
 | 0     |          Yes |           - |            - |
-| 33    |          Yes |           - |          Set |
-| 5265  |          Yes |           - |        Reset |
+| 35    |          Yes |           - |          Set |
+| 5397  |          Yes |           - |        Reset |
 | 22    |          Yes |         Set |            - |
 | 1974  |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
@@ -95,9 +95,9 @@ Warning! LUT value is adjusted to account for LUT combining.
 +-----------------------------+------+-------+------------+-----------+-------+
 |          Site Type          | Used | Fixed | Prohibited | Available | Util% |
 +-----------------------------+------+-------+------------+-----------+-------+
-| Bonded IOB                  |   25 |    25 |          0 |       210 | 11.90 |
-|   IOB Master Pads           |   14 |       |            |           |       |
-|   IOB Slave Pads            |   11 |       |            |           |       |
+| Bonded IOB                  |   50 |    50 |          0 |       210 | 23.81 |
+|   IOB Master Pads           |   22 |       |            |           |       |
+|   IOB Slave Pads            |   27 |       |            |           |       |
 | Bonded IPADs                |    0 |     0 |          0 |         2 |  0.00 |
 | PHY_CONTROL                 |    0 |     0 |          0 |         6 |  0.00 |
 | PHASER_REF                  |    0 |     0 |          0 |         6 |  0.00 |
@@ -153,23 +153,24 @@ Warning! LUT value is adjusted to account for LUT combining.
 +------------+------+---------------------+
 |  Ref Name  | Used | Functional Category |
 +------------+------+---------------------+
-| FDCE       | 5265 |        Flop & Latch |
-| LUT6       | 4401 |                 LUT |
-| LUT5       | 2468 |                 LUT |
+| FDCE       | 5397 |        Flop & Latch |
+| LUT6       | 4485 |                 LUT |
+| LUT5       | 2555 |                 LUT |
 | FDRE       | 1974 |        Flop & Latch |
-| LUT2       | 1467 |                 LUT |
-| LUT3       | 1192 |                 LUT |
-| LUT4       | 1159 |                 LUT |
-| CARRY4     |  484 |          CarryLogic |
-| MUXF7      |  264 |               MuxFx |
-| LUT1       |  215 |                 LUT |
-| MUXF8      |  112 |               MuxFx |
-| FDPE       |   33 |        Flop & Latch |
+| LUT2       | 1341 |                 LUT |
+| LUT4       | 1249 |                 LUT |
+| LUT3       | 1149 |                 LUT |
+| CARRY4     |  494 |          CarryLogic |
+| MUXF7      |  247 |               MuxFx |
+| LUT1       |  231 |                 LUT |
+| MUXF8      |  107 |               MuxFx |
+| FDPE       |   35 |        Flop & Latch |
+| IBUF       |   28 |                  IO |
+| OBUF       |   22 |                  IO |
 | FDSE       |   22 |        Flop & Latch |
-| OBUF       |   21 |                  IO |
 | RAMB36E1   |   16 |        Block Memory |
 | SRL16E     |    5 |  Distributed Memory |
-| IBUF       |    4 |                  IO |
+| OBUFT      |    3 |                  IO |
 | BUFG       |    2 |               Clock |
 | STARTUPE2  |    1 |              Others |
 | MMCME2_ADV |    1 |               Clock |

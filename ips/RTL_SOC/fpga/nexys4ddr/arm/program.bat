@@ -1,9 +1,9 @@
 @echo off
 rem ===========================================================================
-rem RISCFORGE 1TOPS - program the Nexys 4 DDR flash and boot from it
-rem   program.bat                flash out\nexys4ddr_pong.mcs and reboot
+rem RISCFORGE 1TOPS - program the Nexys 4 DDR with the robotic arm demo and boot from flash
+rem   program.bat                flash out\nexys4ddr_arm.mcs and reboot
 rem   program.bat flash <fw>     flash out\nexys4ddr_<fw>.mcs
-rem   program.bat jtag           load out\nexys4ddr_top.bit over JTAG only
+rem   program.bat jtag           load out\top_arm.bit over JTAG only
 rem Programming uses JTAG, so a terminal open on the board's COM port is fine.
 rem Vivado's logs go to work\.
 rem ===========================================================================

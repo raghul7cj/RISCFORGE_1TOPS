@@ -1,13 +1,58 @@
 // =============================================================================
-// RISCFORGE 1TOPS — Nexys 4 DDR board top (XC7A100T-1CSG324C)
+// RISCFORGE 1TOPS — Nexys 4 DDR board top, test "arm" (XC7A100T-1CSG324C)
 // =============================================================================
-// Wraps riscforge_soc_subsystem for the Digilent Nexys 4 DDR. No SoC RTL is
-// changed; the two board-specific parameters inside the SoC are set with
-// defparam (see "Board overrides" below).
+// Build: build.bat   Program: program.bat   (both in this folder, fpga/nexys4ddr/arm/)
+// Drives the WidowX-200 arm (7 x Dynamixel XL430-W250, Protocol 2.0, 1 Mbps)
+// from riscforge_soc_subsystem. Same board top as test "pong" except:
+//   - SoC clock 32 MHz (was 40 MHz), so the SoC UART reaches exactly 1 Mbps:
+//     divisor {DLM,DLL} = 32 MHz / (16 x 1 Mbps) = 2.
+//   - The SoC UART drives the Dynamixel half-duplex DATA line on Pmod JA
+//     through an external 3.3 V <-> 5 V direction-controlled buffer
+//     (e.g. 74LVC1T45). GPIO[16] (DXL_DIR) selects the direction.
+//   - Switches and buttons are GPIO inputs; gpio_out drives LED[15:4].
+// No SoC RTL is changed; the two board-specific parameters inside the SoC are
+// set with defparam (see "Board overrides" below).
+//
+// Dynamixel bus (Pmod JA)
+//   JA1  DXL_DATA  inout   to the buffer's A port (3.3 V side)
+//   JA2  DXL_DIR   output  to the buffer's DIR: 1 = FPGA -> servos (transmit),
+//                          0 = servos -> FPGA (receive)
+//   JA5  GND, JA6  3.3 V   buffer VCCA
+//   DXL_DIR = 1: JA1 drives uart_sout, the UART receiver sees idle (1), so the
+//                SoC does not hear its own transmission.
+//   DXL_DIR = 0: JA1 is high-Z (pulled up), the UART receiver reads JA1.
+//   GPIO reset value is 0, so the bus is never driven before the firmware runs.
+//   The PC USB-UART (UART_RXD_OUT) always mirrors uart_sout: a terminal at
+//   1000000 baud shows the firmware's status text (sent with DXL_DIR = 0, so it
+//   never reaches the servos) and, as binary noise, the servo packets.
+//
+// Link select: SW13 (set it before reset / power-on)
+//   SW13 = 0  direct: the servo bus on Pmod JA as above.
+//   SW13 = 1  laptop relay: no Pmod wiring. The SoC UART talks to the laptop
+//             over the board's USB-UART (TX = UART_RXD_OUT, RX = UART_TXD_IN),
+//             and the laptop's dxl_relay.py passes the servo packets to a U2D2
+//             on the arm and the answers back. JA1 stays released and DXL_DIR
+//             stays 0. The firmware also reads SW13 (gpio_in[13]) and waits
+//             longer for servo answers (USB delay).
+//
+// GPIO map
+//   gpio_in[15:0]   SW[15:0]
+//   gpio_in[16]     BTNC   gpio_in[17] BTNU   gpio_in[18] BTND
+//   gpio_in[19]     BTNL   gpio_in[20] BTNR
+//   gpio_in[21]     PS2_CLK  pin level (keyboard from the USB HOST port)
+//   gpio_in[22]     PS2_DATA pin level
+//   gpio_out[11:0]  LED[15:4] = gpio_out[11:0]
+//   gpio_out[16]    DXL_DIR
+//   gpio_out[17]    1 = pull PS2_CLK low  (open drain; 0 = released)
+//   gpio_out[18]    1 = pull PS2_DATA low (open drain; 0 = released)
+//
+// Keyboard: the Nexys 4 DDR's PIC24 turns a USB keyboard on the USB HOST
+// connector into PS/2 on PS2_CLK (F4) / PS2_DATA (B2). Both pins are only
+// wired to GPIO here, as open-drain lines; the firmware decodes PS/2.
 //
 // Boot flash = the on-board QSPI configuration flash (Spansion S25FL128S, 16 MB)
 //   0x00_0000  FPGA bitstream (~3.8 MB for the XC7A100T)
-//   0x40_0000  firmware image (pong_flash.mem as raw bytes), FLASH_IMAGE_ADDR
+//   0x40_0000  firmware image (arm_flash.mem as raw bytes), FLASH_IMAGE_ADDR
 //   Both are merged into one .mcs by build.tcl (write_cfgmem).
 //
 // Flash clock: the flash SCK is the dedicated configuration pin CCLK (E9),
@@ -21,11 +66,8 @@
 //   DQ0 = MOSI (spi_sdo0_o)   DQ1 = MISO (spi_sdi1_i)   DQ2 = WP#  DQ3 = HOLD#
 //   WP# and HOLD# are driven high.
 //
-// Clock: the SoC runs at 40 MHz from an MMCM (100 MHz x 10 / 25). At 100 MHz
-// the worst path - core MMIO address -> hybrid_mem_interface -> AXI-Lite
-// crossbar -> axi_lite_to_apb -> response -> core stall -> next-PC -> ISRAM
-// address - is ~21.6 ns in one cycle, so the design does not close at 10 ns.
-// Firmware must be built for SOC_CLK_HZ (mem/pong/build.py CLK_HZ).
+// Clock: the SoC runs at 32 MHz from an MMCM (100 MHz x 8 / 25). Firmware must
+// be built for SOC_CLK_HZ (mem/arm/arm.c CLK_HZ).
 //
 // Reset: CPU_RESETN (active low) holds the SoC in hard reset. Releasing it
 // starts a cold boot, so the button re-runs boot from flash. The SoC
@@ -36,15 +78,14 @@
 //   LED[1]  pre-boot dummy clocks done
 //   LED[2]  any bus-timeout monitor fired (should stay off)
 //   LED[3]  UART TX activity (stretched)
-//   LED[15:8] gpio_out_o[7:0]
+//   LED[15:4] gpio_out_o[11:0] (meaning set by the firmware, see arm.c)
 //
 // Simulation: STARTUPE2 and the MMCM exist only under `SYNTHESIS (Vivado
 // defines it). In simulation the SoC runs directly on CLK100MHZ, and the
-// flash clock is the internal net flash_sck, which tb/soc_nexys4ddr_tb.sv
-// connects to its flash model.
+// flash clock is the internal net flash_sck.
 // =============================================================================
 
-module nexys4ddr_top
+module top_arm
   import gpio_reg_pkg::GPIOCount;
 #(
   // Boot ROM image. build.tcl passes an absolute path; the default is the
@@ -58,8 +99,8 @@ module nexys4ddr_top
   input  logic        CLK100MHZ,
   input  logic        CPU_RESETN,
 
-  input  logic        UART_TXD_IN,     // PC -> FPGA
-  output logic        UART_RXD_OUT,    // FPGA -> PC
+  input  logic        UART_TXD_IN,     // PC -> FPGA (used in laptop-relay mode, SW13 = 1)
+  output logic        UART_RXD_OUT,    // FPGA -> PC (mirror of the SoC UART TX)
 
   output logic        QSPI_CSN,
   output logic        QSPI_DQ0,        // MOSI
@@ -67,18 +108,35 @@ module nexys4ddr_top
   output logic        QSPI_DQ2,        // WP#
   output logic        QSPI_DQ3,        // HOLD#
 
+  input  logic [15:0] SW,
+  input  logic        BTNC,
+  input  logic        BTNU,
+  input  logic        BTND,
+  input  logic        BTNL,
+  input  logic        BTNR,
+
+  inout  wire         DXL_DATA,        // Pmod JA1
+  output logic        DXL_DIR,         // Pmod JA2
+
+  inout  wire         PS2_CLK,         // from the PIC24 (USB HOST keyboard)
+  inout  wire         PS2_DATA,
+
   output logic [15:0] LED
 );
 
   // Firmware word counts (FW_NUM_INSTR_WORDS / FW_NUM_DATA_WORDS) generated
-  // by mem/pong/build.py. Vivado: +incdir mem/pong. Simulation: mem/pong/sim_build.
+  // by mem/arm/build.py. Vivado: +incdir mem/arm.
   `include "fw_params.svh"
 
   localparam int unsigned NR_GPIOS   = GPIOCount;
-  localparam int unsigned SOC_CLK_HZ = 40_000_000;
+  localparam int unsigned SOC_CLK_HZ = 32_000_000;
+
+  localparam int unsigned GPIO_DXL_DIR      = 16;
+  localparam int unsigned GPIO_PS2_CLK_LOW  = 17;
+  localparam int unsigned GPIO_PS2_DATA_LOW = 18;
 
   // ───────────────────────────────────────────────────────────────────────
-  //  SoC clock: 40 MHz from the 100 MHz oscillator
+  //  SoC clock: 32 MHz from the 100 MHz oscillator
   // ───────────────────────────────────────────────────────────────────────
   logic clk;            // SoC clock, everything below runs on it
   logic clk_locked;
@@ -89,8 +147,8 @@ module nexys4ddr_top
   MMCME2_BASE #(
     .CLKIN1_PERIOD    ( 10.000 ),   // 100 MHz
     .DIVCLK_DIVIDE    ( 1      ),
-    .CLKFBOUT_MULT_F  ( 10.000 ),   // VCO 1000 MHz
-    .CLKOUT0_DIVIDE_F ( 25.000 )    // 40 MHz
+    .CLKFBOUT_MULT_F  ( 8.000  ),   // VCO 800 MHz
+    .CLKOUT0_DIVIDE_F ( 25.000 )    // 32 MHz
   ) u_mmcm (
     .CLKIN1    ( CLK100MHZ  ),
     .CLKFBIN   ( clkfb_buf  ),
@@ -197,13 +255,25 @@ module nexys4ddr_top
   logic                       boot_done;
   logic                       i2c_scl_o, i2c_scl_oen_o, i2c_sda_o, i2c_sda_oen_o, i2c_interrupt_o;
   logic [3:0]                 timer0_irq, timer1_irq;
-  logic                       uart_sout, uart_int;
-  logic [NR_GPIOS-1:0]        gpio_out, gpio_tx_en, gpio_in_sync, gpio_lvl_irq;
+  logic                       uart_sin, uart_sout, uart_int;
+  logic [NR_GPIOS-1:0]        gpio_in, gpio_out, gpio_tx_en, gpio_in_sync, gpio_lvl_irq;
   logic                       gpio_global_irq;
   logic                       spi_clk, spi_csn0, spi_csn1, spi_sdo0;
   logic [1:0]                 spi_events;
   logic [5:0]                 apb_timeout_sticky;
   logic                       axi_wr_timeout_sticky, axi_rd_timeout_sticky;
+
+  always_comb begin
+    gpio_in        = '0;
+    gpio_in[15:0]  = SW;
+    gpio_in[16]    = BTNC;
+    gpio_in[17]    = BTNU;
+    gpio_in[18]    = BTND;
+    gpio_in[19]    = BTNL;
+    gpio_in[20]    = BTNR;
+    gpio_in[21]    = PS2_CLK;
+    gpio_in[22]    = PS2_DATA;
+  end
 
   riscforge_soc_subsystem #(
     .TIMER0_CNT           ( 2                  ),
@@ -211,8 +281,7 @@ module nexys4ddr_top
     .SPI_BUFFER_DEPTH     ( 10                 ),
     .NUM_INSTR_WORDS      ( FW_NUM_INSTR_WORDS ),
     .NUM_DATA_WORDS       ( FW_NUM_DATA_WORDS  ),
-    .FLASH_POWERUP_CYCLES ( 30_000             )   // 750 us at 40 MHz (S25FL128S tPU = 300 us);
-                                                   // 300 us in simulation at 100 MHz (flash model)
+    .FLASH_POWERUP_CYCLES ( 30_000             )   // 940 us at 32 MHz (S25FL128S tPU = 300 us)
   ) u_soc (
     .clk_i                       ( clk                         ),
     .hard_rst_ni                 ( CPU_RESETN & preboot_done   ),
@@ -233,11 +302,11 @@ module nexys4ddr_top
     .timer0_irq_o                ( timer0_irq                  ),
     .timer1_irq_o                ( timer1_irq                  ),
 
-    .uart_sin_i                  ( UART_TXD_IN                 ),
+    .uart_sin_i                  ( uart_sin                    ),
     .uart_sout_o                 ( uart_sout                   ),
     .uart_int_o                  ( uart_int                    ),
 
-    .gpio_in_i                   ( '0                          ),
+    .gpio_in_i                   ( gpio_in                     ),
     .gpio_out_o                  ( gpio_out                    ),
     .gpio_tx_en_o                ( gpio_tx_en                  ),
     .gpio_in_sync_o              ( gpio_in_sync                ),
@@ -269,12 +338,28 @@ module nexys4ddr_top
   assign QSPI_DQ2     = 1'b1;
   assign QSPI_DQ3     = 1'b1;
 
+  // ───────────────────────────────────────────────────────────────────────
+  //  Dynamixel half-duplex bus
+  // ───────────────────────────────────────────────────────────────────────
+  wire relay   = SW[13];                                   // 1 = laptop relay link
+  wire dxl_dir = gpio_out[GPIO_DXL_DIR] & ~relay;
+
+  assign DXL_DATA     = dxl_dir ? uart_sout : 1'bz;
+  assign uart_sin     = relay   ? UART_TXD_IN :
+                        dxl_dir ? 1'b1        : DXL_DATA;
+  assign DXL_DIR      = dxl_dir;
   assign UART_RXD_OUT = uart_sout;
+
+  // ───────────────────────────────────────────────────────────────────────
+  //  PS/2 keyboard pins: open drain, decoded by the firmware through GPIO
+  // ───────────────────────────────────────────────────────────────────────
+  assign PS2_CLK  = gpio_out[GPIO_PS2_CLK_LOW]  ? 1'b0 : 1'bz;
+  assign PS2_DATA = gpio_out[GPIO_PS2_DATA_LOW] ? 1'b0 : 1'bz;
 
   // ───────────────────────────────────────────────────────────────────────
   //  LEDs
   // ───────────────────────────────────────────────────────────────────────
-  logic [21:0] tx_led_q;      // ~105 ms stretch at 40 MHz
+  logic [21:0] tx_led_q;      // ~130 ms stretch at 32 MHz
 
   always_ff @(posedge clk) begin
     if (!uart_sout)          tx_led_q <= '1;
@@ -285,7 +370,6 @@ module nexys4ddr_top
   assign LED[1]    = preboot_done;
   assign LED[2]    = |{apb_timeout_sticky, axi_wr_timeout_sticky, axi_rd_timeout_sticky};
   assign LED[3]    = (tx_led_q != 0);
-  assign LED[7:4]  = '0;
-  assign LED[15:8] = gpio_out[7:0];
+  assign LED[15:4] = gpio_out[11:0];
 
-endmodule : nexys4ddr_top
+endmodule : top_arm
