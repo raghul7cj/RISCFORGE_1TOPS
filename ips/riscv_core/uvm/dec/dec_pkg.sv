@@ -282,6 +282,7 @@ endpackage
 
 module dec_tb;
   import uvm_pkg::*;
+  import dec_pkg::*;
   logic clk = 1'b0;
   always #5 clk = ~clk;
   dec_if ifc(clk);

@@ -212,6 +212,7 @@ endpackage
 
 module alu_tb;
   import uvm_pkg::*;
+  import alu_pkg::*;
   logic clk = 1'b0;
   always #5 clk = ~clk;
   alu_if ifc(clk);

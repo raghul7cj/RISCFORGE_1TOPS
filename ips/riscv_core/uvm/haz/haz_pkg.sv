@@ -241,6 +241,7 @@ endpackage
 
 module haz_tb;
   import uvm_pkg::*;
+  import haz_pkg::*;
   import haz_types_pkg::*;
   logic clk = 1'b0;
   always #5 clk = ~clk;
