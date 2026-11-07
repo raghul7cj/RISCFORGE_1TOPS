@@ -107,6 +107,15 @@ _start:
   li   t1, 0x10
   sw   t1, 0x00(s1)
   RO   s1, 0x00,          0x00000001, 71
+  li   t0, 2
+  sw   t0, SPI_CLKDIV(s1)
+  li   t0, 0x00100000
+  sw   t0, SPI_LEN(s1)
+  li   t0, 0xBEEF0000
+  sw   t0, SPI_TXFIFO(s1)
+  li   t0, SPI_CMD_WR
+  sw   t0, SPI_STATUS(s1)
+  SPI_WAIT_IDLE
 
   UART_INIT
   sw   zero, UART_THR(s0)
