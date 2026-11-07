@@ -27,6 +27,9 @@ typedef struct packed {
   bit        wb_redirect;
   bit        stall_mul;
   bit        mem_stall;
+  bit        illegal;
+  bit [11:0] csr_raddr_e;
+  bit [11:0] csr_raddr_w;
 } haz_in_t;
 
 typedef struct packed {

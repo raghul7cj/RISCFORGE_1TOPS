@@ -15,6 +15,7 @@ package haz_pkg;
 
   class haz_item extends uvm_sequence_item;
     rand haz_in_t x;
+    rand bit      hit_e, hit_m, hit_w;
     haz_out_t     y;
 
     constraint c_rst  { x.rst dist {1 := 15, 0 := 1}; }
@@ -28,10 +29,12 @@ package haz_pkg;
       x.rs2_d dist {0 := 1, [1 : 3] :/ 6, [4 : 31] :/ 1};
     }
     constraint c_csr {
-      x.csr_raddr_d inside {12'h300, 12'h305, 12'h341, 12'hB00};
-      x.csr_addr_e  inside {12'h300, 12'h305, 12'h341, 12'hB00};
-      x.csr_addr_m  inside {12'h300, 12'h305, 12'h341, 12'hB00};
-      x.csr_addr_w  inside {12'h300, 12'h305, 12'h341, 12'hB00};
+      hit_e dist {1 := 1, 0 := 1};
+      hit_m dist {1 := 1, 0 := 1};
+      hit_w dist {1 := 1, 0 := 1};
+      if (hit_e) x.csr_addr_e == x.csr_raddr_d;
+      if (hit_m) x.csr_addr_m == x.csr_raddr_d;
+      if (hit_w) x.csr_addr_w == x.csr_raddr_d;
     }
     constraint c_ctl {
       x.wb_redirect  dist {1 := 1, 0 := 9};
@@ -259,8 +262,8 @@ module haz_tb;
     .ForwardAE(fwd_a), .ForwardBE(fwd_b), .ResultSrcE(x.result_src_e), .PCSrcE(x.pcsrc_e),
     .StallF(stall_f), .StallD(stall_d), .StallE(stall_e), .StallM(stall_m),
     .FlushD(flush_d), .FlushE(flush_e), .FlushM(flush_m), .FlushW(flush_w),
-    .illegal_instr(1'b0), .csr_valid_D(x.csr_valid_d), .csr_raddr_D(x.csr_raddr_d),
-    .csr_raddr_E(12'd0), .csr_raddr_W(12'd0), .csr_addr_E(x.csr_addr_e), .csr_addr_M(x.csr_addr_m),
+    .illegal_instr(x.illegal), .csr_valid_D(x.csr_valid_d), .csr_raddr_D(x.csr_raddr_d),
+    .csr_raddr_E(x.csr_raddr_e), .csr_raddr_W(x.csr_raddr_w), .csr_addr_E(x.csr_addr_e), .csr_addr_M(x.csr_addr_m),
     .csr_addr_W(x.csr_addr_w), .csr_write_en_W(x.csr_we_w), .csr_write_en_M(x.csr_we_m), .csr_write_en_E(x.csr_we_e),
     .flush_pipeline_onehot(x.flush_onehot), .valid_E(x.valid_e), .exc_valid_E(x.exc_e),
     .valid_M(x.valid_m), .exc_valid_M(x.exc_m), .wb_redirect(x.wb_redirect), .stallMUL(x.stall_mul),
