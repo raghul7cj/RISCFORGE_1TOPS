@@ -41,5 +41,6 @@ run with the check counts and functional coverage. `make cov_report` merges each
 
 ## Known result
 
-`dec_illegal_test` fails: `opcode_check.v` only checks the 7-bit opcode, so invalid funct3/funct7/shift
-encodings, `sret`/`uret` and bad SYSTEM forms are executed instead of raising an illegal-instruction exception.
+`dec_illegal_test` found that `illegal_instr` only checked the 7-bit opcode. Fixed in `Control_Unit_Top.v`
+(full funct3/funct7/shift/SYSTEM check); all tests now pass. Writes to read-only or non-existent CSRs are
+still not trapped: that needs a check in `csr_regfile.v`, outside the decoder.

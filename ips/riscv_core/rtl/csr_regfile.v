@@ -239,7 +239,7 @@ module csr_regfile #(
           MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'hFFFF0888) | (mie_r & ~32'hFFFF0888);      // Mask to writable bits (FLI [31:16], MEIE [11], MTIE [7], MSIE [3])
           MTVEC_ADDR:    mtvec_r    <= (csr_wdata_normal_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);    // Mask to writable bits and retain values of non writable bits
           MSCRATCH_ADDR: mscratch_r <= csr_wdata_normal_i; // Fully writable
-          MEPC_ADDR:     mepc_r     <= csr_wdata_normal_i; // Fully writable
+          MEPC_ADDR:     mepc_r     <= {csr_wdata_normal_i[31:2], 2'b00};
           MCAUSE_ADDR:   mcause_r   <= csr_wdata_normal_i; // Fully writable
           MTVAL_ADDR:    mtval_r    <= csr_wdata_normal_i; // Fully writable
           MCYCLE_ADDR:    mcycle_r[31:0]  <= csr_wdata_normal_i;

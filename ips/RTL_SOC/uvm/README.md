@@ -69,6 +69,7 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | `soc_bus_fault_test` | `bus_fault` | each of the 6 APB slaves hung (PREADY stuck) and an AXI hang: core gets access fault with correct mtval, every slot works again after release |
 | `soc_core_test` | `fetch_fault` | jump to unmapped addresses: instruction access fault, mcause 1, mtval/mepc = target |
 | `soc_hard_reset_test` | `warm_reset` | second hard reset mid-run, program reloaded, DSRAM retained, core reboots |
+| `soc_core_test` | `illegal` | 17 invalid encodings (bad funct3/funct7/shift, `sret`/`uret`, bad SYSTEM/FENCE) trap with mcause 2 and mtval = instruction; `wfi`, `fence.i`, M ops do not trap; `mepc[1:0]` reads 0 |
 | `soc_flash_boot_test` | `flash_data` | cold boot from SPI flash with code and a data section copied into DSRAM over AXI |
 
 ## Run (from this folder)
@@ -102,6 +103,8 @@ Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 | `uart_more` | With DLAB=1 every read except DLL/DLM returned a bus error (load access fault) | `obi_uart_register.sv`: offsets 2-7 readable with DLAB=1 |
 | `lsu_hazard` | `RS2_D` was taken from `InstrD[24:20]` for every instruction, so loads and other I-type instructions raised false load-use stalls when `imm[4:0]` matched the previous load's rd | `riscv_core/rtl/decode_cycle.v`: `RS2_D` only for R-type, store and branch |
 | `lsu_hazard` | `jal`/`jalr` right after a stalled load or MMIO access redirected the PC and was then flushed from EX, so `ra` was never written and `ret` jumped to 0 | `riscv_core/rtl/execute_cycle.v`: gate `PCSrcE` with `~StallM` |
+| `illegal` | Only the opcode was checked: invalid funct3/funct7/shift encodings, `sret`/`uret` and bad SYSTEM forms ran instead of trapping | `riscv_core/rtl/Control_Unit_Top.v`: full field check ORed into `illegal_instr` |
+| `illegal` | `mepc` kept bits [1:0] on a CSR write | `riscv_core/rtl/csr_regfile.v`: write `mepc` with bits [1:0] = 0 |
 | `fetch_fault` | A jump to an unmapped address did not trap; the core fetched garbage and ran away | `fetch_cycle.v`/`top.v`: fetch regions as parameters, instruction access fault (mcause 1) outside them; SoC sets boot ROM + ISRAM |
 
 ## Notes and limits
