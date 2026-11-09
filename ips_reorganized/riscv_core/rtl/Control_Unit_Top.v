@@ -90,6 +90,8 @@ module Control_Unit_Top(
     // ==================================================
     // Main Decoder
     // ==================================================
+    wire op_illegal;
+
     Main_Decoder Main_Decoder(
         .Op(Op),
         .RegWrite(RegWrite),
@@ -103,9 +105,27 @@ module Control_Unit_Top(
         .Jumpe(Jumpe),
         .LUISrcE(LUISrcE),
         .isLUIE(isLUIE),
-        .illegal_instr(illegal_instr),
+        .illegal_instr(op_illegal),
         .csr_valid(csr_valid)
     );
+
+    wire sys_ok = ({funct7, rs2, rs1, funct3, rd, Op} == 32'h0000_0073) ||
+                  ({funct7, rs2, rs1, funct3, rd, Op} == 32'h0010_0073) ||
+                  ({funct7, rs2, rs1, funct3, rd, Op} == 32'h3020_0073) ||
+                  ({funct7, rs2, rs1, funct3, rd, Op} == 32'h1050_0073);
+    wire field_illegal =
+        ((Op == 7'b1100111) && (funct3 != 3'b000)) ||
+        ((Op == 7'b1100011) && (funct3[2:1] == 2'b01)) ||
+        ((Op == 7'b0000011) && ((funct3 == 3'b011) || (funct3[2:1] == 2'b11))) ||
+        ((Op == 7'b0100011) && (funct3[2] || (funct3 == 3'b011))) ||
+        ((Op == 7'b0010011) && (funct3 == 3'b001) && (funct7 != 7'b0000000)) ||
+        ((Op == 7'b0010011) && (funct3 == 3'b101) && (funct7 != 7'b0000000) && (funct7 != 7'b0100000)) ||
+        ((Op == 7'b0110011) && !((funct7 == 7'b0000000) || (funct7 == 7'b0000001) ||
+                                 ((funct7 == 7'b0100000) && ((funct3 == 3'b000) || (funct3 == 3'b101))))) ||
+        ((Op == 7'b0001111) && (funct3[2:1] != 2'b00)) ||
+        ((Op == 7'b1110011) && (funct3 == 3'b100)) ||
+        ((Op == 7'b1110011) && (funct3 == 3'b000) && !sys_ok);
+    assign illegal_instr = op_illegal | field_illegal;
 
     // ==================================================
     // Load / Store Control Bus

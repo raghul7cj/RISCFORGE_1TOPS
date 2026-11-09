@@ -145,7 +145,10 @@ module decode_cycle(
     // Instruction field extraction
     // ==================================================
     assign RS1_D = InstrD[19:15];
-    assign RS2_D = InstrD[24:20];
+    wire uses_rs2_D = (InstrD[6:0] == 7'b0110011) ||
+                      (InstrD[6:0] == 7'b0100011) ||
+                      (InstrD[6:0] == 7'b1100011);
+    assign RS2_D = uses_rs2_D ? InstrD[24:20] : 5'd0;
 
     //ecall and ebreak detection
     wire is_ecall = (InstrD == 32'h00000073); // ECALL instruction encoding

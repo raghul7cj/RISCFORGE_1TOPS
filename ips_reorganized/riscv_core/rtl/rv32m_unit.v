@@ -36,6 +36,7 @@ module rv32m_unit (
     rv32m_mul u_mul (
         .clk       (clk),
         .rst_n     (rst_n),
+        .abort_i   (abort_i),
         .rs1       (rs1),
         .rs2       (rs2),
         .funct3    (funct3),

@@ -48,7 +48,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module fetch_cycle #(
-    parameter [31:0] RESET_PC = 32'h80000000  // first fetch address out of reset
+    parameter [31:0] RESET_PC = 32'h80000000,
+    parameter FETCH_CHECK_ENABLE = 1'b0,
+    parameter [31:0] FETCH_BASE0 = 32'h00000000,
+    parameter [31:0] FETCH_END0 = 32'h00000040,
+    parameter [31:0] FETCH_BASE1 = 32'h00010000,
+    parameter [31:0] FETCH_END1 = 32'h00018000
 )(
     input  clk,
     input  rst,                   // Active-low reset
@@ -180,10 +185,13 @@ module fetch_cycle #(
     //   Misaligned PC → instruction-address-misaligned (cause = 0).
     //   Checked against PC_next (the address about to be committed).
     // =========================================================================
-    assign exc_valid_F = (PC_next[1:0] != 2'b00);
-    assign exc_cause_F = 6'd0;
-    assign exc_pc_F    = PC_next;
-    assign exc_tval_F  = PC_next;
+    wire fetch_fault = FETCH_CHECK_ENABLE &&
+        !(((FETCH_END0 > FETCH_BASE0) && ((PCF - FETCH_BASE0) < (FETCH_END0 - FETCH_BASE0))) ||
+          ((FETCH_END1 > FETCH_BASE1) && ((PCF - FETCH_BASE1) < (FETCH_END1 - FETCH_BASE1))));
+    assign exc_valid_F = fetch_fault || (PC_next[1:0] != 2'b00);
+    assign exc_cause_F = fetch_fault ? 6'd1 : 6'd0;
+    assign exc_pc_F    = fetch_fault ? PCF : PC_next;
+    assign exc_tval_F  = fetch_fault ? PCF : PC_next;
 
     // =========================================================================
     // STALL EXPORT TO HAZARD UNIT

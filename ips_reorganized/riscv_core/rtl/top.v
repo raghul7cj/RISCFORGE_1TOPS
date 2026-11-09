@@ -22,7 +22,12 @@
 
 module top #(
     // First instruction address fetched out of reset.
-    parameter [31:0] RESET_PC = 32'h80000000
+    parameter [31:0] RESET_PC = 32'h80000000,
+    parameter FETCH_CHECK_ENABLE = 1'b0,
+    parameter [31:0] FETCH_BASE0 = 32'h00000000,
+    parameter [31:0] FETCH_END0 = 32'h00000040,
+    parameter [31:0] FETCH_BASE1 = 32'h00010000,
+    parameter [31:0] FETCH_END1 = 32'h00018000
 )(
     input clk,
     input rst,
@@ -293,7 +298,10 @@ module top #(
 
     // ---------------- IF ----------------
     fetch_cycle #(
-        .RESET_PC(RESET_PC)
+        .RESET_PC(RESET_PC),
+        .FETCH_CHECK_ENABLE(FETCH_CHECK_ENABLE),
+        .FETCH_BASE0(FETCH_BASE0), .FETCH_END0(FETCH_END0),
+        .FETCH_BASE1(FETCH_BASE1), .FETCH_END1(FETCH_END1)
     ) Fetch (
         .clk(clk),
         .rst(rst),
@@ -378,6 +386,7 @@ module top #(
         .clk(clk),
         .rst_n(rst),
         .FlushM(FlushM),
+        .wb_redirect_i(wb_trap_redirect),
         .FlushE(FlushE),
         .StallM(StallM),
         .RegWriteE(RegWriteE),

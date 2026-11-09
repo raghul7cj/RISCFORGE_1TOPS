@@ -23,6 +23,7 @@
 module rv32m_mul (
     input         clk,
     input         rst_n,
+    input         abort_i,
  
     // Inputs (from EX stage)
     input  [31:0] rs1,
@@ -132,7 +133,7 @@ assign corr = {
     integer k;
  
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+        if (!rst_n || abort_i) begin
             s1_valid  <= 0;
         end else begin
             s1_valid  <= valid_in;
@@ -226,7 +227,7 @@ assign corr = {
     reg        s2_upper;
  
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+        if (!rst_n || abort_i) begin
             s2_valid <= 0;
         end else begin
             s2_valid   <= s1_valid;
@@ -249,7 +250,7 @@ assign corr = {
     //wire [65:0] product = s2_sum + s2_carry;
  
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+        if (!rst_n || abort_i) begin
             valid_out <= 0;
         end else begin
             valid_out <= s2_valid;
