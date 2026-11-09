@@ -187,7 +187,7 @@ module csr_regfile #(
           MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'hFFFF0888) | (mie_r & ~32'hFFFF0888);
           MTVEC_ADDR:    mtvec_r    <= (csr_wdata_normal_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);
           MSCRATCH_ADDR: mscratch_r <= csr_wdata_normal_i;
-          MEPC_ADDR:     mepc_r     <= csr_wdata_normal_i;
+          MEPC_ADDR:     mepc_r     <= {csr_wdata_normal_i[31:2], 2'b00};
           MCAUSE_ADDR:   mcause_r   <= csr_wdata_normal_i;
           MTVAL_ADDR:    mtval_r    <= csr_wdata_normal_i;
           MINTPRIO_ADDR: mintprio_r <= csr_wdata_normal_i[1:0]; // [31:2] ignored

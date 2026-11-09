@@ -1242,7 +1242,12 @@ module riscforge_soc_subsystem
   // ===========================================================================
 
   top #(
-    .RESET_PC ( 32'h0000_0000 )   // BootROM base — see boot_rom.sv for the image
+    .RESET_PC ( 32'h0000_0000 ),
+    .FETCH_CHECK_ENABLE(1'b1),
+    .FETCH_BASE0(32'h0000_0000),
+    .FETCH_END0(BOOTROM_NUM_WORDS * 4),
+    .FETCH_BASE1(32'h0001_0000),
+    .FETCH_END1(32'h0001_0000 + ISRAM_NUM_WORDS * 4)
   ) i_riscv_core (
     .clk            ( clk_i               ),
     .rst            ( core_rst_n          ),  // active-low
