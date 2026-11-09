@@ -21,6 +21,18 @@ module tb_top;
   i2c_if      i2c   (clk);
   irq_if      irq   (clk);
   trace_if    trace (clk);
+  reg_bus_if  regbus (clk);
+
+  assign regbus.rst_n = dut.core_rst_n;
+  for (genvar i = 0; i < 6; i++) begin : g_regbus
+    assign regbus.psel[i]    = dut.apb_req[i].psel;
+    assign regbus.penable[i] = dut.apb_req[i].penable;
+    assign regbus.pwrite[i]  = dut.apb_req[i].pwrite;
+    assign regbus.paddr[i]   = dut.apb_req[i].paddr[11:0];
+    assign regbus.pwdata[i]  = dut.apb_req[i].pwdata;
+    assign regbus.pready[i]  = dut.apb_resp[i].pready;
+    assign regbus.prdata[i]  = dut.apb_resp[i].prdata;
+  end
 
   logic       i2c_scl_o, i2c_scl_oen, i2c_sda_o, i2c_sda_oen;
   logic [3:0] timer0_irq, timer1_irq;
@@ -202,6 +214,7 @@ module tb_top;
     uvm_config_db #(virtual i2c_if)::set(null, "uvm_test_top.env.i2c", "vif", i2c);
     uvm_config_db #(virtual irq_if)::set(null, "uvm_test_top.env.irq", "vif", irq);
     uvm_config_db #(virtual trace_if)::set(null, "uvm_test_top.env.trace", "vif", trace);
+    uvm_config_db #(virtual reg_bus_if)::set(null, "uvm_test_top.env.regcov", "vif", regbus);
     run_test("soc_hello_test");
   end
 endmodule

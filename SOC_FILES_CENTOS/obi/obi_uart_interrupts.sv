@@ -96,7 +96,7 @@ module obi_uart_interrupts import obi_uart_pkg::*; #()
   always_comb begin
     //--Defaults----------------------------------------------------------------------------------
     reg_isr_o.id       = 3'b000;
-    reg_isr_o.fifos_en = 2'b11; // Indicate 16550A FIFO support
+    reg_isr_o.fifos_en = {2{reg_read_i.fcr.fifo_en}}; // 16550A: 2'b11 only while FIFOs are enabled
     reg_isr_o.unused4  = 1'b0;
     reg_isr_o.unused5  = 1'b0;
 

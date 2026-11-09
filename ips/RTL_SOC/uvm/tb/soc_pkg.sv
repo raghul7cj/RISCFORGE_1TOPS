@@ -11,6 +11,7 @@ package soc_pkg;
   `include "env/trace_monitor.sv"
   `include "env/soc_scoreboard.sv"
   `include "env/soc_coverage.sv"
+  `include "env/reg_cov.sv"
   `include "env/soc_env.sv"
   `include "seq/soc_seqs.sv"
   `include "tests/soc_base_test.sv"

@@ -9,7 +9,7 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | --- | --- |
 | `if/` | ctrl, uart, gpio, spi, i2c, irq, trace interfaces |
 | `agents/` | UART (driver + monitor), GPIO (driver + monitor), SPI slave (on `csn1`), I2C slave (addr `0x50`) |
-| `env/` | config, irq monitor, trace monitor, scoreboard, coverage, env |
+| `env/` | config, irq monitor, trace monitor, scoreboard, coverage, register-field coverage (`reg_cov.sv`, field table in `reg_fields.svh`), env |
 | `seq/` | UART send, GPIO set |
 | `tests/` | base test + one test per block |
 | `tb/` | package, assertions (6 APB slaves, core, bus timeouts), `tb_top` |
@@ -70,6 +70,7 @@ APB I2C / Timer0 / Timer1 / UART / GPIO / SPI and the bootloader.
 | `soc_core_test` | `fetch_fault` | jump to unmapped addresses: instruction access fault, mcause 1, mtval/mepc = target |
 | `soc_hard_reset_test` | `warm_reset` | second hard reset mid-run, program reloaded, DSRAM retained, core reboots |
 | `soc_core_test` | `illegal` | 17 invalid encodings (bad funct3/funct7/shift, `sret`/`uret`, bad SYSTEM/FENCE) trap with mcause 2 and mtval = instruction; `wfi`, `fence.i`, M ops do not trap; `mepc[1:0]` reads 0 |
+| `soc_core_test` | `regs` | every software register of GPIO, UART, SPI, I2C, Timer0/1 (both channels): reset value, all-ones / all-zeros / `0xA5A5A5A5` / `0x5A5A5A5A` write and read-back, read-only and reserved bits |
 | `soc_flash_boot_test` | `flash_data` | cold boot from SPI flash with code and a data section copied into DSRAM over AXI |
 
 ## Run (from this folder)
@@ -84,6 +85,8 @@ make run TEST=soc_spi_test PROG=spi GUI=1
 ```
 
 Results: `logs/<test>_<prog>.log`, `logs/summary.txt`, `rtl_trace.log`.
+
+Register-field coverage: every software-visible field of GPIO, UART, SPI, I2C and both timers (322 fields) has its own bins (write 0, write all-ones, write other value, read). Each test log ends with a `[REGCOV]` line; with `COV=1` the per-field covergroups are also in the merged `imc` database.
 
 Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 
@@ -105,6 +108,8 @@ Plusargs: `+HEX=`, `+TIMEOUT=`, `+UART_BIT_CLKS=`, `+UART_EXPECT=`.
 | `lsu_hazard` | `jal`/`jalr` right after a stalled load or MMIO access redirected the PC and was then flushed from EX, so `ra` was never written and `ret` jumped to 0 | `riscv_core/rtl/execute_cycle.v`: gate `PCSrcE` with `~StallM` |
 | `illegal` | Only the opcode was checked: invalid funct3/funct7/shift encodings, `sret`/`uret` and bad SYSTEM forms ran instead of trapping | `riscv_core/rtl/Control_Unit_Top.v`: full field check ORed into `illegal_instr` |
 | `illegal` | `mepc` kept bits [1:0] on a CSR write | `riscv_core/rtl/csr_regfile.v`: write `mepc` with bits [1:0] = 0 |
+| `regs` | UART IIR always reported FIFOs enabled (`0xC1`), even with FIFOs off | `obi_uart_interrupts.sv`: IIR[7:6] follow FCR.fifo_en |
+| `regs` | UART IER[7:4] and MCR[7:5] are unused but kept written values | `obi_uart_register.sv`: mask IER to `0x0F`, MCR to `0x1F` on write |
 | `fetch_fault` | A jump to an unmapped address did not trap; the core fetched garbage and ran away | `fetch_cycle.v`/`top.v`: fetch regions as parameters, instruction access fault (mcause 1) outside them; SoC sets boot ROM + ISRAM |
 
 ## Notes and limits
