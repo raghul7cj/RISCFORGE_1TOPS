@@ -1,5 +1,5 @@
 xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
-TOOL:	xrun(64)	24.09-s001: Started on Nov 01, 2026 at 04:54:49 IST
+TOOL:	xrun(64)	24.09-s001: Started on Nov 09, 2026 at 20:06:38 IST
 xrun
 	-f ../tests/regtest.f
 		-f ../run.f
@@ -126,313 +126,13 @@ xrun
 		../tb/soc_regtest_tb.sv
 		-top soc_regtest_tb
 	-l logs/regtest.log
-file: ../../axi_lite_xbar/include/common_cells/addr_decode_dync.sv
-	module worklib.addr_decode_dync:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/addr_decode.sv
-	module worklib.addr_decode:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/fifo_v3.sv
-	module worklib.fifo_v3:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/fall_through_register.sv
-	module worklib.fall_through_register:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/spill_register.sv
-	module worklib.spill_register:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/spill_register_flushable.sv
-	module worklib.spill_register_flushable:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/counter.sv
-	module worklib.counter:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/rr_arb_tree.sv
-	module worklib.rr_arb_tree:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/lzc.sv
-	module worklib.lzc:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/onehot_to_bin.sv
-	module worklib.onehot_to_bin:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/delta_counter.sv
-	module worklib.delta_counter:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/id_queue.sv
-	module worklib.id_queue:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/sync.sv
-	module worklib.sync:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/common_cells/stream_register.sv
-	module worklib.stream_register:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/axi/axi_err_slv.sv
-	module worklib.axi_err_slv:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/axi/axi_atop_filter.sv
-	module worklib.axi_atop_filter:sv
-		errors: 0, warnings: 0
-	module worklib.axi_atop_filter_intf:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/axi/axi_lite_to_axi.sv
-	module worklib.axi_lite_to_axi:sv
-		errors: 0, warnings: 0
-	module worklib.axi_lite_to_axi_intf:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/axi/axi_lite_demux.sv
-	module worklib.axi_lite_demux:sv
-		errors: 0, warnings: 0
-	module worklib.axi_lite_demux_intf:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/include/axi/axi_lite_mux.sv
-	module worklib.axi_lite_mux:sv
-		errors: 0, warnings: 0
-	module worklib.axi_lite_mux_intf:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_xbar/axi_lite_xbar.sv
-	module worklib.axi_lite_xbar:sv
-		errors: 0, warnings: 0
-	module worklib.axi_lite_xbar_intf:sv
-		errors: 0, warnings: 0
-file: ../../axi_lite_to_apb/rtl/axi_lite_to_apb.sv
-	module worklib.axi_lite_to_apb:sv
-		errors: 0, warnings: 0
-	module worklib.axi_lite_to_apb_intf:sv
-		errors: 0, warnings: 0
-file: ../../bus_monitors/apb_timeout_monitor.sv
-	module worklib.apb_timeout_monitor:sv
-		errors: 0, warnings: 0
-file: ../../bus_monitors/axi_lite_timeout_monitor.sv
-	module worklib.axi_lite_timeout_monitor:sv
-		errors: 0, warnings: 0
-file: ../../apb_i2c-master/rtl/i2c_master_bit_ctrl.sv
-	module worklib.i2c_master_bit_ctrl:sv
-		errors: 0, warnings: 0
-file: ../../apb_i2c-master/rtl/i2c_master_byte_ctrl.sv
-	module worklib.i2c_master_byte_ctrl:sv
-		errors: 0, warnings: 0
-file: ../../apb_i2c-master/rtl/apb_i2c.sv
-	module worklib.apb_i2c:sv
-		errors: 0, warnings: 0
-file: ../../apb_timer/apb_timer/timer.sv
-	module worklib.timer:sv
-		errors: 0, warnings: 0
-file: ../../apb_timer/apb_timer/apb_timer.sv
-	module worklib.apb_timer:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/apb_to_obi.sv
-	module worklib.apb_to_obi:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart_baudgen.sv
-	module worklib.obi_uart_baudgen:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart_rx.sv
-	module worklib.obi_uart_rx:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart_tx.sv
-	module worklib.obi_uart_tx:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart_interrupts.sv
-	module worklib.obi_uart_interrupts:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart_modem.sv
-	module worklib.obi_uart_modem:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart_register.sv
-	module worklib.obi_uart_register:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/obi/obi_uart.sv
-	module worklib.obi_uart:sv
-		errors: 0, warnings: 0
-file: ../../uart/rtl/apb_uart_wrap.sv
-	module worklib.apb_uart_wrap:sv
-		errors: 0, warnings: 0
-file: ../../uart/rtl/apb_uart.sv
-	module worklib.apb_uart:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/register_interface/reg_intf.sv
-	interface worklib.REG_BUS:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/register_interface/apb_to_reg.sv
-	module worklib.apb_to_reg:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/register_interface/prim_subreg_arb.sv
-	module worklib.prim_subreg_arb:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/register_interface/prim_subreg.sv
-	module worklib.prim_subreg:sv
-		errors: 0, warnings: 0
-file: ../../SOC_FILES/include/register_interface/prim_subreg_ext.sv
-	module worklib.prim_subreg_ext:sv
-		errors: 0, warnings: 0
-file: ../../gpio-master/rtl/gpio_input_stage_no_clk_gates.sv
-	module worklib.gpio_input_stage:sv
-		errors: 0, warnings: 0
-file: ../../gpio-master/rtl/gpio_reg_top.sv
-	module worklib.gpio_reg_top:sv
-		errors: 0, warnings: 0
-	module worklib.gpio_reg_top_intf:sv
-		errors: 0, warnings: 0
-file: ../../gpio-master/rtl/gpio.sv
-	module worklib.gpio:sv
-		errors: 0, warnings: 0
-	module worklib.gpio_intf:sv
-		errors: 0, warnings: 0
-file: ../../gpio-master/rtl/gpio_apb_wrap.sv
-	module worklib.gpio_apb_wrap:sv
-		errors: 0, warnings: 0
-	module worklib.gpio_apb_wrap_intf:sv
-		errors: 0, warnings: 0
-file: ../../spi/spi_master/spi_master_clkgen.sv
-	module worklib.spi_master_clkgen:sv
-		errors: 0, warnings: 0
-file: ../../spi/spi_master/spi_master_fifo.sv
-	module worklib.spi_master_fifo:sv
-		errors: 0, warnings: 0
-file: ../../spi/spi_master/spi_master_rx.sv
-	module worklib.spi_master_rx:sv
-		errors: 0, warnings: 0
-file: ../../spi/spi_master/spi_master_tx.sv
-	module worklib.spi_master_tx:sv
-		errors: 0, warnings: 0
-file: ../../spi/spi_master/spi_master_controller.sv
-	module worklib.spi_master_controller:sv
-		errors: 0, warnings: 0
+Recompiling... reason: file '../mem/regtest/fw_params.svh' is newer than expected.
+	expected: Thu Oct  1 17:30:57 2026
+	actual:   Mon Nov  9 20:05:53 2026
 file: ../../spi/spi_master/spi_master_apb_if.sv
 `define REG_STATUS 4'b0000 // BASEREG + 0x00
                                              |
 xmvlog: *W,MACRDF (../../spi/spi_master/spi_master_apb_if.sv,13|45): text macro 'REG_STATUS' redefined - replaced with new definition, Previous definition was found here ('/home/iiita/MALAY_SOC/rtl/apb_i2c-master/rtl/apb_i2c.sv',6|18 ).
-	module worklib.spi_master_apb_if:sv
-		errors: 0, warnings: 0
-file: ../../spi/spi_master/apb_spi_master.sv
-	module worklib.apb_spi_master:sv
-		errors: 0, warnings: 0
-file: ../../instr_module/Instruction_Memory.v
-	module worklib.Instruction_Memory_new:v
-		errors: 0, warnings: 0
-file: ../../bootloader/rtl/bootloader.sv
-	module worklib.bootloader:sv
-		errors: 0, warnings: 0
-file: ../rtl/sram_sp.sv
-	module worklib.sram_sp:sv
-		errors: 0, warnings: 0
-file: ../rtl/sram_mux.sv
-	module worklib.sram_mux:sv
-		errors: 0, warnings: 0
-file: ../rtl/axi_lite_sram_if.sv
-	module worklib.axi_lite_sram_if:sv
-		errors: 0, warnings: 0
-file: ../rtl/imem_sram_wrapper.sv
-	module worklib.imem_sram_wrapper:sv
-		errors: 0, warnings: 0
-file: ../rtl/boot_rom.sv
-	module worklib.boot_rom:sv
-		errors: 0, warnings: 0
-file: ../rtl/instr_fetch_demux.sv
-	module worklib.instr_fetch_demux:sv
-		errors: 0, warnings: 0
-file: ../rtl/riscforge_soc_subsystem.sv
-	module worklib.riscforge_soc_subsystem:sv
-		errors: 0, warnings: 0
-file: ../../spi_slave_infinion/S25fs512s/model/s25fs512s.sv
-	module worklib.s25fs512s:sv
-		errors: 0, warnings: 0
-	module worklib.BUFFER:sv
-		errors: 0, warnings: 0
-	module worklib.memory_features:sv
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/PC.v
-	module worklib.PC:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/PC_Adder.v
-	module worklib.PC_Adder:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/Mux2.v
-	module worklib.Mux2:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/Mux_3_by_1.v
-	module worklib.Mux_3_by_1:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/ALU.v
-	module worklib.ALU:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/ALU_Decoder.v
-	module worklib.ALU_Decoder:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/Main_Decoder.v
-	module worklib.Main_Decoder:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/Control_Unit_Top.v
-	module worklib.Control_Unit_Top:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/Sign_Extend.v
-	module worklib.Sign_Extend:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/Register_File.v
-	module worklib.Register_File:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/JB_unit.v
-	module worklib.JB_unit:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/opcode_check.v
-	module worklib.opcode_check:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/booth_enc.v
-	module worklib.booth_enc:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/csa.v
-	module worklib.csa:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/pp_gen.v
-	module worklib.pp_gen:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/rv32m_mul.v
-	module worklib.rv32m_mul:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/rv32m_div.v
-	module worklib.rv32m_div:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/rv32m_unit.v
-	module worklib.rv32m_unit:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/csr_regfile.v
-	module worklib.csr_regfile:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/wb_trap_mret_commit_controller.v
-	module worklib.wb_trap_mret_commit_controller:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/hazard_unit.v
-	module worklib.hazard_unit:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/imem_controller.v
-	module worklib.imem_controller:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/ls_unit.v
-	module worklib.ls_unit:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/fetch_cycle.v
-	module worklib.fetch_cycle:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/decode_cycle.v
-	module worklib.decode_cycle:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/execute_cycle.v
-	module worklib.execute_cycle:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/memory_cycle.v
-	module worklib.memory_cycle:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/writeback_cycle.v
-	module worklib.writeback_cycle:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/top.v
-	module worklib.top:v
-		errors: 0, warnings: 0
-file: ../../riscv_core/rtl/hybrid_mem_interface.sv
-	module worklib.hybrid_mem_interface:sv
-		errors: 0, warnings: 0
 file: ../tb/soc_regtest_tb.sv
 	module worklib.soc_regtest_tb:sv
 		errors: 0, warnings: 0
@@ -450,7 +150,7 @@ xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/ALU.v,25): Zero
 
     csr_regfile #(.XLEN(32)) csr_file (
                                     |
-xmelab: *W,CUVWSP (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/top.v,551|36): 2 output ports were not connected:
+xmelab: *W,CUVWSP (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/top.v,590|36): 2 output ports were not connected:
 xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/csr_regfile.v,11): csr_valid_o
 xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/csr_regfile.v,67): mcause_out_o
 
@@ -593,308 +293,128 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_mux.sv,449|95): String literal argument supplied to integer parameter.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.axi_lite_timeout_monitor:sv <0x1e3f2032>
+		worklib.axi_lite_timeout_monitor:sv <0x09aef624>
 			streams:  42, words: 33239
-		worklib.hybrid_mem_interface:sv <0x2d3596e2>
+		worklib.hybrid_mem_interface:sv <0x297deb32>
 			streams:  29, words: 18549
-		worklib.hazard_unit:v <0x3e2eba0a>
-			streams:  12, words:  5103
-		worklib.csr_regfile:v <0x4c125224>
-			streams:  31, words: 16885
-		worklib.wb_trap_mret_commit_controller:v <0x3b5eff64>
-			streams:  15, words:  3051
-		worklib.writeback_cycle:v <0x1079c6ae>
-			streams:   1, words:   553
-		worklib.ls_unit:v <0x5965cbab>
-			streams:   8, words:  7824
-		worklib.memory_cycle:v <0x256e970f>
-			streams:  14, words: 12854
-		worklib.rv32m_div:v <0x39a2401d>
-			streams:  23, words: 10350
-		worklib.csa:v <0x15e73c46>
-			streams:   1, words:  2182
-		worklib.csa:v <0x758a3d5b>
-			streams:   1, words:  2182
-		worklib.csa:v <0x28020825>
-			streams:   1, words:  3358
-		worklib.csa:v <0x486f0938>
-			streams:   1, words:  2183
-		worklib.csa:v <0x53350922>
-			streams:   1, words:  1613
-		worklib.pp_gen:v <0x26efa39d>
-			streams:   4, words:  2285
-		worklib.booth_enc:v <0x1c494a2c>
-			streams:   0, words:     0
-		worklib.rv32m_unit:v <0x00a28b21>
-			streams:  10, words:  2541
-		worklib.JB_unit:v <0x35b22dcb>
-			streams:   6, words:  1713
-		worklib.ALU:v <0x124a3783>
-			streams:   7, words:  2410
-		worklib.Mux2:v <0x53575db0>
-			streams:   1, words:   248
-		worklib.Mux_3_by_1:v <0x51514ad7>
-			streams:   2, words:   513
-		worklib.execute_cycle:v <0x1f129470>
-			streams:  27, words: 23306
-		worklib.Sign_Extend:v <0x0f5e0bee>
-			streams:   1, words:  2090
-		worklib.ALU_Decoder:v <0x0e98e1b9>
-			streams:   1, words:  3374
-		worklib.opcode_check:v <0x51ba57d7>
-			streams:   1, words:  1099
-		worklib.Main_Decoder:v <0x1f5276e8>
-			streams:   1, words:  5637
-		worklib.Control_Unit_Top:v <0x104b80f9>
-			streams:   3, words:  1982
-		worklib.decode_cycle:v <0x0bdf5dd9>
-			streams:  14, words: 29600
-		worklib.imem_controller:v <0x35cb421b>
-			streams:   5, words:  1626
-		worklib.PC_Adder:v <0x1559c584>
-			streams:   1, words:   176
-		worklib.PC:v <0x4f0b7585>
-			streams:   2, words:   503
-		worklib.top:v <0x427b322f>
-			streams:  11, words:  5394
-		worklib.spi_master_rx:sv <0x7c8d8533>
-			streams:   9, words:  6678
-		worklib.spi_master_tx:sv <0x60868fae>
-			streams:  10, words:  7288
-		worklib.spi_master_clkgen:sv <0x006d4aa7>
-			streams:   6, words:  3171
-		worklib.spi_master_controller:sv <0x08b032b8>
-			streams:  38, words: 48076
-		worklib.spi_master_fifo:sv <0x76c2891e>
-			streams:  10, words:  5091
-		worklib.spi_master_apb_if:sv <0x2fb853b2>
-			streams:  24, words: 18876
-		worklib.apb_spi_master:sv <0x0cb8b220>
-			streams:  92, words: 29828
-		worklib.gpio_input_stage:sv <0x6537a648>
-			streams:   5, words:  1546
-		worklib.prim_subreg_arb:sv <0x7c3b26b2>
-			streams:   2, words:   677
-		worklib.prim_subreg:sv <0x5124d049>
-			streams:   8, words:  2099
-		worklib.prim_subreg_ext:sv <0x64b3ae4c>
-			streams:   4, words:   706
-		worklib.prim_subreg_ext:sv <0x6fe7c30c>
-			streams:   4, words:   618
-		worklib.prim_subreg_ext:sv <0x63aa6901>
-			streams:   4, words:   536
-		worklib.prim_subreg_arb:sv <0x57c83dfb>
-			streams:   3, words:   665
-		worklib.prim_subreg:sv <0x449a0c20>
-			streams:   8, words:  2045
-		worklib.prim_subreg_arb:sv <0x6b2ea526>
-			streams:   3, words:   686
-		worklib.prim_subreg:sv <0x7ef3676d>
-			streams:   8, words:  2099
-		worklib.prim_subreg_ext:sv <0x5a8b1fd8>
-			streams:   4, words:   586
-		worklib.gpio_reg_top:sv <0x426dc32e>
-			streams: 2087, words: 1069401
 		worklib.apb_to_reg:sv <0x7d6a0165>
 			streams:   1, words:  1802
-		worklib.gpio_apb_wrap:sv <0x57c32814>
+		worklib.gpio_apb_wrap:sv <0x235f8de2>
 			streams:  14, words:  6049
-		worklib.obi_uart_interrupts:sv <0x00c66caf>
-			streams:   5, words:  5769
-		worklib.obi_uart_tx:sv <0x4b04e6dc>
-			streams:  18, words: 15310
-		worklib.delta_counter:sv <0x36046a79>
-			streams:   4, words:  1593
-		worklib.counter:sv <0x6ccf1117>
-			streams:   3, words:   900
-		worklib.obi_uart_rx:sv <0x4928c1d0>
-			streams:  37, words: 32635
-		worklib.delta_counter:sv <0x7588d616>
-			streams:   4, words:  1593
-		worklib.counter:sv <0x25014986>
-			streams:   3, words:   991
-		worklib.delta_counter:sv <0x3bfc4965>
-			streams:   4, words:  1644
-		worklib.counter:sv <0x4486cea7>
-			streams:   3, words:   914
-		worklib.obi_uart_baudgen:sv <0x7df3cdc3>
-			streams:  20, words:  6380
-		worklib.sync:sv <0x3771cf65>
-			streams:   3, words:   681
-		worklib.obi_uart_modem:sv <0x3d4f7a24>
-			streams:  19, words:  8450
-		worklib.obi_uart_register:sv <0x5ca5bd3d>
-			streams:  21, words: 31632
-		worklib.apb_to_obi:sv <0x126b7905>
-			streams:  17, words: 19570
-		worklib.i2c_master_bit_ctrl:sv <0x1ae37657>
-			streams:  36, words: 22803
-		worklib.i2c_master_byte_ctrl:sv <0x2f03f695>
-			streams:  31, words: 20008
-		worklib.apb_i2c:sv <0x7d3d6f71>
-			streams:  35, words: 12746
-		worklib.apb_timeout_monitor:sv <0x0fea48cf>
+		worklib.apb_timeout_monitor:sv <0x5aa4563f>
 			streams:  11, words:  4448
-		worklib.apb_timeout_monitor:sv <0x6818b803>
+		worklib.apb_timeout_monitor:sv <0x3d56a6f3>
 			streams:  11, words:  4430
-		worklib.addr_decode_dync:sv <0x03ef15ac>
+		worklib.addr_decode_dync:sv <0x7748df82>
 			streams:   4, words: 16815
-		worklib.fifo_v3:sv <0x7adac3c5>
+		worklib.fifo_v3:sv <0x279f495f>
 			streams:  20, words: 18934
-		worklib.fifo_v3:sv <0x73f3706c>
+		worklib.fifo_v3:sv <0x2eb6faf6>
 			streams:  20, words: 17472
-		worklib.fifo_v3:sv <0x267f1b6f>
+		worklib.fifo_v3:sv <0x7b3a91f5>
 			streams:  20, words: 18972
-		worklib.spill_register_flushable:sv <0x792e92db>
+		worklib.spill_register_flushable:sv <0x53ebed5a>
 			streams:   3, words:   680
-		worklib.spill_register_flushable:sv <0x19b87ecb>
+		worklib.spill_register_flushable:sv <0x3cc5fd41>
 			streams:  23, words: 10946
-		worklib.fifo_v3:sv <0x18f49951>
+		worklib.fifo_v3:sv <0x1e77a0d1>
 			streams:  20, words: 16856
-		worklib.spill_register_flushable:sv <0x5d82406c>
+		worklib.spill_register_flushable:sv <0x77473fed>
 			streams:   3, words:   548
-		worklib.spill_register_flushable:sv <0x16af3d19>
+		worklib.spill_register_flushable:sv <0x3c6a4298>
 			streams:   3, words:   680
-		worklib.fifo_v3:sv <0x2204cc98>
+		worklib.fifo_v3:sv <0x2487f518>
 			streams:  20, words: 16856
-		worklib.spill_register_flushable:sv <0x7220ac71>
+		worklib.spill_register_flushable:sv <0x575d2ffb>
 			streams:  23, words: 10946
-		worklib.fifo_v3:sv <0x7ebe7182>
+		worklib.fifo_v3:sv <0x783d4802>
 			streams:  20, words: 16856
-		worklib.delta_counter:sv <0x20f93349>
-			streams:   4, words:  1641
-		worklib.counter:sv <0x083dbbec>
-			streams:   3, words:   911
-		worklib.fifo_v3:sv <0x70483b3c>
+		worklib.fifo_v3:sv <0x38329907>
 			streams:  20, words: 16958
-		worklib.fifo_v3:sv <0x48fec059>
+		worklib.fifo_v3:sv <0x00846262>
 			streams:  20, words: 16856
-		worklib.fifo_v3:sv <0x7ccb743a>
+		worklib.fifo_v3:sv <0x34b1d601>
 			streams:  20, words: 17450
-		worklib.axi_lite_to_axi:sv <0x182976ee>
+		worklib.axi_lite_to_axi:sv <0x5150e974>
 			streams:   3, words:  4433
-		worklib.spill_register_flushable:sv <0x47f08527>
+		worklib.spill_register_flushable:sv <0x46725632>
 			streams:   3, words:   680
-		worklib.fifo_v3:sv <0x2e1fa644>
+		worklib.fifo_v3:sv <0x7d68a904>
 			streams:  20, words: 16927
-		worklib.spill_register_flushable:sv <0x22b1f45d>
+		worklib.spill_register_flushable:sv <0x5e56560e>
 			streams:  23, words: 10946
-		worklib.spill_register_flushable:sv <0x51763fd4>
+		worklib.spill_register_flushable:sv <0x50f4ecc1>
 			streams:   3, words:   548
-		worklib.fifo_v3:sv <0x4f520692>
+		worklib.fifo_v3:sv <0x1c2509d2>
 			streams:  20, words: 16927
-		worklib.spill_register_flushable:sv <0x6b99b72e>
+		worklib.spill_register_flushable:sv <0x6a1b643b>
 			streams:   3, words:   680
-		worklib.fifo_v3:sv <0x094a702e>
+		worklib.fifo_v3:sv <0x5a3d7f6e>
 			streams:  20, words: 16927
-		worklib.spill_register_flushable:sv <0x4ad457ae>
+		worklib.spill_register_flushable:sv <0x3633f5fd>
 			streams:  23, words: 10946
-		worklib.addr_decode_dync:sv <0x00fa9707>
+		worklib.addr_decode_dync:sv <0x29263a60>
 			streams:   4, words: 16542
-		worklib.addr_decode_dync:sv <0x2bfa5bae>
+		worklib.addr_decode_dync:sv <0x0226f6c9>
 			streams:   4, words: 16542
-		worklib.axi_lite_sram_if:sv <0x28ca6d0f>
+		worklib.axi_lite_sram_if:sv <0x03e5c8e4>
 			streams:  15, words: 17183
-		worklib.imem_sram_wrapper:sv <0x60a7ffce>
-			streams:   2, words:   554
-		worklib.sram_mux:sv <0x0869a14e>
-			streams:   7, words:  4422
-		worklib.axi_lite_sram_if:sv <0x7e25cf51>
+		worklib.axi_lite_sram_if:sv <0x550a6aba>
 			streams:  15, words: 17278
-		worklib.instr_fetch_demux:sv <0x7caf3dd1>
-			streams:   8, words:  2879
-		worklib.boot_rom:sv <0x20b0dbf8>
-			streams:   4, words:  1398
-		worklib.s25fs512s:sv <0x32fc41a3>
-			streams: 275, words: 837934
-		worklib.soc_regtest_tb:sv <0x13eaa98e>
-			streams:  65, words: 139079
-		worklib.rr_arb_tree:sv <0x4ef044f2>
+		worklib.soc_regtest_tb:sv <0x08b8b332>
+			streams:  68, words: 159146
+		worklib.rr_arb_tree:sv <0x48464208>
 			streams:  76, words: 56473
-		worklib.addr_decode:sv <0x55fe3edb>
+		worklib.addr_decode:sv <0x42962d34>
 			streams:   7, words:  2480
-		worklib.obi_uart:sv <0x18a0c962>
-			streams:  29, words: 10745
-		worklib.apb_uart_wrap:sv <0x37e24426>
-			streams:  12, words:  5262
-		worklib.apb_uart:sv <0x13678479>
-			streams:  10, words:  4526
-		worklib.fifo_v3:sv <0x4038dc73>
-			streams:  20, words: 17789
-		worklib.fifo_v3:sv <0x0236fdc7>
-			streams:  20, words: 17615
-		worklib.gpio:sv <0x69f39766>
-			streams:  31, words: 43243
-		worklib.gpio_intf:sv <0x312f020d>
-			streams:   9, words:  4875
-		worklib.memory_features:sv <0x602856bc>
-			streams:  32, words: 20085
-		worklib.addr_decode:sv <0x169314b1>
+		worklib.addr_decode:sv <0x32a87df7>
 			streams:   7, words:  2483
-		worklib.addr_decode:sv <0x21b361af>
+		worklib.addr_decode:sv <0x058808e9>
 			streams:   7, words:  2483
-		worklib.axi_err_slv:sv <0x3a4e2cdc>
+		worklib.axi_err_slv:sv <0x08da97cc>
 			streams:  43, words: 25077
-		worklib.fall_through_register:sv <0x4cc53ecd>
+		worklib.fall_through_register:sv <0x0133c23f>
 			streams:   8, words:  2579
-		worklib.fall_through_register:sv <0x1c23f44b>
+		worklib.fall_through_register:sv <0x51d508b9>
 			streams:   8, words:  2426
-		worklib.fall_through_register:sv <0x59d6646f>
+		worklib.fall_through_register:sv <0x1420989d>
 			streams:   8, words:  2628
-		worklib.axi_lite_to_apb:sv <0x554e9fe1>
+		worklib.axi_lite_to_apb:sv <0x28b59bc5>
 			streams:  39, words: 28050
-		worklib.apb_timer:sv <0x56afc624>
-			streams:  13, words:  7203
-		worklib.rv32m_mul:v <0x36c24b78>
-			streams:  61, words: 30052
-		worklib.spill_register:sv <0x230a57ac>
+		worklib.spill_register:sv <0x3081c476>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x21ef25bb>
+		worklib.spill_register:sv <0x3264b661>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x77cc0ca9>
+		worklib.spill_register:sv <0x64479f73>
 			streams:   5, words:  1761
-		worklib.spill_register:sv <0x256bb162>
+		worklib.spill_register:sv <0x36e022b8>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x749ac6ad>
+		worklib.spill_register:sv <0x67115577>
 			streams:   5, words:  1963
-		worklib.axi_lite_demux:sv <0x13c5b635>
+		worklib.axi_lite_demux:sv <0x76eb02dc>
 			streams: 101, words: 62476
-		worklib.rr_arb_tree:sv <0x490c8675>
+		worklib.rr_arb_tree:sv <0x70fda4ed>
 			streams:  76, words: 56471
-		worklib.spill_register:sv <0x148939ce>
+		worklib.spill_register:sv <0x6af65a43>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x5a3fb794>
+		worklib.spill_register:sv <0x2440d419>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x7a3a3e6b>
+		worklib.spill_register:sv <0x04455de6>
 			streams:   5, words:  1761
-		worklib.rr_arb_tree:sv <0x5958d5ef>
+		worklib.rr_arb_tree:sv <0x1612647f>
 			streams:  76, words: 56471
-		worklib.spill_register:sv <0x160473d5>
+		worklib.spill_register:sv <0x687b1058>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x3272c614>
+		worklib.spill_register:sv <0x4c0da599>
 			streams:   5, words:  1963
-		worklib.axi_lite_mux:sv <0x2ee22b66>
+		worklib.axi_lite_mux:sv <0x79984963>
 			streams:  86, words: 40255
-		worklib.axi_lite_xbar:sv <0x2740526c>
+		worklib.axi_lite_xbar:sv <0x7c2f9a9e>
 			streams:  51, words: 43302
-		worklib.lzc:sv <0x532063c1>
-			streams:   7, words:  3131
-		worklib.lzc:sv <0x3f6ce155>
-			streams:   7, words:  3049
-		worklib.sram_sp:sv <0x32e79262>
-			streams:   3, words:  2175
-		worklib.fetch_cycle:v <0x36b03688>
-			streams:  14, words:  9091
-		worklib.Register_File:v <0x7f2f88b9>
-			streams:   6, words:  3125
-		worklib.timer:sv <0x359f389f>
-			streams:  10, words:  6625
-		worklib.bootloader:sv <0x7e87bdbf>
+		worklib.bootloader:sv <0x46d07b9e>
 			streams:  38, words: 37930
-		worklib.riscforge_soc_subsystem:sv <0x3bb0435a>
-			streams: 248, words: 81530
-		worklib.Instruction_Memory_new:v <0x5573fa4b>
-			streams:  11, words:  5673
+		worklib.riscforge_soc_subsystem:sv <0x518b9fbd>
+			streams: 248, words: 81454
 	Building instance specific data structures.
 	Loading native compiled code:     .................... Done
 	Design hierarchy summary:
@@ -904,1566 +424,140 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 		Verilog packages:               6       6
 		Primitives:                    12       2
 		Timing outputs:                 4       4
-		Registers:                  8,992   3,412
-		Scalar wires:              10,848       -
+		Registers:                  9,012   3,432
+		Scalar wires:              10,872       -
 		Expanded wires:             1,570      24
-		Vectored wires:             1,723       -
+		Vectored wires:             1,729       -
 		Named events:                 147      29
-		Always blocks:              1,907     377
+		Always blocks:              1,911     381
 		Initial blocks:               351     174
 		Final blocks:                   5       1
-		Cont. assignments:          3,416   1,808
+		Parallel blocks:                1       1
+		Cont. assignments:          3,445   1,823
 		Pseudo assignments:         4,463       -
 		Timing checks:                 44      20
 		Assertions:                   413      62
 		SV Class declarations:          3       3
 		SV Class specializations:       3       3
-		Process Clocks:             1,146      34
+		Process Clocks:             1,149      34
 		Simulation timescale:         1ps
 	Writing initial simulation snapshot: worklib.soc_regtest_tb:sv
 Loading snapshot worklib.soc_regtest_tb:sv .................... Done
 xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
 xcelium> run
 xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
-            File: /home/iiita/MALAY_SOC/rtl/instr_module/Instruction_Memory.v, line = 53, pos = 38
+            File: /home/iiita/MALAY_SOC/rtl/instr_module/Instruction_Memory.v, line = 56, pos = 38
            Scope: soc_regtest_tb.dut.i_isram.u_imem
             Time: 0 FS + 0
 
 xmsim: *W,LMTMSG: packed array at "soc_regtest_tb.u_flash.SFDP_array_tmp" of 35008 elements exceeds limit of 4096 - not probed
  Use 'probe -create -packed 35008' to adjust limit.
 xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
-            File: ../tb/soc_regtest_tb.sv, line = 698, pos = 15
+            File: ../tb/soc_regtest_tb.sv, line = 778, pos = 15
            Scope: soc_regtest_tb.unmblk1
             Time: 0 FS + 0
 
 [TB] waveforms -> soc_regtest_tb.shm
 [TB] --- RISCFORGE SoC — peripheral register access test
 [TB]  Flash image : ../mem/regtest/regtest_flash.mem
-[TB]  Image       : 1771 ISRAM words + 1197 DSRAM words
+[TB]  Image       : 2011 ISRAM words + 1328 DSRAM words
 [TB] --- A: flash image preload
 [TB] --- B: cold boot from SPI flash
-[TB]   ... booting, cyc 200009, bootloader S_READ_FIFO, word 274 of 2968
-[TB]   ... booting, cyc 400009, bootloader S_READ_FIFO, word 899 of 2968
-[TB]   ... booting, cyc 600009, bootloader S_READ_FIFO, word 1523 of 2968
-[TB]   ... booting, cyc 800009, bootloader S_READ_FIFO, word 2147 of 2968
-[TB]   ... booting, cyc 1000009, bootloader S_READ_FIFO, word 2772 of 2968
-[TB]   boot_done @cyc 1062690
+[TB]   ... booting, cyc 200009, bootloader S_READ_FIFO, word 274 of 3339
+[TB]   ... booting, cyc 400009, bootloader S_READ_FIFO, word 899 of 3339
+[TB]   ... booting, cyc 600009, bootloader S_READ_FIFO, word 1523 of 3339
+[TB]   ... booting, cyc 800009, bootloader S_READ_FIFO, word 2147 of 3339
+[TB]   ... booting, cyc 1000009, bootloader S_READ_FIFO, word 2772 of 3339
+[TB]   boot_done @cyc 1181738
 [TB] --- C: image placement in ISRAM / DSRAM
 [TB] --- D: register test firmware
-[FW] ---- RISCFORGE register access test: firmware started   (cyc 1062803)
-[FW] ---- PHASE 1: reset values (read before any write)   (cyc 1062829)
-[FW]   FAIL  UART.MSR : reset value @0x40002018  exp 0x00000000  got 0x0000000f
-[FW] ---- PHASE 2: read-only registers ignore writes   (cyc 1065866)
-[FW] ---- PHASE 3: read/write registers, 36 patterns each   (cyc 1067294)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x0001003c  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0x00000000  a7 0x00000000
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dc4
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x0001018c  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0x00000000  a7 0x00000000
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dc4
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x00010188  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0xffffffff  a7 0x00000000
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dc8
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x0001003c  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0xffffffff  a7 0x00000000
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dc8
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x0001018c  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0xffffffff  a7 0x00000000
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dc8
-[FW]   FAIL  I2C.PRE : RW pattern readback @0x400202b4  exp 0x0000ffff  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x00010188  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0xaaaaaaaa  a7 0x00000001
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dcc
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x0001003c  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0xaaaaaaaa  a7 0x00000001
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dcc
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]    PC 0x0001018c  ra 0x000108f4  sp 0x00027f70
-[BUS]    a0 0x000203a4  a1 0x00020950  a2 0x400202b4  a3 0x0000ffff
-[BUS]    a4 0xffffffff  a5 0x00000000  a6 0xaaaaaaaa  a7 0x00000001
-[BUS]    s2 0x00021000  s3 0x00000024  s4 0x00000003  t3 0x00020dcc
-[FW]   FAIL  I2C.PRE : RW pattern readback @0x400202b4  exp 0x0000aaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[FW]   FAIL  I2C.PRE : RW pattern readback @0x400202b4  exp 0x00005555  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[FW]   FAIL  I2C.PRE : RW pattern readback @0x400202b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400202b4 (not checked by firmware)
-[FW]   FAIL  I2C.PRE : further RW mismatches (got = total) @0x400202b4  exp 0x00000004  got 0x00000013
-[FW]   FAIL  I2C.CTR : RW pattern readback @0x800202b4  exp 0x000000ff  got 0x00000000
-[FW]   FAIL  I2C.CTR : RW pattern readback @0x800202b4  exp 0x000000aa  got 0x00000000
-[FW]   FAIL  I2C.CTR : RW pattern readback @0x800202b4  exp 0x00000055  got 0x00000000
-[FW]   FAIL  I2C.CTR : RW pattern readback @0x800202b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  I2C.CTR : further RW mismatches (got = total) @0x800202b4  exp 0x00000004  got 0x0000000b
-[FW]   FAIL  I2C.TXR : RW pattern readback @0xc00202b4  exp 0x000000ff  got 0x00000000
-[FW]   FAIL  I2C.TXR : RW pattern readback @0xc00202b4  exp 0x000000aa  got 0x00000000
-[FW]   FAIL  I2C.TXR : RW pattern readback @0xc00202b4  exp 0x00000055  got 0x00000000
-[FW]   FAIL  I2C.TXR : RW pattern readback @0xc00202b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  I2C.TXR : further RW mismatches (got = total) @0xc00202b4  exp 0x00000004  got 0x0000000b
-[BUS]  unexpected DECERR on write @0x400202b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH0 CTRL : RW pattern readback @0x400222b4  exp 0xfffffffe  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH0 CTRL : RW pattern readback @0x400222b4  exp 0xaaaaaaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH0 CTRL : RW pattern readback @0x400222b4  exp 0x55555554  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH0 CTRL : RW pattern readback @0x400222b4  exp 0x00000002  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400222b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH0 CTRL : further RW mismatches (got = total) @0x400222b4  exp 0x00000004  got 0x00000022
-[FW]   FAIL  TIMER0.CH0 VAL : RW pattern readback @0x800232b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  TIMER0.CH0 VAL : RW pattern readback @0x800232b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  TIMER0.CH0 VAL : RW pattern readback @0x800232b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  TIMER0.CH0 VAL : RW pattern readback @0x800232b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  TIMER0.CH0 VAL : further RW mismatches (got = total) @0x800232b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  TIMER0.CH1 CMP : RW pattern readback @0xc00242b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  TIMER0.CH1 CMP : RW pattern readback @0xc00242b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  TIMER0.CH1 CMP : RW pattern readback @0xc00242b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  TIMER0.CH1 CMP : RW pattern readback @0xc00242b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  TIMER0.CH1 CMP : further RW mismatches (got = total) @0xc00242b4  exp 0x00000004  got 0x00000023
-[BUS]  unexpected DECERR on write @0x400222b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH1 VAL : RW pattern readback @0x400262b4  exp 0xffffffff  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH1 VAL : RW pattern readback @0x400262b4  exp 0xaaaaaaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH1 VAL : RW pattern readback @0x400262b4  exp 0x55555555  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH1 VAL : RW pattern readback @0x400262b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400262b4 (not checked by firmware)
-[FW]   FAIL  TIMER0.CH1 VAL : further RW mismatches (got = total) @0x400262b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  UART.IER : RW pattern readback @0x800282b4  exp 0x000000ff  got 0x00000000
-[FW]   FAIL  UART.IER : RW pattern readback @0x800282b4  exp 0x000000aa  got 0x00000000
-[FW]   FAIL  UART.IER : RW pattern readback @0x800282b4  exp 0x00000055  got 0x00000000
-[FW]   FAIL  UART.IER : RW pattern readback @0x800282b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.IER : further RW mismatches (got = total) @0x800282b4  exp 0x00000004  got 0x0000000b
-[FW]   FAIL  UART.LCR : RW pattern readback @0xc002a2b4  exp 0x0000007f  got 0x00000000
-[FW]   FAIL  UART.LCR : RW pattern readback @0xc002a2b4  exp 0x0000002a  got 0x00000000
-[FW]   FAIL  UART.LCR : RW pattern readback @0xc002a2b4  exp 0x00000055  got 0x00000000
-[FW]   FAIL  UART.LCR : RW pattern readback @0xc002a2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.LCR : further RW mismatches (got = total) @0xc002a2b4  exp 0x00000004  got 0x0000000a
-[FW]   FAIL  UART.MCR : RW pattern readback @0x0002c2b4  exp 0x000000ff  got 0x00000000
-[FW]   FAIL  UART.MCR : RW pattern readback @0x0002c2b4  exp 0x000000aa  got 0x00000000
-[FW]   FAIL  UART.MCR : RW pattern readback @0x0002c2b4  exp 0x00000055  got 0x00000000
-[FW]   FAIL  UART.MCR : RW pattern readback @0x0002c2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.MCR : further RW mismatches (got = total) @0x0002c2b4  exp 0x00000004  got 0x0000000b
-[BUS]  unexpected DECERR on write @0x400262b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.CFG : RW pattern readback @0x4002f2b4  exp 0x00000003  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.CFG : RW pattern readback @0x4002f2b4  exp 0x00000002  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.CFG : RW pattern readback @0x4002f2b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.CFG : RW pattern readback @0x4002f2b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4002f2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.CFG : further RW mismatches (got = total) @0x4002f2b4  exp 0x00000004  got 0x00000005
-[FW]   FAIL  GPIO.GPIO_MODE_0 : RW pattern readback @0x800322b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_0 : RW pattern readback @0x800322b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_0 : RW pattern readback @0x800322b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_0 : RW pattern readback @0x800322b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_0 : further RW mismatches (got = total) @0x800322b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  GPIO.GPIO_MODE_1 : RW pattern readback @0xc00352b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_1 : RW pattern readback @0xc00352b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_1 : RW pattern readback @0xc00352b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_1 : RW pattern readback @0xc00352b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_MODE_1 : further RW mismatches (got = total) @0xc00352b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  GPIO.GPIO_EN : RW pattern readback @0x000382b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_EN : RW pattern readback @0x000382b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_EN : RW pattern readback @0x000382b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_EN : RW pattern readback @0x000382b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  GPIO.GPIO_EN : further RW mismatches (got = total) @0x000382b4  exp 0x00000004  got 0x00000023
-[BUS]  unexpected DECERR on write @0x4002f2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.GPIO_OUT : RW pattern readback @0x4003b2b4  exp 0xffffffff  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.GPIO_OUT : RW pattern readback @0x4003b2b4  exp 0xaaaaaaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.GPIO_OUT : RW pattern readback @0x4003b2b4  exp 0x55555555  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.GPIO_OUT : RW pattern readback @0x4003b2b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4003b2b4 (not checked by firmware)
-[FW]   FAIL  GPIO.GPIO_OUT : further RW mismatches (got = total) @0x4003b2b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  GPIO.INTRPT_RISE_EN : RW pattern readback @0x8003e2b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_RISE_EN : RW pattern readback @0x8003e2b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_RISE_EN : RW pattern readback @0x8003e2b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_RISE_EN : RW pattern readback @0x8003e2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_RISE_EN : further RW mismatches (got = total) @0x8003e2b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  GPIO.INTRPT_FALL_EN : RW pattern readback @0xc00412b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_FALL_EN : RW pattern readback @0xc00412b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_FALL_EN : RW pattern readback @0xc00412b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_FALL_EN : RW pattern readback @0xc00412b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_FALL_EN : further RW mismatches (got = total) @0xc00412b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  GPIO.INTRPT_LVL_HIGH_EN : RW pattern readback @0x000442b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_LVL_HIGH_EN : RW pattern readback @0x000442b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_LVL_HIGH_EN : RW pattern readback @0x000442b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_LVL_HIGH_EN : RW pattern readback @0x000442b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  GPIO.INTRPT_LVL_HIGH_EN : further RW mismatches (got = total) @0x000442b4  exp 0x00000004  got 0x00000023
-[BUS]  unexpected DECERR on write @0x4003b2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[FW]   FAIL  GPIO.INTRPT_LVL_LOW_EN : RW pattern readback @0x400472b4  exp 0xffffffff  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[FW]   FAIL  GPIO.INTRPT_LVL_LOW_EN : RW pattern readback @0x400472b4  exp 0xaaaaaaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[FW]   FAIL  GPIO.INTRPT_LVL_LOW_EN : RW pattern readback @0x400472b4  exp 0x55555555  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[FW]   FAIL  GPIO.INTRPT_LVL_LOW_EN : RW pattern readback @0x400472b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400472b4 (not checked by firmware)
-[FW]   FAIL  GPIO.INTRPT_LVL_LOW_EN : further RW mismatches (got = total) @0x400472b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  SPI.CLKDIV : RW pattern readback @0x8004b2b4  exp 0x000000ff  got 0x00000000
-[FW]   FAIL  SPI.CLKDIV : RW pattern readback @0x8004b2b4  exp 0x000000aa  got 0x00000000
-[FW]   FAIL  SPI.CLKDIV : RW pattern readback @0x8004b2b4  exp 0x00000055  got 0x00000000
-[FW]   FAIL  SPI.CLKDIV : RW pattern readback @0x8004b2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  SPI.CLKDIV : further RW mismatches (got = total) @0x8004b2b4  exp 0x00000004  got 0x0000000b
-[FW]   FAIL  SPI.SPICMD : RW pattern readback @0xc004f2b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  SPI.SPICMD : RW pattern readback @0xc004f2b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  SPI.SPICMD : RW pattern readback @0xc004f2b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  SPI.SPICMD : RW pattern readback @0xc004f2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  SPI.SPICMD : further RW mismatches (got = total) @0xc004f2b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  SPI.SPIADR : RW pattern readback @0x000532b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  SPI.SPIADR : RW pattern readback @0x000532b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  SPI.SPIADR : RW pattern readback @0x000532b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  SPI.SPIADR : RW pattern readback @0x000532b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  SPI.SPIADR : further RW mismatches (got = total) @0x000532b4  exp 0x00000004  got 0x00000023
-[BUS]  unexpected DECERR on write @0x400472b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[FW]   FAIL  SPI.SPILEN : RW pattern readback @0x400572b4  exp 0xffff3f3f  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[FW]   FAIL  SPI.SPILEN : RW pattern readback @0x400572b4  exp 0xaaaa2a2a  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[FW]   FAIL  SPI.SPILEN : RW pattern readback @0x400572b4  exp 0x55551515  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[FW]   FAIL  SPI.SPILEN : RW pattern readback @0x400572b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400572b4 (not checked by firmware)
-[FW]   FAIL  SPI.SPILEN : further RW mismatches (got = total) @0x400572b4  exp 0x00000004  got 0x0000001f
-[FW]   FAIL  SPI.SPIDUM : RW pattern readback @0x8005b2b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  SPI.SPIDUM : RW pattern readback @0x8005b2b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  SPI.SPIDUM : RW pattern readback @0x8005b2b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  SPI.SPIDUM : RW pattern readback @0x8005b2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  SPI.SPIDUM : further RW mismatches (got = total) @0x8005b2b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  SPI.INTCFG : RW pattern readback @0xc005f2b4  exp 0xdf1f1f1f  got 0x00000000
-[FW]   FAIL  SPI.INTCFG : RW pattern readback @0xc005f2b4  exp 0x8a0a0a0a  got 0x00000000
-[FW]   FAIL  SPI.INTCFG : RW pattern readback @0xc005f2b4  exp 0x55151515  got 0x00000000
-[FW]   FAIL  SPI.INTCFG : RW pattern readback @0xc005f2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  SPI.INTCFG : further RW mismatches (got = total) @0xc005f2b4  exp 0x00000004  got 0x00000019
-[FW]   FAIL  TIMER1.CH0 CMP : RW pattern readback @0x000642b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 CMP : RW pattern readback @0x000642b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 CMP : RW pattern readback @0x000642b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 CMP : RW pattern readback @0x000642b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 CMP : further RW mismatches (got = total) @0x000642b4  exp 0x00000004  got 0x00000023
-[BUS]  unexpected DECERR on write @0x400572b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH0 CTRL : RW pattern readback @0x400692b4  exp 0xfffffffe  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH0 CTRL : RW pattern readback @0x400692b4  exp 0xaaaaaaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH0 CTRL : RW pattern readback @0x400692b4  exp 0x55555554  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH0 CTRL : RW pattern readback @0x400692b4  exp 0x00000002  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x400692b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH0 CTRL : further RW mismatches (got = total) @0x400692b4  exp 0x00000004  got 0x00000022
-[FW]   FAIL  TIMER1.CH0 VAL : RW pattern readback @0x8006e2b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 VAL : RW pattern readback @0x8006e2b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 VAL : RW pattern readback @0x8006e2b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 VAL : RW pattern readback @0x8006e2b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  TIMER1.CH0 VAL : further RW mismatches (got = total) @0x8006e2b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  TIMER1.CH1 CMP : RW pattern readback @0xc00732b4  exp 0xffffffff  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CMP : RW pattern readback @0xc00732b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CMP : RW pattern readback @0xc00732b4  exp 0x55555555  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CMP : RW pattern readback @0xc00732b4  exp 0x00000001  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CMP : further RW mismatches (got = total) @0xc00732b4  exp 0x00000004  got 0x00000023
-[FW]   FAIL  TIMER1.CH1 CTRL : RW pattern readback @0x000782b4  exp 0xfffffffe  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CTRL : RW pattern readback @0x000782b4  exp 0xaaaaaaaa  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CTRL : RW pattern readback @0x000782b4  exp 0x55555554  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CTRL : RW pattern readback @0x000782b4  exp 0x00000002  got 0x00000000
-[FW]   FAIL  TIMER1.CH1 CTRL : further RW mismatches (got = total) @0x000782b4  exp 0x00000004  got 0x00000022
-[BUS]  unexpected DECERR on write @0x400692b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH1 VAL : RW pattern readback @0x4007d2b4  exp 0xffffffff  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH1 VAL : RW pattern readback @0x4007d2b4  exp 0xaaaaaaaa  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH1 VAL : RW pattern readback @0x4007d2b4  exp 0x55555555  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH1 VAL : RW pattern readback @0x4007d2b4  exp 0x00000001  got 0x00000000
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on  read @0x4007d2b4 (not checked by firmware)
-[FW]   FAIL  TIMER1.CH1 VAL : further RW mismatches (got = total) @0x4007d2b4  exp 0x00000004  got 0x00000023
-[FW] ---- PHASE 4: per-IP uniqueness (distinct value in every R/W register)   (cyc 1219556)
-[BUS]  unexpected DECERR on write @0x4007d2b4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40021224 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002123c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40021284 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40022194 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400221ac (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400221c4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400221dc (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400221f4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002220c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400230ec (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002311c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023134 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023f24 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023f3c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023f54 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023f6c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023f9c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40023ffc (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024014 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x4002402c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024044 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024e4c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024e64 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024e7c (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024e94 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024eac (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40024edc (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x40026194 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400261ac (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400261c4 (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400261dc (not checked by firmware)
-[BUS]  unexpected DECERR on write @0x400261f4 (not checked by firmware)
-[FW] ---- PHASE 5: I2C command register   (cyc 1234747)
-[FW] ---- PHASE 5: timer enable, CMP side effect, disabled-timer hold   (cyc 1234968)
-[FW] ---- PHASE 5: timer enable, CMP side effect, disabled-timer hold   (cyc 1236234)
-[FW] ---- PHASE 5: UART divisor latch (DLAB=1)   (cyc 1237477)
-[FW]   FAIL  UART.DLL : reset value @0x40002000  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.DLM : reset value @0x40002004  exp 0x00000000  got 0x000000d1
-[FW]   FAIL  UART.DLL : RW pattern readback @0x40002000  exp 0x000000ff  got 0x00000000
-[FW]   FAIL  UART.DLL : RW pattern readback @0x40002000  exp 0x000000aa  got 0x00000000
-[FW]   FAIL  UART.DLL : RW pattern readback @0x40002000  exp 0x00000055  got 0x00000000
-[FW]   FAIL  UART.DLL : RW pattern readback @0x40002000  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.DLL : further RW mismatches (got = total) @0x40002000  exp 0x00000004  got 0x0000000b
-[FW] ---- PHASE 5: UART THR -> RBR through MCR loopback   (cyc 1240030)
-[FW]   FAIL  UART.LSR : data ready after loopback TX (DR=1) @0x40002014  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.RBR : loopback byte @0x40002000  exp 0x000000a5  got 0x00000000
-[FW]   FAIL  UART.LSR : data ready after loopback TX (DR=1) @0x40002014  exp 0x00000001  got 0x00000000
-[FW]   FAIL  UART.RBR : loopback byte @0x40002000  exp 0x0000005a  got 0x00000000
-[FW]   FAIL  UART.LSR : idle, RX empty after reads (THRE+TEMT) @0x40002014  exp 0x00000060  got 0x00000000
-[FW] ---- PHASE 5: GPIO SET / CLEAR / TOGGLE   (cyc 1380384)
-[FW] ---- PHASE 5: GPIO_IN through TB pad loopback   (cyc 1380665)
-[FW] ---- PHASE 5: GPIO interrupt status registers (W1C) on pin 0   (cyc 1381052)
-[FW]   FAIL  GPIO.INTRPT_STATUS : clear before test @0x40003580  exp 0x00000000  got 0x00000001
-[FW]   FAIL  GPIO.INTRPT_STATUS : clear after W1C @0x40003580  exp 0x00000000  got 0x00000001
-[FW] ---- PHASE 5: SPI TX FIFO fill (10 words) and software reset   (cyc 1382036)
-[FW] ---- PHASE 5: SPI 64-bit read on CS1 (TB slave model) -> RXFIFO   (cyc 1382271)
-[FW] ---- PHASE 6: unmapped offsets (OKAY, read 0) and address aliasing   (cyc 1382759)
-[FW]   FAIL  I2C.PRE : unchanged by hole writes @0x40000000  exp 0x00000000  got 0x00004bd2
-[FW] ---- PHASE 7: accesses that must fault (bus error -> access fault)   (cyc 1384397)
-[BUS]  unexpected DECERR on write @0x4002620c (not checked by firmware)
-[FW] ---- PHASE 8: summary   (cyc 1388108)
-[FW]   FAIL  CORE.trap handler : traps taken == traps expected @0x00000000  exp 0x0000000f  got 0x00000907
+[FW] ---- RISCFORGE register access test: firmware started   (cyc 1181851)
+[FW] ---- PHASE 1: reset values (read before any write)   (cyc 1181877)
+[FW] ---- PHASE 2: read-only registers ignore writes   (cyc 1184853)
+[FW] ---- PHASE 3: read/write registers, 36 patterns each   (cyc 1186261)
+[FW] ---- PHASE 4: per-IP uniqueness (distinct value in every R/W register)   (cyc 1225449)
+[FW] ---- PHASE 5: I2C command register   (cyc 1238850)
+[FW] ---- PHASE 5: timer enable, CMP side effect, disabled-timer hold   (cyc 1239071)
+[FW] ---- PHASE 5: timer enable, CMP side effect, disabled-timer hold   (cyc 1240786)
+[FW] ---- PHASE 5: UART divisor latch (DLAB=1)   (cyc 1242478)
+[FW] ---- PHASE 5: UART THR -> RBR through MCR loopback   (cyc 1244987)
+[FW] ---- PHASE 5: UART TX and RX on the pins (8N1, polled)   (cyc 1245962)
+[FW] ---- PHASE 5: GPIO SET / CLEAR / TOGGLE   (cyc 1250210)
+[FW] ---- PHASE 5: GPIO_IN through TB pad loopback   (cyc 1250490)
+[FW] ---- PHASE 5: GPIO interrupt status registers (W1C) on pin 0   (cyc 1250877)
+[FW] ---- PHASE 5: SPI TX FIFO fill (10 words) and software reset   (cyc 1251848)
+[FW] ---- PHASE 5: SPI 64-bit read on CS1 (TB slave model) -> RXFIFO   (cyc 1252083)
+[FW] ---- PHASE 6: unmapped offsets (OKAY, read 0) and address aliasing   (cyc 1252706)
+[FW] ---- PHASE 7: accesses that must fault (bus error -> access fault)   (cyc 1254342)
+[FW] ---- PHASE 8: summary   (cyc 1259716)
 [TB] ------------------------------------------------------------------
 [TB]  REGISTER COVERAGE
 [TB] ------------------------------------------------------------------
 [TB]   ADDRESS      REGISTER                       KIND  CHECKS  RESULT
-[TB]   0x40000000   I2C.PRE                       RW       12  FAIL (6)
-
-[TB]           RW pattern readback : exp 0x0000ffff  got 0x00000000
-[TB]           RW pattern readback : exp 0x0000aaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00005555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000013
-[TB]           unchanged by hole writes : exp 0x00000000  got 0x00004bd2
-[TB]   0x40000004   I2C.CTR                       RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x000000ff  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000aa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000b
+[TB]   0x40000000   I2C.PRE                       RW        8  PASS
+[TB]   0x40000004   I2C.CTR                       RW        4  PASS
 [TB]   0x40000008   I2C.RXR                       RO        2  PASS
 [TB]   0x4000000c   I2C.SR                        RO        3  PASS
-[TB]   0x40000010   I2C.TXR                       RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x000000ff  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000aa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000b
+[TB]   0x40000010   I2C.TXR                       RW        4  PASS
 [TB]   0x40000014   I2C.CR                        CMD       4  PASS
-[TB]   0x40001000   TIMER0.CH0 VAL                RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40001004   TIMER0.CH0 CTRL               RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xfffffffe  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555554  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000002  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000022
+[TB]   0x40001000   TIMER0.CH0 VAL                RW        4  PASS
+[TB]   0x40001004   TIMER0.CH0 CTRL               RW        4  PASS
 [TB]   0x40001008   TIMER0.CH0 CMP                RW        6  PASS
-[TB]   0x40001010   TIMER0.CH1 VAL                RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
+[TB]   0x40001010   TIMER0.CH1 VAL                RW        4  PASS
 [TB]   0x40001014   TIMER0.CH1 CTRL               RW        4  PASS
-[TB]   0x40001018   TIMER0.CH1 CMP                RW       10  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40002000   UART.RBR                      RO        3  FAIL (2)
-
-[TB]           loopback byte : exp 0x000000a5  got 0x00000000
-[TB]           loopback byte : exp 0x0000005a  got 0x00000000
-[TB]   0x40002000   UART.DLL                      RW        6  FAIL (6)
-
-[TB]           reset value : exp 0x00000001  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000ff  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000aa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000b
-[TB]   0x40002004   UART.IER                      RW       11  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x000000ff  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000aa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000b
-[TB]   0x40002004   UART.DLM                      RW        2  FAIL (1)
-
-[TB]           reset value : exp 0x00000000  got 0x000000d1
+[TB]   0x40001018   TIMER0.CH1 CMP                RW        6  PASS
+[TB]   0x40002000   UART.RBR                      RO        5  PASS
+[TB]   0x40002000   UART.DLL                      RW        2  PASS
+[TB]   0x40002004   UART.IER                      RW        7  PASS
+[TB]   0x40002004   UART.DLM                      RW        2  PASS
 [TB]   0x40002008   UART.IIR                      RO        1  PASS
-[TB]   0x4000200c   UART.LCR                      RW       10  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x0000007f  got 0x00000000
-[TB]           RW pattern readback : exp 0x0000002a  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000a
-[TB]   0x40002010   UART.MCR                      RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x000000ff  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000aa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000b
-[TB]   0x40002014   UART.LSR                      RO        5  FAIL (3)
-
-[TB]           data ready after loopback TX (DR=1) : exp 0x00000001  got 0x00000000
-[TB]           data ready after loopback TX (DR=1) : exp 0x00000001  got 0x00000000
-[TB]           idle, RX empty after reads (THRE+TEMT) : exp 0x00000060  got 0x00000000
-[TB]   0x40002018   UART.MSR                      RO        3  FAIL (1)
-
-[TB]           reset value : exp 0x00000000  got 0x0000000f
+[TB]   0x4000200c   UART.LCR                      RW        6  PASS
+[TB]   0x40002010   UART.MCR                      RW        4  PASS
+[TB]   0x40002014   UART.LSR                      RO        9  PASS
 [TB]   0x4000201c   UART.SCR                      RO        2  PASS
 [TB]   0x40003000   GPIO.INFO                     RO        2  PASS
-[TB]   0x40003004   GPIO.CFG                      RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x00000003  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000002  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000005
-[TB]   0x40003008   GPIO.GPIO_MODE_0              RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x4000300c   GPIO.GPIO_MODE_1              RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40003080   GPIO.GPIO_EN                  RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
+[TB]   0x40003004   GPIO.CFG                      RW        4  PASS
+[TB]   0x40003008   GPIO.GPIO_MODE_0              RW        4  PASS
+[TB]   0x4000300c   GPIO.GPIO_MODE_1              RW        4  PASS
+[TB]   0x40003080   GPIO.GPIO_EN                  RW        4  PASS
 [TB]   0x40003100   GPIO.GPIO_IN                  RO        5  PASS
-[TB]   0x40003180   GPIO.GPIO_OUT                 RW        9  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
+[TB]   0x40003180   GPIO.GPIO_OUT                 RW        5  PASS
 [TB]   0x40003200   GPIO.GPIO_SET                 CMD       3  PASS
 [TB]   0x40003280   GPIO.GPIO_CLEAR               CMD       3  PASS
 [TB]   0x40003300   GPIO.GPIO_TOGGLE              CMD       3  PASS
-[TB]   0x40003380   GPIO.INTRPT_RISE_EN           RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40003400   GPIO.INTRPT_FALL_EN           RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40003480   GPIO.INTRPT_LVL_HIGH_EN       RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40003500   GPIO.INTRPT_LVL_LOW_EN        RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40003580   GPIO.INTRPT_STATUS            W1C       5  FAIL (2)
-
-[TB]           clear before test : exp 0x00000000  got 0x00000001
-[TB]           clear after W1C : exp 0x00000000  got 0x00000001
+[TB]   0x40003380   GPIO.INTRPT_RISE_EN           RW        4  PASS
+[TB]   0x40003400   GPIO.INTRPT_FALL_EN           RW        4  PASS
+[TB]   0x40003480   GPIO.INTRPT_LVL_HIGH_EN       RW        4  PASS
+[TB]   0x40003500   GPIO.INTRPT_LVL_LOW_EN        RW        4  PASS
+[TB]   0x40003580   GPIO.INTRPT_STATUS            W1C       5  PASS
 [TB]   0x40003600   GPIO.INTRPT_RISE_STATUS       W1C       4  PASS
 [TB]   0x40003680   GPIO.INTRPT_FALL_STATUS       W1C       3  PASS
 [TB]   0x40003700   GPIO.INTRPT_LVL_HIGH_STATUS   W1C       3  PASS
 [TB]   0x40003780   GPIO.INTRPT_LVL_LOW_STATUS    W1C       3  PASS
 [TB]   0x40004000   SPI.STATUS                    CMD       6  PASS
-[TB]   0x40004004   SPI.CLKDIV                    RW       10  FAIL (5)
-
-[TB]           RW pattern readback : exp 0x000000ff  got 0x00000000
-[TB]           RW pattern readback : exp 0x000000aa  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000055  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000000b
-[TB]   0x40004008   SPI.SPICMD                    RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x4000400c   SPI.SPIADR                    RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40004010   SPI.SPILEN                    RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffff3f3f  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaa2a2a  got 0x00000000
-[TB]           RW pattern readback : exp 0x55551515  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x0000001f
-[TB]   0x40004014   SPI.SPIDUM                    RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
+[TB]   0x40004004   SPI.CLKDIV                    RW        6  PASS
+[TB]   0x40004008   SPI.SPICMD                    RW        4  PASS
+[TB]   0x4000400c   SPI.SPIADR                    RW        4  PASS
+[TB]   0x40004010   SPI.SPILEN                    RW        4  PASS
+[TB]   0x40004014   SPI.SPIDUM                    RW        4  PASS
 [TB]   0x40004018   SPI.TXFIFO                    WO        2  PASS
 [TB]   0x40004020   SPI.RXFIFO                    RO        2  PASS
-[TB]   0x40004024   SPI.INTCFG                    RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xdf1f1f1f  got 0x00000000
-[TB]           RW pattern readback : exp 0x8a0a0a0a  got 0x00000000
-[TB]           RW pattern readback : exp 0x55151515  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000019
+[TB]   0x40004024   SPI.INTCFG                    RW        4  PASS
 [TB]   0x40004028   SPI.INTSTA                    RO        1  PASS
-[TB]   0x40005000   TIMER1.CH0 VAL                RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40005004   TIMER1.CH0 CTRL               RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xfffffffe  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555554  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000002  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000022
-[TB]   0x40005008   TIMER1.CH0 CMP                RW       10  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40005010   TIMER1.CH1 VAL                RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
-[TB]   0x40005014   TIMER1.CH1 CTRL               RW        8  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xfffffffe  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555554  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000002  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000022
-[TB]   0x40005018   TIMER1.CH1 CMP                RW       10  FAIL (5)
-
-[TB]           RW pattern readback : exp 0xffffffff  got 0x00000000
-[TB]           RW pattern readback : exp 0xaaaaaaaa  got 0x00000000
-[TB]           RW pattern readback : exp 0x55555555  got 0x00000000
-[TB]           RW pattern readback : exp 0x00000001  got 0x00000000
-[TB]           further RW mismatches (got = total) : exp 0x00000004  got 0x00000023
+[TB]   0x40005000   TIMER1.CH0 VAL                RW        4  PASS
+[TB]   0x40005004   TIMER1.CH0 CTRL               RW        4  PASS
+[TB]   0x40005008   TIMER1.CH0 CMP                RW        6  PASS
+[TB]   0x40005010   TIMER1.CH1 VAL                RW        4  PASS
+[TB]   0x40005014   TIMER1.CH1 CTRL               RW        4  PASS
+[TB]   0x40005018   TIMER1.CH1 CMP                RW        6  PASS
 [TB] ------------------------------------------------------------------
-[TB]   57 registers mapped: 57 exercised, 20 PASS, 37 FAIL, 0 NOT EXERCISED
-[TB]   FAIL  no register failed (37 of 57 failed)
+[TB]   56 registers mapped: 56 exercised, 56 PASS, 0 FAIL, 0 NOT EXERCISED
 [TB] ------------------------------------------------------------------
 [TB]  OTHER CHECKS (holes, aliases, deliberate faults, sequences)
-[TB]   TIMER0.CH0                                      6  PASS
-[TB]   TIMER0.CH1                                      6  PASS
-[TB]   TIMER1.CH0                                      6  PASS
-[TB]   TIMER1.CH1                                      6  PASS
+[TB]   TIMER0.CH0                                      8  PASS
+[TB]   TIMER0.CH1                                      8  PASS
+[TB]   TIMER1.CH0                                      8  PASS
+[TB]   TIMER1.CH1                                      8  PASS
 [TB]   I2C.offset 0x18                                 2  PASS
 [TB]   I2C.offset 0x3C                                 2  PASS
 [TB]   TIMER0.offset 0x0C                              2  PASS
@@ -2474,8 +568,6 @@ xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
 [TB]   SPI.offset 0x2C                                 2  PASS
 [TB]   SPI.offset 0x3C                                 2  PASS
 [TB]   UART.LSR write (read-only)                      3  PASS
-[TB]   UART.MSR write (read-only)                      3  PASS
-[TB]   UART.LCR read with DLAB=1                       3  PASS
 [TB]   GPIO.unmapped 0x010 load                        3  PASS
 [TB]   GPIO.unmapped 0x010 store                       3  PASS
 [TB]   GPIO.unmapped 0x7FC load                        3  PASS
@@ -2488,19 +580,26 @@ xmsim: *W,SHMPOPT: Some objects excluded from $shm_probe due to optimizations.
 [TB]   MMIO.after last slave 0x4000_6000 store         3  PASS
 [TB]   MMIO.window end 0x4FFF_FFFC load                3  PASS
 [TB]   MMIO.window end 0x4FFF_FFFC store               3  PASS
-[TB]   CORE.trap handler                               1  FAIL (1)
-
-[TB]           traps taken == traps expected : exp 0x0000000f  got 0x00000907
+[TB]   MEM.boot ROM 0x0000_0000 load                   3  PASS
+[TB]   MEM.ISRAM 0x0001_0000 load                      3  PASS
+[TB]   MEM.ISRAM 0x0001_0000 store                     3  PASS
+[TB]   MEM.after DSRAM 0x0002_8000 load                3  PASS
+[TB]   MEM.after DSRAM 0x0002_8000 store               3  PASS
+[TB]   MEM.unmapped 0x1000_0000 load                   3  PASS
+[TB]   MEM.unmapped 0x1000_0000 store                  3  PASS
+[TB]   MEM.above MMIO 0x5000_0000 load                 3  PASS
+[TB]   MEM.above MMIO 0x5000_0000 store                3  PASS
+[TB]   MEM.top 0xFFFF_FFFC load                        3  PASS
+[TB]   CORE.trap handler                               1  PASS
 [TB] ------------------------------------------------------------------
 [TB] --- E: TB-side checks
-[TB]   FAIL  every bus error was expected (1029 errors, 15 BUSRESP checks)
 [TB] ------------------------------------------------------------------
-[TB]  Firmware checks : 268 passed, 172 failed
-[TB]  TB checks       : 27 passed, 2 failed
-[TB]  Runtime         : 325497 cycles, 12985 MMIO reads, 652 MMIO writes, 2311 traps
-[TB]  *** REGISTER TEST FAILED ***
+[TB]  Firmware checks : 347 passed, 0 failed
+[TB]  TB checks       : 32 passed, 0 failed
+[TB]  Runtime         : 78050 cycles, 1888 MMIO reads, 1566 MMIO writes, 23 traps
+[TB]  *** REGISTER TEST PASSED ***
 [TB] ------------------------------------------------------------------
-Simulation complete via $finish(1) at time 13881875 NS + 0
-../tb/soc_regtest_tb.sv:831     $finish;
+Simulation complete via $finish(1) at time 12597885 NS + 0
+../tb/soc_regtest_tb.sv:915     $finish;
 xcelium> exit
-TOOL:	xrun(64)	24.09-s001: Exiting on Nov 01, 2026 at 04:55:39 IST  (total: 00:00:50)
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 09, 2026 at 20:07:08 IST  (total: 00:00:30)

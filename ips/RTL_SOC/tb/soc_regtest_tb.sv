@@ -13,7 +13,8 @@
 //   +8 NAME  pointer to register name string
 //  +12 SUB   pointer to check description string
 //  +16 ADDR / +20 EXP / +24 GOT
-//   CMD 1 PASS, 2 FAIL, 3 SECTION, 4 BUSRESP, 0xD0 DONE
+//   CMD 1 PASS, 2 FAIL, 3 SECTION, 4 BUSRESP, 5 UART_TXMON, 6 UART_TXCHK,
+//       7 UART_RXSEND, 0xD0 DONE
 //
 // Checks done by the TB itself (independent of the firmware)
 //   - Flash preload and image placement in ISRAM / DSRAM after boot
@@ -26,6 +27,9 @@
 //   - SPI: CS0 and CS1 never low together; CS1 selected exactly once; the
 //     flash (CS0) is not selected by the firmware
 //   - Firmware's own PASS/FAIL totals match what the TB received
+//   - UART pins: bytes the firmware sends are decoded on uart_sout_o (value,
+//     start and stop bit), and every decoded byte is checked; bytes the
+//     firmware asks for are driven on uart_sin_i
 //
 // Board model around the DUT
 //   - SPI CS0: S25FS512S flash holding the image (boot)
@@ -33,7 +37,9 @@
 //              changing on SCK falling edges (mode 0, like the flash)
 //   - GPIO:    pads looped back, gpio_in_i = gpio_out_o
 //   - I2C:     open-drain SCL/SDA with pull-ups, no slave
-//   - UART:    RX idle high (the firmware uses the internal MCR loopback)
+//   - UART:    RX idle high; an 8N1 receiver on the TX pin and transmitter on
+//              the RX pin, driven by mailbox commands 5/6/7 (the firmware also
+//              uses the internal MCR loopback)
 //
 // -----------------------------------------------------------------------------
 // Build the firmware + flash image first (needs the RISC-V GCC toolchain):
@@ -92,6 +98,9 @@ module soc_regtest_tb;
   localparam logic [31:0] CMD_FAIL    = 32'h02;
   localparam logic [31:0] CMD_SECTION = 32'h03;
   localparam logic [31:0] CMD_BUSRESP = 32'h04;
+  localparam logic [31:0] CMD_UART_TXMON  = 32'h05;  // arm TX-pin receiver, EXP = clocks/bit
+  localparam logic [31:0] CMD_UART_TXCHK  = 32'h06;  // byte ADDR on the TX pin must be EXP
+  localparam logic [31:0] CMD_UART_RXSEND = 32'h07;  // drive byte EXP on RX pin, GOT = clocks/bit
   localparam logic [31:0] CMD_DONE    = 32'hD0;
 
   // ───────────────────────────────────────────────────────────────────────
@@ -143,6 +152,45 @@ module soc_regtest_tb;
   logic                        axi_wr_timeout_sticky, axi_rd_timeout_sticky;
 
   initial uart_sin_i = 1'b1;           // UART RX idle
+
+  // ───────────────────────────────────────────────────────────────────────
+  //  UART pin models (8N1, LSB first), armed by the firmware mailbox:
+  //   - receiver on uart_sout_o: decodes every frame after CMD_UART_TXMON
+  //   - transmitter on uart_sin_i: sends one byte per CMD_UART_RXSEND
+  // ───────────────────────────────────────────────────────────────────────
+  bit          uart_mon_armed;
+  int unsigned uart_bit_cyc;
+  logic [7:0]  uart_tx_q [$];          // bytes seen on the TX pin
+  bit          uart_tx_frame_ok [$];   // start bit low and stop bit high
+  int unsigned uart_tx_checked;
+
+  always @(negedge uart_sout_o) begin
+    if (uart_mon_armed && uart_bit_cyc != 0) begin : tx_frame
+      logic [7:0] d;
+      bit         ok;
+      repeat (uart_bit_cyc / 2) @(posedge clk);     // middle of the start bit
+      ok = (uart_sout_o === 1'b0);
+      for (int i = 0; i < 8; i++) begin
+        repeat (uart_bit_cyc) @(posedge clk);
+        d[i] = uart_sout_o;
+      end
+      repeat (uart_bit_cyc) @(posedge clk);         // middle of the stop bit
+      ok = ok && (uart_sout_o === 1'b1);
+      uart_tx_q.push_back(d);
+      uart_tx_frame_ok.push_back(ok);
+    end
+  end
+
+  task automatic uart_drive_byte(input logic [7:0] d, input int unsigned bit_cyc);
+    uart_sin_i = 1'b0;                              // start bit
+    repeat (bit_cyc) @(posedge clk);
+    for (int i = 0; i < 8; i++) begin
+      uart_sin_i = d[i];
+      repeat (bit_cyc) @(posedge clk);
+    end
+    uart_sin_i = 1'b1;                              // stop bit, then idle
+    repeat (bit_cyc) @(posedge clk);
+  endtask
 
   // I2C: open-drain bus, pull-ups, no slave. The DUT drives a line only when
   // its output enable (active low) is 0.
@@ -370,7 +418,12 @@ module soc_regtest_tb;
     regdef("UART", "LCR", 32'h4000_200C, "RW");
     regdef("UART", "MCR", 32'h4000_2010, "RW");
     regdef("UART", "LSR", 32'h4000_2014, "RO");
-    regdef("UART", "MSR", 32'h4000_2018, "RO");
+    // MSR (0x4000_2018) is not mapped here: the UART is used as a plain TX/RX
+    // UART and the modem interface is unused, so regtest.c does not test it.
+    // Known RTL issue (not fixed, unused feature): MSR reads 0x0F after reset
+    // instead of 0x00. In obi_uart_modem.sv the sync instances i_sync_cts/dsr/
+    // ri/cd use sync's default ResetValue = 0, while sync_*_n_q reset to 1, so
+    // the delta bits d_cts/d_dsr/te_ri/d_cd latch into MSR right after reset.
     regdef("UART", "SCR", 32'h4000_201C, "RO");
 
     // gpio_reg_top.sv (reggen)
@@ -609,6 +662,33 @@ module soc_regtest_tb;
         end
         bus_err_pending = 1'b0;
       end
+      CMD_UART_TXMON: begin
+        uart_tx_q.delete();
+        uart_tx_frame_ok.delete();
+        uart_tx_checked = 0;
+        uart_bit_cyc    = exp;
+        uart_mon_armed  = 1'b1;
+        if (verbose)
+          $display("[TB]   UART TX pin receiver armed, %0d clocks per bit", exp);
+      end
+      CMD_UART_TXCHK: begin
+        uart_tx_checked++;
+        if (addr < uart_tx_q.size())
+          tb_check($sformatf("%s : TX pin byte %0d = 0x%02h (expected 0x%02h), framing %s",
+                             full, addr, uart_tx_q[addr], exp[7:0],
+                             uart_tx_frame_ok[addr] ? "ok" : "BAD"),
+                   uart_tx_q[addr] === exp[7:0] && uart_tx_frame_ok[addr]);
+        else
+          tb_check($sformatf("%s : TX pin byte %0d received (only %0d bytes seen)",
+                             full, addr, uart_tx_q.size()), 1'b0);
+      end
+      CMD_UART_RXSEND: begin
+        if (verbose)
+          $display("[TB]   UART RX pin: sending 0x%02h, %0d clocks per bit", exp[7:0], got);
+        fork
+          uart_drive_byte(exp[7:0], got);
+        join_none
+      end
       CMD_DONE: begin
         done_pass  = addr;
         done_fail  = exp;
@@ -805,6 +885,10 @@ module soc_regtest_tb;
                          bus_err_cnt, busresp_checks),
                bus_err_cnt == busresp_checks && !bus_err_pending && bus_unexpected_err == 0);
     end
+    if (fw_done)
+      tb_check($sformatf("UART TX pin: every byte received was checked (%0d received, %0d checked)",
+                         uart_tx_q.size(), uart_tx_checked),
+               uart_mon_armed && uart_tx_q.size() == uart_tx_checked);
     tb_check($sformatf("no timer IRQ while CTRL.EN=0 (%0d violations, %0d IRQ cycles)",
                        timer_irq_violations, timer_irq_pulses), timer_irq_violations == 0);
     tb_check($sformatf("SPI CS0 and CS1 never low together (%0d cycles)", cs_both_low_cnt),

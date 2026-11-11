@@ -17,9 +17,11 @@
  *      walking one (36 patterns), read back through the implemented-bit mask
  *   4  per-IP uniqueness: write a distinct value to every R/W register, then
  *      read them all (catches two offsets decoding to the same register)
- *   5  command / FIFO / W1C registers that cannot be pattern-tested
+ *   5  command / FIFO / W1C registers that cannot be pattern-tested, timer
+ *      compare-match period, UART TX/RX on the pins, SPI read on CS1
  *   6  unmapped offsets inside a window (read 0, write ignored) and aliases
- *   7  accesses that must fault (bus error -> access-fault trap)
+ *   7  accesses that must fault: bus errors inside the MMIO window, and
+ *      addresses outside DSRAM / MMIO faulted by the core's data router
  *   8  unexpected-trap check and DONE
  *
  * Firmware rules followed (see project notes):
@@ -28,13 +30,19 @@
  *     build.py fails the build if any other function contains lb/lh/sb/sh.
  *   - SPI: RXFIFO is only read when STATUS[20:16] != 0, TXFIFO holds at most
  *     10 words (an empty read / full write would stall the bus for ever).
- *   - UART: no register other than DLL/DLM is read while LCR.DLAB = 1, except
- *     the one deliberate negative test in phase 7.
+ *     Reads use CLKDIV >= 2 (spi_master_clkgen.sv).
+ *   - UART: with LCR.DLAB = 1, offsets 0x08-0x1C stay readable (obi_uart_register
+ *     DLAB=1 read branch), so LCR is read back while DLAB = 1 in phase 5.
+ *   - UART is used as a plain TX/RX UART: the modem lines (CTS/DSR/RI/DCD,
+ *     DTR/RTS/OUT1/OUT2) are not used, so MSR and the modem bits of MCR/IER are
+ *     not tested. MCR is tested only on its LOOP bit, which the RX test needs.
  *
  * Testbench dependencies (soc_regtest_tb.sv)
  *   - GPIO pads looped back: gpio_in_i = gpio_out_o
  *   - SPI chip select 1 has a slave model that returns 0xC3A55A3C_0F1E2D4B
- *   - I2C SCL/SDA pulled up, UART RX idle high
+ *   - I2C SCL/SDA pulled up
+ *   - UART: 8N1 receiver on the TX pin and transmitter on the RX pin, driven
+ *     by mailbox commands 5/6/7 (RX idle high otherwise)
  *
  * Built for rv32i_zicsr (no M extension: rv32m_mul.v is not yet signed off).
  * ========================================================================== */
@@ -104,9 +112,21 @@
 
 #define ALL       0xFFFFFFFFu
 
+/* Timer compare-match test: period in timer ticks (prescaler bypass) */
+#define TMR_PERIOD    0x40u
+
+/* UART pin test: {DLM,DLL} divisor. obi_uart_baudgen gives one oversample
+ * tick every DIV clocks and 16 ticks per bit, so one bit = 16 * DIV clocks. */
+#define UART_PIN_DIV      4u
+#define UART_PIN_BIT_CYC  (16u * UART_PIN_DIV)
+
 /* AXI response codes, as seen by the TB bus monitor */
 #define RESP_SLVERR  2u
 #define RESP_DECERR  3u
+/* No bus transaction at all: hybrid_mem_interface faults an address outside
+ * DSRAM and 0x4000_0000-0x4FFF_FFFF itself (addr_fault), so the TB bus monitor
+ * must see nothing and no BUSRESP check is posted. */
+#define RESP_NONE    0u
 
 /* ------------------------------------------------------------------------ */
 /*  Mailbox protocol (DSRAM 0x0002_0000, reserved by link.ld)               */
@@ -122,6 +142,9 @@ enum {
     CMD_FAIL    = 2,     /* check failed: TB prints ip.name : sub, exp, got */
     CMD_SECTION = 3,     /* progress banner                                 */
     CMD_BUSRESP = 4,     /* TB: last bus error must be at ADDR with resp EXP */
+    CMD_UART_TXMON  = 5, /* TB: clear + arm the TX-pin receiver, EXP = clocks per bit */
+    CMD_UART_TXCHK  = 6, /* TB: byte number ADDR seen on the TX pin must be EXP       */
+    CMD_UART_RXSEND = 7, /* TB: send byte EXP on the RX pin, GOT = clocks per bit     */
     CMD_DONE    = 0xD0   /* ADDR = passes, EXP = fails, GOT = total traps   */
 };
 
@@ -243,17 +266,21 @@ static const reg_t timer_regs[] = {
 };
 
 /* obi_uart (16550-style), DLAB = 0 view. LCR bit 7 (DLAB) is kept out of the
- * generic tests: with DLAB = 1 every read except DLL/DLM returns PSLVERR.
- * MSR resets to 0x00 because the modem inputs are tied inactive in
- * riscforge_soc_subsystem.sv. SCR is not implemented (reads 0, write ignored). */
+ * generic tests; DLAB = 1 is covered in uart_special (phase 5).
+ * Plain TX/RX UART only - the modem interface is not used in this SoC:
+ *   - MSR is not tested. (Known RTL issue, not fixed because unused: MSR reads
+ *     0x0F after reset instead of 0x00 - obi_uart_modem.sv sync instances reset
+ *     to 0 while sync_*_n_q reset to 1, so the delta bits latch at reset.)
+ *   - IER bit 3 (EDSSI, modem-status interrupt) is not written: wmask 0x07.
+ *   - MCR: only bit 4 (LOOP) is written; DTR/RTS/OUT1/OUT2 are modem outputs.
+ * SCR is not implemented (reads 0, write ignored). */
 static const reg_t uart_regs[] = {
     { "RBR", 0x00, K_RST, 0x00, 0xFF, 0           },
-    { "IER", 0x04, K_RW,  0x00, 0xFF, ALL         },
+    { "IER", 0x04, K_RW,  0x00, 0xFF, 0x07        },
     { "IIR", 0x08, K_RST, 0xC1, 0xFF, 0           },
     { "LCR", 0x0C, K_RW,  0x00, 0x7F, 0xFFFFFF7Fu },
-    { "MCR", 0x10, K_RW,  0x00, 0xFF, ALL         },
+    { "MCR", 0x10, K_RW,  0x00, 0xFF, 0x10        },
     { "LSR", 0x14, K_RST, 0x60, 0xFF, 0           },
-    { "MSR", 0x18, K_RST, 0x00, 0xFF, 0           },
     { "SCR", 0x1C, K_RO,  0x00, 0xFF, ALL         },
 };
 
@@ -472,6 +499,25 @@ static void timer_special(const char *ip, uint32_t b)
 
         wr32(cmp, 0);                     /* also clears VAL */
         check(ip, nm, "VAL back to 0", val, 0, rd32(val));
+
+        /* EN=1: VAL counts up to CMP and the compare match resets it to 0
+         * (timer.sv: irq_o[1] when VAL == CMP, then REG_TIMER <= 0). This is
+         * how firmware gets a fixed period (pong frame tick on TIMER0 CH0). */
+        wr32(cmp, TMR_PERIOD);            /* also clears VAL */
+        wr32(ctl, 1);                     /* EN = 1, prescaler bypass */
+        {
+            uint32_t prev = rd32(val), cur, maxv = prev, wraps = 0;
+            for (uint32_t n = 0; n < 400 && wraps < 2; n++) {
+                cur = rd32(val);
+                if (cur > maxv) maxv = cur;
+                if (cur < prev) wraps++;
+                prev = cur;
+            }
+            wr32(ctl, 0);
+            check(ip, nm, "EN=1: VAL wraps to 0 at CMP (wraps seen)", val, 2, wraps);
+            check(ip, nm, "EN=1: VAL never above CMP (1 = yes)", val, 1, (maxv <= TMR_PERIOD) ? 1u : 0u);
+        }
+        wr32(cmp, 0);                     /* also clears VAL */
     }
 }
 
@@ -487,6 +533,7 @@ static void uart_special(void)
     check(ip, "DLM", "reset value", b + U_DLM, 0x00, rd32(b + U_DLM));
     rw_patterns(ip, "DLL", b + U_DLL, 0xFF, ALL, 0x02);   /* leave divisor = 2 */
     rw_patterns(ip, "DLM", b + U_DLM, 0xFF, ALL, 0x00);
+    check(ip, "LCR", "readable with DLAB=1", b + U_LCR, 0x80, rd32(b + U_LCR));
     wr32(b + U_LCR, 0x03);                /* 8N1, DLAB=0 (LCR write allowed with DLAB=1) */
     check(ip, "LCR", "DLAB cleared by write", b + U_LCR, 0x03, rd32(b + U_LCR));
     check(ip, "IER", "not changed by DLM writes", b + U_IER, 0x00, rd32(b + U_IER));
@@ -520,8 +567,56 @@ static void uart_special(void)
     wr32(b + U_MCR, 0x00);
     wr32(b + U_FCR, 0x06);                /* reset FIFOs, FIFO off */
     wr32(b + U_LCR, 0x00);
-    (void)rd32(b + U_MSR);                /* clears the delta bits set by loopback */
-    check(ip, "MSR", "delta bits clear on read", b + U_MSR, 0x00, rd32(b + U_MSR));
+    (void)rd32(b + U_IIR);
+}
+
+/* Plain TX/RX on the real pins, 8N1, polled - the way the board firmware uses
+ * the UART. The loopback test above never drives uart_sout_o or samples
+ * uart_sin_i; here the TB decodes the TX pin and drives the RX pin.
+ * Word arrays (not uint8_t) so no byte loads are generated. */
+static const uint32_t uart_tx_bytes[4] = { 0x55u, 0xA3u, 0x0Fu, 0xF0u };
+static const uint32_t uart_rx_bytes[2] = { 0x3Cu, 0xC5u };
+
+static void uart_pins(void)
+{
+    const char *ip = "UART";
+    uint32_t    b  = UART_BASE;
+    uint32_t    lsr, n;
+
+    section("PHASE 5: UART TX and RX on the pins (8N1, polled)");
+    wr32(b + U_MCR, 0x00);                /* no loopback: TX drives the pin */
+    wr32(b + U_IER, 0x00);
+    wr32(b + U_LCR, 0x80);                /* DLAB = 1 */
+    wr32(b + U_DLL, UART_PIN_DIV);
+    wr32(b + U_DLM, 0x00);
+    wr32(b + U_LCR, 0x03);                /* 8N1, DLAB = 0 */
+    wr32(b + U_FCR, 0x07);                /* FIFO enable + reset RX/TX FIFO */
+
+    mbox_post(CMD_UART_TXMON, ip, "THR", "arm TX pin receiver", b + U_THR, UART_PIN_BIT_CYC, 0);
+    for (uint32_t k = 0; k < 4; k++)
+        wr32(b + U_THR, uart_tx_bytes[k]);
+    n = 0;
+    do {
+        lsr = rd32(b + U_LSR);
+    } while (!(lsr & 0x40u) && ++n < 20000);   /* TEMT: last stop bit sent */
+    check(ip, "LSR", "TX done (TEMT=1)", b + U_LSR, 0x40u, lsr & 0x40u);
+    for (uint32_t k = 0; k < 4; k++)
+        mbox_post(CMD_UART_TXCHK, ip, "THR", "byte on TX pin", k, uart_tx_bytes[k], 0);
+
+    for (uint32_t k = 0; k < 2; k++) {
+        mbox_post(CMD_UART_RXSEND, ip, "RBR", "TB sends byte on RX pin",
+                  b + U_RBR, uart_rx_bytes[k], UART_PIN_BIT_CYC);
+        n = 0;
+        do {
+            lsr = rd32(b + U_LSR);
+        } while (!(lsr & 0x01u) && ++n < 20000);
+        check(ip, "LSR", "data ready after RX pin byte (DR=1)", b + U_LSR, 1, lsr & 0x01u);
+        check(ip, "RBR", "byte from RX pin", b + U_RBR, uart_rx_bytes[k], rd32(b + U_RBR));
+    }
+    check(ip, "LSR", "no RX error, idle after reads (THRE+TEMT)", b + U_LSR, 0x60, rd32(b + U_LSR));
+
+    wr32(b + U_FCR, 0x06);                /* reset FIFOs, FIFO off */
+    wr32(b + U_LCR, 0x00);
     (void)rd32(b + U_IIR);
 }
 
@@ -627,7 +722,10 @@ static void spi_special(void)
     check(ip, "STATUS", "FIFOs empty after swrst", b + S_STATUS, 0x00000001u, rd32(b + S_STATUS));
 
     section("PHASE 5: SPI 64-bit read on CS1 (TB slave model) -> RXFIFO");
-    wr32(b + S_CLKDIV, 1);
+    /* Firmware rule: reads use CLKDIV >= 2 (spi_master_clkgen.sv note). Below 2
+     * the MISO round trip (pad, board, slave tV) has no margin on silicon; the
+     * zero-delay RTL sim would still pass, so 1 is not tested here. */
+    wr32(b + S_CLKDIV, 2);
     wr32(b + S_SPICMD, 0);
     wr32(b + S_SPIADR, 0);
     wr32(b + S_SPIDUM, 0);
@@ -731,22 +829,17 @@ static void expect_fault(const char *ip, const char *name, uint32_t a,
     check(ip, name, "one trap taken",               a, 1,     g_trap.count);
     check(ip, name, "mcause (5 load / 7 store)",    a, cause, g_trap.cause);
     check(ip, name, "mtval = faulting address",     a, a,     g_trap.tval);
-    mbox_post(CMD_BUSRESP, ip, name, "bus response", a, resp, 0);
+    if (resp != RESP_NONE)
+        mbox_post(CMD_BUSRESP, ip, name, "bus response", a, resp, 0);
 }
 
 static void phase7_faults(void)
 {
     section("PHASE 7: accesses that must fault (bus error -> access fault)");
 
-    /* UART: writes to read-only LSR/MSR, and any non-DLL/DLM read with DLAB=1 */
+    /* UART: write to read-only LSR */
     expect_fault("UART", "LSR write (read-only)", UART_BASE + U_LSR, ACC_STORE32, RESP_SLVERR);
     check("UART", "LSR", "unchanged after faulting write", UART_BASE + U_LSR, 0x60, rd32(UART_BASE + U_LSR));
-    expect_fault("UART", "MSR write (read-only)", UART_BASE + U_MSR, ACC_STORE32, RESP_SLVERR);
-    check("UART", "MSR", "unchanged after faulting write", UART_BASE + U_MSR, 0x00, rd32(UART_BASE + U_MSR));
-    wr32(UART_BASE + U_LCR, 0x80);
-    expect_fault("UART", "LCR read with DLAB=1", UART_BASE + U_LCR, ACC_LOAD, RESP_SLVERR);
-    wr32(UART_BASE + U_LCR, 0x00);
-    check("UART", "LCR", "DLAB cleared again", UART_BASE + U_LCR, 0x00, rd32(UART_BASE + U_LCR));
 
     /* GPIO: unmapped offsets inside the 2 KB window, and sub-word stores */
     expect_fault("GPIO", "unmapped 0x010 load",  GPIO_BASE + 0x010, ACC_LOAD,    RESP_SLVERR);
@@ -764,6 +857,20 @@ static void phase7_faults(void)
     expect_fault("MMIO", "after last slave 0x4000_6000 store", 0x40006000u, ACC_STORE32, RESP_DECERR);
     expect_fault("MMIO", "window end 0x4FFF_FFFC load",  0x4FFFFFFCu, ACC_LOAD,    RESP_DECERR);
     expect_fault("MMIO", "window end 0x4FFF_FFFC store", 0x4FFFFFFCu, ACC_STORE32, RESP_DECERR);
+
+    /* Outside DSRAM and the MMIO window: faulted inside the core's data router
+     * (hybrid_mem_interface addr_fault) - no bus transaction is issued. The
+     * boot ROM and ISRAM are instruction-only: loads/stores to them must fault. */
+    expect_fault("MEM", "boot ROM 0x0000_0000 load",      0x00000000u, ACC_LOAD,    RESP_NONE);
+    expect_fault("MEM", "ISRAM 0x0001_0000 load",         0x00010000u, ACC_LOAD,    RESP_NONE);
+    expect_fault("MEM", "ISRAM 0x0001_0000 store",        0x00010000u, ACC_STORE32, RESP_NONE);
+    expect_fault("MEM", "after DSRAM 0x0002_8000 load",   0x00028000u, ACC_LOAD,    RESP_NONE);
+    expect_fault("MEM", "after DSRAM 0x0002_8000 store",  0x00028000u, ACC_STORE32, RESP_NONE);
+    expect_fault("MEM", "unmapped 0x1000_0000 load",      0x10000000u, ACC_LOAD,    RESP_NONE);
+    expect_fault("MEM", "unmapped 0x1000_0000 store",     0x10000000u, ACC_STORE32, RESP_NONE);
+    expect_fault("MEM", "above MMIO 0x5000_0000 load",    0x50000000u, ACC_LOAD,    RESP_NONE);
+    expect_fault("MEM", "above MMIO 0x5000_0000 store",   0x50000000u, ACC_STORE32, RESP_NONE);
+    expect_fault("MEM", "top 0xFFFF_FFFC load",           0xFFFFFFFCu, ACC_LOAD,    RESP_NONE);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -780,6 +887,7 @@ int main(void)
     timer_special("TIMER0", TIMER0_BASE);
     timer_special("TIMER1", TIMER1_BASE);
     uart_special();
+    uart_pins();
     gpio_special();
     spi_special();
 

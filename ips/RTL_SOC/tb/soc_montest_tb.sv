@@ -25,6 +25,18 @@
 //   fabric deadlock the AXI backstop exists for, and it proves the APB monitors
 //   cannot cover it.
 //
+//   Expected assertion during the UART stall (target 2), not a test failure:
+//     apb_to_obi.sv:144 "APB PENABLE must be asserted during OBI RESP phase!"
+//     (soc_montest_tb.dut.i_apb_uart.i_apb_uart_wrap.i_apb_to_obi.penable)
+//   Forcing dut.uart_pready low blocks PREADY only at the SoC level; the UART's
+//   apb_to_obi bridge keeps running. It completes the access and, with PSEL and
+//   PENABLE still held by axi_lite_to_apb, starts it again. When the APB timeout
+//   monitor aborts the access after 16 cycles, PENABLE drops while apb_to_obi is
+//   in the RESP phase of the repeated access, and the assertion fires. On the
+//   real SoC the UART answers in one wait state and is never held like this, so
+//   this only happens under the forced stall. Phase 1 checks still pass. Left in
+//   place on purpose (not masked) - 2026-11-09.
+//
 // Firmware -> TB result words (DSRAM 0x0002_0000, 7 words), same layout as
 // soc_regtest_tb, with five commands added:
 //   0x10 STALL    ADDR = target above

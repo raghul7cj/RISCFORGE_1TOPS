@@ -1,5 +1,5 @@
 xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
-TOOL:	xrun(64)	24.09-s001: Started on Nov 01, 2026 at 04:57:05 IST
+TOOL:	xrun(64)	24.09-s001: Started on Nov 09, 2026 at 20:12:50 IST
 xrun
 	-f ../tests/pong.f
 		-f ../run.f
@@ -450,7 +450,7 @@ xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/ALU.v,25): Zero
 
     csr_regfile #(.XLEN(32)) csr_file (
                                     |
-xmelab: *W,CUVWSP (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/top.v,551|36): 2 output ports were not connected:
+xmelab: *W,CUVWSP (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/top.v,590|36): 2 output ports were not connected:
 xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/csr_regfile.v,11): csr_valid_o
 xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/csr_regfile.v,67): mcause_out_o
 
@@ -593,14 +593,14 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_mux.sv,449|95): String literal argument supplied to integer parameter.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.bootloader:sv <0x2724143a>
+		worklib.bootloader:sv <0x0bde9b0f>
 			streams:  38, words: 37930
-		worklib.axi_lite_timeout_monitor:sv <0x18baa792>
+		worklib.axi_lite_timeout_monitor:sv <0x10c7f580>
 			streams:  42, words: 33239
-		worklib.hybrid_mem_interface:sv <0x235b7be3>
+		worklib.hybrid_mem_interface:sv <0x0b3737ed>
 			streams:  29, words: 18549
 		worklib.hazard_unit:v <0x3e2eba0a>
-			streams:  12, words:  5103
+			streams:  12, words:  5181
 		worklib.csr_regfile:v <0x4c125224>
 			streams:  31, words: 16885
 		worklib.wb_trap_mret_commit_controller:v <0x3b5eff64>
@@ -637,8 +637,8 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   1, words:   248
 		worklib.Mux_3_by_1:v <0x51514ad7>
 			streams:   2, words:   513
-		worklib.execute_cycle:v <0x1f129470>
-			streams:  27, words: 23306
+		worklib.execute_cycle:v <0x3b2cf22f>
+			streams:  39, words: 27804
 		worklib.Sign_Extend:v <0x0f5e0bee>
 			streams:   1, words:  2090
 		worklib.Register_File:v <0x34bab9d4>
@@ -651,16 +651,14 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   1, words:  5637
 		worklib.Control_Unit_Top:v <0x104b80f9>
 			streams:   3, words:  1982
-		worklib.decode_cycle:v <0x0bdf5dd9>
-			streams:  14, words: 29600
+		worklib.decode_cycle:v <0x1a38741f>
+			streams:  15, words: 30127
 		worklib.imem_controller:v <0x35cb421b>
 			streams:   5, words:  1626
 		worklib.PC_Adder:v <0x1559c584>
 			streams:   1, words:   176
 		worklib.PC:v <0x4f0b7585>
 			streams:   2, words:   503
-		worklib.top:v <0x427b322f>
-			streams:  11, words:  5394
 		worklib.spi_master_rx:sv <0x7c8d8533>
 			streams:   9, words:  6678
 		worklib.spi_master_tx:sv <0x60868fae>
@@ -671,10 +669,10 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:  38, words: 48076
 		worklib.spi_master_fifo:sv <0x76c2891e>
 			streams:  10, words:  5091
-		worklib.spi_master_apb_if:sv <0x2fb853b2>
+		worklib.spi_master_apb_if:sv <0x2614bef5>
 			streams:  24, words: 18876
 		worklib.apb_spi_master:sv <0x0cb8b220>
-			streams:  92, words: 29828
+			streams:  92, words: 29878
 		worklib.gpio_input_stage:sv <0x6537a648>
 			streams:   5, words:  1546
 		worklib.prim_subreg_arb:sv <0x7c3b26b2>
@@ -701,18 +699,18 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams: 2087, words: 1069401
 		worklib.apb_to_reg:sv <0x3f2f62d9>
 			streams:   1, words:  1802
-		worklib.gpio_apb_wrap:sv <0x28f8d1a7>
+		worklib.gpio_apb_wrap:sv <0x786e501b>
 			streams:  14, words:  6049
-		worklib.obi_uart_interrupts:sv <0x00c66caf>
-			streams:   5, words:  5769
-		worklib.obi_uart_tx:sv <0x4b04e6dc>
-			streams:  18, words: 15310
+		worklib.obi_uart_interrupts:sv <0x1ff6f217>
+			streams:   5, words:  5916
+		worklib.obi_uart_tx:sv <0x05887564>
+			streams:  18, words: 15404
 		worklib.delta_counter:sv <0x36046a79>
 			streams:   4, words:  1593
 		worklib.counter:sv <0x6ccf1117>
 			streams:   3, words:   900
-		worklib.obi_uart_rx:sv <0x4928c1d0>
-			streams:  37, words: 32635
+		worklib.obi_uart_rx:sv <0x76705901>
+			streams:  37, words: 32480
 		worklib.delta_counter:sv <0x7588d616>
 			streams:   4, words:  1593
 		worklib.counter:sv <0x25014986>
@@ -727,9 +725,9 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   3, words:   681
 		worklib.obi_uart_modem:sv <0x3d4f7a24>
 			streams:  19, words:  8450
-		worklib.obi_uart_register:sv <0x5ca5bd3d>
-			streams:  21, words: 31632
-		worklib.apb_to_obi:sv <0x126b7905>
+		worklib.obi_uart_register:sv <0x22cbdf8b>
+			streams:  21, words: 34353
+		worklib.apb_to_obi:sv <0x75ae1b2b>
 			streams:  17, words: 19570
 		worklib.timer:sv <0x64a01fbe>
 			streams:  10, words:  6284
@@ -739,73 +737,73 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:  31, words: 20008
 		worklib.apb_i2c:sv <0x7d3d6f71>
 			streams:  35, words: 12746
-		worklib.apb_timeout_monitor:sv <0x14bba21e>
+		worklib.apb_timeout_monitor:sv <0x13c1e202>
 			streams:  11, words:  4448
-		worklib.apb_timeout_monitor:sv <0x734952d2>
+		worklib.apb_timeout_monitor:sv <0x743312ce>
 			streams:  11, words:  4430
-		worklib.addr_decode_dync:sv <0x6563a317>
+		worklib.addr_decode_dync:sv <0x52866723>
 			streams:   4, words: 16815
-		worklib.fifo_v3:sv <0x5865b622>
+		worklib.fifo_v3:sv <0x107ae0bb>
 			streams:  20, words: 18934
-		worklib.fifo_v3:sv <0x514c058b>
+		worklib.fifo_v3:sv <0x19535312>
 			streams:  20, words: 17472
-		worklib.fifo_v3:sv <0x04c06e88>
+		worklib.fifo_v3:sv <0x4cdf3811>
 			streams:  20, words: 18972
-		worklib.spill_register_flushable:sv <0x47fb6401>
+		worklib.spill_register_flushable:sv <0x4dac6db5>
 			streams:   3, words:   680
-		worklib.spill_register_flushable:sv <0x2068e1b6>
+		worklib.spill_register_flushable:sv <0x3ef261a0>
 			streams:  23, words: 10946
-		worklib.fifo_v3:sv <0x5b5d23c9>
+		worklib.fifo_v3:sv <0x0c0cf18a>
 			streams:  20, words: 16856
-		worklib.spill_register_flushable:sv <0x6357b6b6>
+		worklib.spill_register_flushable:sv <0x6900bf02>
 			streams:   3, words:   548
-		worklib.spill_register_flushable:sv <0x287acbc3>
+		worklib.spill_register_flushable:sv <0x222dc277>
 			streams:   3, words:   680
-		worklib.fifo_v3:sv <0x61ad7600>
+		worklib.fifo_v3:sv <0x36fca443>
 			streams:  20, words: 16856
-		worklib.spill_register_flushable:sv <0x4bf0330c>
+		worklib.spill_register_flushable:sv <0x556ab31a>
 			streams:  23, words: 10946
-		worklib.fifo_v3:sv <0x3d17cb1a>
+		worklib.fifo_v3:sv <0x6a461959>
 			streams:  20, words: 16856
 		worklib.delta_counter:sv <0x20f93349>
 			streams:   4, words:  1641
 		worklib.counter:sv <0x083dbbec>
 			streams:   3, words:   911
-		worklib.fifo_v3:sv <0x043ae00f>
+		worklib.fifo_v3:sv <0x2a78bfc4>
 			streams:  20, words: 16958
-		worklib.fifo_v3:sv <0x3c8c1b6a>
+		worklib.fifo_v3:sv <0x12ce44a1>
 			streams:  20, words: 16856
-		worklib.fifo_v3:sv <0x08b9af09>
+		worklib.fifo_v3:sv <0x26fbf0c2>
 			streams:  20, words: 17450
-		worklib.axi_lite_to_axi:sv <0x3a7cb771>
+		worklib.axi_lite_to_axi:sv <0x17f7d9fb>
 			streams:   3, words:  4433
-		worklib.spill_register_flushable:sv <0x0a726f60>
+		worklib.spill_register_flushable:sv <0x2542ab15>
 			streams:   3, words:   680
-		worklib.fifo_v3:sv <0x6d5a1b65>
+		worklib.fifo_v3:sv <0x5958d937>
 			streams:  20, words: 16927
-		worklib.spill_register_flushable:sv <0x08a86c22>
+		worklib.spill_register_flushable:sv <0x216cbaec>
 			streams:  23, words: 10946
-		worklib.spill_register_flushable:sv <0x1cf4d593>
+		worklib.spill_register_flushable:sv <0x33c411e6>
 			streams:   3, words:   548
-		worklib.fifo_v3:sv <0x0c17bbb3>
+		worklib.fifo_v3:sv <0x381579e1>
 			streams:  20, words: 16927
-		worklib.spill_register_flushable:sv <0x261b5d69>
+		worklib.spill_register_flushable:sv <0x092b991c>
 			streams:   3, words:   680
-		worklib.fifo_v3:sv <0x4a0fcd0f>
+		worklib.fifo_v3:sv <0x7e0d0f5d>
 			streams:  20, words: 16927
-		worklib.spill_register_flushable:sv <0x60cdcfd1>
+		worklib.spill_register_flushable:sv <0x4909191f>
 			streams:  23, words: 10946
-		worklib.addr_decode_dync:sv <0x0339ec14>
+		worklib.addr_decode_dync:sv <0x59a7b510>
 			streams:   4, words: 16542
-		worklib.addr_decode_dync:sv <0x283920bd>
+		worklib.addr_decode_dync:sv <0x72a779b9>
 			streams:   4, words: 16542
-		worklib.axi_lite_sram_if:sv <0x1b241dd1>
+		worklib.axi_lite_sram_if:sv <0x63b9a1db>
 			streams:  15, words: 17183
 		worklib.imem_sram_wrapper:sv <0x60a7ffce>
 			streams:   2, words:   554
 		worklib.sram_mux:sv <0x0869a14e>
 			streams:   7, words:  4422
-		worklib.axi_lite_sram_if:sv <0x4dcbbf8f>
+		worklib.axi_lite_sram_if:sv <0x35560385>
 			streams:  15, words: 17278
 		worklib.instr_fetch_demux:sv <0x7caf3dd1>
 			streams:   8, words:  2879
@@ -813,15 +811,15 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   4, words:  1398
 		worklib.s25fs512s:sv <0x1ab3e3e0>
 			streams: 275, words: 837934
-		worklib.soc_pong_tb:sv <0x5cdeaf1c>
+		worklib.soc_pong_tb:sv <0x034f1804>
 			streams:  63, words: 87711
-		worklib.rr_arb_tree:sv <0x36ec2b4d>
+		worklib.rr_arb_tree:sv <0x649aecfb>
 			streams:  76, words: 56473
-		worklib.addr_decode:sv <0x0dfae532>
+		worklib.addr_decode:sv <0x7caeb4db>
 			streams:   7, words:  2480
-		worklib.obi_uart:sv <0x18a0c962>
+		worklib.obi_uart:sv <0x6ba1fb32>
 			streams:  29, words: 10745
-		worklib.apb_uart_wrap:sv <0x37e24426>
+		worklib.apb_uart_wrap:sv <0x0281bd95>
 			streams:  12, words:  5262
 		worklib.apb_uart:sv <0x13678479>
 			streams:  10, words:  4526
@@ -835,55 +833,57 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   9, words:  4875
 		worklib.memory_features:sv <0x602856bc>
 			streams:  32, words: 20085
-		worklib.addr_decode:sv <0x2cc311c4>
+		worklib.addr_decode:sv <0x1d53ae39>
 			streams:   7, words:  2483
-		worklib.addr_decode:sv <0x1be364da>
+		worklib.addr_decode:sv <0x2a73db27>
 			streams:   7, words:  2483
-		worklib.axi_err_slv:sv <0x5ecb37eb>
+		worklib.axi_err_slv:sv <0x4f90d20b>
 			streams:  43, words: 25077
-		worklib.fall_through_register:sv <0x5292c979>
+		worklib.fall_through_register:sv <0x40d104b6>
 			streams:   8, words:  2579
-		worklib.fall_through_register:sv <0x027403ff>
+		worklib.fall_through_register:sv <0x1037ce30>
 			streams:   8, words:  2426
-		worklib.fall_through_register:sv <0x478193db>
+		worklib.fall_through_register:sv <0x55c25e14>
 			streams:   8, words:  2628
-		worklib.axi_lite_to_apb:sv <0x5bb7d7a7>
+		worklib.axi_lite_to_apb:sv <0x4e23e15c>
 			streams:  39, words: 28050
 		worklib.apb_timer:sv <0x56afc624>
 			streams:  13, words:  7203
 		worklib.rv32m_mul:v <0x36c24b78>
 			streams:  61, words: 30052
-		worklib.spill_register:sv <0x45ba83c6>
+		worklib.top:v <0x33485d23>
+			streams:  20, words:  8369
+		worklib.spill_register:sv <0x1b92759b>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x475ff1d1>
+		worklib.spill_register:sv <0x1977078c>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x117cd8c3>
+		worklib.spill_register:sv <0x4f542e9e>
 			streams:   5, words:  1761
-		worklib.spill_register:sv <0x43db6508>
+		worklib.spill_register:sv <0x1df39355>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x122a12c7>
+		worklib.spill_register:sv <0x4c02e49a>
 			streams:   5, words:  1963
-		worklib.axi_lite_demux:sv <0x3ae228b8>
+		worklib.axi_lite_demux:sv <0x61257c3f>
 			streams: 101, words: 62476
-		worklib.rr_arb_tree:sv <0x6ce8382b>
+		worklib.rr_arb_tree:sv <0x6caa8f63>
 			streams:  76, words: 56471
-		worklib.spill_register:sv <0x4eaaa889>
+		worklib.spill_register:sv <0x4c481efa>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x001c26d3>
+		worklib.spill_register:sv <0x02fe90a0>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x2019af2c>
+		worklib.spill_register:sv <0x22fb195f>
 			streams:   5, words:  1761
-		worklib.rr_arb_tree:sv <0x51ccd14f>
+		worklib.rr_arb_tree:sv <0x7c1c5560>
 			streams:  76, words: 56471
-		worklib.spill_register:sv <0x4c27e292>
+		worklib.spill_register:sv <0x4ec554e1>
 			streams:   5, words:  1963
-		worklib.spill_register:sv <0x68515753>
+		worklib.spill_register:sv <0x6ab3e120>
 			streams:   5, words:  1963
-		worklib.axi_lite_mux:sv <0x0d620fb6>
+		worklib.axi_lite_mux:sv <0x2024c3b3>
 			streams:  86, words: 40255
-		worklib.axi_lite_xbar:sv <0x7ab8df82>
+		worklib.axi_lite_xbar:sv <0x6c3ba56f>
 			streams:  51, words: 43302
-		worklib.riscforge_soc_subsystem:sv <0x799e51ab>
+		worklib.riscforge_soc_subsystem:sv <0x407a0f3c>
 			streams: 248, words: 81232
 		worklib.lzc:sv <0x532063c1>
 			streams:   7, words:  3131
@@ -891,10 +891,10 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   7, words:  3049
 		worklib.timer:sv <0x1444513e>
 			streams:  10, words:  6341
-		worklib.fetch_cycle:v <0x36b03688>
-			streams:  14, words:  9091
-		worklib.Instruction_Memory_new:v <0x5573fa4b>
-			streams:  11, words:  5673
+		worklib.fetch_cycle:v <0x46832120>
+			streams:  16, words:  9630
+		worklib.Instruction_Memory_new:v <0x237baf75>
+			streams:  11, words:  5444
 		worklib.sram_sp:sv <0x51c4eaf7>
 			streams:   3, words:  2175
 	Building instance specific data structures.
@@ -906,47 +906,47 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 		Verilog packages:               6       6
 		Primitives:                    12       2
 		Timing outputs:                 4       4
-		Registers:                  9,000   3,420
-		Scalar wires:              10,848       -
+		Registers:                  9,009   3,429
+		Scalar wires:              10,872       -
 		Expanded wires:             1,570      24
-		Vectored wires:             1,723       -
+		Vectored wires:             1,729       -
 		Named events:                 147      29
-		Always blocks:              1,902     372
+		Always blocks:              1,905     375
 		Initial blocks:               354     177
 		Final blocks:                   5       1
-		Cont. assignments:          3,415   1,808
+		Cont. assignments:          3,444   1,823
 		Pseudo assignments:         4,463       -
 		Timing checks:                 44      20
 		Assertions:                   413      62
 		SV Class declarations:          3       3
 		SV Class specializations:       3       3
-		Process Clocks:             1,146      34
+		Process Clocks:             1,149      34
 		Simulation timescale:         1ps
 	Writing initial simulation snapshot: worklib.soc_pong_tb:sv
 Loading snapshot worklib.soc_pong_tb:sv .................... Done
 xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
 xcelium> run
 xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
-            File: /home/iiita/MALAY_SOC/rtl/instr_module/Instruction_Memory.v, line = 53, pos = 38
+            File: /home/iiita/MALAY_SOC/rtl/instr_module/Instruction_Memory.v, line = 56, pos = 38
            Scope: soc_pong_tb.dut.i_isram.u_imem
             Time: 0 FS + 0
 
 [TB] --- RISCFORGE SoC — Pong demo
 [TB]  Flash image : ../mem/pong/sim_build/pong_flash.mem
-[TB]  Image       : 894 ISRAM words + 142 DSRAM words
+[TB]  Image       : 922 ISRAM words + 167 DSRAM words
 [TB]  UART        : divisor 2, 32 clocks per bit
 [TB]  Frame       : every 40001 cycles
 [TB] --- A: flash image preload
 [TB]   PASS  flash word 0 = 0x00028137 (expected 0x00028137)
 [TB]   PASS  flash last word = 0x01234567 (expected 0x01234567)
 [TB] --- B: cold boot from SPI flash
-[TB]   PASS  boot_done asserted (cyc 444122)
+[TB]   PASS  boot_done asserted (cyc 461082)
 [TB] --- C: image placement in ISRAM / DSRAM
-[TB]   PASS  ISRAM holds all 894 instruction words (0 mismatches)
-[TB]   PASS  DSRAM holds data words 16..141 (0 mismatches)
+[TB]   PASS  ISRAM holds all 922 instruction words (0 mismatches)
+[TB]   PASS  DSRAM holds data words 16..166 (0 mismatches)
 [TB] --- D1: first screen after boot
-[SCR] ---- after boot (frame 12, cyc 924406)
-[SCR] |  RISCFORGE PONG            P1 0   :   0 CPU                                    |
+[SCR] ---- after boot (frame 12, cyc 941373)
+[SCR] |  RISCFORGE PONG      LEFT (w/s)  0  :  0  RIGHT (CPU)                          |
 [SCR] |================================================================================|
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
@@ -971,9 +971,9 @@ xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
 [SCR] |================================================================================|
-[SCR] |  SPACE serve   w/s move   i/k player 2   p pause   r restart   2 viewer mode   |
+[SCR] |  SPACE serve   w/s left   i/k right   a CPU   p pause   r restart              |
 [TB]   PASS  score line shows RISCFORGE PONG
-[TB]   PASS  score line shows 0 : 0 vs CPU
+[TB]   PASS  score line shows LEFT 0 : 0 RIGHT (CPU)
 [TB]   PASS  top wall complete
 [TB]   PASS  bottom wall complete
 [TB]   PASS  left paddle at rows 9..12 (got top 9, 4 cells)
@@ -987,16 +987,16 @@ xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
 [TB]   PASS  after s: left paddle top row 7 (expected 7), 4 cells
 [TB]   PASS  right (CPU) paddle unaffected by w/s (top 9)
 [TB] --- D4: SPACE serves
-[TB]   frame 29: ball at (38,10)
-[TB]   frame 34: ball at (35,10)
-[TB]   frame 39: ball at (32,10)
-[TB]   frame 44: ball at (29,9)
-[TB]   frame 49: ball at (27,9)
-[TB]   frame 54: ball at (24,9)
-[TB]   frame 59: ball at (21,8)
-[TB]   frame 64: ball at (18,8)
-[SCR] ---- ball in play (frame 64, cyc 3004458)
-[SCR] |  RISCFORGE PONG            P1 0   :   0 CPU                                    |
+[TB]   frame 29: ball at (38,11)
+[TB]   frame 34: ball at (35,12)
+[TB]   frame 39: ball at (32,13)
+[TB]   frame 44: ball at (29,14)
+[TB]   frame 49: ball at (27,15)
+[TB]   frame 54: ball at (24,16)
+[TB]   frame 59: ball at (21,17)
+[TB]   frame 64: ball at (18,18)
+[SCR] ---- ball in play (frame 64, cyc 3021425)
+[SCR] |  RISCFORGE PONG      LEFT (w/s)  0  :  0  RIGHT (CPU)                          |
 [SCR] |================================================================================|
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
@@ -1006,7 +1006,7 @@ xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
 [SCR] |                                                                                |
 [SCR] |                                        :                                       |
 [SCR] |  #                                                                             |
-[SCR] |  #               O                     :                                       |
+[SCR] |  #                                     :                                       |
 [SCR] |  #                                                                          #  |
 [SCR] |  #                                     :                                    #  |
 [SCR] |                                                                             #  |
@@ -1016,31 +1016,31 @@ xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
 [SCR] |                                                                                |
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
-[SCR] |                                        :                                       |
+[SCR] |                  O                     :                                       |
 [SCR] |                                                                                |
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
 [SCR] |================================================================================|
-[SCR] |  w/s move   p pause   r restart   running on RISCFORGE RV32I                   |
+[SCR] |  w/s left   i/k right   a CPU   p pause   r restart   on RISCFORGE RV32I       |
 [TB]   PASS  status line left the serve prompt
-[TB]   PASS  ball travelled from (40,11) to (18,8) in 40 frames
-[TB] --- D5: '2' -> binary packets for pong_viewer.py
-[PKT]  #1  ball (17.50, 8.50)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #2  ball (16.93, 8.43)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #3  ball (16.37, 8.37)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #4  ball (15.81, 8.31)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #5  ball (15.25, 8.25)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #6  ball (14.68, 8.18)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #10  ball (12.43, 7.93)  paddles 7 / 9  score 0:0  state 0
-[PKT]  #20  ball (6.81, 7.31)  paddles 7 / 9  score 0:0  state 0
+[TB]   PASS  ball travelled from (40,11) to (18,18) in 40 frames
+[TB] --- D5: 0x02 -> binary packets for pong_viewer.py
+[PKT]  #1  ball (17.50, 18.50)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #2  ball (16.93, 18.68)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #3  ball (16.37, 18.87)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #4  ball (15.81, 19.06)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #5  ball (15.25, 19.25)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #6  ball (14.68, 19.43)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #10  ball (12.43, 20.18)  paddles 7 / 9  score 0:0  state 0
+[PKT]  #20  ball (6.81, 21.87)  paddles 7 / 9  score 0:0  state 0
 [TB]   PASS  29 packets received in 30 frames
 [TB]   PASS  no checksum errors (0)
 [TB]   PASS  all packet fields in range (0 errors)
 [TB]   PASS  ball position changed in 28 of 28 packets
 [TB]   PASS  packet left paddle = 7, same as the screen in D3
-[TB] --- D6: '1' -> terminal mode, full redraw
-[SCR] ---- back in terminal mode (frame 109, cyc 4804503)
-[SCR] |  RISCFORGE PONG            P1 0   :   1 CPU                                    |
+[TB] --- D6: 0x01 -> terminal mode, full redraw
+[SCR] ---- back in terminal mode (frame 109, cyc 4821470)
+[SCR] |  RISCFORGE PONG      LEFT (w/s)  0  :  1  RIGHT (CPU)                          |
 [SCR] |================================================================================|
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
@@ -1065,21 +1065,21 @@ xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
 [SCR] |                                        :                                       |
 [SCR] |                                                                                |
 [SCR] |================================================================================|
-[SCR] |  SPACE serve   w/s move   i/k player 2   p pause   r restart   2 viewer mode   |
+[SCR] |  RIGHT scores!   SPACE to serve                                                |
 [TB]   PASS  screen cleared and redrawn (1 clears)
 [TB]   PASS  title and walls redrawn
 [TB]   PASS  left paddle redrawn at top row 7
 [TB] --- E: whole-run checks
-[TB]   PASS  no bus error on the core port (377043 reads, 5718 writes, 0 errors)
+[TB]   PASS  no bus error on the core port (368784 reads, 3621 writes, 0 errors)
 [TB]   PASS  no bus timeout monitor fired (sticky 0x00)
-[TB]   PASS  no UART framing error (5709 bytes, 0 errors)
+[TB]   PASS  no UART framing error (3612 bytes, 0 errors)
 [TB]   PASS  frame period constant over 109 frames (0 wrong)
 [TB] ------------------------------------------------------------------
 [TB]  TB checks : 31 passed, 0 failed
-[TB]  Run       : 4804508 cycles, 109 frames, 5709 UART bytes, 29 packets
+[TB]  Run       : 4821475 cycles, 109 frames, 3612 UART bytes, 29 packets
 [TB]  *** PONG DEMO TEST PASSED ***
 [TB] ------------------------------------------------------------------
-Simulation complete via $finish(1) at time 48045085 NS + 0
-../tb/soc_pong_tb.sv:731     $finish;
+Simulation complete via $finish(1) at time 48214755 NS + 0
+../tb/soc_pong_tb.sv:730     $finish;
 xcelium> exit
-TOOL:	xrun(64)	24.09-s001: Exiting on Nov 01, 2026 at 04:58:02 IST  (total: 00:00:57)
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 09, 2026 at 20:13:49 IST  (total: 00:00:59)

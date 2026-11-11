@@ -1,5 +1,5 @@
 xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
-TOOL:	xrun(64)	24.09-s001: Started on Nov 01, 2026 at 04:56:35 IST
+TOOL:	xrun(64)	24.09-s001: Started on Nov 09, 2026 at 20:09:48 IST
 xrun
 	-f ../tests/montest.f
 		-f ../run.f
@@ -434,8 +434,6 @@ file: ../../riscv_core/rtl/hybrid_mem_interface.sv
 	module worklib.hybrid_mem_interface:sv
 		errors: 0, warnings: 0
 file: ../tb/soc_montest_tb.sv
-	module worklib.soc_montest_tb:sv
-		errors: 0, warnings: 0
 xmvlog: *W,SPDUSD: Include directory ../../SOC_FILES/include/common_cells given but not used.
 xmvlog: *W,SPDUSD: Include directory ../../SOC_FILES/include/axi given but not used.
 xmvlog: *W,SPDUSD: Include directory ../../spi/spi_master given but not used.
@@ -450,7 +448,7 @@ xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/ALU.v,25): Zero
 
     csr_regfile #(.XLEN(32)) csr_file (
                                     |
-xmelab: *W,CUVWSP (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/top.v,551|36): 2 output ports were not connected:
+xmelab: *W,CUVWSP (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/top.v,590|36): 2 output ports were not connected:
 xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/csr_regfile.v,11): csr_valid_o
 xmelab: (/home/iiita/MALAY_SOC/rtl/riscv_core/rtl/csr_regfile.v,67): mcause_out_o
 
@@ -593,12 +591,12 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_mux.sv,449|95): String literal argument supplied to integer parameter.
 	Building instance overlay tables: .................... Done
 	Generating native compiled code:
-		worklib.axi_lite_timeout_monitor:sv <0x0653a3fc>
+		worklib.axi_lite_timeout_monitor:sv <0x5de9928b>
 			streams:  42, words: 33239
-		worklib.hybrid_mem_interface:sv <0x3b892616>
+		worklib.hybrid_mem_interface:sv <0x75ca3efe>
 			streams:  29, words: 18549
 		worklib.hazard_unit:v <0x3e2eba0a>
-			streams:  12, words:  5103
+			streams:  12, words:  5181
 		worklib.csr_regfile:v <0x4c125224>
 			streams:  31, words: 16885
 		worklib.wb_trap_mret_commit_controller:v <0x3b5eff64>
@@ -635,8 +633,8 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   1, words:   248
 		worklib.Mux_3_by_1:v <0x51514ad7>
 			streams:   2, words:   513
-		worklib.execute_cycle:v <0x1f129470>
-			streams:  27, words: 23306
+		worklib.execute_cycle:v <0x3b2cf22f>
+			streams:  39, words: 27804
 		worklib.Sign_Extend:v <0x0f5e0bee>
 			streams:   1, words:  2090
 		worklib.Register_File:v <0x34bab9d4>
@@ -649,16 +647,14 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   1, words:  5637
 		worklib.Control_Unit_Top:v <0x104b80f9>
 			streams:   3, words:  1982
-		worklib.decode_cycle:v <0x0bdf5dd9>
-			streams:  14, words: 29600
+		worklib.decode_cycle:v <0x1a38741f>
+			streams:  15, words: 30127
 		worklib.imem_controller:v <0x35cb421b>
 			streams:   5, words:  1626
 		worklib.PC_Adder:v <0x1559c584>
 			streams:   1, words:   176
 		worklib.PC:v <0x4f0b7585>
 			streams:   2, words:   503
-		worklib.top:v <0x427b322f>
-			streams:  11, words:  5394
 		worklib.spi_master_rx:sv <0x7c8d8533>
 			streams:   9, words:  6678
 		worklib.spi_master_tx:sv <0x60868fae>
@@ -669,10 +665,10 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:  38, words: 48076
 		worklib.spi_master_fifo:sv <0x76c2891e>
 			streams:  10, words:  5091
-		worklib.spi_master_apb_if:sv <0x2fb853b2>
+		worklib.spi_master_apb_if:sv <0x2614bef5>
 			streams:  24, words: 18876
 		worklib.apb_spi_master:sv <0x0cb8b220>
-			streams:  92, words: 29828
+			streams:  92, words: 29878
 		worklib.gpio_input_stage:sv <0x6537a648>
 			streams:   5, words:  1546
 		worklib.prim_subreg_arb:sv <0x7c3b26b2>
@@ -699,16 +695,16 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams: 2087, words: 1069401
 		worklib.apb_to_reg:sv <0x3f2f62d9>
 			streams:   1, words:  1802
-		worklib.obi_uart_interrupts:sv <0x00c66caf>
-			streams:   5, words:  5769
-		worklib.obi_uart_tx:sv <0x4b04e6dc>
-			streams:  18, words: 15310
+		worklib.obi_uart_interrupts:sv <0x1ff6f217>
+			streams:   5, words:  5916
+		worklib.obi_uart_tx:sv <0x05887564>
+			streams:  18, words: 15404
 		worklib.delta_counter:sv <0x36046a79>
 			streams:   4, words:  1593
 		worklib.counter:sv <0x6ccf1117>
 			streams:   3, words:   900
-		worklib.obi_uart_rx:sv <0x4928c1d0>
-			streams:  37, words: 32635
+		worklib.obi_uart_rx:sv <0x76705901>
+			streams:  37, words: 32480
 		worklib.delta_counter:sv <0x7588d616>
 			streams:   4, words:  1593
 		worklib.counter:sv <0x25014986>
@@ -723,9 +719,9 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:   3, words:   681
 		worklib.obi_uart_modem:sv <0x3d4f7a24>
 			streams:  19, words:  8450
-		worklib.obi_uart_register:sv <0x5ca5bd3d>
-			streams:  21, words: 31632
-		worklib.apb_to_obi:sv <0x126b7905>
+		worklib.obi_uart_register:sv <0x22cbdf8b>
+			streams:  21, words: 34353
+		worklib.apb_to_obi:sv <0x75ae1b2b>
 			streams:  17, words: 19570
 		worklib.i2c_master_bit_ctrl:sv <0x1ae37657>
 			streams:  36, words: 22803
@@ -807,9 +803,9 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:  76, words: 56473
 		worklib.addr_decode:sv <0x3d1c86e1>
 			streams:   7, words:  2480
-		worklib.obi_uart:sv <0x18a0c962>
+		worklib.obi_uart:sv <0x6ba1fb32>
 			streams:  29, words: 10745
-		worklib.apb_uart_wrap:sv <0x37e24426>
+		worklib.apb_uart_wrap:sv <0x0281bd95>
 			streams:  12, words:  5262
 		worklib.apb_uart:sv <0x13678479>
 			streams:  10, words:  4526
@@ -837,7 +833,9 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:  13, words:  7203
 		worklib.rv32m_mul:v <0x36c24b78>
 			streams:  61, words: 30052
-		worklib.soc_montest_tb:sv <0x749389a8>
+		worklib.top:v <0x33485d23>
+			streams:  20, words:  8369
+		worklib.soc_montest_tb:sv <0x7d171ca0>
 			streams: 105, words: 158876
 		worklib.memory_features:sv <0x602856bc>
 			streams:  32, words: 20085
@@ -883,12 +881,12 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 			streams:  14, words:  5982
 		worklib.timer:sv <0x359f389f>
 			streams:  10, words:  6625
-		worklib.bootloader:sv <0x795bbe1e>
+		worklib.bootloader:sv <0x36a12b35>
 			streams:  38, words: 37930
-		worklib.Instruction_Memory_new:v <0x5573fa4b>
-			streams:  11, words:  5673
-		worklib.fetch_cycle:v <0x36b03688>
-			streams:  14, words:  9091
+		worklib.Instruction_Memory_new:v <0x237baf75>
+			streams:  11, words:  5444
+		worklib.fetch_cycle:v <0x46832120>
+			streams:  16, words:  9630
 		worklib.apb_timeout_monitor:sv <0x01ef2e91>
 			streams:  11, words:  4683
 		worklib.apb_timeout_monitor:sv <0x661dde5d>
@@ -904,28 +902,28 @@ xmelab: *W,STRINT (/home/iiita/MALAY_SOC/rtl/axi_lite_xbar/include/axi/axi_lite_
 		Verilog packages:               6       6
 		Primitives:                    12       2
 		Timing outputs:                 4       4
-		Registers:                  9,008   3,428
-		Scalar wires:              10,894       -
+		Registers:                  9,017   3,437
+		Scalar wires:              10,918       -
 		Expanded wires:             1,570      24
-		Vectored wires:             1,723       -
+		Vectored wires:             1,729       -
 		Named events:                 147      29
-		Always blocks:              1,912     382
+		Always blocks:              1,915     385
 		Initial blocks:               351     174
 		Final blocks:                   5       1
-		Cont. assignments:          3,458   1,824
+		Cont. assignments:          3,487   1,839
 		Pseudo assignments:         4,463       -
 		Timing checks:                 44      20
 		Assertions:                   413      62
 		SV Class declarations:          3       3
 		SV Class specializations:       3       3
-		Process Clocks:             1,146      34
+		Process Clocks:             1,149      34
 		Simulation timescale:         1ps
 	Writing initial simulation snapshot: worklib.soc_montest_tb:sv
 Loading snapshot worklib.soc_montest_tb:sv .................... Done
 xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
 xcelium> run
 xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
-            File: /home/iiita/MALAY_SOC/rtl/instr_module/Instruction_Memory.v, line = 53, pos = 38
+            File: /home/iiita/MALAY_SOC/rtl/instr_module/Instruction_Memory.v, line = 56, pos = 38
            Scope: soc_montest_tb.dut.i_isram.u_imem
             Time: 0 FS + 0
 
@@ -990,4 +988,4 @@ xmsim: *E,ASRTST (/home/iiita/MALAY_SOC/rtl/SOC_FILES/include/obi/apb_to_obi.sv,
 Simulation complete via $finish(1) at time 13175565 NS + 0
 ../tb/soc_montest_tb.sv:1037     $finish;
 xcelium> exit
-TOOL:	xrun(64)	24.09-s001: Exiting on Nov 01, 2026 at 04:56:51 IST  (total: 00:00:16)
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 09, 2026 at 20:10:05 IST  (total: 00:00:17)
