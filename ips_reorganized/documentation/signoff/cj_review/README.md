@@ -17,8 +17,12 @@ This package reconciles known source, contract and evidence records for CJ's 18 
 | 01 | [Core architecture](01_core_architecture.md) | [HTML](01_core_architecture.html) | G1–G3: ISA, privilege, CSR/trap, interrupt/LSU interfaces and unresolved contracts |
 | 02 | [Verification architecture](02_verification_architecture.md) | [HTML](02_verification_architecture.html) | Bench boundaries, user hooks, checking, sampling, coverage and evidence limits |
 | 03 | [Benchmark / external SPI](03_benchmark_spi_evidence.md) | [HTML](03_benchmark_spi_evidence.html) | Historical workloads and boot results versus current qualification |
-| 04 | [Gate readiness](04_gate_readiness.md) | [HTML](04_gate_readiness.html) | All18 responsibilities, open defects/decisions and next closure evidence |
+| 04 | [Gate readiness](04_gate_readiness.md) | [HTML](04_gate_readiness.html) | All 18 responsibilities, open defects/decisions and next closure evidence |
+| 05 | [Hazard and pipeline gate](05_hazard_pipeline_gate.md) | [HTML](05_hazard_pipeline_gate.html) | Hazard-unit and pipeline benches, campaign evidence, and open finding HZ-F001 (issue #30) |
 
+## Scope of document 05
+
+Document 05 is the only part of this package backed by a fresh execution campaign. It reports a bounded development run on Verilator, keeps the open finding open, and claims no sign-off, no coverage closure and no decision on the interrupt/MDU policy. Its two figures are rendered from saved ground-truth specs under `ips/Verification/hazard_tb/docs/diagrams/`, each validated with zero rejected elements; the other six structural figures are hand-authored. The bench and script files it cites are local to the workspace and are not yet upstreamed, so the reproducer is not runnable from a fresh clone.
 ## Authority and maintenance
 
 - Maintain each Markdown source and its concise HTML together. The HTML is a reviewer summary, not the only evidence record.

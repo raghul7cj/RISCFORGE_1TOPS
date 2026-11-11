@@ -1,0 +1,124 @@
+{
+  "title": "CSR trap closure-check scope",
+  "scope": "Static DUT and environment connections for the executed source snapshot. Reset remains asserted; these edges do not claim functional activity or checking.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main/rtl source archive",
+    "commit": "unavailable; executed source manifest SHA256 68e2e9281fee441b5281fd51575d747d79c9df37fc3373ed218eea1d6b66f2aa"
+  },
+  "nodes": [
+    {
+      "id": "U",
+      "label": "CSR unit top",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "symbol": "module tb_csr_corner_unit",
+        "line": 1
+      }
+    },
+    {
+      "id": "R",
+      "label": "CSR DUT",
+      "status": "present",
+      "source": {
+        "path": "ips/riscv_core/rtl/csr_regfile.v",
+        "symbol": "module csr_regfile",
+        "line": 3
+      }
+    },
+    {
+      "id": "C",
+      "label": "Core bench top",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_core_csr_trap.sv",
+        "symbol": "module tb_core_csr_trap",
+        "line": 1
+      }
+    },
+    {
+      "id": "D",
+      "label": "Actual core DUT",
+      "status": "present",
+      "source": {
+        "path": "ips/riscv_core/rtl/top.v",
+        "symbol": "module top #(",
+        "line": 23
+      }
+    },
+    {
+      "id": "E",
+      "label": "OOP environment",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/csr_trap/csr_trap_env_pkg.sv",
+        "symbol": "class corner_env",
+        "line": 107
+      }
+    },
+    {
+      "id": "M",
+      "label": "Independent reference checks",
+      "status": "absent",
+      "note": "Inspected trap_scoreboard.consume/model_and_check and unit extend_reference_model: empty USER_REF_MODEL hooks."
+    },
+    {
+      "id": "F",
+      "label": "Functional coverage bins",
+      "status": "absent",
+      "note": "Inspected both bench tops, coverage class, interfaces and assertion stub: no covergroup definitions or bins."
+    }
+  ],
+  "edges": [
+    {
+      "from": "U",
+      "to": "R",
+      "label": "named DUT ports",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "symbol": ".clk_i(clk)",
+        "line": 16
+      }
+    },
+    {
+      "from": "C",
+      "to": "D",
+      "label": "actual core instance",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_core_csr_trap.sv",
+        "symbol": "top #(.RESET_PC(RESET_PC)) core",
+        "line": 18
+      }
+    },
+    {
+      "from": "C",
+      "to": "E",
+      "label": "construct environment",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_core_csr_trap.sv",
+        "symbol": "environment = new(core_if)",
+        "line": 118
+      }
+    },
+    {
+      "from": "E",
+      "to": "M",
+      "label": "checking deferred",
+      "status": "absent"
+    },
+    {
+      "from": "E",
+      "to": "F",
+      "label": "bins deferred",
+      "status": "absent"
+    }
+  ],
+  "unknowns": [
+    "Git commit/branch/dirty state not established; exact source hashes and snapshots retained.",
+    "VCS and Cadence hosts unreachable during this check.",
+    "Full architecture behavior and any coverage closure remain unverified."
+  ]
+}

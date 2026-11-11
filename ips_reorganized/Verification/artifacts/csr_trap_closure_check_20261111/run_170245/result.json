@@ -1,0 +1,113 @@
+{
+  "artifact_directory": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245",
+  "benches": {
+    "tb_csr_corner_unit": {
+      "stages": {
+        "compile": {
+          "argv": [
+            "C:\\Xilinx\\Vivado\\2022.2\\bin\\xvlog.bat",
+            "-sv",
+            "-i",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\source_snapshot\\ips\\riscv_core\\rtl",
+            "-f",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_csr_corner_unit\\sources.xsim.f",
+            "-log",
+            "compile.log"
+          ],
+          "cwd": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_csr_corner_unit",
+          "exit_code": 0
+        },
+        "elaborate": {
+          "argv": [
+            "C:\\Xilinx\\Vivado\\2022.2\\bin\\xelab.bat",
+            "-debug",
+            "typical",
+            "-timescale",
+            "1ns/1ps",
+            "-cc_type",
+            "sbct",
+            "-cc_db",
+            "tb_csr_corner_unit",
+            "-cc_dir",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_csr_corner_unit\\coverage",
+            "-cov_db_dir",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_csr_corner_unit\\coverage",
+            "-cov_db_name",
+            "tb_csr_corner_unit",
+            "-s",
+            "tb_csr_corner_unit_snapshot",
+            "work.tb_csr_corner_unit",
+            "-log",
+            "elaborate.log"
+          ],
+          "cwd": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_csr_corner_unit",
+          "exit_code": 1
+        }
+      },
+      "diagnostics": [
+        {
+          "log": "elaborate.stdout.log",
+          "line": "ERROR: [XSIM 43-3409] Failed to compile generated C file xsim.dir/tb_csr_corner_unit_snapshot/obj/xsim_1.c."
+        },
+        {
+          "log": "elaborate.stdout.log",
+          "line": "ERROR: [XSIM 43-3915] Encountered a fatal error. Cannot continue. Exiting... "
+        }
+      ]
+    },
+    "tb_core_csr_trap": {
+      "stages": {
+        "compile": {
+          "argv": [
+            "C:\\Xilinx\\Vivado\\2022.2\\bin\\xvlog.bat",
+            "-sv",
+            "-i",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\source_snapshot\\ips\\riscv_core\\rtl",
+            "-f",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_core_csr_trap\\sources.xsim.f",
+            "-log",
+            "compile.log"
+          ],
+          "cwd": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_core_csr_trap",
+          "exit_code": 0
+        },
+        "elaborate": {
+          "argv": [
+            "C:\\Xilinx\\Vivado\\2022.2\\bin\\xelab.bat",
+            "-debug",
+            "typical",
+            "-timescale",
+            "1ns/1ps",
+            "-cc_type",
+            "sbct",
+            "-cc_db",
+            "tb_core_csr_trap",
+            "-cc_dir",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_core_csr_trap\\coverage",
+            "-cov_db_dir",
+            "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_core_csr_trap\\coverage",
+            "-cov_db_name",
+            "tb_core_csr_trap",
+            "-s",
+            "tb_core_csr_trap_snapshot",
+            "work.tb_core_csr_trap",
+            "-log",
+            "elaborate.log"
+          ],
+          "cwd": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170245\\tb_core_csr_trap",
+          "exit_code": 1
+        }
+      },
+      "diagnostics": [
+        {
+          "log": "elaborate.stdout.log",
+          "line": "ERROR: [XSIM 43-3409] Failed to compile generated C file xsim.dir/tb_core_csr_trap_snapshot/obj/xsim_2.c."
+        },
+        {
+          "log": "elaborate.stdout.log",
+          "line": "ERROR: [XSIM 43-3915] Encountered a fatal error. Cannot continue. Exiting... "
+        }
+      ]
+    }
+  }
+}

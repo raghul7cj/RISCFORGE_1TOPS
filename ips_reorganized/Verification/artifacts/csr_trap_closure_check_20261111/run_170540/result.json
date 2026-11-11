@@ -1,0 +1,228 @@
+{
+  "artifact_directory": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\Verification\\artifacts\\csr_trap_closure_check_20261111\\run_170540",
+  "execution_directory": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz",
+  "benches": {
+    "tb_csr_corner_unit": {
+      "stages": {
+        "compile": {
+          "argv": [
+            "C:/Xilinx/Vivado/2022.2/bin/xvlog.bat",
+            "-sv",
+            "-i",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/source_snapshot/ips/riscv_core/rtl",
+            "-f",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/sources.xsim.f",
+            "-log",
+            "compile.log"
+          ],
+          "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_csr_corner_unit",
+          "exit_code": 0
+        },
+        "elaborate": {
+          "argv": [
+            "C:/Xilinx/Vivado/2022.2/bin/xelab.bat",
+            "-debug",
+            "typical",
+            "-timescale",
+            "1ns/1ps",
+            "-cc_type",
+            "sbct",
+            "-cc_db",
+            "tb_csr_corner_unit",
+            "-cc_dir",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/coverage",
+            "-cov_db_dir",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/coverage",
+            "-cov_db_name",
+            "tb_csr_corner_unit",
+            "-s",
+            "tb_csr_corner_unit_snapshot",
+            "work.tb_csr_corner_unit",
+            "-log",
+            "elaborate.log"
+          ],
+          "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_csr_corner_unit",
+          "exit_code": 0
+        },
+        "simulate": {
+          "argv": [
+            "C:/Xilinx/Vivado/2022.2/bin/xsim.bat",
+            "tb_csr_corner_unit_snapshot",
+            "-tclbatch",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/run.tcl",
+            "-onerror",
+            "quit",
+            "-onfinish",
+            "quit",
+            "-sv_seed",
+            "1",
+            "-cov_db_dir",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/coverage",
+            "-cov_db_name",
+            "tb_csr_corner_unit",
+            "-log",
+            "simulation.log"
+          ],
+          "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_csr_corner_unit",
+          "exit_code": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "log": "simulate.stdout.log",
+          "line": "CSR corner unit: SKELETON/INCOMPLETE; no checks performed"
+        }
+      ],
+      "coverage_report": {
+        "argv": [
+          "C:/Xilinx/Vivado/2022.2/bin/xcrg.bat",
+          "-cc_db",
+          "tb_csr_corner_unit",
+          "-cc_dir",
+          "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/coverage",
+          "-cc_report",
+          "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/code_coverage_report",
+          "-log",
+          "code_coverage_report.log"
+        ],
+        "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_csr_corner_unit",
+        "exit_code": 3221226356
+      },
+      "functional_verdict": "SKELETON/INCOMPLETE",
+      "functional_coverage": {
+        "implemented_covergroups": 0,
+        "implemented_bins": 0,
+        "closure_percentage": null,
+        "reason": "No covergroups/bins implemented; simulator reports database not updated."
+      },
+      "checking": "Reference/checker hooks remain empty; zero functional checks.",
+      "coverage_report_env_retry": {
+        "argv": [
+          "C:/Xilinx/Vivado/2022.2/bin/xcrg.bat",
+          "-cc_db",
+          "tb_csr_corner_unit",
+          "-cc_dir",
+          "coverage",
+          "-cc_report",
+          "code_coverage_env_retry",
+          "-log",
+          "code_coverage_env_retry.log"
+        ],
+        "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_csr_corner_unit",
+        "XILINX_VIVADO": "C:/Xilinx/Vivado/2022.2",
+        "exit_code": 3221226356
+      }
+    },
+    "tb_core_csr_trap": {
+      "stages": {
+        "compile": {
+          "argv": [
+            "C:/Xilinx/Vivado/2022.2/bin/xvlog.bat",
+            "-sv",
+            "-i",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/source_snapshot/ips/riscv_core/rtl",
+            "-f",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/sources.xsim.f",
+            "-log",
+            "compile.log"
+          ],
+          "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_core_csr_trap",
+          "exit_code": 0
+        },
+        "elaborate": {
+          "argv": [
+            "C:/Xilinx/Vivado/2022.2/bin/xelab.bat",
+            "-debug",
+            "typical",
+            "-timescale",
+            "1ns/1ps",
+            "-cc_type",
+            "sbct",
+            "-cc_db",
+            "tb_core_csr_trap",
+            "-cc_dir",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/coverage",
+            "-cov_db_dir",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/coverage",
+            "-cov_db_name",
+            "tb_core_csr_trap",
+            "-s",
+            "tb_core_csr_trap_snapshot",
+            "work.tb_core_csr_trap",
+            "-log",
+            "elaborate.log"
+          ],
+          "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_core_csr_trap",
+          "exit_code": 0
+        },
+        "simulate": {
+          "argv": [
+            "C:/Xilinx/Vivado/2022.2/bin/xsim.bat",
+            "tb_core_csr_trap_snapshot",
+            "-tclbatch",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/run.tcl",
+            "-onerror",
+            "quit",
+            "-onfinish",
+            "quit",
+            "-sv_seed",
+            "1",
+            "-cov_db_dir",
+            "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/coverage",
+            "-cov_db_name",
+            "tb_core_csr_trap",
+            "-log",
+            "simulation.log"
+          ],
+          "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_core_csr_trap",
+          "exit_code": 0
+        }
+      },
+      "diagnostics": [
+        {
+          "log": "simulate.stdout.log",
+          "line": "Core corner environment: SKELETON/INCOMPLETE; checks=0; failures=0"
+        }
+      ],
+      "coverage_report": {
+        "argv": [
+          "C:/Xilinx/Vivado/2022.2/bin/xcrg.bat",
+          "-cc_db",
+          "tb_core_csr_trap",
+          "-cc_dir",
+          "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/coverage",
+          "-cc_report",
+          "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/code_coverage_report",
+          "-log",
+          "code_coverage_report.log"
+        ],
+        "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_core_csr_trap",
+        "exit_code": 3221226356
+      },
+      "functional_verdict": "SKELETON/INCOMPLETE",
+      "functional_coverage": {
+        "implemented_covergroups": 0,
+        "implemented_bins": 0,
+        "closure_percentage": null,
+        "reason": "No covergroups/bins implemented; simulator reports database not updated."
+      },
+      "checking": "Reference/checker hooks remain empty; zero functional checks.",
+      "coverage_report_env_retry": {
+        "argv": [
+          "C:/Xilinx/Vivado/2022.2/bin/xcrg.bat",
+          "-cc_db",
+          "tb_core_csr_trap",
+          "-cc_dir",
+          "coverage",
+          "-cc_report",
+          "code_coverage_env_retry",
+          "-log",
+          "code_coverage_env_retry.log"
+        ],
+        "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_core_csr_trap",
+        "XILINX_VIVADO": "C:/Xilinx/Vivado/2022.2",
+        "exit_code": 3221226356
+      }
+    }
+  }
+}

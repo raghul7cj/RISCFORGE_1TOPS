@@ -1,6 +1,6 @@
 # CSR, exception and interrupt corner-case test plan
 
-Created: 2026-11-03. Architecture proposal added: 2026-11-04. Status: proposed design; no new testbench implemented or simulation run.
+Created: 2026-11-03. Architecture proposal added: 2026-11-04. Status updated 2026-11-11: the CSR unit bench is implemented and simulates in local XSim (552 checks, 0 failures, 56 spec-pending cases, observed-attempt bins only); the core bench remains a reset-held skeleton with no stimulus. No closure claim.
 
 ## 1. Bench decision and scope
 
@@ -269,3 +269,15 @@ The engineer's 2026-11-04 instruction limits the next implementation to a readab
 - Existing DUT RTL, existing IRQ tests and their expected results remain outside the implementation scope. Actual DUT ports must be connected explicitly, with one driver per driven signal and coherent compile ordering.
 - Distinguish structural completeness from functional verification. Skeleton execution must identify itself as incomplete and cannot report a test PASS, coverage closure or a verified architectural result. Syntax/elaboration checks may be used if a suitable simulator is available.
 - Delegated implementation receives a standalone brief, this plan and targeted DUT/filelist references; it does not need the surrounding conversation.
+
+## 11. Implementation status — 2026-11-11
+
+Section 10 records the 2026-11-04 skeleton scope. Under the later instruction to implement and run the unit bench, `tb_csr_corner_unit` now carries:
+
+- `status_cases` (8), `metadata_cases` (168), `collision_cases` (40), `counter_cases` (16), `reset_cases` (4): 236 cases.
+- Checked expectations for status, metadata and reset (552 comparisons, 0 failures); collision and counter cases stay `spec_pending` (56 observations, no assertion).
+- Five observed-bin groups covering those 236 cases, sampled once per case, reported at 100% each.
+
+`tb_core_csr_trap` remains at section 10 scope: it compiles (39 sources), elaborates and runs 30 ns reset-held with `checks=0`.
+
+Results, evidence paths, integrity re-verification and the open specification decisions D1–D6 are recorded in [CSR_TRAP_VERIFICATION_STATUS.md](CSR_TRAP_VERIFICATION_STATUS.md). No closure or signoff credit follows from this status.

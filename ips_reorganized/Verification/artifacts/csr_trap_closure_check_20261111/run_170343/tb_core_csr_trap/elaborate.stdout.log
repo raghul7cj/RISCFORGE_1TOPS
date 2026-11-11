@@ -1,0 +1,74 @@
+Vivado Simulator v2022.2
+Copyright 1986-1999, 2001-2022 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2022.2/bin/unwrapped/win64.o/xelab.exe -debug typical -timescale 1ns/1ps -cc_type sbct -cc_db tb_core_csr_trap -cc_dir C:\Users\cj\AppData\Local\Temp\csrcheck_wxno_0yl\tb_core_csr_trap\coverage -cov_db_dir C:\Users\cj\AppData\Local\Temp\csrcheck_wxno_0yl\tb_core_csr_trap\coverage -cov_db_name tb_core_csr_trap -s tb_core_csr_trap_snapshot work.tb_core_csr_trap -log elaborate.log 
+Multi-threading is on. Using 14 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:175]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:176]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:177]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:178]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:179]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:180]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:187]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:188]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:189]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:190]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:196]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:197]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:205]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:206]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:212]
+WARNING: [VRFC 10-3091] actual bit length 65 differs from formal bit length 66 for port 'co' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:219]
+WARNING: [VRFC 10-3091] actual bit length 32 differs from formal bit length 6 for port 'shift' [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/rv32m_mul.v:81]
+WARNING: [VRFC 10-3645] port 'imem_stall' remains unconnected for this instance [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/top.v:309]
+WARNING: [VRFC 10-3645] port 'csr_valid_o' remains unconnected for this instance [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/top.v:571]
+WARNING: [VRFC 10-3645] port 'Zero' remains unconnected for this instance [C:/Users/cj/AppData/Local/Temp/csrcheck_wxno_0yl/source_snapshot/ips/riscv_core/rtl/execute_cycle.v:260]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package work.csr_trap_env_pkg
+Compiling package work.csr_trap_types_pkg
+Compiling package std.std
+Compiling module work.observe_cb
+Compiling module work.state_cb
+Compiling module work.core_corner_if
+Compiling module work.irq_gateway
+Compiling module work.irq_arbiter
+Compiling module work.PC
+Compiling module work.PC_Adder
+Compiling module work.imem_controller
+Compiling module work.fetch_cycle
+Compiling module work.opcode_check
+Compiling module work.Main_Decoder
+Compiling module work.ALU_Decoder
+Compiling module work.Control_Unit_Top
+Compiling module work.Register_File
+Compiling module work.Sign_Extend
+Compiling module work.decode_cycle
+Compiling module work.Mux_3_by_1
+Compiling module work.Mux2
+Compiling module work.ALU
+Compiling module work.JB_unit
+Compiling module work.booth_enc
+Compiling module work.pp_gen
+Compiling module work.csa
+Compiling module work.rv32m_mul_default
+Compiling module work.rv32m_div
+Compiling module work.rv32m_unit
+Compiling module work.execute_cycle
+Compiling module work.ls_unit
+Compiling module work.memory_cycle
+Compiling module work.writeback_cycle
+Compiling module work.wb_trap_mret_commit_controller
+Compiling module work.csr_regfile
+Compiling module work.hazard_unit
+Compiling module work.top
+Compiling module work.core_corner_imem
+Compiling module work.core_corner_dmem
+Compiling module work.core_csr_trap_probe
+Compiling module work.core_csr_trap_assertions
+Compiling module work.tb_core_csr_trap
+ERROR: [XSIM 43-3409] Failed to compile generated C file xsim.dir/tb_core_csr_trap_snapshot/obj/xsim_2.c.
+ERROR: [XSIM 43-3915] Encountered a fatal error. Cannot continue. Exiting... 

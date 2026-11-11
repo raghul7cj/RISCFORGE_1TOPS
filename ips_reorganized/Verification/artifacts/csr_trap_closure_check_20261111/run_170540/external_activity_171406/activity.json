@@ -1,0 +1,179 @@
+{
+  "manual": "https://docs.amd.com/r/2022.2-English/ug900-vivado-logic-simulation/Using-the-Value-Change-Dump-Feature",
+  "scope": "External diagnostic activity counts; no new functional coverage bins or expected behavior.",
+  "source_manifest_sha256": "68e2e9281fee441b5281fd51575d747d79c9df37fc3373ed218eea1d6b66f2aa",
+  "benches": {
+    "tb_csr_corner_unit": {
+      "argv": [
+        "C:/Xilinx/Vivado/2022.2/bin/xsim.bat",
+        "tb_csr_corner_unit_snapshot",
+        "-tclbatch",
+        "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/collect.tcl",
+        "-onerror",
+        "quit",
+        "-onfinish",
+        "stop",
+        "-sv_seed",
+        "1",
+        "-cov_db_dir",
+        "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/functional_db",
+        "-cov_db_name",
+        "tb_csr_corner_unit",
+        "-log",
+        "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/simulation.log"
+      ],
+      "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_csr_corner_unit",
+      "exit_code": 0,
+      "metrics": {
+        "duration_ns": 25.0,
+        "vcd_timescale": "1ps",
+        "sample_phase": "Values after applying all VCD changes at each rising-clock timestamp. Counts are high/nonzero samples, not unique architectural transaction counts.",
+        "counts": {
+          "clock_rising_samples": 3,
+          "active_clock_samples": 0,
+          "reset_held_clock_samples": 3,
+          "reset_unknown_clock_samples": 0
+        },
+        "signals": {
+          "normal_csr_write": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "trap_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "mret_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "retirement_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "fast_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "timer_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "external_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "software_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          }
+        },
+        "reset_n_final": "0"
+      }
+    },
+    "tb_core_csr_trap": {
+      "argv": [
+        "C:/Xilinx/Vivado/2022.2/bin/xsim.bat",
+        "tb_core_csr_trap_snapshot",
+        "-tclbatch",
+        "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/collect.tcl",
+        "-onerror",
+        "quit",
+        "-onfinish",
+        "stop",
+        "-sv_seed",
+        "1",
+        "-cov_db_dir",
+        "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/functional_db",
+        "-cov_db_name",
+        "tb_core_csr_trap",
+        "-log",
+        "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/simulation.log"
+      ],
+      "cwd": "C:\\Users\\cj\\AppData\\Local\\Temp\\csrcheck_9mi5njrz\\tb_core_csr_trap",
+      "exit_code": 0,
+      "metrics": {
+        "duration_ns": 30.0,
+        "vcd_timescale": "1ps",
+        "sample_phase": "Values after applying all VCD changes at each rising-clock timestamp. Counts are high/nonzero samples, not unique architectural transaction counts.",
+        "counts": {
+          "clock_rising_samples": 3,
+          "active_clock_samples": 0,
+          "reset_held_clock_samples": 3,
+          "reset_unknown_clock_samples": 0
+        },
+        "signals": {
+          "trap_commit": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "mret_commit": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "writeback_valid": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "writeback_exception": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "gpr_write": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "csr_write": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "memory_request": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "memory_write": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "fast_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "timer_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "external_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          },
+          "software_irq_input": {
+            "nonzero_clock_samples": 0,
+            "nonzero_active_samples": 0,
+            "unknown_clock_samples": 0
+          }
+        },
+        "reset_n_final": "0"
+      }
+    }
+  }
+}

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P3 Architectural Checks</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / P3 Architectural</span></div>
+<div class="wrap">
+
+<h1>P3 Architectural checks</h1>
+<p class="lead">P3 verifies behaviour that no register read-back can show: reset and clock ordering (P3.1), interrupt delivery (P3.2), fabric and bridge response (P3.3), and the integration of the firmware oracle (P3.4). This page gives the entry, exit, check families and a concrete order of work for the four sub-phases.</p>
+<p class="meta">Scope: P3.1 to P3.4 | Sources: Rev B sections 11, 13, 14, 20, 21; stage 5 brief; <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Status in one line.</b> <span class="tag open">OPEN</span> No P3 sub-phase has started. P0 is IN PROGRESS (13 of 20 exit criteria met, 5 partial, 2 not met, snapshot 2026-10-31) and P0 exit is not met, so no later phase can have its entry satisfied. Everything below is <span class="tag specified">SPECIFIED</span> unless marked. Related: <a href="vf_phases_overview.html">overview</a>, <a href="vf_p2_models.html">P2</a>, <a href="vf_p4_closure.html">P4</a>, <a href="vf_track_f.html">track F</a>, <a href="vf_regression_gates.html">gates</a>, <a href="tracker_status.html">tracker</a>.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective and sub-phase structure</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">Exit criteria and gates</a></li>
+<li><a href="#s4">Work breakdown</a></li>
+<li><a href="#s5">Check families</a></li>
+<li><a href="#s6">Inputs, outputs, dependencies</a></li>
+<li><a href="#s7">Effort and risks</a></li>
+<li><a href="#s8">Current status</a></li>
+<li><a href="#s9">Execution proposal</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective and sub-phase structure</h2>
+<p>P3 is decomposed into four sub-phases. Three start from the P1b exit and are independent of each other. P3.1 is also independent of P2. P3.4 alone waits for P2, because the firmware oracle observes device behaviour and there is nothing to observe until the device models exist. All four rejoin at P4.1 (Figure 1). A sub-phase identifier is never used without its parent, and the gate stamped at P3 exit is the conjunction of the four sub-phase exits.</p>
+
+<figure>
+<svg viewBox="0 0 960 352" role="img" aria-label="P1b exit feeds P3.1, P3.2 and P3.3 in parallel; P2 exit feeds P3.4; all four feed P4.1">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ext" x="24" y="104" width="120" height="64" rx="6"/>
+<text class="tb mid" x="84" y="130">P1b exit</text>
+<text class="ts mid" x="84" y="148">CT-1..5, freeze F</text>
+<rect class="bx-ext" x="24" y="264" width="120" height="64" rx="6"/>
+<text class="tb mid" x="84" y="290">P2 exit</text>
+<text class="ts mid" x="84" y="308">DC-2 record</text>
+<rect class="bx-ver" x="256" y="24" width="200" height="64" rx="6"/>
+<text class="tb mid" x="356" y="48">P3.1 Reset and clock</text>
+<text class="ts mid" x="356" y="64">RS-1..7, RS-9..13</text>
+<text class="ts mid" x="356" y="78">12 to 22 ED (assumed)</text>
+<rect class="bx-ver" x="256" y="104" width="200" height="64" rx="6"/>
+<text class="tb mid" x="356" y="128">P3.2 Interrupts</text>
+<text class="ts mid" x="356" y="144">IC-1..9 (IC-1..24 registered)</text>
+<text class="ts mid" x="356" y="158">15 to 28 ED (assumed)</text>
+<rect class="bx-ver" x="256" y="184" width="200" height="64" rx="6"/>
+<text class="tb mid" x="356" y="208">P3.3 Fabric and bridge</text>
+<text class="ts mid" x="356" y="224">FP-1..FP-11</text>
+<text class="ts mid" x="356" y="238">10 to 18 ED (assumed)</text>
+<rect class="bx-ver" x="256" y="264" width="200" height="64" rx="6"/>
+<text class="tb mid" x="356" y="288">P3.4 Firmware oracle</text>
+<text class="ts mid" x="356" y="304">needs device models</text>
+<text class="ts mid" x="356" y="318">8 to 15 ED (assumed)</text>
+<rect class="bx-ver" x="760" y="168" width="136" height="64" rx="6"/>
+<text class="tb mid" x="828" y="192">P4.1</text>
+<text class="ts mid" x="828" y="210">Coverage model</text>
+<path class="ln" d="M144 136 H200"/>
+<path class="ln" d="M200 56 V216"/>
+<path class="ar" d="M200 56 H256"/>
+<path class="ar" d="M200 136 H256"/>
+<path class="ar" d="M200 216 H256"/>
+<path class="ar" d="M144 296 H256"/>
+<text class="ts mid" x="200" y="288">device models</text>
+<path class="ln" d="M456 56 H608"/>
+<path class="ln" d="M456 136 H608"/>
+<path class="ln" d="M456 216 H608"/>
+<path class="ln" d="M456 296 H608"/>
+<path class="ln" d="M608 56 V296"/>
+<path class="ar" d="M608 200 H760"/>
+</svg>
+<figcaption><b>Figure 1.</b> The four P3 sub-phases and their dependencies (Rev B Table 21.7). P3.1 to P3.3 start at the P1b exit and may run in parallel with P2. P3.4 waits for the P2 exit. The sub-phases rejoin at P4.1, so shortening one of P3.1 to P3.3 does not shorten the plan. Effort ranges are engineer-days, planning estimates.</figcaption>
+</figure>
+
+<h2 id="s2">2. Entry criteria</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Sub-phase</th><th>Entry (Rev B Table 21.4)</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P3.1</td><td>P1b exit met. P2 is not required.</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>P3.2</td><td>P1b exit met, and Table 13.1 names the 6 software-visible sources. Sources wired at the SoC but dropped inside the core are not sources for this purpose.</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>P3.3</td><td>P1b exit met, and the path scoreboard's slot-4 rule reflects the bootloader interposition: slot 4 is bridge, bootloader, SPI master, not a direct path.</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>P3.4</td><td>P2 exit met, and the DC-2 record names an arbitrator other than the author of any check it would invalidate (SD-9).</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>All</td><td>CT-1 to CT-5 satisfied at the recorded identity; standing predicates SD-1, SD-2, SD-5, SD-6, SD-7 are zero.</td><td><span class="tag open">OPEN</span></td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. Exit criteria and gates</h2>
+<p>Rev B Table 20.1: the RS-1 to RS-7 and RS-9 to RS-13, IC-1 to IC-9 and FP-1 to FP-11 check families are all satisfied, on the configuration each family applies to. Gate stamped: G3 (per-run: <code>open_findings == 0</code>, <code>unexplained_ring_drops == 0</code>, <code>scoreboard_drain_satisfied</code>), at P3 exit as the conjunction of the sub-phase exits (Rev B Tables 6.1, 21.3).</p>
+<div class="warn"><b>OPEN, three points to reconcile.</b> (1) Table 20.1 names IC-1 to IC-9, while Rev B Table 13.8 registers IC-1 to IC-24. (2) Four registered rows are not executable today (IC-12, IC-13S, IC-17, IC-24, which need RTL edits or an unintegrated block) and IC-11 needs a recorded hierarchical force; a family cannot be "all satisfied" while a row cannot run. Rev B says a green result on a non-executable row is a harness defect. (3) RS-11 is registered to fail today (specified RTL change); Table 20.1 lists RS-9 to RS-13 as satisfied. No RS-8 appears in Rev B Table 11.7.</div>
+<p>Every IC-n is graded in the integrated configuration (CFG-S) only. A green IC result in the compliance-tree configuration is a harness defect.</p>
+
+<h2 id="s4">4. Work breakdown</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Sub-phase</th><th>Scope</th><th>Key facts from Rev B</th></tr></thead>
+<tbody>
+<tr><td>P3.1 Reset and clock</td><td>Reset release order across five domains, warm and cold boot, reset during traffic, boot-load restarts, reset-domain crossings.</td><td>Domains: <code>sys_rst_n</code>, <code>hard_rst_sync_n</code>, <code>core_rst_n</code>, <code>periph_rst_n</code>, <code>spi_rst_n</code>. Boot FSM has 16 states, S_RESET to S_DONE. RS-3 is a directed sweep of 8 assertion points x 4 activity states = 32 cases, assumed (D-040). Reset-domain crossing decision is recorded at P3.1 exit (track F depends on it).</td></tr>
+<tr><td>P3.2 Interrupts</td><td>Gateway, class arbiter, shadow stack, trap entry and MRET, gate matrix, spurious and nesting cases.</td><td>Six deliverable sources; edge sources are mip[27], mip[7], mip[18], mip[16]; level sources UART mip[19], I2C mip[17]. Nesting depth is capped at 2, so shadow-stack overflow is latent (IC-11 needs a force). MSIP has no delivery path today (IC-13 characterises it).</td></tr>
+<tr><td>P3.3 Fabric and bridge</td><td>2 masters by 3 targets plus internal error slave; decode, error response, bridge protocol, timeout monitors, SRAM mux.</td><td>Deployed configuration only (FP-8). Core fetch and data ports have no handshake, so the fixed port-0 priority of the sram_mux is load-bearing (FP-11). 39 scoreboard rules. 7 timeout monitors (FP-10).</td></tr>
+<tr><td>P3.4 Firmware-oracle integration</td><td>Firmware checks an observable value or device effect; its reported result is cross-checked against passive monitor and model evidence (Figure 2).</td><td>A mailbox PASS alone is an unfalsifiable self-report. Needs the P2 device models and the DC-2 record.</td></tr>
+</tbody></table></div>
+
+<figure>
+<svg viewBox="0 0 960 304" role="img" aria-label="Firmware oracle integration: firmware drives a device and writes a mailbox result; a passive monitor and a mailbox reader feed an oracle cross-check that yields PASS on agreement or an attributed finding on disagreement">
+<rect class="bx-core" x="24" y="112" width="152" height="64" rx="6"/>
+<text class="tb mid" x="100" y="138">Firmware test</text>
+<text class="ts mid" x="100" y="156">reads value or effect</text>
+<rect class="bx-per" x="248" y="48" width="160" height="64" rx="6"/>
+<text class="tb mid" x="328" y="74">Peripheral device</text>
+<text class="ts mid" x="328" y="92">register, pin, timing</text>
+<rect class="bx-mem" x="248" y="176" width="160" height="64" rx="6"/>
+<text class="tb mid" x="328" y="202">Mailbox (DSRAM)</text>
+<text class="ts mid" x="328" y="220">result + word count</text>
+<rect class="bx-ver" x="496" y="48" width="176" height="64" rx="6"/>
+<text class="tb mid" x="584" y="74">Passive monitor/model</text>
+<text class="ts mid" x="584" y="92">observed effect</text>
+<rect class="bx-ver" x="496" y="176" width="176" height="64" rx="6"/>
+<text class="tb mid" x="584" y="202">Mailbox reader</text>
+<text class="ts mid" x="584" y="220">reported result</text>
+<rect class="bx-ver" x="744" y="112" width="184" height="64" rx="6"/>
+<text class="tb mid" x="836" y="138">Oracle cross-check</text>
+<text class="ts mid" x="836" y="156">reported vs observed</text>
+<rect class="bx-ver" x="744" y="24" width="184" height="48" rx="6"/>
+<text class="tb mid" x="836" y="52">PASS: both agree</text>
+<rect class="bx" x="744" y="232" width="184" height="48" rx="6"/>
+<text class="tb mid" x="836" y="260">FAIL: attributed finding</text>
+<path class="ar" d="M176 128 H212 V80 H248"/>
+<path class="ar" d="M176 160 H212 V208 H248"/>
+<path class="ar-ver" d="M408 80 H496"/>
+<text class="ts mid" x="452" y="72">passive</text>
+<path class="ar-ver" d="M408 208 H496"/>
+<text class="ts mid" x="452" y="200">word count</text>
+<path class="ar-ver" d="M672 80 H704 V132 H744"/>
+<path class="ar-ver" d="M672 208 H704 V156 H744"/>
+<path class="ar-ver" d="M836 112 V72"/>
+<path class="ar-bad" d="M836 176 V232"/>
+</svg>
+<figcaption><b>Figure 2.</b> Firmware-oracle integration. The firmware both exercises the device and reports a result to the mailbox. A separate passive path observes the same device effect. Only agreement of the two counts as a pass; disagreement is an attributed finding (red), so the firmware cannot vouch for itself.</figcaption>
+</figure>
+
+<h2 id="s5">5. Check families</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Family</th><th>Range</th><th>What it covers (Rev B)</th><th>Executability notes</th></tr></thead>
+<tbody>
+<tr><td>RS</td><td>RS-1 to RS-7, RS-9 to RS-13 (Table 11.7)</td><td>Cold and warm boot; exhaustive reset-during-traffic sweep; APB and AXI-Lite reset; double reset in loader; soft reset under hard reset; structural reset-pin extraction (RS-9); release-edge alignment (RS-10); soft/hard release relative order (RS-11); reset at each of 16 boot states (RS-12); reset inside S_CLEAN_HOLD (RS-13).</td><td>RS-11 must fail today. RS-10 recovery/removal half is TBD(D-037).</td></tr>
+<tr><td>IC</td><td>IC-1 to IC-9 in Table 20.1; IC-1 to IC-24 in Table 13.8</td><td>Lost edge, wrong winner, starvation, pointer drift, illegal pre-emption, trap context, MRET restore, clear strobe, level/edge re-assert; extended rows cover gate matrix (24 cases), mtvec modes, spurious requests, clear order, nesting, class-2 priority.</td><td>IC-12, IC-13S, IC-17, IC-24 not executable; IC-11 needs a force.</td></tr>
+<tr><td>FP</td><td>FP-1 to FP-11 (Table 14.3)</td><td>Channel stability, no unknowns, grant fairness, decode, DECERR on unmatched address, abort legality, write orphaning, deployed configuration, one APB per AXI transfer, 7 timeout monitors, sram_mux priority.</td><td>All stated as properties; verified here by simulation checks, proved in track F where registered.</td></tr>
+</tbody></table></div>
+<p>FP-10 thresholds in clk_i cycles: 16 for I2C, Timer 0, UART, GPIO and Timer 1; 65536 for SPI; AXI-Lite 64 (SRAM region) and 131072 (APB region). <span class="tag open">OPEN</span> Rev B Table 6.5 counts 6 APB monitors plus one AXI-Lite monitor, so how one AXI-Lite instance carries two thresholds is not settled in the passages read. The firmware-oracle work (P3.4) has no separate family identifier in the passages read; it is graded through the attestation cross-check and the G1 counters.</p>
+
+<h2 id="s6">6. Inputs, outputs, dependencies</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Kind</th><th>Artefact</th></tr></thead>
+<tbody>
+<tr><td>Inputs</td><td>P1b exit evidence and freeze point F; Table 13.1 source list; reset contract and Table 11.1 release order; fabric inventory (Table 14.2); P2 models and DC-2 record (P3.4 only).</td></tr>
+<tr><td>Outputs</td><td>Per-run G3 verdicts for RS, IC, FP checks; compact state and timing traces for reset, interrupt and error behaviour; checker bindings that P4.1 declares bins against; reset-domain-crossing decision (P3.1 exit).</td></tr>
+<tr><td>Predecessors</td><td>P1b (all four); P2 (P3.4 only). See <a href="vf_p1b_soc_structural.html">P1b</a>.</td></tr>
+<tr><td>Successors</td><td>P4.1, and track F for reset-domain and interrupt-interface goals (<a href="vf_track_f.html">track F</a>).</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Effort and risks</h2>
+<p>P3.1 12 to 22, P3.2 15 to 28, P3.3 10 to 18, P3.4 8 to 15 engineer-days (total 45 to 83), <code>ASSUMED(D-GR01)</code>, Rev B Table 21.3. No throughput has been measured. Volumes depend on TBD(D-025) (reset, fault-class and interrupt-scenario counts), so the widest band applies. Effort is not elapsed time.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>Mitigation (proposed)</th></tr></thead>
+<tbody>
+<tr><td>Specified-only behaviour reported as green</td><td>False sign-off (IC-12, IC-13S, IC-17, IC-24, RS-11).</td><td>Carry an executable flag per row; reject green on non-executable rows.</td></tr>
+<tr><td>Unrouted interrupt lines counted as tested</td><td>Overstated coverage.</td><td>Only the 6 deliverable sources count; list the rest as unrouted.</td></tr>
+<tr><td>Boot path leaves reset 2 cycles before the fabric (Rev B RS-2 note)</td><td>Warm-boot results may be attributed to the wrong block.</td><td>Run one scenario at a time; record release order.</td></tr>
+<tr><td>Scope and behaviour decisions late</td><td>Re-authoring checks.</td><td>DC-1 at P0 exit, DC-2 at P2 exit.</td></tr>
+<tr><td>Shadow-stack overflow unreachable</td><td>Cannot be tested without a force.</td><td>Use the recorded hierarchical force of IC-11 and keep a depth-1 positive control.</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Current status</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P3.1, P3.2, P3.3, P3.4</td><td>All NOT STARTED, entry met NO, gate G3 at P3 exit</td></tr>
+<tr><td>Predecessors</td><td>P0 IN PROGRESS (13 of 20 met); P1a, P1b, P2 NOT STARTED. P0 exit is not met.</td></tr>
+<tr><td>Relevant known defect</td><td>DEF-001 (load-use flush during MMIO stall) is FIXED-UNVERIFIED: the fix is in the current <code>hazard_unit.v</code>, its regression (ACT-010) is not yet written.</td></tr>
+</tbody></table></div>
+<p>Source: <code>Verification/status/PHASE_STATUS.md</code>, generated 2026-10-31. This page claims no reset, interrupt or fabric result.</p>
+
+<h2 id="s9">9. Execution proposal</h2>
+<p>Proposal, not Rev B text. The stage 5 brief defines a representative subset (one scenario per area); the order below runs that subset first, then fills the families.</p>
+<ol>
+<li><b>P3.1 first, one scenario at a time.</b> Capture current release order; run RS-1 (cold) and RS-2 (warm) with a self-checking firmware outcome; then RS-4 (reset during one APB access). Preserve traces. Expect RS-11 to fail and register that as the expected result.</li>
+<li><b>P3.3 in parallel.</b> Pick one negative bus condition (unmapped address to FP-5, DECERR with no target activity); confirm one accepted request, one response, no duplicate completion, and the CPU access-fault behaviour only if architecturally expected. Then FP-6 and FP-10 timeout abort on one slot.</li>
+<li><b>P3.2 with one routed source.</b> Confirm real wiring first (Table 13.1, <code>top.v:207,548</code>). Suggested candidate to confirm: Timer 0 channel 0 compare reaching mip[7]. Check enable, pending, trap entry, mepc, mcause, mstatus, handler, MRET, plus one masked-interrupt negative case (IC-14 style). Do not count unrouted timer lines or the AON watchdog.</li>
+<li><b>P3.4 after P2 exit.</b> Make one firmware test check a device effect and cross-check against the passive model (Figure 2); then force a disagreement and show an attributed FAIL.</li>
+<li><b>Fill families.</b> Extend to RS-3 sweep, RS-12/13, the IC gate matrix and nesting cases, FP-1 to FP-11, marking non-executable rows explicitly.</li>
+<li><b>Record findings</b> (<code>p3_findings.md</code>): outcomes, missing source wiring, untested families. Do not soften predicates or edit RTL silently.</li>
+</ol>
+<p><b>Not claimed.</b> Finishing the representative subset is not P3 exit. Exhaustive reset-domain crossing, all-source nesting and the full boot-FSM sweep remain open Rev B obligations.</p>
+
+<div class="sources"><b>Sources read:</b> <code>_src/AUTHORING_GUIDE.md</code>, <code>_src/RevB_plan.txt</code> (Tables 6.1, 6.5, 11.7, 13.8, 14.3, 20.1, 21.3, 21.4, 21.7; sections 13.13, 13.14, 14.1, 14.4), <code>Verification/doc/briefs/stages/stage_5_brief.md</code>, <code>Verification/status/PHASE_STATUS.md</code>.</div>
+</div>
+</body>
+</html>
