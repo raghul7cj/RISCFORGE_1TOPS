@@ -1,0 +1,527 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Nov 09, 2026 at 20:46:08 IST
+xrun
+	-sv
+	-assert
+	-coverage all
+	rtl/ALU_Decoder.v
+	rtl/ALU.v
+	rtl/booth_enc.v
+	rtl/Control_Unit_Top.v
+	rtl/csa.v
+	rtl/csr_regfile.v
+	rtl/Data_Memory.v
+	rtl/decode_cycle.v
+	rtl/execute_cycle.v
+	rtl/fetch_cycle.v
+	rtl/hazard_unit.v
+	rtl/imem_controller.v
+	rtl/Instruction_Memory.v
+	rtl/JB_unit.v
+	rtl/ls_unit.v
+	rtl/Main_Decoder.v
+	rtl/memory_cycle.v
+	rtl/Mux2.v
+	rtl/Mux_3_by_1.v
+	rtl/opcode_check.v
+	rtl/PC_Adder.v
+	rtl/PC.v
+	rtl/pp_gen.v
+	rtl/Register_File.v
+	rtl/rv32m_div.v
+	rtl/rv32m_mul.v
+	rtl/rv32m_unit.v
+	rtl/Sign_Extend.v
+	rtl/top.v
+	rtl/wb_trap_mret_commit_controller.v
+	rtl/writeback_cycle.v
+	tb/tb_rv32m_unit.v
+	tb/rv32m_assertions.sv
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+    ALU alu_inst (
+               |
+xmelab: *W,CUVWSP (./rtl/execute_cycle.v,251|15): 1 output port was not connected:
+xmelab: (./rtl/ALU.v,25): Zero
+
+    csr_regfile #(.XLEN(32)) csr_file (
+                                    |
+xmelab: *W,CUVWSP (./rtl/top.v,590|36): 2 output ports were not connected:
+xmelab: (./rtl/csr_regfile.v,11): csr_valid_o
+xmelab: (./rtl/csr_regfile.v,67): mcause_out_o
+
+	Top level design units:
+		$unit_0x05066a90
+		Data_Memory
+		Instruction_Memory_new
+		top
+		tb_rv32m_unit
+		Caching library 'worklib' ....... Done
+
+	Extracting FSMs for coverage:
+		worklib.Data_Memory
+		worklib.Instruction_Memory_new
+		worklib.PC
+		worklib.PC_Adder
+		worklib.imem_controller
+		worklib.fetch_cycle
+		worklib.opcode_check
+		worklib.Main_Decoder
+		worklib.ALU_Decoder
+		worklib.Control_Unit_Top
+		worklib.Register_File
+		worklib.Sign_Extend
+		worklib.decode_cycle
+		worklib.Mux_3_by_1
+		worklib.Mux2
+		worklib.ALU
+		worklib.JB_unit
+		worklib.booth_enc
+		worklib.pp_gen
+		worklib.csa
+		worklib.rv32m_mul
+		worklib.rv32m_div
+			FSM extracted for state register state
+		worklib.rv32m_assertions
+		worklib.rv32m_unit
+		worklib.execute_cycle
+		worklib.ls_unit
+		worklib.memory_cycle
+		worklib.writeback_cycle
+		worklib.wb_trap_mret_commit_controller
+		worklib.csr_regfile
+		worklib.hazard_unit
+		worklib.top
+		worklib.tb_rv32m_unit
+	Total FSMs extracted = 1
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[16]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[15]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[14]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[13]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[12]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[11]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[10]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[9]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[8]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[7]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[6]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[5]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[4]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[3]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[2]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[1]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(top.Execute.m_unit.u_mul.gen_booth[0]) .
+    csa u_l1_0(.a(l0[0]), .b(l0[1]),  .c(l0[2]),  .s(l1s0), .co(l1c0));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,174|67): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l1_1(.a(l0[3]), .b(l0[4]),  .c(l0[5]),  .s(l1s1), .co(l1c1));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,175|67): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l1_2(.a(l0[6]), .b(l0[7]),  .c(l0[8]),  .s(l1s2), .co(l1c2));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,176|67): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l1_3(.a(l0[9]), .b(l0[10]), .c(l0[11]), .s(l1s3), .co(l1c3));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,177|67): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l1_4(.a(l0[12]),.b(l0[13]), .c(l0[14]), .s(l1s4), .co(l1c4));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,178|67): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l1_5(.a(l0[15]),.b(l0[16]), .c(l0[17]), .s(l1s5), .co(l1c5));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,179|67): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l2_0(.a(l1s0),        .b(l1s1),        .c({l1c0[64:0],1'b0}), .s(l2s0), .co(l2c0));
+                                                                                         |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,186|89): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l2_1(.a(l1s2),        .b(l1s3),        .c({l1c1[64:0],1'b0}), .s(l2s1), .co(l2c1));
+                                                                                         |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,187|89): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l2_2(.a(l1s4),        .b(l1s5),        .c({l1c2[64:0],1'b0}), .s(l2s2), .co(l2c2));
+                                                                                         |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,188|89): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l2_3(.a({l1c3[64:0],1'b0}),.b({l1c4[64:0],1'b0}),.c({l1c5[64:0],1'b0}), .s(l2s3), .co(l2c3));
+                                                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,189|99): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l3_0(.a(l2s0), .b(l2s1), .c({l2c0[64:0],1'b0}), .s(l3s0), .co(l3c0));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,195|75): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l3_1(.a(l2s2), .b(l2s3), .c({l2c1[64:0],1'b0}), .s(l3s1), .co(l3c1));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,196|75): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l4_0(.a(l3s0), .b(l3s1), .c({l3c0[64:0],1'b0}), .s(l4s0), .co(l4c0));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,204|75): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l4_1(.a({l3c1[64:0],1'b0}), .b(l2c2_sh), .c(l2c3_sh), .s(l4s1), .co(l4c1));
+                                                                                 |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,205|81): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l5_0(.a(l4s0), .b(l4s1), .c({l4c0[64:0],1'b0}), .s(l5s0), .co(l5c0));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,211|75): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+    csa u_l6(.a(l5s0), .b({l5c0[64:0],1'b0}), .c(l4c1_sh), .s(final_sum), .co(final_cout));
+                                                                                       |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,218|87): port sizes differ in port connection(65/66) for the instance(top.Execute.m_unit.u_mul) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[16]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[15]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[14]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[13]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[12]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[11]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[10]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[9]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[8]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[7]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[6]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[5]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[4]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[3]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[2]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[1]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_rv32m_unit.dut.u_mul.gen_booth[0]) .
+    csa u_l1_0(.a(l0[0]), .b(l0[1]),  .c(l0[2]),  .s(l1s0), .co(l1c0));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,174|67): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l1_1(.a(l0[3]), .b(l0[4]),  .c(l0[5]),  .s(l1s1), .co(l1c1));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,175|67): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l1_2(.a(l0[6]), .b(l0[7]),  .c(l0[8]),  .s(l1s2), .co(l1c2));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,176|67): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l1_3(.a(l0[9]), .b(l0[10]), .c(l0[11]), .s(l1s3), .co(l1c3));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,177|67): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l1_4(.a(l0[12]),.b(l0[13]), .c(l0[14]), .s(l1s4), .co(l1c4));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,178|67): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l1_5(.a(l0[15]),.b(l0[16]), .c(l0[17]), .s(l1s5), .co(l1c5));
+                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,179|67): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l2_0(.a(l1s0),        .b(l1s1),        .c({l1c0[64:0],1'b0}), .s(l2s0), .co(l2c0));
+                                                                                         |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,186|89): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l2_1(.a(l1s2),        .b(l1s3),        .c({l1c1[64:0],1'b0}), .s(l2s1), .co(l2c1));
+                                                                                         |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,187|89): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l2_2(.a(l1s4),        .b(l1s5),        .c({l1c2[64:0],1'b0}), .s(l2s2), .co(l2c2));
+                                                                                         |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,188|89): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l2_3(.a({l1c3[64:0],1'b0}),.b({l1c4[64:0],1'b0}),.c({l1c5[64:0],1'b0}), .s(l2s3), .co(l2c3));
+                                                                                                   |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,189|99): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l3_0(.a(l2s0), .b(l2s1), .c({l2c0[64:0],1'b0}), .s(l3s0), .co(l3c0));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,195|75): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l3_1(.a(l2s2), .b(l2s3), .c({l2c1[64:0],1'b0}), .s(l3s1), .co(l3c1));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,196|75): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l4_0(.a(l3s0), .b(l3s1), .c({l3c0[64:0],1'b0}), .s(l4s0), .co(l4c0));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,204|75): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l4_1(.a({l3c1[64:0],1'b0}), .b(l2c2_sh), .c(l2c3_sh), .s(l4s1), .co(l4c1));
+                                                                                 |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,205|81): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l5_0(.a(l4s0), .b(l4s1), .c({l4c0[64:0],1'b0}), .s(l5s0), .co(l5c0));
+                                                                           |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,211|75): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+    csa u_l6(.a(l5s0), .b({l5c0[64:0],1'b0}), .c(l4c1_sh), .s(final_sum), .co(final_cout));
+                                                                                       |
+xmelab: *W,CUVMPW (./rtl/rv32m_mul.v,218|87): port sizes differ in port connection(65/66) for the instance(tb_rv32m_unit.dut.u_mul) .
+	Building instance overlay tables: ...........
+xmelab: *W,COVFDP: FSM description matching across instance of a module for "COVFDM" warning has been moved from elaboration to simulation dumping. To restore old matching behavior, use "set_backward_compat -COVFDM_during_elab". Also, it is recommended to use set_parameterized_module_coverage CCF command to avoid coverage loss due to FSM description difference across instances of a module.
+xmelab: *W,COVFHT: FSM hold transitions (transitions to the current state) are not extracted for any FSM in default mode.
+......... Done
+	Enabling instrumentation for coverage types: block expression FSM toggle functional
+xmelab: *W,COVDCL: By default expression coverage is scored only for Verilog logical operators (|| and &&) and VHDL logical operators (OR, AND, NOR, and NAND), and is scored only in condition expressions. To score coverage for other operators and for expressions in other statements, use the "set_expr_coverable_operators" and "set_expr_coverable_statements" coverage configuration file commands with suitable options at elaboration.
+	Generating native compiled code:
+		worklib.tb_rv32m_unit:v <0x4d21e242>
+			streams:  14, words: 83066
+		worklib.hazard_unit:v <0x7675098d>
+			streams:  12, words:  6951
+		worklib.csr_regfile:v <0x61c88e7c>
+			streams:  31, words: 25114
+		worklib.wb_trap_mret_commit_controller:v <0x282de86d>
+			streams:  15, words:  3050
+		worklib.writeback_cycle:v <0x532ab74f>
+			streams:   1, words:   553
+		worklib.ls_unit:v <0x14e51076>
+			streams:   8, words: 15264
+		worklib.memory_cycle:v <0x0a804079>
+			streams:  14, words: 21869
+		worklib.rv32m_div:v <0x4aa85617>
+			streams:  23, words: 15898
+		worklib.csa:v <0x37737724>
+			streams:   1, words:  2182
+		worklib.csa:v <0x571e7639>
+			streams:   1, words:  2182
+		worklib.csa:v <0x0a964347>
+			streams:   1, words:  3358
+		worklib.csa:v <0x6afb425a>
+			streams:   1, words:  2183
+		worklib.csa:v <0x71a14240>
+			streams:   1, words:  1613
+		worklib.pp_gen:v <0x4fe45cea>
+			streams:   4, words:  2348
+		worklib.booth_enc:v <0x625305b2>
+			streams:   0, words:     0
+		worklib.JB_unit:v <0x072603b6>
+			streams:   6, words:  1731
+		worklib.ALU:v <0x66cb3d95>
+			streams:   6, words:  6226
+		worklib.Mux2:v <0x24964aaa>
+			streams:   1, words:   248
+		worklib.Mux_3_by_1:v <0x0b4b282d>
+			streams:   2, words:   513
+		worklib.execute_cycle:v <0x1eb0da0e>
+			streams:  40, words: 44818
+		worklib.Sign_Extend:v <0x050e2d2b>
+			streams:   1, words:  2090
+		worklib.Register_File:v <0x4d35032a>
+			streams:   6, words:  4021
+		worklib.ALU_Decoder:v <0x24e7dafa>
+			streams:   1, words:  8552
+		worklib.opcode_check:v <0x41ec2480>
+			streams:   1, words:   943
+		worklib.Main_Decoder:v <0x6fb1c4d5>
+			streams:   1, words: 13728
+		worklib.Control_Unit_Top:v <0x7f5e0d2e>
+			streams:   5, words:  2850
+		worklib.decode_cycle:v <0x704e3f0f>
+			streams:  15, words: 53177
+		worklib.imem_controller:v <0x6b6b352a>
+			streams:   5, words:  2341
+		worklib.PC_Adder:v <0x3e14ed89>
+			streams:   1, words:   176
+		worklib.PC:v <0x18345ea1>
+			streams:   2, words:   766
+		worklib.fetch_cycle:v <0x5f3e1d1e>
+			streams:  16, words: 15141
+		worklib.Instruction_Memory_new:v <0x14a05f62>
+			streams:  11, words:  8492
+		worklib.Data_Memory:v <0x011f7d01>
+			streams:   9, words:  6887
+		worklib.top:v <0x31123f62>
+			streams:  21, words: 14083
+		worklib.rv32m_mul:v <0x67fd665a>
+			streams:  61, words: 21430
+		worklib.rv32m_unit:v <0x0fed108b>
+			streams:  11, words:  4166
+		worklib.rv32m_assertions:sv <0x16c870ac>
+			streams: 105, words: 69177
+    reg [31:0] Register [31:0];
+                      |
+xmelab: *W,COVMDD (./rtl/Register_File.v,29|22): Toggle coverage for bit, logic, reg, wire, enum and struct multi-dimensional static arrays and vectors is not supported by default. To enable toggle coverage for enum multi-dimensional static arrays specify 'set_toggle_scoring -sv_enum enable_mda' and for other multi-dimensional static arrays, specify 'set_toggle_scoring -sv_mda [<max_bit_base2_exponent>] [-sv_mda_of_struct]' ccf command in the coverage configuration file.
+    integer idx;
+              |
+xmelab: *W,COVUTA (./rtl/Register_File.v,54|14): Toggle coverage is not supported for SystemVerilog integer, real array, string, dynamic array, sparse memory and reference ports. It is also not supported for VHDL multi-dimensional array and array of record. There may also be other such objects in the design.
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                       Instances  Unique
+		Modules:                     136      33
+		Registers:                   413     286
+		Scalar wires:                333       -
+		Expanded wires:            2,214      35
+		Vectored wires:              450       -
+		Named events:                 30      15
+		Always blocks:               164      99
+		Initial blocks:               37      22
+		Clocking blocks:               2       1
+		Cont. assignments:           399     324
+		Pseudo assignments:           53       -
+		Assertions:                   30      15
+		Sparse arrays:                 2       -
+		Compilation units:             1       1
+		SV Class declarations:         6       3
+		SV Class specializations:      6       6
+		Process Clocks:               56       5
+		Simulation timescale:        1ps
+	Writing initial simulation snapshot: worklib.Data_Memory:v
+Loading snapshot worklib.Data_Memory:v .................... Done
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+xmsim: *W,RMEMNOF: $readmem error: open failed on file "dmem.hex".
+            File: ./rtl/Data_Memory.v, line = 69, pos = 42
+           Scope: Data_Memory
+            Time: 0 FS + 0
+
+[IMEM] Loading imem.hex
+xmsim: *W,RMEMNOF: $readmem error: open failed on file "imem.hex".
+            File: ./rtl/Instruction_Memory.v, line = 86, pos = 42
+           Scope: Instruction_Memory_new
+            Time: 0 FS + 0
+
+==================================================================
+   RV32M Full Functional Verification Stimulus Driver            
+==================================================================
+[PASS #01]          MUL: rs1=0x00000000, rs2=0x00000000 -> res=0x00000000 (rd=x1, 3 cycles)
+[PASS #02]          MUL: rs1=0x00000001, rs2=0x00000001 -> res=0x00000001 (rd=x2, 3 cycles)
+[PASS #03]          MUL: rs1=0xffffffff, rs2=0xffffffff -> res=0x00000001 (rd=x3, 3 cycles)
+[PASS #04]          MUL: rs1=0x7fffffff, rs2=0x7fffffff -> res=0x00000001 (rd=x4, 3 cycles)
+[PASS #05]          MUL: rs1=0x80000000, rs2=0x80000000 -> res=0x00000000 (rd=x5, 3 cycles)
+[PASS #06]          MUL: rs1=0x00000010, rs2=0x00000008 -> res=0x00000080 (rd=x6, 3 cycles)
+[PASS #07]          MUL: rs1=0x0000002d, rs2=0xfffffff4 -> res=0xfffffde4 (rd=x7, 3 cycles)
+[PASS #08]          MUL: rs1=0xffffffd3, rs2=0x0000000c -> res=0xfffffde4 (rd=x8, 3 cycles)
+[PASS #09]          MUL: rs1=0x000003e8, rs2=0x00000000 -> res=0x00000000 (rd=x9, 3 cycles)
+[PASS #10]         MULH: rs1=0x00000000, rs2=0x00000032 -> res=0x00000000 (rd=x10, 3 cycles)
+[PASS #11]         MULH: rs1=0x00000032, rs2=0x00000000 -> res=0x00000000 (rd=x10, 3 cycles)
+[PASS #12]         MULH: rs1=0x7fffffff, rs2=0x7fffffff -> res=0x3fffffff (rd=x11, 3 cycles)
+[PASS #13]         MULH: rs1=0x80000000, rs2=0x80000000 -> res=0x40000000 (rd=x12, 3 cycles)
+[PASS #14]         MULH: rs1=0xffffffff, rs2=0x00000001 -> res=0xffffffff (rd=x13, 3 cycles)
+[PASS #15]         MULH: rs1=0xffffffff, rs2=0xffffffff -> res=0x00000000 (rd=x13, 3 cycles)
+[PASS #16]         MULH: rs1=0xfffffffe, rs2=0xfffffffe -> res=0x00000000 (rd=x14, 3 cycles)
+[PASS #17]         MULH: rs1=0x00000064, rs2=0x000000c8 -> res=0x00000000 (rd=x15, 3 cycles)
+[PASS #18]         MULH: rs1=0xffffff9c, rs2=0xffffff38 -> res=0x00000000 (rd=x16, 3 cycles)
+[PASS #19]       MULHSU: rs1=0x00000000, rs2=0x00000000 -> res=0x00000000 (rd=x17, 3 cycles)
+[PASS #20]       MULHSU: rs1=0x00000032, rs2=0x00000001 -> res=0x00000000 (rd=x17, 3 cycles)
+[PASS #21]       MULHSU: rs1=0x7fffffff, rs2=0xffffffff -> res=0x7ffffffe (rd=x18, 3 cycles)
+[PASS #22]       MULHSU: rs1=0x80000000, rs2=0x00000002 -> res=0xffffffff (rd=x19, 3 cycles)
+[PASS #23]       MULHSU: rs1=0xffffffff, rs2=0x00000002 -> res=0xffffffff (rd=x20, 3 cycles)
+[PASS #24]       MULHSU: rs1=0xffffffce, rs2=0x80000000 -> res=0xffffffe7 (rd=x21, 3 cycles)
+[PASS #25]       MULHSU: rs1=0x00000032, rs2=0x80000000 -> res=0x00000019 (rd=x22, 3 cycles)
+[PASS #26]       MULHSU: rs1=0x00000002, rs2=0x00000002 -> res=0x00000000 (rd=x23, 3 cycles)
+[PASS #27]        MULHU: rs1=0xffffffff, rs2=0x00000000 -> res=0x00000000 (rd=x24, 3 cycles)
+[PASS #28]        MULHU: rs1=0x00000000, rs2=0xffffffff -> res=0x00000000 (rd=x24, 3 cycles)
+[PASS #29]        MULHU: rs1=0x00000001, rs2=0x00000001 -> res=0x00000000 (rd=x25, 3 cycles)
+[PASS #30]        MULHU: rs1=0xffffffff, rs2=0xffffffff -> res=0xfffffffe (rd=x26, 3 cycles)
+[PASS #31]        MULHU: rs1=0x40000000, rs2=0x40000000 -> res=0x10000000 (rd=x27, 3 cycles)
+[PASS #32]        MULHU: rs1=0x90000000, rs2=0x90000000 -> res=0x51000000 (rd=x28, 3 cycles)
+[PASS #33]        MULHU: rs1=0x0000000a, rs2=0x0000000a -> res=0x00000000 (rd=x29, 3 cycles)
+[PASS #34]          DIV: rs1=0x0000002a, rs2=0x00000000 -> res=0xffffffff (rd=x30, 2 cycles)
+[PASS #35]          DIV: rs1=0x80000000, rs2=0xffffffff -> res=0x80000000 (rd=x31, 2 cycles)
+[PASS #36]          DIV: rs1=0x80000000, rs2=0x00000002 -> res=0xc0000000 (rd=x31, 35 cycles)
+[PASS #37]          DIV: rs1=0x00000001, rs2=0x00000001 -> res=0x00000001 (rd=x1, 35 cycles)
+[PASS #38]          DIV: rs1=0xffffffff, rs2=0x00000001 -> res=0xffffffff (rd=x1, 35 cycles)
+[PASS #39]          DIV: rs1=0x00000032, rs2=0xffffffff -> res=0xffffffce (rd=x1, 35 cycles)
+[PASS #40]          DIV: rs1=0x00000032, rs2=0x00000032 -> res=0x00000001 (rd=x1, 35 cycles)
+[PASS #41]          DIV: rs1=0x00000002, rs2=0x00000032 -> res=0x00000000 (rd=x2, 35 cycles)
+[PASS #42]          DIV: rs1=0x00000064, rs2=0x00000001 -> res=0x00000064 (rd=x3, 35 cycles)
+[PASS #43]          DIV: rs1=0x00000040, rs2=0x00000008 -> res=0x00000008 (rd=x4, 35 cycles)
+[PASS #44]          DIV: rs1=0x00000064, rs2=0x00000005 -> res=0x00000014 (rd=x5, 35 cycles)
+[PASS #45]          DIV: rs1=0x00000064, rs2=0xfffffffb -> res=0xffffffec (rd=x6, 35 cycles)
+[PASS #46]          DIV: rs1=0xffffff9c, rs2=0x00000005 -> res=0xffffffec (rd=x7, 35 cycles)
+[PASS #47]          DIV: rs1=0xffffff9c, rs2=0xfffffffb -> res=0x00000014 (rd=x8, 35 cycles)
+[PASS #48]          DIV: rs1=0x00000000, rs2=0x0000000a -> res=0x00000000 (rd=x9, 35 cycles)
+[PASS #49]          DIV: rs1=0x7fffffff, rs2=0x00000002 -> res=0x3fffffff (rd=x10, 35 cycles)
+[PASS #50]         DIVU: rs1=0x00000000, rs2=0x00000032 -> res=0x00000000 (rd=x11, 35 cycles)
+[PASS #51]         DIVU: rs1=0x00000001, rs2=0x00000001 -> res=0x00000001 (rd=x11, 35 cycles)
+[PASS #52]         DIVU: rs1=0x0000002a, rs2=0x00000000 -> res=0xffffffff (rd=x11, 2 cycles)
+[PASS #53]         DIVU: rs1=0x0000000a, rs2=0x0000000a -> res=0x00000001 (rd=x12, 35 cycles)
+[PASS #54]         DIVU: rs1=0x00000005, rs2=0x00000064 -> res=0x00000000 (rd=x13, 35 cycles)
+[PASS #55]         DIVU: rs1=0xffffffff, rs2=0x00000002 -> res=0x7fffffff (rd=x14, 35 cycles)
+[PASS #56]         DIVU: rs1=0x00000064, rs2=0x00000001 -> res=0x00000064 (rd=x15, 35 cycles)
+[PASS #57]         DIVU: rs1=0x00000100, rs2=0x00000010 -> res=0x00000010 (rd=x16, 35 cycles)
+[PASS #58]         DIVU: rs1=0x90000000, rs2=0x80000000 -> res=0x00000001 (rd=x17, 35 cycles)
+[PASS #59]          REM: rs1=0x0000002a, rs2=0x00000000 -> res=0x0000002a (rd=x18, 2 cycles)
+[PASS #60]          REM: rs1=0x80000000, rs2=0xffffffff -> res=0x00000000 (rd=x19, 2 cycles)
+[PASS #61]          REM: rs1=0xffffffff, rs2=0x00000005 -> res=0xffffffff (rd=x19, 35 cycles)
+[PASS #62]          REM: rs1=0x00000005, rs2=0xffffffff -> res=0x00000000 (rd=x19, 35 cycles)
+[PASS #63]          REM: rs1=0x00000005, rs2=0x00000001 -> res=0x00000000 (rd=x19, 35 cycles)
+[PASS #64]          REM: rs1=0x00000064, rs2=0x0000000a -> res=0x00000000 (rd=x20, 35 cycles)
+[PASS #65]          REM: rs1=0x00000019, rs2=0x00000004 -> res=0x00000001 (rd=x21, 35 cycles)
+[PASS #66]          REM: rs1=0x00000019, rs2=0xfffffffc -> res=0x00000001 (rd=x22, 35 cycles)
+[PASS #67]          REM: rs1=0xffffffe7, rs2=0x00000004 -> res=0xffffffff (rd=x23, 35 cycles)
+[PASS #68]          REM: rs1=0xffffffe7, rs2=0xfffffffc -> res=0xffffffff (rd=x24, 35 cycles)
+[PASS #69]          REM: rs1=0x7fffffff, rs2=0x0000000a -> res=0x00000007 (rd=x25, 35 cycles)
+[PASS #70]          REM: rs1=0x00000000, rs2=0x00000005 -> res=0x00000000 (rd=x26, 35 cycles)
+[PASS #71]         REMU: rs1=0x00000000, rs2=0x00000005 -> res=0x00000000 (rd=x27, 35 cycles)
+[PASS #72]         REMU: rs1=0x0000002a, rs2=0x00000000 -> res=0x0000002a (rd=x27, 2 cycles)
+[PASS #73]         REMU: rs1=0x00000064, rs2=0x00000001 -> res=0x00000000 (rd=x28, 35 cycles)
+[PASS #74]         REMU: rs1=0x00000064, rs2=0x0000000a -> res=0x00000000 (rd=x28, 35 cycles)
+[PASS #75]         REMU: rs1=0x00000005, rs2=0x00000014 -> res=0x00000005 (rd=x29, 35 cycles)
+[PASS #76]         REMU: rs1=0x00000005, rs2=0xffffffff -> res=0x00000005 (rd=x29, 35 cycles)
+[PASS #77]         REMU: rs1=0xffffffff, rs2=0x0000000a -> res=0x00000005 (rd=x30, 35 cycles)
+[PASS #78]         REMU: rs1=0xffffffff, rs2=0x80000000 -> res=0x7fffffff (rd=x31, 35 cycles)
+[PASS #79]         REMU: rs1=0xffffffff, rs2=0x00000000 -> res=0xffffffff (rd=x1, 2 cycles)
+
+==================================================================
+                   VERIFICATION SUMMARY                           
+==================================================================
+ Total Tests Executed: 79
+ Passed:              79
+ Failed:              0
+ >>> [STATUS: ALL TESTS PASSED SUCCESSFULLY] <<<
+==================================================================
+
+Simulation complete via $finish(1) at time 16400 NS + 0
+./tb/tb_rv32m_unit.v:305         $finish;
+xcelium> exit
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  Data_Memory(Data_Memory)
+  dutinst  :  Instruction_Memory_new(Instruction_Memory_new)
+  dutinst  :  top(top)
+  dutinst  :  tb_rv32m_unit(tb_rv32m_unit)
+  scope    :  scope
+  testname :  test
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_761d3d45_3c7efc79.ucm
+  data               :  ./cov_work/scope/test/icc_761d3d45_3c7efc79.ucd
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 09, 2026 at 20:46:11 IST  (total: 00:00:03)

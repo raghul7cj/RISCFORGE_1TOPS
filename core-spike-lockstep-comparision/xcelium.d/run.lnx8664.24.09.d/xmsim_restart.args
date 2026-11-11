@@ -1,0 +1,29 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
++imem_hex=hex/imem.hex
++dmem_hex=hex/dmem.hex
++tohost_addr=80008040
++max_cycles=50000
++log_file=logs/rtl_main.log
+-COVOVERWRITE
+-MESSAGES
++EMGRLOG
+logs/xrun_rtl.log
+-XLSTIME
+1794323985
+-XLKEEP
+-XLMODE
+./xcelium.d/run.lnx8664.24.09.d
+-RUNMODE
+-CDSLIB
+./xcelium.d/run.lnx8664.24.09.d/cds.lib
+-HDLVAR
+./xcelium.d/run.lnx8664.24.09.d/hdl.var
+-XLNAME
+xrun
+-XLVERSION
+"TOOL:	xrun(64)	24.09-s001"
+-XLNAME
+./xcelium.d/run.lnx8664.24.09.d/vlsi.iiita.ac.in_11377

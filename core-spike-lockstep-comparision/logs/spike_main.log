@@ -1,0 +1,278 @@
+core   0: 0x00001000 (0x00000297) auipc   t0, 0x0
+core   0: 3 0x00001000 (0x00000297) x5  0x00001000
+core   0: 0x00001004 (0x02028593) addi    a1, t0, 32
+core   0: 3 0x00001004 (0x02028593) x11 0x00001020
+core   0: 0x00001008 (0xf1402573) csrr    a0, mhartid
+core   0: 3 0x00001008 (0xf1402573) x10 0x00000000
+core   0: 0x0000100c (0x0182a283) lw      t0, 24(t0)
+core   0: 3 0x0000100c (0x0182a283) x5  0x80000000 mem 0x00001018
+core   0: 0x00001010 (0x00028067) jr      t0
+core   0: 3 0x00001010 (0x00028067)
+core   0: 0x80000000 (0x30401073) csrw    mie, zero
+core   0: 3 0x80000000 (0x30401073) c772_mie 0x00000000
+core   0: 0x80000004 (0x00010117) auipc   sp, 0x10
+core   0: 3 0x80000004 (0x00010117) x2  0x80010004
+core   0: 0x80000008 (0xffc10113) addi    sp, sp, -4
+core   0: 3 0x80000008 (0xffc10113) x2  0x80010000
+core   0: 0x8000000c (0x054000ef) jal     pc + 0x54
+core   0: 3 0x8000000c (0x054000ef) x1  0x80000010
+core   0: 0x80000060 (0xfc010113) addi    sp, sp, -64
+core   0: 3 0x80000060 (0xfc010113) x2  0x8000ffc0
+core   0: 0x80000064 (0x02112e23) sw      ra, 60(sp)
+core   0: 3 0x80000064 (0x02112e23) mem 0x8000fffc 0x80000010
+core   0: 0x80000068 (0x02812c23) sw      s0, 56(sp)
+core   0: 3 0x80000068 (0x02812c23) mem 0x8000fff8 0x00000000
+core   0: 0x8000006c (0x04010413) addi    s0, sp, 64
+core   0: 3 0x8000006c (0x04010413) x8  0x80010000
+core   0: 0x80000070 (0x00a00793) li      a5, 10
+core   0: 3 0x80000070 (0x00a00793) x15 0x0000000a
+core   0: 0x80000074 (0xfef42423) sw      a5, -24(s0)
+core   0: 3 0x80000074 (0xfef42423) mem 0x8000ffe8 0x0000000a
+core   0: 0x80000078 (0x01400793) li      a5, 20
+core   0: 3 0x80000078 (0x01400793) x15 0x00000014
+core   0: 0x8000007c (0xfef42223) sw      a5, -28(s0)
+core   0: 3 0x8000007c (0xfef42223) mem 0x8000ffe4 0x00000014
+core   0: 0x80000080 (0xfe842783) lw      a5, -24(s0)
+core   0: 3 0x80000080 (0xfe842783) x15 0x0000000a mem 0x8000ffe8
+core   0: 0x80000084 (0xfe442703) lw      a4, -28(s0)
+core   0: 3 0x80000084 (0xfe442703) x14 0x00000014 mem 0x8000ffe4
+core   0: 0x80000088 (0x00070593) mv      a1, a4
+core   0: 3 0x80000088 (0x00070593) x11 0x00000014
+core   0: 0x8000008c (0x00078513) mv      a0, a5
+core   0: 3 0x8000008c (0x00078513) x10 0x0000000a
+core   0: 0x80000090 (0xf99ff0ef) jal     pc - 0x68
+core   0: 3 0x80000090 (0xf99ff0ef) x1  0x80000094
+core   0: 0x80000028 (0xfe010113) addi    sp, sp, -32
+core   0: 3 0x80000028 (0xfe010113) x2  0x8000ffa0
+core   0: 0x8000002c (0x00112e23) sw      ra, 28(sp)
+core   0: 3 0x8000002c (0x00112e23) mem 0x8000ffbc 0x80000094
+core   0: 0x80000030 (0x00812c23) sw      s0, 24(sp)
+core   0: 3 0x80000030 (0x00812c23) mem 0x8000ffb8 0x80010000
+core   0: 0x80000034 (0x02010413) addi    s0, sp, 32
+core   0: 3 0x80000034 (0x02010413) x8  0x8000ffc0
+core   0: 0x80000038 (0xfea42623) sw      a0, -20(s0)
+core   0: 3 0x80000038 (0xfea42623) mem 0x8000ffac 0x0000000a
+core   0: 0x8000003c (0xfeb42423) sw      a1, -24(s0)
+core   0: 3 0x8000003c (0xfeb42423) mem 0x8000ffa8 0x00000014
+core   0: 0x80000040 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000040 (0xfec42703) x14 0x0000000a mem 0x8000ffac
+core   0: 0x80000044 (0xfe842783) lw      a5, -24(s0)
+core   0: 3 0x80000044 (0xfe842783) x15 0x00000014 mem 0x8000ffa8
+core   0: 0x80000048 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x80000048 (0x00f707b3) x15 0x0000001e
+core   0: 0x8000004c (0x00078513) mv      a0, a5
+core   0: 3 0x8000004c (0x00078513) x10 0x0000001e
+core   0: 0x80000050 (0x01c12083) lw      ra, 28(sp)
+core   0: 3 0x80000050 (0x01c12083) x1  0x80000094 mem 0x8000ffbc
+core   0: 0x80000054 (0x01812403) lw      s0, 24(sp)
+core   0: 3 0x80000054 (0x01812403) x8  0x80010000 mem 0x8000ffb8
+core   0: 0x80000058 (0x02010113) addi    sp, sp, 32
+core   0: 3 0x80000058 (0x02010113) x2  0x8000ffc0
+core   0: 0x8000005c (0x00008067) ret
+core   0: 3 0x8000005c (0x00008067)
+core   0: 0x80000094 (0x00050793) mv      a5, a0
+core   0: 3 0x80000094 (0x00050793) x15 0x0000001e
+core   0: 0x80000098 (0xfef42023) sw      a5, -32(s0)
+core   0: 3 0x80000098 (0xfef42023) mem 0x8000ffe0 0x0000001e
+core   0: 0x8000009c (0x800087b7) lui     a5, 0x80008
+core   0: 3 0x8000009c (0x800087b7) x15 0x80008000
+core   0: 0x800000a0 (0x00078793) mv      a5, a5
+core   0: 3 0x800000a0 (0x00078793) x15 0x80008000
+core   0: 0x800000a4 (0x0007a583) lw      a1, 0(a5)
+core   0: 3 0x800000a4 (0x0007a583) x11 0x00000001 mem 0x80008000
+core   0: 0x800000a8 (0x0047a603) lw      a2, 4(a5)
+core   0: 3 0x800000a8 (0x0047a603) x12 0x00000002 mem 0x80008004
+core   0: 0x800000ac (0x0087a683) lw      a3, 8(a5)
+core   0: 3 0x800000ac (0x0087a683) x13 0x00000003 mem 0x80008008
+core   0: 0x800000b0 (0x00c7a703) lw      a4, 12(a5)
+core   0: 3 0x800000b0 (0x00c7a703) x14 0x00000004 mem 0x8000800c
+core   0: 0x800000b4 (0xfcb42623) sw      a1, -52(s0)
+core   0: 3 0x800000b4 (0xfcb42623) mem 0x8000ffcc 0x00000001
+core   0: 0x800000b8 (0xfcc42823) sw      a2, -48(s0)
+core   0: 3 0x800000b8 (0xfcc42823) mem 0x8000ffd0 0x00000002
+core   0: 0x800000bc (0xfcd42a23) sw      a3, -44(s0)
+core   0: 3 0x800000bc (0xfcd42a23) mem 0x8000ffd4 0x00000003
+core   0: 0x800000c0 (0xfce42c23) sw      a4, -40(s0)
+core   0: 3 0x800000c0 (0xfce42c23) mem 0x8000ffd8 0x00000004
+core   0: 0x800000c4 (0x0107a783) lw      a5, 16(a5)
+core   0: 3 0x800000c4 (0x0107a783) x15 0x00000005 mem 0x80008010
+core   0: 0x800000c8 (0xfcf42e23) sw      a5, -36(s0)
+core   0: 3 0x800000c8 (0xfcf42e23) mem 0x8000ffdc 0x00000005
+core   0: 0x800000cc (0xfc042423) sw      zero, -56(s0)
+core   0: 3 0x800000cc (0xfc042423) mem 0x8000ffc8 0x00000000
+core   0: 0x800000d0 (0xfe042623) sw      zero, -20(s0)
+core   0: 3 0x800000d0 (0xfe042623) mem 0x8000ffec 0x00000000
+core   0: 0x800000d4 (0x0300006f) j       pc + 0x30
+core   0: 3 0x800000d4 (0x0300006f)
+core   0: 0x80000104 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000104 (0xfec42703) x14 0x00000000 mem 0x8000ffec
+core   0: 0x80000108 (0x00400793) li      a5, 4
+core   0: 3 0x80000108 (0x00400793) x15 0x00000004
+core   0: 0x8000010c (0xfce7d6e3) bge     a5, a4, pc - 52
+core   0: 3 0x8000010c (0xfce7d6e3)
+core   0: 0x800000d8 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x800000d8 (0xfec42703) x14 0x00000000 mem 0x8000ffec
+core   0: 0x800000dc (0xfcc40793) addi    a5, s0, -52
+core   0: 3 0x800000dc (0xfcc40793) x15 0x8000ffcc
+core   0: 0x800000e0 (0x00271713) slli    a4, a4, 2
+core   0: 3 0x800000e0 (0x00271713) x14 0x00000000
+core   0: 0x800000e4 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000e4 (0x00f707b3) x15 0x8000ffcc
+core   0: 0x800000e8 (0x0007a703) lw      a4, 0(a5)
+core   0: 3 0x800000e8 (0x0007a703) x14 0x00000001 mem 0x8000ffcc
+core   0: 0x800000ec (0xfc842783) lw      a5, -56(s0)
+core   0: 3 0x800000ec (0xfc842783) x15 0x00000000 mem 0x8000ffc8
+core   0: 0x800000f0 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000f0 (0x00f707b3) x15 0x00000001
+core   0: 0x800000f4 (0xfcf42423) sw      a5, -56(s0)
+core   0: 3 0x800000f4 (0xfcf42423) mem 0x8000ffc8 0x00000001
+core   0: 0x800000f8 (0xfec42783) lw      a5, -20(s0)
+core   0: 3 0x800000f8 (0xfec42783) x15 0x00000000 mem 0x8000ffec
+core   0: 0x800000fc (0x00178793) addi    a5, a5, 1
+core   0: 3 0x800000fc (0x00178793) x15 0x00000001
+core   0: 0x80000100 (0xfef42623) sw      a5, -20(s0)
+core   0: 3 0x80000100 (0xfef42623) mem 0x8000ffec 0x00000001
+core   0: 0x80000104 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000104 (0xfec42703) x14 0x00000001 mem 0x8000ffec
+core   0: 0x80000108 (0x00400793) li      a5, 4
+core   0: 3 0x80000108 (0x00400793) x15 0x00000004
+core   0: 0x8000010c (0xfce7d6e3) bge     a5, a4, pc - 52
+core   0: 3 0x8000010c (0xfce7d6e3)
+core   0: 0x800000d8 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x800000d8 (0xfec42703) x14 0x00000001 mem 0x8000ffec
+core   0: 0x800000dc (0xfcc40793) addi    a5, s0, -52
+core   0: 3 0x800000dc (0xfcc40793) x15 0x8000ffcc
+core   0: 0x800000e0 (0x00271713) slli    a4, a4, 2
+core   0: 3 0x800000e0 (0x00271713) x14 0x00000004
+core   0: 0x800000e4 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000e4 (0x00f707b3) x15 0x8000ffd0
+core   0: 0x800000e8 (0x0007a703) lw      a4, 0(a5)
+core   0: 3 0x800000e8 (0x0007a703) x14 0x00000002 mem 0x8000ffd0
+core   0: 0x800000ec (0xfc842783) lw      a5, -56(s0)
+core   0: 3 0x800000ec (0xfc842783) x15 0x00000001 mem 0x8000ffc8
+core   0: 0x800000f0 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000f0 (0x00f707b3) x15 0x00000003
+core   0: 0x800000f4 (0xfcf42423) sw      a5, -56(s0)
+core   0: 3 0x800000f4 (0xfcf42423) mem 0x8000ffc8 0x00000003
+core   0: 0x800000f8 (0xfec42783) lw      a5, -20(s0)
+core   0: 3 0x800000f8 (0xfec42783) x15 0x00000001 mem 0x8000ffec
+core   0: 0x800000fc (0x00178793) addi    a5, a5, 1
+core   0: 3 0x800000fc (0x00178793) x15 0x00000002
+core   0: 0x80000100 (0xfef42623) sw      a5, -20(s0)
+core   0: 3 0x80000100 (0xfef42623) mem 0x8000ffec 0x00000002
+core   0: 0x80000104 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000104 (0xfec42703) x14 0x00000002 mem 0x8000ffec
+core   0: 0x80000108 (0x00400793) li      a5, 4
+core   0: 3 0x80000108 (0x00400793) x15 0x00000004
+core   0: 0x8000010c (0xfce7d6e3) bge     a5, a4, pc - 52
+core   0: 3 0x8000010c (0xfce7d6e3)
+core   0: 0x800000d8 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x800000d8 (0xfec42703) x14 0x00000002 mem 0x8000ffec
+core   0: 0x800000dc (0xfcc40793) addi    a5, s0, -52
+core   0: 3 0x800000dc (0xfcc40793) x15 0x8000ffcc
+core   0: 0x800000e0 (0x00271713) slli    a4, a4, 2
+core   0: 3 0x800000e0 (0x00271713) x14 0x00000008
+core   0: 0x800000e4 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000e4 (0x00f707b3) x15 0x8000ffd4
+core   0: 0x800000e8 (0x0007a703) lw      a4, 0(a5)
+core   0: 3 0x800000e8 (0x0007a703) x14 0x00000003 mem 0x8000ffd4
+core   0: 0x800000ec (0xfc842783) lw      a5, -56(s0)
+core   0: 3 0x800000ec (0xfc842783) x15 0x00000003 mem 0x8000ffc8
+core   0: 0x800000f0 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000f0 (0x00f707b3) x15 0x00000006
+core   0: 0x800000f4 (0xfcf42423) sw      a5, -56(s0)
+core   0: 3 0x800000f4 (0xfcf42423) mem 0x8000ffc8 0x00000006
+core   0: 0x800000f8 (0xfec42783) lw      a5, -20(s0)
+core   0: 3 0x800000f8 (0xfec42783) x15 0x00000002 mem 0x8000ffec
+core   0: 0x800000fc (0x00178793) addi    a5, a5, 1
+core   0: 3 0x800000fc (0x00178793) x15 0x00000003
+core   0: 0x80000100 (0xfef42623) sw      a5, -20(s0)
+core   0: 3 0x80000100 (0xfef42623) mem 0x8000ffec 0x00000003
+core   0: 0x80000104 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000104 (0xfec42703) x14 0x00000003 mem 0x8000ffec
+core   0: 0x80000108 (0x00400793) li      a5, 4
+core   0: 3 0x80000108 (0x00400793) x15 0x00000004
+core   0: 0x8000010c (0xfce7d6e3) bge     a5, a4, pc - 52
+core   0: 3 0x8000010c (0xfce7d6e3)
+core   0: 0x800000d8 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x800000d8 (0xfec42703) x14 0x00000003 mem 0x8000ffec
+core   0: 0x800000dc (0xfcc40793) addi    a5, s0, -52
+core   0: 3 0x800000dc (0xfcc40793) x15 0x8000ffcc
+core   0: 0x800000e0 (0x00271713) slli    a4, a4, 2
+core   0: 3 0x800000e0 (0x00271713) x14 0x0000000c
+core   0: 0x800000e4 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000e4 (0x00f707b3) x15 0x8000ffd8
+core   0: 0x800000e8 (0x0007a703) lw      a4, 0(a5)
+core   0: 3 0x800000e8 (0x0007a703) x14 0x00000004 mem 0x8000ffd8
+core   0: 0x800000ec (0xfc842783) lw      a5, -56(s0)
+core   0: 3 0x800000ec (0xfc842783) x15 0x00000006 mem 0x8000ffc8
+core   0: 0x800000f0 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000f0 (0x00f707b3) x15 0x0000000a
+core   0: 0x800000f4 (0xfcf42423) sw      a5, -56(s0)
+core   0: 3 0x800000f4 (0xfcf42423) mem 0x8000ffc8 0x0000000a
+core   0: 0x800000f8 (0xfec42783) lw      a5, -20(s0)
+core   0: 3 0x800000f8 (0xfec42783) x15 0x00000003 mem 0x8000ffec
+core   0: 0x800000fc (0x00178793) addi    a5, a5, 1
+core   0: 3 0x800000fc (0x00178793) x15 0x00000004
+core   0: 0x80000100 (0xfef42623) sw      a5, -20(s0)
+core   0: 3 0x80000100 (0xfef42623) mem 0x8000ffec 0x00000004
+core   0: 0x80000104 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000104 (0xfec42703) x14 0x00000004 mem 0x8000ffec
+core   0: 0x80000108 (0x00400793) li      a5, 4
+core   0: 3 0x80000108 (0x00400793) x15 0x00000004
+core   0: 0x8000010c (0xfce7d6e3) bge     a5, a4, pc - 52
+core   0: 3 0x8000010c (0xfce7d6e3)
+core   0: 0x800000d8 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x800000d8 (0xfec42703) x14 0x00000004 mem 0x8000ffec
+core   0: 0x800000dc (0xfcc40793) addi    a5, s0, -52
+core   0: 3 0x800000dc (0xfcc40793) x15 0x8000ffcc
+core   0: 0x800000e0 (0x00271713) slli    a4, a4, 2
+core   0: 3 0x800000e0 (0x00271713) x14 0x00000010
+core   0: 0x800000e4 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000e4 (0x00f707b3) x15 0x8000ffdc
+core   0: 0x800000e8 (0x0007a703) lw      a4, 0(a5)
+core   0: 3 0x800000e8 (0x0007a703) x14 0x00000005 mem 0x8000ffdc
+core   0: 0x800000ec (0xfc842783) lw      a5, -56(s0)
+core   0: 3 0x800000ec (0xfc842783) x15 0x0000000a mem 0x8000ffc8
+core   0: 0x800000f0 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x800000f0 (0x00f707b3) x15 0x0000000f
+core   0: 0x800000f4 (0xfcf42423) sw      a5, -56(s0)
+core   0: 3 0x800000f4 (0xfcf42423) mem 0x8000ffc8 0x0000000f
+core   0: 0x800000f8 (0xfec42783) lw      a5, -20(s0)
+core   0: 3 0x800000f8 (0xfec42783) x15 0x00000004 mem 0x8000ffec
+core   0: 0x800000fc (0x00178793) addi    a5, a5, 1
+core   0: 3 0x800000fc (0x00178793) x15 0x00000005
+core   0: 0x80000100 (0xfef42623) sw      a5, -20(s0)
+core   0: 3 0x80000100 (0xfef42623) mem 0x8000ffec 0x00000005
+core   0: 0x80000104 (0xfec42703) lw      a4, -20(s0)
+core   0: 3 0x80000104 (0xfec42703) x14 0x00000005 mem 0x8000ffec
+core   0: 0x80000108 (0x00400793) li      a5, 4
+core   0: 3 0x80000108 (0x00400793) x15 0x00000004
+core   0: 0x8000010c (0xfce7d6e3) bge     a5, a4, pc - 52
+core   0: 3 0x8000010c (0xfce7d6e3)
+core   0: 0x80000110 (0xfe042703) lw      a4, -32(s0)
+core   0: 3 0x80000110 (0xfe042703) x14 0x0000001e mem 0x8000ffe0
+core   0: 0x80000114 (0xfc842783) lw      a5, -56(s0)
+core   0: 3 0x80000114 (0xfc842783) x15 0x0000000f mem 0x8000ffc8
+core   0: 0x80000118 (0x00f707b3) add     a5, a4, a5
+core   0: 3 0x80000118 (0x00f707b3) x15 0x0000002d
+core   0: 0x8000011c (0x00078513) mv      a0, a5
+core   0: 3 0x8000011c (0x00078513) x10 0x0000002d
+core   0: 0x80000120 (0x03c12083) lw      ra, 60(sp)
+core   0: 3 0x80000120 (0x03c12083) x1  0x80000010 mem 0x8000fffc
+core   0: 0x80000124 (0x03812403) lw      s0, 56(sp)
+core   0: 3 0x80000124 (0x03812403) x8  0x00000000 mem 0x8000fff8
+core   0: 0x80000128 (0x04010113) addi    sp, sp, 64
+core   0: 3 0x80000128 (0x04010113) x2  0x80010000
+core   0: 0x8000012c (0x00008067) ret
+core   0: 3 0x8000012c (0x00008067)
+core   0: 0x80000010 (0x00008297) auipc   t0, 0x8
+core   0: 3 0x80000010 (0x00008297) x5  0x80008010
+core   0: 0x80000014 (0x03028293) addi    t0, t0, 48
+core   0: 3 0x80000014 (0x03028293) x5  0x80008040
+core   0: 0x80000018 (0x00100313) li      t1, 1
+core   0: 3 0x80000018 (0x00100313) x6  0x00000001
+core   0: 0x8000001c (0x0062a023) sw      t1, 0(t0)
+core   0: 3 0x8000001c (0x0062a023) mem 0x80008040 0x00000001
+core   0: 0x80000020 (0x10500073) wfi
+core   0: 3 0x80000020 (0x10500073)

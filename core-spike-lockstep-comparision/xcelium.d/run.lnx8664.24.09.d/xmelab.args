@@ -1,0 +1,26 @@
+//
+// File created by:  xrun
+// Do not modify this file
+//
++imem_hex=hex/imem.hex
++dmem_hex=hex/dmem.hex
++tohost_addr=80008040
++max_cycles=50000
++log_file=logs/rtl_baremetal_helloworld.log
+-ACCESS
++rc
+-no_analogsolver
+-MESSAGES
+tb_top
+-dms_perf
+-XLMODE
+./xcelium.d/run.lnx8664.24.09.d
+-RUNMODE
+-CDSLIB
+./xcelium.d/run.lnx8664.24.09.d/cds.lib
+-HDLVAR
+./xcelium.d/run.lnx8664.24.09.d/hdl.var
+-WORK
+worklib
+-IRUNHASTOP
+-HASXLMODE

@@ -1,0 +1,70 @@
+00000000000000009085[]
+
+[{"title": "   ", "lazy": true, "folder": true}][{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"Verification Metrics","All Average Grd":"83.6%","All Cov":"1487 / 1697 (87.63%)","Assertion Status Grd":"100%","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"Types","All Average Grd":"85.42%","All Cov":"771 / 876 (88.01%)","Assertion Status Grd":"100%","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"uvm_pkg","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_pkg","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"$unit","All Average Grd":"100%","All Cov":"55 / 55 (100%)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_coverage::instr_cg","All Average Grd":"100%","All Cov":"8 / 8 (100%)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_instr","All Average Grd":"100%","All Cov":"8 / 8 (100%)","Assertion Status Grd":"n/a","bins_json":"bin0.json"}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_coverage::offset_cg","All Average Grd":"100%","All Cov":"24 / 24 (100%)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_instr","All Average Grd":"100%","All Cov":"6 / 6 (100%)","Assertion Status Grd":"n/a","bins_json":"bin1.json"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_offset","All Average Grd":"100%","All Cov":"4 / 4 (100%)","Assertion Status Grd":"n/a","bins_json":"bin2.json"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cx_instr_offset","All Average Grd":"100%","All Cov":"14 / 14 (100%)","Assertion Status Grd":"n/a","columns":"cp_instr;cp_offset","bins_json":"bin3.json"}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_coverage::strobe_cg","All Average Grd":"100%","All Cov":"8 / 8 (100%)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_be","All Average Grd":"100%","All Cov":"8 / 8 (100%)","Assertion Status Grd":"n/a","bins_json":"bin4.json"}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_coverage::sign_ext_cg","All Average Grd":"100%","All Cov":"4 / 4 (100%)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_lb_sign","All Average Grd":"100%","All Cov":"2 / 2 (100%)","Assertion Status Grd":"n/a","bins_json":"bin5.json"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_lh_sign","All Average Grd":"100%","All Cov":"2 / 2 (100%)","Assertion Status Grd":"n/a","bins_json":"bin6.json"}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_coverage::handshake_cg","All Average Grd":"100%","All Cov":"11 / 11 (100%)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_stall","All Average Grd":"100%","All Cov":"3 / 3 (100%)","Assertion Status Grd":"n/a","bins_json":"bin7.json"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cp_resp","All Average Grd":"100%","All Cov":"2 / 2 (100%)","Assertion Status Grd":"n/a","bins_json":"bin8.json"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"cx_stall_resp","All Average Grd":"100%","All Cov":"6 / 6 (100%)","Assertion Status Grd":"n/a","columns":"cp_stall;cp_resp","bins_json":"bin9.json"}
+]}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"top_tb","All Average Grd":"58.33%","All Cov":"9 / 14 (64.29%)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_if","All Average Grd":"84.21%","All Cov":"176 / 209 (84.21%)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"ls_unit","All Average Grd":"92.45%","All Cov":"347 / 381 (91.08%)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_assertions","All Average Grd":"92.11%","All Cov":"184 / 217 (84.79%)","Assertion Status Grd":"100%","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_mem_req_decode","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_mem_we_decode","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_mem_addr_passthrough","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_core_stall_gating","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_core_err_passthrough","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_idle_quiescent","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_store_be_legal","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_load_be_zero","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+]}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"Instances","All Average Grd":"81.77%","All Cov":"716 / 821 (87.21%)","Assertion Status Grd":"100%","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"uvm_pkg","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"uvm_test_top","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"m_env","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"m_coverage","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a"}
+]}
+]}
+]}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"lsu_pkg","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"$unit","All Average Grd":"n/a","All Cov":"0 / 0 (n/a)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"top_tb","All Average Grd":"81.77%","All Cov":"716 / 821 (87.21%)","Assertion Status Grd":"100%","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"dut_if","All Average Grd":"84.21%","All Cov":"176 / 209 (84.21%)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"u_lsu","All Average Grd":"92.45%","All Cov":"347 / 381 (91.08%)","Assertion Status Grd":"n/a"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"u_assert","All Average Grd":"92.11%","All Cov":"184 / 217 (84.79%)","Assertion Status Grd":"100%","children"
+:[{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_mem_req_decode","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_mem_we_decode","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_mem_addr_passthrough","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_core_stall_gating","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_core_err_passthrough","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_idle_quiescent","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_store_be_legal","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+,{"expanded":false,"Exclusion Rule Type":"None","UNR":"none","title":"p_load_be_zero","All Average Grd":"100%","All Cov":"1 / 1 (100%)","Assertion Status Grd":"100%"}
+]}
+]}
+]}
+]}
+]
+{"resources/report/lazy.json":{"start":23,"end":72},"resources/report/empty.json":{"start":20,"end":23},"tree.json":{"start":72,"end":9085}}

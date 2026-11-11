@@ -1,0 +1,64 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Nov 10, 2026 at 20:49:45 IST
+xrun
+	-64bit
+	-sv
+	rtl/ALU.v
+	rtl/Control_Unit_Top.v
+	rtl/csa.v
+	rtl/writeback_cycle.v
+	rtl/wb_trap_mret_commit_controller.v
+	rtl/fetch_cycle.v
+	rtl/top.v
+	rtl/rv32m_unit.v
+	rtl/Mux2.v
+	rtl/memory_cycle.v
+	rtl/Instruction_Memory.v
+	rtl/csr_regfile.v
+	rtl/imem_controller.v
+	rtl/Data_Memory.v
+	rtl/decode_cycle.v
+	rtl/pp_gen.v
+	rtl/Mux_3_by_1.v
+	rtl/ls_unit.v
+	rtl/hazard_unit.v
+	rtl/execute_cycle.v
+	rtl/Sign_Extend.v
+	rtl/PC.v
+	rtl/Main_Decoder.v
+	rtl/opcode_check.v
+	rtl/rv32m_div.v
+	rtl/PC_Adder.v
+	rtl/rv32m_mul.v
+	rtl/ALU_Decoder.v
+	rtl/JB_unit.v
+	rtl/booth_enc.v
+	rtl/Register_File.v
+	tb/tb_top.v
+	-top tb_top
+	+imem_hex=hex/imem.hex
+	+dmem_hex=hex/dmem.hex
+	+tohost_addr=80008040
+	+max_cycles=50000
+	+log_file=logs/rtl_main.log
+	-access +rc
+	-covoverwrite
+	-l logs/xrun_rtl.log
+
+   User defined plus("+") options:
+	+imem_hex=hex/imem.hex
+	+dmem_hex=hex/dmem.hex
+	+tohost_addr=80008040
+	+max_cycles=50000
+	+log_file=logs/rtl_main.log
+
+Loading snapshot worklib.tb_top:v .................... Done
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+[IMEM] Loading hex/imem.hex
+[TB_TOP] tohost write detected at cycle 179: addr=0x80008040 data=0x00000001
+[TB_TOP] RTL simulation completed successfully.
+Simulation complete via $finish(1) at time 1850 NS + 0
+./tb/tb_top.v:174                     $finish;
+xcelium> exit
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 10, 2026 at 20:49:48 IST  (total: 00:00:03)
