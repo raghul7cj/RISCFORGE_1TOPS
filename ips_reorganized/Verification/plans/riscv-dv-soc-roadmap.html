@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:var(--font-sans);color:var(--foreground);margin:0;line-height:1.5}*{box-sizing:border-box}h2,h3{font-weight:500;margin:20px 0 8px}h2{font-size:19px}h3{font-size:16px}p{margin:8px 0 14px}.muted{color:var(--muted-foreground);font-size:13px}.scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}.level{border-top:3px solid var(--border);padding-top:8px}.level.recommend{border-color:var(--primary)}.eyebrow{font-size:12px;color:var(--muted-foreground)}.level h3{margin:4px 0}.level p{margin:7px 0}.tags{font-size:12px;color:var(--muted-foreground)}table{border-collapse:collapse;width:100%;font-size:13px}td,th{text-align:left;vertical-align:top;padding:10px 7px;border-bottom:1px solid var(--border);font-weight:400}th{font-weight:500}td:first-child,th:first-child{padding-left:0}details{border-bottom:1px solid var(--border);padding:12px 0}summary{font-weight:500;cursor:pointer}details p{margin-bottom:0}.chain{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:12px 0}.node{flex:1;min-width:120px;padding:16px;background:var(--secondary);color:var(--secondary-foreground);border-radius:var(--radius)}.node small{display:block;color:var(--muted-foreground)}.arrow{align-self:center}.week{display:grid;grid-template-columns:50px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.week b{font-weight:500}a{color:var(--foreground)}@media(max-width:480px){.scope{grid-template-columns:1fr}.arrow{display:none}table{font-size:12px}td,th{padding:9px 4px}.node{min-width:130px}}
+</style></head><body>
+<div id="soc-scope">
+<p class="muted">Planning proposal · 6 team members · 4 committed weeks · 2 optional weeks · inspected 4 November 2026</p>
+<div class="chain" role="img" aria-label="Random software and randomized external events drive the real SoC. Independent checkers and staged ISS comparison provide evidence.">
+<div class="node">riscv-dv software<small>Bounded code, ISR runtime, semantic MMIO</small></div><span class="arrow">+</span><div class="node">External event agents<small>UART, GPIO, I2C, SPI, reset</small></div><span class="arrow">→</span><div class="node">Real SoC + checkers<small>Core, fabric, peripherals, trace</small></div>
+</div>
+<h2>Four levels of scope</h2>
+<div class="scope">
+<section class="level"><div class="eyebrow">LEVEL 1 · FOUNDATION</div><h3>Execute random software on the SoC</h3><p>Real reset and SRAM map; direct ISR dispatch; protected runtime memory; strict completion.</p><div class="tags">2–4 cumulative person-weeks · Week 1 milestone</div></section>
+<section class="level recommend"><div class="eyebrow">LEVEL 2 · COMMITTED INTEGRATION TARGET</div><h3>Random software plus concurrent events</h3><p>Independent IRQ and device models; UART/GPIO/timer/SPI/I2C activity; exactly-once MMIO checks.</p><div class="tags">6–10 cumulative person-weeks · All critical checkers qualified</div></section>
+<section class="level recommend"><div class="eyebrow">LEVEL 3 · AMBITIOUS FOUR-WEEK TARGET</div><h3>Architectural comparison in stages</h3><p>Lossless trace and real-map ISS; deterministic programs first, then qualified IRQ replay and selected MMIO.</p><div class="tags">12–20 cumulative person-weeks · Publish supported comparison subset</div></section>
+<section class="level"><div class="eyebrow">LEVEL 4 · CONDITIONAL STRETCH</div><h3>Live Spike co-simulation</h3><p>DPI event synchronization, custom IRQ/CSR adapter, broader MMIO support, automated reduction.</p><div class="tags">24–40+ cumulative person-weeks · Early prototype, optional expansion</div></section>
+</div>
+<p class="muted">Estimates exclude substantive DUT fixes and outages. These are infrastructure levels; each leaves separate compliance, formal, reset, boot, and release obligations.</p>
+<h2>Four-week evidence milestones</h2>
+<div class="week"><b>W1</b><span>One canonical DUT; one generated full-SoC program; GPIO/timer ISR return; one independently checked peripheral effect; short ISS comparison proof.</span></div>
+<div class="week"><b>W2</b><span>All six APB instances exercised; critical checker negative tests; paired concurrent devices; single-source IRQ differential test. Two-day live-DPI decision point.</span></div>
+<div class="week"><b>W3</b><span>Priority/threshold and software nesting; IRQ × pipeline crosses; MMIO side effects; reset phase sweeps; cold boot images; targeted coverage closure.</span></div>
+<div class="week"><b>W4</b><span>Candidate reruns; reproducibility; current coverage and checker-viability ledgers; requirement-to-result links; mentor review of residual risks.</span></div>
+<h2>Six ownership lanes</h2>
+<table aria-label="Six human ownership lanes"><thead><tr><th>Lane</th><th>Accountable work</th></tr></thead><tbody>
+<tr><td>1 · Integration</td><td>Canonical RTL, runner, identities, warm/cold loading, artifacts</td></tr>
+<tr><td>2 · Software</td><td>riscv-dv target, linker, ISR/context, semantic MMIO streams</td></tr>
+<tr><td>3 · Architecture</td><td>Trace contract, ISS platform, differential checking and replay</td></tr>
+<tr><td>4 · IRQ and devices</td><td>Independent IRQ model; timer, UART and GPIO agents/checks</td></tr>
+<tr><td>5 · Serial and fabric</td><td>SPI/I2C models, boot scenarios, transaction correlation</td></tr>
+<tr><td>6 · Closure</td><td>Assertions, negative tests, coverage, formal/compliance evidence</td></tr>
+</tbody></table>
+<h2>Architecture decisions before expansion</h2>
+<details open><summary>Direct ISR dispatch now; hardware vectoring is a separate decision</summary><p>Current normal CSR writes cannot select <code>mtvec.MODE=1</code>. A software ISR dispatch table works with direct mode. Decide hardware-vectored support with the mentor by day 2; then verify its WARL, readback and vector-entry behavior.</p></details>
+<details><summary>Rev B and the current RTL describe different interrupt contracts</summary><p>The local gateway now connects 13 sources. The current core uses software-managed <code>mintprio</code> nesting and has no automatic trap shadow stack. Reconcile the source map, classes, context-save contract, and existing predictor before counting evidence.</p></details>
+<details><summary>Accepted-interrupt replay cannot validate interrupt arbitration</summary><p>Replay aligns CPU and ISS execution. An independent raw-source/pending/priority model must still detect a lost request or wrong winner. MMIO read replay also needs independent device checks before its response is used.</p></details>
+<details><summary>Verification closure and physical tapeout readiness have different evidence</summary><p>Use the PDK delay to close functional requirements. Physical implementation, timing, equivalence, DFT, macro models, and foundry signoff remain later handoffs.</p></details>
+<p class="muted">Evidence gates: G0/G1/G3 per run; G2/G4/G6 per candidate; G5 release input/decision at the frozen identity. Completing a scope level does not automatically satisfy Rev B.</p>
+</div>
+<script>console.log(JSON.stringify({levels:document.querySelectorAll('.level').length,lanes:document.querySelectorAll('tbody tr').length,weeks:document.querySelectorAll('.week').length,overflow:document.documentElement.scrollWidth>innerWidth}));</script>
+</body></html>

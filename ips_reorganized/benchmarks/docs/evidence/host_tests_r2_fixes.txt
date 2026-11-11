@@ -1,0 +1,42 @@
+test_diagnostics_cannot_claim_unexecuted_iterations (test_build_config.BuildConfigurationTests.test_diagnostics_cannot_claim_unexecuted_iterations) ... ok
+test_dedicated_manifest_uses_real_full_soc_sources (test_filelists.FilelistGenerationTests.test_dedicated_manifest_uses_real_full_soc_sources) ... ok
+test_rejects_missing_design_source (test_filelists.FilelistGenerationTests.test_rejects_missing_design_source) ... ok
+test_rejects_missing_include_directory (test_filelists.FilelistGenerationTests.test_rejects_missing_include_directory) ... ok
+test_contradictory_console_failure_is_not_hidden_by_a_pass (test_preflight.FirmwarePreflightTests.test_contradictory_console_failure_is_not_hidden_by_a_pass) ... ok
+test_extra_payload_outside_elf_is_rejected (test_preflight.FirmwarePreflightTests.test_extra_payload_outside_elf_is_rejected) ... ok
+test_implicit_increment_cannot_escape_sram (test_preflight.FirmwarePreflightTests.test_implicit_increment_cannot_escape_sram) ... ok
+test_log_verdict_requires_an_actual_pass_marker (test_preflight.FirmwarePreflightTests.test_log_verdict_requires_an_actual_pass_marker) ... ok
+test_matching_sparse_images_follow_the_elf (test_preflight.FirmwarePreflightTests.test_matching_sparse_images_follow_the_elf) ... ok
+test_metadata_lists_do_not_break_identity_search (test_preflight.FirmwarePreflightTests.test_metadata_lists_do_not_break_identity_search) ... ok
+test_missing_instruction_uses_the_same_zero_default_as_the_tb (test_preflight.FirmwarePreflightTests.test_missing_instruction_uses_the_same_zero_default_as_the_tb) ... ok
+test_preloaded_terminal_result_is_rejected (test_preflight.FirmwarePreflightTests.test_preloaded_terminal_result_is_rejected) ... ok
+test_repeated_word_address_is_rejected (test_preflight.FirmwarePreflightTests.test_repeated_word_address_is_rejected) ... ok
+test_sparse_address_cannot_escape_sram (test_preflight.FirmwarePreflightTests.test_sparse_address_cannot_escape_sram) ... ok
+test_sparse_words_inside_sram_are_accepted (test_preflight.FirmwarePreflightTests.test_sparse_words_inside_sram_are_accepted) ... ok
+test_stale_instruction_image_is_rejected (test_preflight.FirmwarePreflightTests.test_stale_instruction_image_is_rejected) ... ok
+test_unknown_bits_are_not_firmware (test_preflight.FirmwarePreflightTests.test_unknown_bits_are_not_firmware) ... ok
+test_xsim_assignments_use_a_response_file (test_preflight.FirmwarePreflightTests.test_xsim_assignments_use_a_response_file) ... ok
+test_changed_hdl_after_fingerprinting_is_rejected (test_provenance.ProvenanceTests.test_changed_hdl_after_fingerprinting_is_rejected) ... ok
+test_completed_build_fingerprints_match (test_provenance.ProvenanceTests.test_completed_build_fingerprints_match) ... ok
+test_failed_rebuild_cannot_run_prior_images (test_provenance.ProvenanceTests.test_failed_rebuild_cannot_run_prior_images) ... ok
+test_forged_source_hash_is_rejected (test_provenance.ProvenanceTests.test_forged_source_hash_is_rejected) ... ok
+test_missing_output_hashes_are_rejected (test_provenance.ProvenanceTests.test_missing_output_hashes_are_rejected) ... ok
+test_modified_elf_is_rejected_by_its_recorded_hash (test_provenance.ProvenanceTests.test_modified_elf_is_rejected_by_its_recorded_hash) ... ok
+test_build_metadata_identity_is_checked (test_results.ResultAnalysisTests.test_build_metadata_identity_is_checked) ... ok
+test_cycle_delta_cannot_exceed_the_entire_observed_run (test_results.ResultAnalysisTests.test_cycle_delta_cannot_exceed_the_entire_observed_run) ... ok
+test_detects_corrupt_magic_and_unsupported_benchmark (test_results.ResultAnalysisTests.test_detects_corrupt_magic_and_unsupported_benchmark) ... ok
+test_error_and_trap_words_override_an_apparent_pass (test_results.ResultAnalysisTests.test_error_and_trap_words_override_an_apparent_pass) ... ok
+test_firmware_cannot_relabel_the_simulated_clock (test_results.ResultAnalysisTests.test_firmware_cannot_relabel_the_simulated_clock) ... ok
+test_handles_64_bit_counter_wrap_and_unqualified_zero_instret (test_results.ResultAnalysisTests.test_handles_64_bit_counter_wrap_and_unqualified_zero_instret) ... ok
+test_missing_or_null_trap_observation_is_not_a_pass (test_results.ResultAnalysisTests.test_missing_or_null_trap_observation_is_not_a_pass) ... ok
+test_missing_raw_file_is_a_failure (test_results.ResultAnalysisTests.test_missing_raw_file_is_a_failure) ... ok
+test_preserves_firmware_failure (test_results.ResultAnalysisTests.test_preserves_firmware_failure) ... ok
+test_preserves_watchdog_timeout_and_running_status (test_results.ResultAnalysisTests.test_preserves_watchdog_timeout_and_running_status) ... ok
+test_rejects_iteration_mismatch_and_zero_timing_delta (test_results.ResultAnalysisTests.test_rejects_iteration_mismatch_and_zero_timing_delta) ... ok
+test_terminal_result_requires_observed_running_status (test_results.ResultAnalysisTests.test_terminal_result_requires_observed_running_status) ... ok
+test_valid_result_keeps_unqualified_counters_and_estimate_label (test_results.ResultAnalysisTests.test_valid_result_keeps_unqualified_counters_and_estimate_label) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 0.556s
+
+OK

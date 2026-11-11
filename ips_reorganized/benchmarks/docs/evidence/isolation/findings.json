@@ -1,0 +1,2908 @@
+{
+  "sampling": "pre-rising-edge; times in ps",
+  "runs": {
+    "smoke": {
+      "directory": "ips\\benchmarks\\runs\\isolation\\smoke_20261104T113155Z_f7e5a503",
+      "result": {
+        "schema_version": 1,
+        "reason": "firmware_status_fail",
+        "testbench_marker": "BENCH_TB_FAIL",
+        "observed_clock_cycles": 1841,
+        "held_wb_cycles": 82,
+        "raw_wb_valid_cycles": 1190,
+        "running_seen": 1,
+        "timing_phase_first_cycle": 526,
+        "timing_phase_last_cycle": 833,
+        "trap_seen": 0,
+        "trap_is_interrupt": 0,
+        "trap_cause": "0x00000000",
+        "trap_pc": "0x00000000",
+        "trap_tval": "0x00000000",
+        "words": [
+          "0x42454e43",
+          "0x00000001",
+          "0x00000003",
+          "0x00000001",
+          "0x00000001",
+          "0x00000003",
+          "0x0000020f",
+          "0x00000000",
+          "0x00000301",
+          "0x00000000",
+          "0x00000125",
+          "0x00000000",
+          "0x000001b1",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00001001",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000007",
+          "0x0000240a",
+          "0x00000ba4",
+          "0x000003f8",
+          "0x00000002",
+          "0x00000003",
+          "0x05f5e100",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000"
+        ]
+      },
+      "mdu_completions": [
+        {
+          "issue": {
+            "time_ps": 6135000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 3,
+            "Execute.Src_B_interim": 0
+          },
+          "completion_time_ps": 6165000,
+          "result": 0,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 0
+        },
+        {
+          "issue": {
+            "time_ps": 6335000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 20,
+            "Execute.Src_B_interim": 1
+          },
+          "completion_time_ps": 6365000,
+          "result": 20,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 20
+        },
+        {
+          "issue": {
+            "time_ps": 6535000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 37,
+            "Execute.Src_B_interim": 2
+          },
+          "completion_time_ps": 6565000,
+          "result": 74,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 74
+        },
+        {
+          "issue": {
+            "time_ps": 6735000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 54,
+            "Execute.Src_B_interim": 3
+          },
+          "completion_time_ps": 6765000,
+          "result": 162,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 162
+        },
+        {
+          "issue": {
+            "time_ps": 6935000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 71,
+            "Execute.Src_B_interim": 4
+          },
+          "completion_time_ps": 6965000,
+          "result": 284,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 284
+        },
+        {
+          "issue": {
+            "time_ps": 7135000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 88,
+            "Execute.Src_B_interim": 5
+          },
+          "completion_time_ps": 7165000,
+          "result": 440,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 440
+        },
+        {
+          "issue": {
+            "time_ps": 7335000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 105,
+            "Execute.Src_B_interim": 6
+          },
+          "completion_time_ps": 7365000,
+          "result": 630,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 630
+        },
+        {
+          "issue": {
+            "time_ps": 7535000,
+            "PCE": 67892,
+            "RD_E": 15,
+            "Execute.Src_A": 122,
+            "Execute.Src_B_interim": 7
+          },
+          "completion_time_ps": 7565000,
+          "result": 854,
+          "destination": 15,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 15,
+          "wb_result": 854
+        },
+        {
+          "issue": {
+            "time_ps": 7695000,
+            "PCE": 67932,
+            "RD_E": 19,
+            "Execute.Src_A": 26505,
+            "Execute.Src_B_interim": 74565
+          },
+          "completion_time_ps": 7725000,
+          "result": 1976345325,
+          "destination": 19,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 19,
+          "wb_result": 1976345325
+        },
+        {
+          "issue": {
+            "time_ps": 7765000,
+            "PCE": 67944,
+            "RD_E": 18,
+            "Execute.Src_A": 305419896,
+            "Execute.Src_B_interim": 154
+          },
+          "completion_time_ps": 8115000,
+          "result": 1983246,
+          "destination": 18,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 18,
+          "wb_result": 1983246
+        }
+      ],
+      "flush_stall_overlaps": [
+        {
+          "time_ps": 7695000,
+          "older_pc": 67928,
+          "younger_pc": 67932,
+          "older_destination": 15,
+          "older_address": 163796,
+          "next_valid_M": 0,
+          "next_pc_M": 0
+        },
+        {
+          "time_ps": 7765000,
+          "older_pc": 67940,
+          "younger_pc": 67944,
+          "older_destination": 21,
+          "older_address": 163796,
+          "next_valid_M": 0,
+          "next_pc_M": 0
+        }
+      ],
+      "held_wb_increments": [
+        {
+          "time_ps": 6095000,
+          "pc_W": 67876,
+          "minstret_before": 315,
+          "minstret_next": 316,
+          "minstret_later": 317,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6115000,
+          "pc_W": 67880,
+          "minstret_before": 317,
+          "minstret_next": 318,
+          "minstret_later": 319,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6295000,
+          "pc_W": 67876,
+          "minstret_before": 328,
+          "minstret_next": 329,
+          "minstret_later": 330,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6315000,
+          "pc_W": 67880,
+          "minstret_before": 330,
+          "minstret_next": 331,
+          "minstret_later": 332,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6495000,
+          "pc_W": 67876,
+          "minstret_before": 341,
+          "minstret_next": 342,
+          "minstret_later": 343,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6515000,
+          "pc_W": 67880,
+          "minstret_before": 343,
+          "minstret_next": 344,
+          "minstret_later": 345,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6695000,
+          "pc_W": 67876,
+          "minstret_before": 354,
+          "minstret_next": 355,
+          "minstret_later": 356,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6715000,
+          "pc_W": 67880,
+          "minstret_before": 356,
+          "minstret_next": 357,
+          "minstret_later": 358,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6895000,
+          "pc_W": 67876,
+          "minstret_before": 367,
+          "minstret_next": 368,
+          "minstret_later": 369,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 6915000,
+          "pc_W": 67880,
+          "minstret_before": 369,
+          "minstret_next": 370,
+          "minstret_later": 371,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7095000,
+          "pc_W": 67876,
+          "minstret_before": 380,
+          "minstret_next": 381,
+          "minstret_later": 382,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7115000,
+          "pc_W": 67880,
+          "minstret_before": 382,
+          "minstret_next": 383,
+          "minstret_later": 384,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7295000,
+          "pc_W": 67876,
+          "minstret_before": 393,
+          "minstret_next": 394,
+          "minstret_later": 395,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7315000,
+          "pc_W": 67880,
+          "minstret_before": 395,
+          "minstret_next": 396,
+          "minstret_later": 397,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7495000,
+          "pc_W": 67876,
+          "minstret_before": 406,
+          "minstret_next": 407,
+          "minstret_later": 408,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7515000,
+          "pc_W": 67880,
+          "minstret_before": 408,
+          "minstret_next": 409,
+          "minstret_later": 410,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7635000,
+          "pc_W": 67912,
+          "minstret_before": 416,
+          "minstret_next": 417,
+          "minstret_later": 418,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7655000,
+          "pc_W": 67916,
+          "minstret_before": 418,
+          "minstret_next": 419,
+          "minstret_later": 420,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7675000,
+          "pc_W": 67920,
+          "minstret_before": 420,
+          "minstret_next": 421,
+          "minstret_later": 422,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7695000,
+          "pc_W": 67924,
+          "minstret_before": 422,
+          "minstret_next": 423,
+          "minstret_later": 424,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 7765000,
+          "pc_W": 67936,
+          "minstret_before": 424,
+          "minstret_next": 425,
+          "minstret_later": 426,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8395000,
+          "pc_W": 66004,
+          "minstret_before": 446,
+          "minstret_next": 447,
+          "minstret_later": 448,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8415000,
+          "pc_W": 66008,
+          "minstret_before": 448,
+          "minstret_next": 449,
+          "minstret_later": 450,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8435000,
+          "pc_W": 66012,
+          "minstret_before": 450,
+          "minstret_next": 451,
+          "minstret_later": 452,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8455000,
+          "pc_W": 66016,
+          "minstret_before": 452,
+          "minstret_next": 453,
+          "minstret_later": 454,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8545000,
+          "pc_W": 66068,
+          "minstret_before": 458,
+          "minstret_next": 459,
+          "minstret_later": 460,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8725000,
+          "pc_W": 66088,
+          "minstret_before": 466,
+          "minstret_next": 467,
+          "minstret_later": 468,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8785000,
+          "pc_W": 66104,
+          "minstret_before": 471,
+          "minstret_next": 472,
+          "minstret_later": 473,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 8935000,
+          "pc_W": 67960,
+          "minstret_before": 482,
+          "minstret_next": 483,
+          "minstret_later": 484,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9055000,
+          "pc_W": 66192,
+          "minstret_before": 491,
+          "minstret_next": 492,
+          "minstret_later": 493,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9105000,
+          "pc_W": 66204,
+          "minstret_before": 495,
+          "minstret_next": 496,
+          "minstret_later": 497,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9225000,
+          "pc_W": 68000,
+          "minstret_before": 503,
+          "minstret_next": 504,
+          "minstret_later": 505,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9335000,
+          "pc_W": 66192,
+          "minstret_before": 510,
+          "minstret_next": 511,
+          "minstret_later": 512,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9385000,
+          "pc_W": 66204,
+          "minstret_before": 514,
+          "minstret_next": 515,
+          "minstret_later": 516,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9525000,
+          "pc_W": 68032,
+          "minstret_before": 521,
+          "minstret_next": 522,
+          "minstret_later": 523,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9635000,
+          "pc_W": 66192,
+          "minstret_before": 528,
+          "minstret_next": 529,
+          "minstret_later": 530,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 9685000,
+          "pc_W": 66204,
+          "minstret_before": 532,
+          "minstret_next": 533,
+          "minstret_later": 534,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 11085000,
+          "pc_W": 66764,
+          "minstret_before": 607,
+          "minstret_next": 608,
+          "minstret_later": 609,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 11405000,
+          "pc_W": 66852,
+          "minstret_before": 632,
+          "minstret_next": 633,
+          "minstret_later": 634,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 11605000,
+          "pc_W": 66852,
+          "minstret_before": 647,
+          "minstret_next": 648,
+          "minstret_later": 649,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 11805000,
+          "pc_W": 66852,
+          "minstret_before": 662,
+          "minstret_next": 663,
+          "minstret_later": 664,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 12005000,
+          "pc_W": 66852,
+          "minstret_before": 677,
+          "minstret_next": 678,
+          "minstret_later": 679,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 12205000,
+          "pc_W": 66852,
+          "minstret_before": 692,
+          "minstret_next": 693,
+          "minstret_later": 694,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 12405000,
+          "pc_W": 66852,
+          "minstret_before": 707,
+          "minstret_next": 708,
+          "minstret_later": 709,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 12605000,
+          "pc_W": 66852,
+          "minstret_before": 722,
+          "minstret_next": 723,
+          "minstret_later": 724,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 12805000,
+          "pc_W": 66852,
+          "minstret_before": 737,
+          "minstret_next": 738,
+          "minstret_later": 739,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 13005000,
+          "pc_W": 66852,
+          "minstret_before": 752,
+          "minstret_next": 753,
+          "minstret_later": 754,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 13205000,
+          "pc_W": 66852,
+          "minstret_before": 767,
+          "minstret_next": 768,
+          "minstret_later": 769,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 13405000,
+          "pc_W": 66852,
+          "minstret_before": 782,
+          "minstret_next": 783,
+          "minstret_later": 784,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 13605000,
+          "pc_W": 66852,
+          "minstret_before": 797,
+          "minstret_next": 798,
+          "minstret_later": 799,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 13805000,
+          "pc_W": 66852,
+          "minstret_before": 812,
+          "minstret_next": 813,
+          "minstret_later": 814,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 14005000,
+          "pc_W": 66852,
+          "minstret_before": 827,
+          "minstret_next": 828,
+          "minstret_later": 829,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 14205000,
+          "pc_W": 66852,
+          "minstret_before": 842,
+          "minstret_next": 843,
+          "minstret_later": 844,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 14405000,
+          "pc_W": 66852,
+          "minstret_before": 857,
+          "minstret_next": 858,
+          "minstret_later": 859,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 14605000,
+          "pc_W": 66852,
+          "minstret_before": 872,
+          "minstret_next": 873,
+          "minstret_later": 874,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 14805000,
+          "pc_W": 66852,
+          "minstret_before": 887,
+          "minstret_next": 888,
+          "minstret_later": 889,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 15005000,
+          "pc_W": 66852,
+          "minstret_before": 902,
+          "minstret_next": 903,
+          "minstret_later": 904,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 15205000,
+          "pc_W": 66852,
+          "minstret_before": 917,
+          "minstret_next": 918,
+          "minstret_later": 919,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 15405000,
+          "pc_W": 66852,
+          "minstret_before": 932,
+          "minstret_next": 933,
+          "minstret_later": 934,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 15605000,
+          "pc_W": 66852,
+          "minstret_before": 947,
+          "minstret_next": 948,
+          "minstret_later": 949,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 15805000,
+          "pc_W": 66852,
+          "minstret_before": 962,
+          "minstret_next": 963,
+          "minstret_later": 964,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 16005000,
+          "pc_W": 66852,
+          "minstret_before": 977,
+          "minstret_next": 978,
+          "minstret_later": 979,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 16205000,
+          "pc_W": 66852,
+          "minstret_before": 992,
+          "minstret_next": 993,
+          "minstret_later": 994,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 16405000,
+          "pc_W": 66852,
+          "minstret_before": 1007,
+          "minstret_next": 1008,
+          "minstret_later": 1009,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 16605000,
+          "pc_W": 66852,
+          "minstret_before": 1022,
+          "minstret_next": 1023,
+          "minstret_later": 1024,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 16805000,
+          "pc_W": 66852,
+          "minstret_before": 1037,
+          "minstret_next": 1038,
+          "minstret_later": 1039,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 17005000,
+          "pc_W": 66852,
+          "minstret_before": 1052,
+          "minstret_next": 1053,
+          "minstret_later": 1054,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 17205000,
+          "pc_W": 66852,
+          "minstret_before": 1067,
+          "minstret_next": 1068,
+          "minstret_later": 1069,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 17405000,
+          "pc_W": 66852,
+          "minstret_before": 1082,
+          "minstret_next": 1083,
+          "minstret_later": 1084,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 17605000,
+          "pc_W": 66852,
+          "minstret_before": 1097,
+          "minstret_next": 1098,
+          "minstret_later": 1099,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 17805000,
+          "pc_W": 66852,
+          "minstret_before": 1112,
+          "minstret_next": 1113,
+          "minstret_later": 1114,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18005000,
+          "pc_W": 66852,
+          "minstret_before": 1127,
+          "minstret_next": 1128,
+          "minstret_later": 1129,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18205000,
+          "pc_W": 66852,
+          "minstret_before": 1142,
+          "minstret_next": 1143,
+          "minstret_later": 1144,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18405000,
+          "pc_W": 66852,
+          "minstret_before": 1157,
+          "minstret_next": 1158,
+          "minstret_later": 1159,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18495000,
+          "pc_W": 67100,
+          "minstret_before": 1161,
+          "minstret_next": 1162,
+          "minstret_later": 1163,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18515000,
+          "pc_W": 67104,
+          "minstret_before": 1163,
+          "minstret_next": 1164,
+          "minstret_later": 1165,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18535000,
+          "pc_W": 67108,
+          "minstret_before": 1165,
+          "minstret_next": 1166,
+          "minstret_later": 1167,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18585000,
+          "pc_W": 67116,
+          "minstret_before": 1168,
+          "minstret_next": 1169,
+          "minstret_later": 1170,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18605000,
+          "pc_W": 67120,
+          "minstret_before": 1170,
+          "minstret_next": 1171,
+          "minstret_later": 1172,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18625000,
+          "pc_W": 67124,
+          "minstret_before": 1172,
+          "minstret_next": 1173,
+          "minstret_later": 1174,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18655000,
+          "pc_W": 67132,
+          "minstret_before": 1175,
+          "minstret_next": 1176,
+          "minstret_later": 1177,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 18845000,
+          "pc_W": 66224,
+          "minstret_before": 1184,
+          "minstret_next": 1185,
+          "minstret_later": 1186,
+          "next_retirement_input": 1
+        }
+      ],
+      "hashes": {
+        "program.elf": "eb7d1e3f7e90d208b15fede8a153c40ce528e3f458ef5f0f66e609351084c88e",
+        "program.dis": "a263cb63b47714e77ca2c3090f3012379f6de36deb02591ae51e7f15a4298cf6",
+        "waves.vcd": "b6174f77c4e2705aa41ecf294fa745076cab9827d1d26b08ef94695fcb40d5e4",
+        "core_cycles.csv": "89613ce8e383a3b2327dc374a15c183f2106831ea4304e3b827df36e16020241",
+        "result.json": "77fd655dccffa12ba3212e810835ff687f2068e0b484a7f1e894362206693b42",
+        "source_hashes.json": "5065105771ba04d3d8ba12a17ac28882d8025dcdd7132afa77173f72995219a4"
+      }
+    },
+    "coremark": {
+      "directory": "ips\\benchmarks\\runs\\isolation\\coremark_20261104T113222Z_030e35af",
+      "result": {
+        "schema_version": 1,
+        "reason": "unexpected_synchronous_trap",
+        "testbench_marker": "BENCH_TB_FAIL",
+        "observed_clock_cycles": 4293,
+        "held_wb_cycles": 12,
+        "raw_wb_valid_cycles": 2400,
+        "running_seen": 1,
+        "timing_phase_first_cycle": 0,
+        "timing_phase_last_cycle": 0,
+        "trap_seen": 1,
+        "trap_is_interrupt": 0,
+        "trap_cause": "0x00000006",
+        "trap_pc": "0x00010fa4",
+        "trap_tval": "0x0002092d",
+        "words": [
+          "0x42454e43",
+          "0x00000001",
+          "0x00000001",
+          "0x00000003",
+          "0x00000001",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000003",
+          "0x05f5e100",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000"
+        ]
+      },
+      "mdu_completions": [
+        {
+          "issue": {
+            "time_ps": 41765000,
+            "PCE": 70276,
+            "RD_E": 11,
+            "Execute.Src_A": 2000,
+            "Execute.Src_B_interim": 3
+          },
+          "completion_time_ps": 42115000,
+          "result": 666,
+          "destination": 11,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 11,
+          "wb_result": 666
+        },
+        {
+          "issue": {
+            "time_ps": 42255000,
+            "PCE": 70664,
+            "RD_E": 14,
+            "Execute.Src_A": 0,
+            "Execute.Src_B_interim": 2000
+          },
+          "completion_time_ps": 42285000,
+          "result": 0,
+          "destination": 14,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 14,
+          "wb_result": 0
+        },
+        {
+          "issue": {
+            "time_ps": 42505000,
+            "PCE": 70664,
+            "RD_E": 14,
+            "Execute.Src_A": 1,
+            "Execute.Src_B_interim": 2000
+          },
+          "completion_time_ps": 42535000,
+          "result": 2000,
+          "destination": 14,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 14,
+          "wb_result": 2000
+        },
+        {
+          "issue": {
+            "time_ps": 42755000,
+            "PCE": 70664,
+            "RD_E": 14,
+            "Execute.Src_A": 2,
+            "Execute.Src_B_interim": 2000
+          },
+          "completion_time_ps": 42785000,
+          "result": 4000,
+          "destination": 14,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 14,
+          "wb_result": 4000
+        },
+        {
+          "issue": {
+            "time_ps": 43055000,
+            "PCE": 69532,
+            "RD_E": 28,
+            "Execute.Src_A": 2000,
+            "Execute.Src_B_interim": 20
+          },
+          "completion_time_ps": 43405000,
+          "result": 100,
+          "destination": 28,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 28,
+          "wb_result": 100
+        }
+      ],
+      "flush_stall_overlaps": [],
+      "held_wb_increments": [
+        {
+          "time_ps": 36105000,
+          "pc_W": 76172,
+          "minstret_before": 2037,
+          "minstret_next": 2038,
+          "minstret_later": 2039,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 36145000,
+          "pc_W": 76184,
+          "minstret_before": 2041,
+          "minstret_next": 2042,
+          "minstret_later": 2043,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 40345000,
+          "pc_W": 75520,
+          "minstret_before": 2263,
+          "minstret_next": 2264,
+          "minstret_later": 2265,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 40595000,
+          "pc_W": 75520,
+          "minstret_before": 2277,
+          "minstret_next": 2278,
+          "minstret_later": 2279,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 40845000,
+          "pc_W": 75520,
+          "minstret_before": 2291,
+          "minstret_next": 2292,
+          "minstret_later": 2293,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 41095000,
+          "pc_W": 75520,
+          "minstret_before": 2305,
+          "minstret_next": 2306,
+          "minstret_later": 2307,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 41345000,
+          "pc_W": 75520,
+          "minstret_before": 2319,
+          "minstret_next": 2320,
+          "minstret_later": 2321,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 41425000,
+          "pc_W": 75532,
+          "minstret_before": 2323,
+          "minstret_next": 2324,
+          "minstret_later": 2325,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 42915000,
+          "pc_W": 70324,
+          "minstret_before": 2387,
+          "minstret_next": 2388,
+          "minstret_later": 2389,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 42965000,
+          "pc_W": 70336,
+          "minstret_before": 2391,
+          "minstret_next": 2392,
+          "minstret_later": 2393,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 42985000,
+          "pc_W": 70340,
+          "minstret_before": 2393,
+          "minstret_next": 2394,
+          "minstret_later": 2395,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 43005000,
+          "pc_W": 70344,
+          "minstret_before": 2395,
+          "minstret_next": 2396,
+          "minstret_later": 2397,
+          "next_retirement_input": 1
+        }
+      ],
+      "hashes": {
+        "program.elf": "cadbb0ef81a55b0651f5c3d0c5ec3aff16fc646d72b3d980b42ffd8d322c685e",
+        "program.dis": "e00ee311f26212a02deb524b67343f7f199d44518061ec48d06acd78c1b98f9a",
+        "waves.vcd": "0760020e8c23bb3c9ff93e1237a01a8ed8be30f7d11f1f116d4dc57aebfac4de",
+        "core_cycles.csv": "eec16f2f08060b6cb997f29c200c29f98ca7c010a61d6a37ce9f7521013b5da3",
+        "result.json": "f99d62e9aeaa42ffc22a95320624c300ec30f5cb7cd35c3f34fa1859f9d470b8",
+        "source_hashes.json": "cab555ad379b2ccf1e0c711ca8e8795855b91dbdcc6dfb71059f797aced2106b"
+      }
+    },
+    "dhrystone": {
+      "directory": "ips\\benchmarks\\runs\\isolation\\dhrystone_20261104T113308Z_2036a556",
+      "result": {
+        "schema_version": 1,
+        "reason": "unexpected_synchronous_trap",
+        "testbench_marker": "BENCH_TB_FAIL",
+        "observed_clock_cycles": 22470,
+        "held_wb_cycles": 183,
+        "raw_wb_valid_cycles": 13188,
+        "running_seen": 1,
+        "timing_phase_first_cycle": 0,
+        "timing_phase_last_cycle": 0,
+        "trap_seen": 1,
+        "trap_is_interrupt": 0,
+        "trap_cause": "0x00000005",
+        "trap_pc": "0x00010088",
+        "trap_tval": "0x00040231",
+        "words": [
+          "0x42454e43",
+          "0x00000001",
+          "0x00000001",
+          "0x00000004",
+          "0x0000000a",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x0000863d",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000003",
+          "0x05f5e100",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000",
+          "0x00000000"
+        ]
+      },
+      "mdu_completions": [
+        {
+          "issue": {
+            "time_ps": 223965000,
+            "PCE": 65652,
+            "RD_E": 13,
+            "Execute.Src_A": 100000000,
+            "Execute.Src_B_interim": 10
+          },
+          "completion_time_ps": 224315000,
+          "result": 0,
+          "destination": 13,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 13,
+          "wb_result": 0
+        },
+        {
+          "issue": {
+            "time_ps": 224375000,
+            "PCE": 65676,
+            "RD_E": 10,
+            "Execute.Src_A": 100000000,
+            "Execute.Src_B_interim": 10
+          },
+          "completion_time_ps": 224725000,
+          "result": 10000000,
+          "destination": 10,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 10,
+          "wb_result": 10000000
+        },
+        {
+          "issue": {
+            "time_ps": 224795000,
+            "PCE": 65652,
+            "RD_E": 13,
+            "Execute.Src_A": 100000000,
+            "Execute.Src_B_interim": 10
+          },
+          "completion_time_ps": 225145000,
+          "result": 0,
+          "destination": 13,
+          "valid_E": 0,
+          "StallM": 0,
+          "FlushM": 0,
+          "next_valid_M": 0,
+          "wb_valid": 0,
+          "wb_write_enable": 0,
+          "wb_destination": 13,
+          "wb_result": 0
+        }
+      ],
+      "flush_stall_overlaps": [
+        {
+          "time_ps": 224375000,
+          "older_pc": 65672,
+          "younger_pc": 65676,
+          "older_destination": 13,
+          "older_address": 131357,
+          "next_valid_M": 0,
+          "next_pc_M": 0
+        }
+      ],
+      "held_wb_increments": [
+        {
+          "time_ps": 184545000,
+          "pc_W": 67804,
+          "minstret_before": 10509,
+          "minstret_next": 10510,
+          "minstret_later": 10511,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 187425000,
+          "pc_W": 67804,
+          "minstret_before": 10671,
+          "minstret_next": 10672,
+          "minstret_later": 10673,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191475000,
+          "pc_W": 66764,
+          "minstret_before": 10899,
+          "minstret_next": 10900,
+          "minstret_later": 10901,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191795000,
+          "pc_W": 66852,
+          "minstret_before": 10924,
+          "minstret_next": 10925,
+          "minstret_later": 10926,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191885000,
+          "pc_W": 67100,
+          "minstret_before": 10928,
+          "minstret_next": 10929,
+          "minstret_later": 10930,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191905000,
+          "pc_W": 67104,
+          "minstret_before": 10930,
+          "minstret_next": 10931,
+          "minstret_later": 10932,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191925000,
+          "pc_W": 67108,
+          "minstret_before": 10932,
+          "minstret_next": 10933,
+          "minstret_later": 10934,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191975000,
+          "pc_W": 67116,
+          "minstret_before": 10935,
+          "minstret_next": 10936,
+          "minstret_later": 10937,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 191995000,
+          "pc_W": 67120,
+          "minstret_before": 10937,
+          "minstret_next": 10938,
+          "minstret_later": 10939,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 192015000,
+          "pc_W": 67124,
+          "minstret_before": 10939,
+          "minstret_next": 10940,
+          "minstret_later": 10941,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 192045000,
+          "pc_W": 67132,
+          "minstret_before": 10942,
+          "minstret_next": 10943,
+          "minstret_later": 10944,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193105000,
+          "pc_W": 66684,
+          "minstret_before": 11002,
+          "minstret_next": 11003,
+          "minstret_later": 11004,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193225000,
+          "pc_W": 66684,
+          "minstret_before": 11009,
+          "minstret_next": 11010,
+          "minstret_later": 11011,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193345000,
+          "pc_W": 66684,
+          "minstret_before": 11016,
+          "minstret_next": 11017,
+          "minstret_later": 11018,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193465000,
+          "pc_W": 66684,
+          "minstret_before": 11023,
+          "minstret_next": 11024,
+          "minstret_later": 11025,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193585000,
+          "pc_W": 66684,
+          "minstret_before": 11030,
+          "minstret_next": 11031,
+          "minstret_later": 11032,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193705000,
+          "pc_W": 66684,
+          "minstret_before": 11037,
+          "minstret_next": 11038,
+          "minstret_later": 11039,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193825000,
+          "pc_W": 66684,
+          "minstret_before": 11044,
+          "minstret_next": 11045,
+          "minstret_later": 11046,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 193945000,
+          "pc_W": 66684,
+          "minstret_before": 11051,
+          "minstret_next": 11052,
+          "minstret_later": 11053,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 194065000,
+          "pc_W": 66684,
+          "minstret_before": 11058,
+          "minstret_next": 11059,
+          "minstret_later": 11060,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 194495000,
+          "pc_W": 66764,
+          "minstret_before": 11081,
+          "minstret_next": 11082,
+          "minstret_later": 11083,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 194815000,
+          "pc_W": 66852,
+          "minstret_before": 11106,
+          "minstret_next": 11107,
+          "minstret_later": 11108,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 195015000,
+          "pc_W": 66852,
+          "minstret_before": 11121,
+          "minstret_next": 11122,
+          "minstret_later": 11123,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 195215000,
+          "pc_W": 66852,
+          "minstret_before": 11136,
+          "minstret_next": 11137,
+          "minstret_later": 11138,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 195415000,
+          "pc_W": 66852,
+          "minstret_before": 11151,
+          "minstret_next": 11152,
+          "minstret_later": 11153,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 195615000,
+          "pc_W": 66852,
+          "minstret_before": 11166,
+          "minstret_next": 11167,
+          "minstret_later": 11168,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 195815000,
+          "pc_W": 66852,
+          "minstret_before": 11181,
+          "minstret_next": 11182,
+          "minstret_later": 11183,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 196015000,
+          "pc_W": 66852,
+          "minstret_before": 11196,
+          "minstret_next": 11197,
+          "minstret_later": 11198,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 196215000,
+          "pc_W": 66852,
+          "minstret_before": 11211,
+          "minstret_next": 11212,
+          "minstret_later": 11213,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 196415000,
+          "pc_W": 66852,
+          "minstret_before": 11226,
+          "minstret_next": 11227,
+          "minstret_later": 11228,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 196615000,
+          "pc_W": 66852,
+          "minstret_before": 11241,
+          "minstret_next": 11242,
+          "minstret_later": 11243,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 196815000,
+          "pc_W": 66852,
+          "minstret_before": 11256,
+          "minstret_next": 11257,
+          "minstret_later": 11258,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 197015000,
+          "pc_W": 66852,
+          "minstret_before": 11271,
+          "minstret_next": 11272,
+          "minstret_later": 11273,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 197215000,
+          "pc_W": 66852,
+          "minstret_before": 11286,
+          "minstret_next": 11287,
+          "minstret_later": 11288,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 197415000,
+          "pc_W": 66852,
+          "minstret_before": 11301,
+          "minstret_next": 11302,
+          "minstret_later": 11303,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 197615000,
+          "pc_W": 66852,
+          "minstret_before": 11316,
+          "minstret_next": 11317,
+          "minstret_later": 11318,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 197815000,
+          "pc_W": 66852,
+          "minstret_before": 11331,
+          "minstret_next": 11332,
+          "minstret_later": 11333,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 198015000,
+          "pc_W": 66852,
+          "minstret_before": 11346,
+          "minstret_next": 11347,
+          "minstret_later": 11348,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 198215000,
+          "pc_W": 66852,
+          "minstret_before": 11361,
+          "minstret_next": 11362,
+          "minstret_later": 11363,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 198415000,
+          "pc_W": 66852,
+          "minstret_before": 11376,
+          "minstret_next": 11377,
+          "minstret_later": 11378,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 198615000,
+          "pc_W": 66852,
+          "minstret_before": 11391,
+          "minstret_next": 11392,
+          "minstret_later": 11393,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 198815000,
+          "pc_W": 66852,
+          "minstret_before": 11406,
+          "minstret_next": 11407,
+          "minstret_later": 11408,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 199015000,
+          "pc_W": 66852,
+          "minstret_before": 11421,
+          "minstret_next": 11422,
+          "minstret_later": 11423,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 199215000,
+          "pc_W": 66852,
+          "minstret_before": 11436,
+          "minstret_next": 11437,
+          "minstret_later": 11438,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 199415000,
+          "pc_W": 66852,
+          "minstret_before": 11451,
+          "minstret_next": 11452,
+          "minstret_later": 11453,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 199615000,
+          "pc_W": 66852,
+          "minstret_before": 11466,
+          "minstret_next": 11467,
+          "minstret_later": 11468,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 199815000,
+          "pc_W": 66852,
+          "minstret_before": 11481,
+          "minstret_next": 11482,
+          "minstret_later": 11483,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 200015000,
+          "pc_W": 66852,
+          "minstret_before": 11496,
+          "minstret_next": 11497,
+          "minstret_later": 11498,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 200215000,
+          "pc_W": 66852,
+          "minstret_before": 11511,
+          "minstret_next": 11512,
+          "minstret_later": 11513,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 200415000,
+          "pc_W": 66852,
+          "minstret_before": 11526,
+          "minstret_next": 11527,
+          "minstret_later": 11528,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 200475000,
+          "pc_W": 66868,
+          "minstret_before": 11531,
+          "minstret_next": 11532,
+          "minstret_later": 11533,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 200875000,
+          "pc_W": 66944,
+          "minstret_before": 11556,
+          "minstret_next": 11557,
+          "minstret_later": 11558,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 200985000,
+          "pc_W": 67340,
+          "minstret_before": 11562,
+          "minstret_next": 11563,
+          "minstret_later": 11564,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201035000,
+          "pc_W": 67352,
+          "minstret_before": 11566,
+          "minstret_next": 11567,
+          "minstret_later": 11568,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201155000,
+          "pc_W": 67396,
+          "minstret_before": 11578,
+          "minstret_next": 11579,
+          "minstret_later": 11580,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201285000,
+          "pc_W": 67396,
+          "minstret_before": 11587,
+          "minstret_next": 11588,
+          "minstret_later": 11589,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201415000,
+          "pc_W": 67396,
+          "minstret_before": 11596,
+          "minstret_next": 11597,
+          "minstret_later": 11598,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201545000,
+          "pc_W": 67396,
+          "minstret_before": 11605,
+          "minstret_next": 11606,
+          "minstret_later": 11607,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201675000,
+          "pc_W": 67396,
+          "minstret_before": 11614,
+          "minstret_next": 11615,
+          "minstret_later": 11616,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201805000,
+          "pc_W": 67396,
+          "minstret_before": 11623,
+          "minstret_next": 11624,
+          "minstret_later": 11625,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 201935000,
+          "pc_W": 67396,
+          "minstret_before": 11632,
+          "minstret_next": 11633,
+          "minstret_later": 11634,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202065000,
+          "pc_W": 67396,
+          "minstret_before": 11641,
+          "minstret_next": 11642,
+          "minstret_later": 11643,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202195000,
+          "pc_W": 67396,
+          "minstret_before": 11650,
+          "minstret_next": 11651,
+          "minstret_later": 11652,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202325000,
+          "pc_W": 67396,
+          "minstret_before": 11659,
+          "minstret_next": 11660,
+          "minstret_later": 11661,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202455000,
+          "pc_W": 67396,
+          "minstret_before": 11668,
+          "minstret_next": 11669,
+          "minstret_later": 11670,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202585000,
+          "pc_W": 67396,
+          "minstret_before": 11677,
+          "minstret_next": 11678,
+          "minstret_later": 11679,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202715000,
+          "pc_W": 67396,
+          "minstret_before": 11686,
+          "minstret_next": 11687,
+          "minstret_later": 11688,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202845000,
+          "pc_W": 67396,
+          "minstret_before": 11695,
+          "minstret_next": 11696,
+          "minstret_later": 11697,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 202885000,
+          "pc_W": 67404,
+          "minstret_before": 11698,
+          "minstret_next": 11699,
+          "minstret_later": 11700,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203225000,
+          "pc_W": 66852,
+          "minstret_before": 11720,
+          "minstret_next": 11721,
+          "minstret_later": 11722,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203315000,
+          "pc_W": 67100,
+          "minstret_before": 11724,
+          "minstret_next": 11725,
+          "minstret_later": 11726,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203335000,
+          "pc_W": 67104,
+          "minstret_before": 11726,
+          "minstret_next": 11727,
+          "minstret_later": 11728,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203355000,
+          "pc_W": 67108,
+          "minstret_before": 11728,
+          "minstret_next": 11729,
+          "minstret_later": 11730,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203405000,
+          "pc_W": 67116,
+          "minstret_before": 11731,
+          "minstret_next": 11732,
+          "minstret_later": 11733,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203425000,
+          "pc_W": 67120,
+          "minstret_before": 11733,
+          "minstret_next": 11734,
+          "minstret_later": 11735,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203445000,
+          "pc_W": 67124,
+          "minstret_before": 11735,
+          "minstret_next": 11736,
+          "minstret_later": 11737,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 203475000,
+          "pc_W": 67132,
+          "minstret_before": 11738,
+          "minstret_next": 11739,
+          "minstret_later": 11740,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 204895000,
+          "pc_W": 66764,
+          "minstret_before": 11814,
+          "minstret_next": 11815,
+          "minstret_later": 11816,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 205215000,
+          "pc_W": 66852,
+          "minstret_before": 11839,
+          "minstret_next": 11840,
+          "minstret_later": 11841,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 205415000,
+          "pc_W": 66852,
+          "minstret_before": 11854,
+          "minstret_next": 11855,
+          "minstret_later": 11856,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 205615000,
+          "pc_W": 66852,
+          "minstret_before": 11869,
+          "minstret_next": 11870,
+          "minstret_later": 11871,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 205815000,
+          "pc_W": 66852,
+          "minstret_before": 11884,
+          "minstret_next": 11885,
+          "minstret_later": 11886,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 206015000,
+          "pc_W": 66852,
+          "minstret_before": 11899,
+          "minstret_next": 11900,
+          "minstret_later": 11901,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 206215000,
+          "pc_W": 66852,
+          "minstret_before": 11914,
+          "minstret_next": 11915,
+          "minstret_later": 11916,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 206415000,
+          "pc_W": 66852,
+          "minstret_before": 11929,
+          "minstret_next": 11930,
+          "minstret_later": 11931,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 206615000,
+          "pc_W": 66852,
+          "minstret_before": 11944,
+          "minstret_next": 11945,
+          "minstret_later": 11946,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 206815000,
+          "pc_W": 66852,
+          "minstret_before": 11959,
+          "minstret_next": 11960,
+          "minstret_later": 11961,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 207015000,
+          "pc_W": 66852,
+          "minstret_before": 11974,
+          "minstret_next": 11975,
+          "minstret_later": 11976,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 207215000,
+          "pc_W": 66852,
+          "minstret_before": 11989,
+          "minstret_next": 11990,
+          "minstret_later": 11991,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 207415000,
+          "pc_W": 66852,
+          "minstret_before": 12004,
+          "minstret_next": 12005,
+          "minstret_later": 12006,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 207615000,
+          "pc_W": 66852,
+          "minstret_before": 12019,
+          "minstret_next": 12020,
+          "minstret_later": 12021,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 207815000,
+          "pc_W": 66852,
+          "minstret_before": 12034,
+          "minstret_next": 12035,
+          "minstret_later": 12036,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 208015000,
+          "pc_W": 66852,
+          "minstret_before": 12049,
+          "minstret_next": 12050,
+          "minstret_later": 12051,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 208215000,
+          "pc_W": 66852,
+          "minstret_before": 12064,
+          "minstret_next": 12065,
+          "minstret_later": 12066,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 208415000,
+          "pc_W": 66852,
+          "minstret_before": 12079,
+          "minstret_next": 12080,
+          "minstret_later": 12081,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 208615000,
+          "pc_W": 66852,
+          "minstret_before": 12094,
+          "minstret_next": 12095,
+          "minstret_later": 12096,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 208815000,
+          "pc_W": 66852,
+          "minstret_before": 12109,
+          "minstret_next": 12110,
+          "minstret_later": 12111,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 209015000,
+          "pc_W": 66852,
+          "minstret_before": 12124,
+          "minstret_next": 12125,
+          "minstret_later": 12126,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 209215000,
+          "pc_W": 66852,
+          "minstret_before": 12139,
+          "minstret_next": 12140,
+          "minstret_later": 12141,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 209415000,
+          "pc_W": 66852,
+          "minstret_before": 12154,
+          "minstret_next": 12155,
+          "minstret_later": 12156,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 209615000,
+          "pc_W": 66852,
+          "minstret_before": 12169,
+          "minstret_next": 12170,
+          "minstret_later": 12171,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 209815000,
+          "pc_W": 66852,
+          "minstret_before": 12184,
+          "minstret_next": 12185,
+          "minstret_later": 12186,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 210015000,
+          "pc_W": 66852,
+          "minstret_before": 12199,
+          "minstret_next": 12200,
+          "minstret_later": 12201,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 210215000,
+          "pc_W": 66852,
+          "minstret_before": 12214,
+          "minstret_next": 12215,
+          "minstret_later": 12216,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 210415000,
+          "pc_W": 66852,
+          "minstret_before": 12229,
+          "minstret_next": 12230,
+          "minstret_later": 12231,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 210615000,
+          "pc_W": 66852,
+          "minstret_before": 12244,
+          "minstret_next": 12245,
+          "minstret_later": 12246,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 210815000,
+          "pc_W": 66852,
+          "minstret_before": 12259,
+          "minstret_next": 12260,
+          "minstret_later": 12261,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 211015000,
+          "pc_W": 66852,
+          "minstret_before": 12274,
+          "minstret_next": 12275,
+          "minstret_later": 12276,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 211215000,
+          "pc_W": 66852,
+          "minstret_before": 12289,
+          "minstret_next": 12290,
+          "minstret_later": 12291,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 211415000,
+          "pc_W": 66852,
+          "minstret_before": 12304,
+          "minstret_next": 12305,
+          "minstret_later": 12306,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 211615000,
+          "pc_W": 66852,
+          "minstret_before": 12319,
+          "minstret_next": 12320,
+          "minstret_later": 12321,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 211815000,
+          "pc_W": 66852,
+          "minstret_before": 12334,
+          "minstret_next": 12335,
+          "minstret_later": 12336,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 212015000,
+          "pc_W": 66852,
+          "minstret_before": 12349,
+          "minstret_next": 12350,
+          "minstret_later": 12351,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 212215000,
+          "pc_W": 66852,
+          "minstret_before": 12364,
+          "minstret_next": 12365,
+          "minstret_later": 12366,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 212415000,
+          "pc_W": 66852,
+          "minstret_before": 12379,
+          "minstret_next": 12380,
+          "minstret_later": 12381,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 212615000,
+          "pc_W": 66852,
+          "minstret_before": 12394,
+          "minstret_next": 12395,
+          "minstret_later": 12396,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 212815000,
+          "pc_W": 66852,
+          "minstret_before": 12409,
+          "minstret_next": 12410,
+          "minstret_later": 12411,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 213015000,
+          "pc_W": 66852,
+          "minstret_before": 12424,
+          "minstret_next": 12425,
+          "minstret_later": 12426,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 213215000,
+          "pc_W": 66852,
+          "minstret_before": 12439,
+          "minstret_next": 12440,
+          "minstret_later": 12441,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 213415000,
+          "pc_W": 66852,
+          "minstret_before": 12454,
+          "minstret_next": 12455,
+          "minstret_later": 12456,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 213615000,
+          "pc_W": 66852,
+          "minstret_before": 12469,
+          "minstret_next": 12470,
+          "minstret_later": 12471,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 213815000,
+          "pc_W": 66852,
+          "minstret_before": 12484,
+          "minstret_next": 12485,
+          "minstret_later": 12486,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214015000,
+          "pc_W": 66852,
+          "minstret_before": 12499,
+          "minstret_next": 12500,
+          "minstret_later": 12501,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214215000,
+          "pc_W": 66852,
+          "minstret_before": 12514,
+          "minstret_next": 12515,
+          "minstret_later": 12516,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214305000,
+          "pc_W": 67100,
+          "minstret_before": 12518,
+          "minstret_next": 12519,
+          "minstret_later": 12520,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214325000,
+          "pc_W": 67104,
+          "minstret_before": 12520,
+          "minstret_next": 12521,
+          "minstret_later": 12522,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214345000,
+          "pc_W": 67108,
+          "minstret_before": 12522,
+          "minstret_next": 12523,
+          "minstret_later": 12524,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214395000,
+          "pc_W": 67116,
+          "minstret_before": 12525,
+          "minstret_next": 12526,
+          "minstret_later": 12527,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214415000,
+          "pc_W": 67120,
+          "minstret_before": 12527,
+          "minstret_next": 12528,
+          "minstret_later": 12529,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214435000,
+          "pc_W": 67124,
+          "minstret_before": 12529,
+          "minstret_next": 12530,
+          "minstret_later": 12531,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 214465000,
+          "pc_W": 67132,
+          "minstret_before": 12532,
+          "minstret_next": 12533,
+          "minstret_later": 12534,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 215895000,
+          "pc_W": 66764,
+          "minstret_before": 12611,
+          "minstret_next": 12612,
+          "minstret_later": 12613,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 216215000,
+          "pc_W": 66852,
+          "minstret_before": 12636,
+          "minstret_next": 12637,
+          "minstret_later": 12638,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 216415000,
+          "pc_W": 66852,
+          "minstret_before": 12651,
+          "minstret_next": 12652,
+          "minstret_later": 12653,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 216615000,
+          "pc_W": 66852,
+          "minstret_before": 12666,
+          "minstret_next": 12667,
+          "minstret_later": 12668,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 216815000,
+          "pc_W": 66852,
+          "minstret_before": 12681,
+          "minstret_next": 12682,
+          "minstret_later": 12683,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217015000,
+          "pc_W": 66852,
+          "minstret_before": 12696,
+          "minstret_next": 12697,
+          "minstret_later": 12698,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217215000,
+          "pc_W": 66852,
+          "minstret_before": 12711,
+          "minstret_next": 12712,
+          "minstret_later": 12713,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217275000,
+          "pc_W": 66868,
+          "minstret_before": 12716,
+          "minstret_next": 12717,
+          "minstret_later": 12718,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217675000,
+          "pc_W": 66944,
+          "minstret_before": 12741,
+          "minstret_next": 12742,
+          "minstret_later": 12743,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217785000,
+          "pc_W": 67340,
+          "minstret_before": 12747,
+          "minstret_next": 12748,
+          "minstret_later": 12749,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217835000,
+          "pc_W": 67352,
+          "minstret_before": 12751,
+          "minstret_next": 12752,
+          "minstret_later": 12753,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 217955000,
+          "pc_W": 67396,
+          "minstret_before": 12763,
+          "minstret_next": 12764,
+          "minstret_later": 12765,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218085000,
+          "pc_W": 67396,
+          "minstret_before": 12772,
+          "minstret_next": 12773,
+          "minstret_later": 12774,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218215000,
+          "pc_W": 67396,
+          "minstret_before": 12781,
+          "minstret_next": 12782,
+          "minstret_later": 12783,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218345000,
+          "pc_W": 67396,
+          "minstret_before": 12790,
+          "minstret_next": 12791,
+          "minstret_later": 12792,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218475000,
+          "pc_W": 67396,
+          "minstret_before": 12799,
+          "minstret_next": 12800,
+          "minstret_later": 12801,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218605000,
+          "pc_W": 67396,
+          "minstret_before": 12808,
+          "minstret_next": 12809,
+          "minstret_later": 12810,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218735000,
+          "pc_W": 67396,
+          "minstret_before": 12817,
+          "minstret_next": 12818,
+          "minstret_later": 12819,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218865000,
+          "pc_W": 67396,
+          "minstret_before": 12826,
+          "minstret_next": 12827,
+          "minstret_later": 12828,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 218995000,
+          "pc_W": 67396,
+          "minstret_before": 12835,
+          "minstret_next": 12836,
+          "minstret_later": 12837,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219125000,
+          "pc_W": 67396,
+          "minstret_before": 12844,
+          "minstret_next": 12845,
+          "minstret_later": 12846,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219255000,
+          "pc_W": 67396,
+          "minstret_before": 12853,
+          "minstret_next": 12854,
+          "minstret_later": 12855,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219385000,
+          "pc_W": 67396,
+          "minstret_before": 12862,
+          "minstret_next": 12863,
+          "minstret_later": 12864,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219515000,
+          "pc_W": 67396,
+          "minstret_before": 12871,
+          "minstret_next": 12872,
+          "minstret_later": 12873,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219645000,
+          "pc_W": 67396,
+          "minstret_before": 12880,
+          "minstret_next": 12881,
+          "minstret_later": 12882,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219775000,
+          "pc_W": 67396,
+          "minstret_before": 12889,
+          "minstret_next": 12890,
+          "minstret_later": 12891,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 219905000,
+          "pc_W": 67396,
+          "minstret_before": 12898,
+          "minstret_next": 12899,
+          "minstret_later": 12900,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220035000,
+          "pc_W": 67396,
+          "minstret_before": 12907,
+          "minstret_next": 12908,
+          "minstret_later": 12909,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220165000,
+          "pc_W": 67396,
+          "minstret_before": 12916,
+          "minstret_next": 12917,
+          "minstret_later": 12918,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220295000,
+          "pc_W": 67396,
+          "minstret_before": 12925,
+          "minstret_next": 12926,
+          "minstret_later": 12927,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220425000,
+          "pc_W": 67396,
+          "minstret_before": 12934,
+          "minstret_next": 12935,
+          "minstret_later": 12936,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220555000,
+          "pc_W": 67396,
+          "minstret_before": 12943,
+          "minstret_next": 12944,
+          "minstret_later": 12945,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220685000,
+          "pc_W": 67396,
+          "minstret_before": 12952,
+          "minstret_next": 12953,
+          "minstret_later": 12954,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220815000,
+          "pc_W": 67396,
+          "minstret_before": 12961,
+          "minstret_next": 12962,
+          "minstret_later": 12963,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 220945000,
+          "pc_W": 67396,
+          "minstret_before": 12970,
+          "minstret_next": 12971,
+          "minstret_later": 12972,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221075000,
+          "pc_W": 67396,
+          "minstret_before": 12979,
+          "minstret_next": 12980,
+          "minstret_later": 12981,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221205000,
+          "pc_W": 67396,
+          "minstret_before": 12988,
+          "minstret_next": 12989,
+          "minstret_later": 12990,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221335000,
+          "pc_W": 67396,
+          "minstret_before": 12997,
+          "minstret_next": 12998,
+          "minstret_later": 12999,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221465000,
+          "pc_W": 67396,
+          "minstret_before": 13006,
+          "minstret_next": 13007,
+          "minstret_later": 13008,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221595000,
+          "pc_W": 67396,
+          "minstret_before": 13015,
+          "minstret_next": 13016,
+          "minstret_later": 13017,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221725000,
+          "pc_W": 67396,
+          "minstret_before": 13024,
+          "minstret_next": 13025,
+          "minstret_later": 13026,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221855000,
+          "pc_W": 67396,
+          "minstret_before": 13033,
+          "minstret_next": 13034,
+          "minstret_later": 13035,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 221985000,
+          "pc_W": 67396,
+          "minstret_before": 13042,
+          "minstret_next": 13043,
+          "minstret_later": 13044,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 222025000,
+          "pc_W": 67404,
+          "minstret_before": 13045,
+          "minstret_next": 13046,
+          "minstret_later": 13047,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 222365000,
+          "pc_W": 66852,
+          "minstret_before": 13067,
+          "minstret_next": 13068,
+          "minstret_later": 13069,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 222565000,
+          "pc_W": 66852,
+          "minstret_before": 13082,
+          "minstret_next": 13083,
+          "minstret_later": 13084,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 222765000,
+          "pc_W": 66852,
+          "minstret_before": 13097,
+          "minstret_next": 13098,
+          "minstret_later": 13099,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 222965000,
+          "pc_W": 66852,
+          "minstret_before": 13112,
+          "minstret_next": 13113,
+          "minstret_later": 13114,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 223165000,
+          "pc_W": 66852,
+          "minstret_before": 13127,
+          "minstret_next": 13128,
+          "minstret_later": 13129,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 223225000,
+          "pc_W": 66868,
+          "minstret_before": 13132,
+          "minstret_next": 13133,
+          "minstret_later": 13134,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 223625000,
+          "pc_W": 66944,
+          "minstret_before": 13157,
+          "minstret_next": 13158,
+          "minstret_later": 13159,
+          "next_retirement_input": 1
+        },
+        {
+          "time_ps": 224375000,
+          "pc_W": 65668,
+          "minstret_before": 13179,
+          "minstret_next": 13180,
+          "minstret_later": 13181,
+          "next_retirement_input": 1
+        }
+      ],
+      "hashes": {
+        "program.elf": "81ed7fe927cd1c3a8da2e0f90ecfdceb87f4895a1af221b3c38d6229ab44c9fe",
+        "program.dis": "e86fc1adf92c55a8c1995d4f30333aa5de907984db14466f56dde1063aca481f",
+        "waves.vcd": "4e96a0edb3ff642a12ace2c318b46c88035977d524b89337582ee976e438e6ec",
+        "core_cycles.csv": "8cc511442b2437431e7916ca38abace47641df40a5d265cba1804e094cef8095",
+        "result.json": "baca1ee5cdd199502b02f78b1a4fe000aac22e2e0413116626cd97efc305caee",
+        "source_hashes.json": "e37fc1744f84c0d1795f9fbc57dd53988710d9e26ce373bb0a5526624b209a6b"
+      }
+    }
+  },
+  "design_baseline": {
+    "checked": 109,
+    "differences": []
+  }
+}

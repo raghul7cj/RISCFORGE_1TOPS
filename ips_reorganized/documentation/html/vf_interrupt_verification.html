@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interrupt Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan Rev B / Interrupts</span></div>
+<div class="wrap">
+
+<h1>Interrupt Verification</h1>
+<p class="lead">What Rev B section 13 plans to check in the interrupt path, in a form you can build tests from: the reference table, the two (now three) capture regimes, the arbiter, gating, nesting, and the check register, with an explicit account of where the RTL on disk has moved away from the plan.</p>
+<p class="meta">Scope: Rev B section 13 | Sources: Rev B plan, <code>riscv_core/rtl/irq_gateway.v</code>, <code>irq_arbiter.v</code>, <code>top.v</code>, <code>csr_regfile.v</code>, <code>wb_trap_mret_commit_controller.v</code>, SoC top | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Rev B baseline versus the RTL on disk</a></li>
+<li><a href="#s2">The interrupt reference table</a></li>
+<li><a href="#s3">Capture regimes</a></li>
+<li><a href="#s4">Arbiter, classes and the gate</a></li>
+<li><a href="#s5">Shadow stack obligation</a></li>
+<li><a href="#s6">Gate tests</a></li>
+<li><a href="#s7">mtvec mode</a></li>
+<li><a href="#s8">Spurious interrupts</a></li>
+<li><a href="#s9">Peripheral clear versus gateway clear</a></li>
+<li><a href="#s10">The watchdog class</a></li>
+<li><a href="#s11">Pre-emption and nesting</a></li>
+<li><a href="#s12">The check register</a></li>
+<li><a href="#s13">Configuration scope and limits</a></li>
+</ol></div>
+
+<h2 id="s1">1. Rev B baseline versus the RTL on disk</h2>
+<p>Rev B describes a core with a six-source gateway, a depth-gated arbiter and a two-deep shadow stack, and its statement that <code>mip[20]</code> to <code>mip[26]</code> are provably zero. The files now in the repository describe a different interrupt design: thirteen sources, a software-managed priority threshold <code>mintprio</code>, and no shadow stack. Both are recorded below. Each Rev B check keeps its identifier; where its premise is absent on disk it is marked OPEN rather than rewritten, because the plan owner must decide whether to revise the plan or the RTL. Core pipeline and the interrupt hardware are described on <a href="core_interrupts.html">the core interrupts page</a>, and the unit-level checks on <a href="verif_interrupt_unit.html">the interrupt unit verification page</a>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Topic</th><th>Rev B section 13 states</th><th>RTL on disk (2026-11-03)</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Sources into the core</td><td>Six; <code>mip[20]</code> to <code>mip[26]</code> wired at the SoC and dropped in the core</td><td>Thirteen: <code>irq_raw = {fast_irq_i[11:0], timer_irq_i}</code> (<code>riscv_core/rtl/top.v:207</code>); SoC wires SPI, all four timer channel pairs, UART, I2C, GPIO (<code>RTL_SOC/riscforge_soc_subsystem.sv:1275-1288</code>)</td><td>Rev B's 'provably zero' statement and the seven-bit legality set no longer match <span class="tag open">OPEN</span></td></tr><tr><td>Capture regimes</td><td>Two: edge (latched) and level (pass-through)</td><td>Three: edge for GPIO only (<code>edge_mode = 13'h0002</code>), event for 13'h1fe9, level for I2C and UART (<code>top.v:208-210</code>; <code>irq_gateway.v:16-30</code>)</td><td>Event mode is new and has no Rev B check <span class="tag open">OPEN</span></td></tr><tr><td>Arbiter classes</td><td>Class 2: causes 27 and 7; class 1: 18, 19; class 0: 16, 17</td><td>Class 2 fixed: 7, 22, 24, 26, 20, 21, 23, 25; class 1 round robin: 19, 18, 27; class 0 round robin: 17, 16 (<code>irq_arbiter.v:2-4,42-97</code>)</td><td>Cause 27 is class 1 on disk. IC-23 as written (27 beats 7) fails its premise <span class="tag open">OPEN</span></td></tr><tr><td>Pre-emption gate</td><td><code>nest_depth == 0</code> or incoming class strictly greater than current class</td><td><code>irq_pending_o = winner_valid &amp;&amp; (class + 1 &gt; mintprio)</code> (<code>irq_arbiter.v:99-100</code>)</td><td>Software-managed threshold; no depth counter in the arbiter</td></tr><tr><td>Shadow stack</td><td>Two entries of mepc, mcause, MPIE, class (<code>csr_regfile.v:84-88</code>)</td><td>Not present: <code>csr_regfile.v</code> has no nesting counter or stack; one mepc, mcause and MPIE set; <code>mintprio_r</code> at 0x7C0 is untouched by trap entry and MRET (<code>csr_regfile.v:90,157,170</code>)</td><td>D-70, IC-11, IC-12, IC-21 and IC-22 refer to a mechanism that does not exist <span class="tag open">OPEN</span></td></tr><tr><td><code>mtvec</code> mode</td><td>Direct only reachable</td><td>Unchanged: write mask preserves bits [1:0], reset 0 (<code>csr_regfile.v:142,188</code>); vectored datapath still present (<code>wb_trap_mret_commit_controller.v:98-100</code>)</td><td>Rev B holds <span class="tag exists">EXISTS</span></td></tr><tr><td>MSIP, MEIP</td><td>CSR bits with no delivery path</td><td><code>ext_irq_i</code> and <code>sw_irq_i</code> tied to 0 (<code>soc:1289-1290</code>); arbiter input is the 13-bit pend vector only</td><td>Still not deliverable <span class="tag exists">EXISTS</span></td></tr><tr><td>AON watchdog</td><td>Specified, not integrated</td><td>No <code>aon_timer</code> or <code>clk_aon</code> match in the SoC file; no cause 28 slot in the 13-bit vector</td><td>Rev B holds <span class="tag specified">SPECIFIED</span></td></tr>
+</tbody>
+</table></div>
+<div class="warn">Nothing on this page is a verification result. P0 is in progress (13 of 20 exit criteria met, 5 partial, 2 not met per <code>Verification/status/PHASE_STATUS.md</code>). The path through the SoC is also on <a href="soc_architecture.html">the SoC architecture page</a>.</div>
+<p>The deployed path is entirely inside the core: peripheral pin, SoC <code>fast_irq_i</code> and <code>timer_irq_i</code>, <code>irq_gateway</code>, <code>irq_arbiter</code>, trap commit, <code>csr_regfile</code>. There is no CLIC, PLIC or CLINT. The CLIC exists as RTL instantiated nowhere. Figure 1 shows the path and Rev B's five observation points.</p>
+<figure>
+<svg viewBox="0 0 1040 352" role="img" aria-label="Interrupt source-to-core map: peripherals, SoC pins, gateway, arbiter and trap CSRs with five observation points">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-per" x="24" y="70" width="170" height="48" rx="6"/>
+<text class="tb mid" x="109" y="90.5">GPIO, I2C</text>
+<text class="ts mid" x="109" y="105.5">slot 3, slot 0</text>
+<path class="ar" d="M194 94 H244"/>
+<rect class="bx-per" x="24" y="140" width="170" height="48" rx="6"/>
+<text class="tb mid" x="109" y="160.5">SPI, UART</text>
+<text class="ts mid" x="109" y="175.5">slot 4, slot 2</text>
+<path class="ar" d="M194 164 H244"/>
+<rect class="bx-per" x="24" y="210" width="170" height="48" rx="6"/>
+<text class="tb mid" x="109" y="230.5">Timer 0, Timer 1</text>
+<text class="ts mid" x="109" y="245.5">slots 1, 5</text>
+<path class="ar" d="M194 234 H244"/>
+<rect class="bx-bus" x="244" y="70" width="170" height="188" rx="6"/>
+<text class="tb mid" x="329" y="145.5">SoC top</text>
+<text class="ts mid" x="329" y="160.5">fast_irq_i[11:0]</text>
+<text class="ts mid" x="329" y="175.5">timer_irq_i</text>
+<text class="ts mid" x="329" y="190.5">ext, sw tied to 0</text>
+<path class="ar" d="M414 164 H464"/>
+<rect class="bx-ctrl" x="464" y="120" width="150" height="88" rx="6"/>
+<text class="tb mid" x="539" y="153.0">irq_gateway</text>
+<text class="ts mid" x="539" y="168.0">13 sources</text>
+<text class="ts mid" x="539" y="183.0">edge, event, level</text>
+<path class="ar" d="M614 164 H664"/>
+<rect class="bx-ctrl" x="664" y="120" width="150" height="88" rx="6"/>
+<text class="tb mid" x="739" y="153.0">irq_arbiter</text>
+<text class="ts mid" x="739" y="168.0">3 classes</text>
+<text class="ts mid" x="739" y="183.0">class+1 &gt; mintprio</text>
+<path class="ar" d="M814 164 H864"/>
+<rect class="bx-core" x="864" y="120" width="152" height="88" rx="6"/>
+<text class="tb mid" x="940" y="153.0">Trap commit, CSRs</text>
+<text class="ts mid" x="940" y="168.0">mcause, mepc, mtvec</text>
+<text class="ts mid" x="940" y="183.0">mintprio 0x7C0</text>
+<path class="ar-d" d="M940 208 V280 H539 V208"/>
+<text class="ts mid" x="740" y="272">clear strobe (P5, IC-8)</text>
+<rect class="bx-ver" x="244" y="20" width="170" height="30" rx="6"/>
+<text class="tb mid" x="329" y="39.0">P1 pins: IC-1,18,19</text>
+<path class="ar-ver" d="M329 50 V70"/>
+<rect class="bx-ver" x="464" y="20" width="150" height="30" rx="6"/>
+<text class="tb mid" x="539" y="39.0">P2 pend IC-1,18,19</text>
+<path class="ar-ver" d="M539 50 V120"/>
+<rect class="bx-ver" x="664" y="20" width="150" height="30" rx="6"/>
+<text class="tb mid" x="739" y="39.0">P3 winner IC-2..5</text>
+<path class="ar-ver" d="M739 50 V120"/>
+<rect class="bx-ver" x="864" y="20" width="152" height="30" rx="6"/>
+<text class="tb mid" x="940" y="39.0">P4 CSRs IC-6,7,16</text>
+<path class="ar-ver" d="M940 50 V120"/>
+<text class="ts start" x="24" y="330">Rev B draws six sources into the core; the file on disk carries thirteen (top.v:207). P1 to P5 are Rev B's five observation points.</text>
+</svg>
+<figcaption><b>Figure 1.</b> Source-to-core map. P1 to P5 mark where the model observes the DUT. The dashed return path is the gateway clear strobe, which is produced by the trap commit controller and so always precedes the handler.</figcaption>
+</figure>
+
+<h2 id="s2">2. The interrupt reference table</h2>
+<p>Rev B Table 13.1 is the authority for sensitivity, class, priority and build state; no other section may state an mip bit without quoting it or the address map. The table below keeps its twelve rows and adds the on-disk wiring. The row labels IS-1 to IS-12 are labels, not check IDs; every interrupt check is an IC-n row.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Row</th><th>Interrupt</th><th>Cause</th><th>Rev B class, mode</th><th>On-disk class and gateway mode</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>IS-1</td><td>GPIO</td><td>16</td><td>0, edge</td><td>0, edge (<code>top.v:208</code>)</td><td><span class="tag exists">EXISTS</span> end to end</td></tr><tr><td>IS-2</td><td>I2C</td><td>17</td><td>0, level</td><td>0, level</td><td><span class="tag exists">EXISTS</span></td></tr><tr><td>IS-3</td><td>SPI transfer (threshold)</td><td>18</td><td>1, edge</td><td>1, event (bit 3 of 13'h1fe9)</td><td><span class="tag exists">EXISTS</span> mode differs</td></tr><tr><td>IS-4</td><td>UART</td><td>19</td><td>1, level</td><td>1, level</td><td><span class="tag exists">EXISTS</span></td></tr><tr><td>IS-5</td><td>Timer 0 ch0 compare</td><td>7 (MTIP)</td><td>2, edge</td><td>2, event; first in class 2</td><td><span class="tag exists">EXISTS</span> mode differs</td></tr><tr><td>IS-6</td><td>SPI end of transfer</td><td>27</td><td>2, edge; highest overall</td><td>1, event (round robin with 19, 18)</td><td><span class="tag exists">EXISTS</span> class differs <span class="tag open">OPEN</span></td></tr><tr><td>IS-7</td><td>Timer 0 ch0 overflow</td><td>20</td><td>2, not routed</td><td>2, event, wired (<code>soc:1283</code>)</td><td><span class="tag exists">EXISTS</span> on disk; Rev B says <span class="tag specified">SPECIFIED</span></td></tr><tr><td>IS-8</td><td>Timer 0 ch1 overflow, compare</td><td>21, 22</td><td>2, not routed</td><td>2, event, wired (<code>soc:1281-1282</code>)</td><td><span class="tag exists">EXISTS</span> on disk</td></tr><tr><td>IS-9</td><td>Timer 1, four sources</td><td>23 to 26</td><td>2, not routed</td><td>2, event, wired (<code>soc:1277-1280</code>)</td><td><span class="tag exists">EXISTS</span> on disk</td></tr><tr><td>IS-10</td><td>AON watchdog</td><td>28</td><td>2, level, lowest in class</td><td>No slot</td><td><span class="tag specified">SPECIFIED</span> not integrated</td></tr><tr><td>IS-11</td><td>Machine software</td><td>3</td><td>No path</td><td><code>sw_irq_i</code> tied 0</td><td><span class="tag exists">EXISTS</span> CSR bit, not deliverable</td></tr><tr><td>IS-12</td><td>Machine external</td><td>11</td><td>No path</td><td><code>ext_irq_i</code> tied 0</td><td><span class="tag exists">EXISTS</span> CSR bit, not deliverable</td></tr>
+</tbody>
+</table></div>
+<p>Two consequences hold in either version. The deliverable set must be derived from the arbiter's active vector, not from <code>mip</code>, because <code>mip[3]</code> and <code>mip[11]</code> are CSR bits that never reach it. And the name "Watchdog" in old arbiter comments is vestigial: <code>mip[20]</code> is Timer 0 channel 0 overflow, not a watchdog.</p>
+
+<h2 id="s3">3. Capture regimes</h2>
+<p>The gateway is not one mechanism, and the regimes are not interchangeable. Rev B documents two; the file on disk has three.</p>
+<div class="tablewrap"><table>
+<thead><tr><th></th><th>Edge</th><th>Event (on disk)</th><th>Level</th></tr></thead>
+<tbody>
+<tr><td>Sources</td><td>GPIO (on disk); Rev B also lists SPI, Timer 0, SPI EOT</td><td>Timers, SPI threshold and EOT (13'h1fe9)</td><td>I2C, UART</td></tr><tr><td>Capture</td><td>Rising edge against a registered copy, then a sticky latch</td><td>Every asserted cycle sets the latch; sets coalesce and win over a same-cycle clear</td><td>None: <code>pend_o</code> is the raw level (<code>irq_gateway.v:29-30</code>)</td></tr><tr><td>Effect of the clear strobe</td><td>Clears the latch; a new interrupt needs a new rising edge</td><td>Clears the latch; a level held high sets it again next cycle</td><td>No effect</td></tr><tr><td>Request withdrawn before acknowledgement</td><td>Still taken, once</td><td>Still taken, once (latched)</td><td>Lost</td></tr><tr><td>Level still high at MRET</td><td>No re-trap</td><td>Re-trap after the next clear, while the level persists (my reading, OPEN)</td><td>Re-trap when MIE returns</td></tr>
+</tbody>
+</table></div>
+<p>The minimum observable pulse width on a latched source is one <code>clk_i</code> cycle (D-73), so the injector must not generate narrower pulses; IC-1 asserts the floor. Rev B corrects its own Rev A table twice: Timer 0 compare was recorded as level, and the clear strobe was recorded as clearing all sources.</p>
+
+<h2 id="s4">4. Arbiter, classes and the gate</h2>
+<p>The arbiter qualifies, rotates, selects, ranks and gates; each step is a separate check. The reference model computes the winner itself from stimulus and architectural CSR state, never from the DUT's grant, otherwise it would only compare two copies of the RTL.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Step</th><th>What it does</th><th>Locator</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td>A1 Qualify</td><td><code>active = pend &amp; {mie[27:16], mie[7]} &amp; {13{mstatus.MIE}}</code> (13 bits on disk; six in Rev B)</td><td><code>irq_arbiter.v:20-21</code></td><td>IC-14, IC-15</td></tr><tr><td>A2 Rotate</td><td>Round-robin pointers advance only on <code>wb_commit_i</code> with the matching cause</td><td><code>irq_arbiter.v:26-40</code></td><td>IC-4</td></tr><tr><td>A3 Select</td><td>Class 2 fixed order; classes 1 and 0 cyclic by pointer</td><td><code>irq_arbiter.v:42-97</code></td><td>IC-2, IC-3, IC-23</td></tr><tr><td>A4 Rank</td><td>Class 2 over class 1 over class 0</td><td><code>irq_arbiter.v:72-97</code></td><td>IC-2</td></tr><tr><td>A5 Gate</td><td>Rev B: depth zero or strictly higher class. On disk: <code>class + 1 &gt; mintprio</code></td><td><code>irq_arbiter.v:99-100</code></td><td>IC-5, IC-21, IC-22 <span class="tag open">OPEN</span></td></tr>
+</tbody>
+</table></div>
+<p>Rev B's pre-emption rule is: allowed if and only if depth is zero or the incoming class is strictly greater than the current class, so at depth 2 nothing can pre-empt. On disk there is no depth. The gate is the threshold, which is software state:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>mintprio</th><th>Classes that can raise <code>irq_pending_o</code></th></tr></thead>
+<tbody>
+<tr><td>0 (reset)</td><td>0, 1, 2</td></tr><tr><td>1</td><td>1, 2</td></tr><tr><td>2</td><td>2 only</td></tr><tr><td>3</td><td>None</td></tr>
+</tbody>
+</table></div>
+<p><code>mintprio</code> is 2 bits at 0x7C0, resets to 0, and trap entry and MRET leave it untouched. Nesting is therefore a firmware protocol (raise the threshold, re-enable MIE, restore on exit), and the verification target becomes: no interrupt of class not exceeding the threshold is delivered, and software that follows the protocol sees correct context restoration. <span class="tag open">OPEN</span> The plan does not yet contain those checks.</p>
+
+<h2 id="s5">5. Shadow stack obligation</h2>
+<p>Rev B rejects a finding that asked for a synchronous exception inside the deepest handler to reach depth 3: a synchronous exception never pushes, and nothing can be pending at depth 2, so the scenario cannot be built. The real defect it found was that a push beyond depth 2 would be silently discarded with no cause, status bit or trap, which D-70 would cure with a three-deep stack and a defined exception (mcause 24, 10 edits in one file). IC-11 characterised today's discard using a recorded hierarchical force, with a depth-1 positive control so the depth-2 assertions are not vacuous; IC-12 specified the cure and was not executable.</p>
+<p>On the file now in the repository none of this applies: <code>csr_regfile.v</code> holds one mepc, mcause and MPIE, written live at trap entry (<code>csr_regfile.v:157-175</code>). By my reading a second trap taken with MIE re-enabled overwrites the first context unless firmware saved it. <span class="tag open">OPEN</span> IC-11, IC-12 and D-70 are retained as Rev B identifiers but have no object until the plan or the RTL is reconciled. Lock-step comparison does not cover nesting in either version.</p>
+
+<h2 id="s6">6. Gate tests</h2>
+<p>Both gates feed the qualify step. The <code>mie</code> write mask is <code>32'hFFFF0888</code> (<code>csr_regfile.v:187</code>), covering bits [31:16], 11 and 7.</p>
+<div class="tablewrap"><table>
+<thead><tr><th></th><th>mie = 1, MIE = 1</th><th>mie = 0, MIE = 1</th><th>mie = 1, MIE = 0</th><th>mie = 0, MIE = 0</th></tr></thead>
+<tbody>
+<tr><td>Required</td><td>Delivered: exactly one trap, cause equal to the source's mip bit</td><td>No trap; request stays recorded</td><td>No trap; MIE gates globally</td><td>No trap</td></tr><tr><td>Edge source</td><td>Latch clears on the trap-commit strobe</td><td>Latch still sets and is retained</td><td>Retained</td><td>Retained</td></tr><tr><td>Level source</td><td>Delivered</td><td>Visible again the instant the gate opens, if the level persists</td><td>As left</td><td>As left</td></tr>
+</tbody>
+</table></div>
+<p>IC-14 crosses sources, the two gate registers and the two gate states, asserting the trap count as a number: 24 cases with six sources. If the same rule is applied to the thirteen on-disk sources it gives 52 (my arithmetic, not in Rev B). IC-15 is the clear-while-pending case: assert, hold, clear the gate, wait, restore, and count. Required: exactly one trap after restoration and none before, exactly one rising edge of the commit pulse, and MPIE constant at 1 for the <code>mie</code>-bit variant and 0 for the MIE variant. For level sources the retention holds only while the peripheral keeps its level, and the stimulus must say so (D-77). A source whose <code>mie</code> bit is cleared inside its handler must not be redelivered after MRET until the gate is restored.</p>
+
+<h2 id="s7">7. mtvec mode</h2>
+<p>Both modes exist in the datapath, but the <code>mtvec</code> write preserves bits [1:0], so the mode field resets to 0 and can never become 1: vectored mode is dead code (<code>csr_regfile.v:188</code>, <code>wb_trap_mret_commit_controller.v:98-100</code>). Rev B calls this a defect: a WARL field always reading 0 is legal only if the vectored datapath does not exist. The measurable difference is the first retired PC of the handler: the base in direct mode, base plus four times cause in vectored mode for interrupts only.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Mode</th><th>mtvec.MODE</th><th>State</th><th>Required behaviour</th><th>Check</th><th>Executable</th></tr></thead>
+<tbody>
+<tr><td>Direct</td><td>2'b00</td><td><span class="tag exists">EXISTS</span> only reachable value</td><td>Target is the base for every trap</td><td>IC-16</td><td>Yes</td></tr><tr><td>Vectored</td><td>2'b01</td><td><span class="tag specified">SPECIFIED</span> (datapath exists, field cannot be written)</td><td>Interrupt target is base plus four times cause; exceptions use the base</td><td>IC-17</td><td>No, until D-71 lands</td></tr><tr><td>Reserved</td><td>2'b10, 2'b11</td><td><span class="tag specified">SPECIFIED</span></td><td>Must read back as Direct</td><td>IC-16 negative</td><td>Yes (read-back)</td></tr>
+</tbody>
+</table></div>
+<p>D-71 specifies two edits in one file: widen the write mask and legalise reserved values. IC-17 is registered not executable until both land.</p>
+
+<h2 id="s8">8. Spurious interrupts</h2>
+<p>The behaviour is asymmetric and must be predicted, not reported as a defect: the same withdrawn request is delivered in one regime and cancelled in the other, and both are architecturally permitted (D-76).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Case</th><th>Expected behaviour</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td>S1 edge request withdrawn before acknowledgement</td><td>Still taken, exactly once</td><td>IC-18</td></tr><tr><td>S2 level request withdrawn before acknowledgement</td><td>Not taken</td><td>IC-19</td></tr><tr><td>S3 edge pulse narrower than one <code>clk_i</code> period</td><td>Lost; no interrupt</td><td>IC-1 negative</td></tr><tr><td>S4 edge, withdrawn, new edge before acknowledgement</td><td>One interrupt, not two</td><td>IC-18</td></tr><tr><td>S5 level still asserted at MRET</td><td>No trap in the handler; re-trap after MRET while the level holds</td><td>IC-9, IC-20</td></tr>
+</tbody>
+</table></div>
+<p>S5 is the highest-consequence row: software that does not clear a level source first re-traps without bound.</p>
+
+<h2 id="s9">9. Peripheral clear versus gateway clear</h2>
+<p>The required order is: the peripheral clears its own source, and the gateway strobe follows from trap commit. It is not a choice. The strobe is a one-hot decode of the commit and the cause (<code>wb_trap_mret_commit_controller.v:81-92</code>: bit 0 for cause 7, otherwise cause minus 15), issued when the interrupt is taken, so it always precedes the handler's first instruction; the peripheral clear is software and cannot. Figure 4 shows the sequence.</p>
+<figure>
+<svg viewBox="0 0 1040 396" role="img" aria-label="Ordering of the gateway clear strobe and the peripheral clear: the strobe precedes software, clears only the latch, and cannot clear a level source">
+
+<rect class="lane" x="24" y="74" width="992" height="52"/>
+<text class="tm end" x="176" y="104">source level</text>
+<text class="tm end" x="176" y="156">pend_o level src</text>
+<rect class="lane" x="24" y="178" width="992" height="52"/>
+<text class="tm end" x="176" y="208">pend_q edge src</text>
+<text class="tm end" x="176" y="260">clear strobe</text>
+<rect class="lane" x="24" y="282" width="992" height="52"/>
+<text class="tm end" x="176" y="312">handler</text>
+<path class="ln" d="M190 112 H240 V88 H600 V112 H1000"/>
+<path class="ln" d="M190 164 H240 V140 H600 V164 H1000"/>
+<path class="ln" d="M190 216 H240 V192 H380 V216 H1000"/>
+<path class="ln" d="M190 268 H380 V244 H396 V268 H1000"/>
+<rect class="bx-ctrl" x="396" y="286" width="344" height="28" rx="6"/>
+<text class="tb mid" x="568" y="304">handler runs, MIE = 0</text>
+<path class="ar-bad" d="M740 300 H800"/>
+<text class="ts" x="810" y="304">level still high: re-trap (CO-A)</text>
+<line class="grp" x1="240" y1="60" x2="240" y2="330"/>
+<circle class="pill" cx="240" cy="40" r="11"/>
+<text class="tb mid" x="240" y="44">1</text>
+<line class="grp" x1="380" y1="60" x2="380" y2="330"/>
+<circle class="pill" cx="380" cy="40" r="11"/>
+<text class="tb mid" x="380" y="44">2</text>
+<line class="grp" x1="600" y1="60" x2="600" y2="330"/>
+<circle class="pill" cx="600" cy="40" r="11"/>
+<text class="tb mid" x="600" y="44">3</text>
+<line class="grp" x1="740" y1="60" x2="740" y2="330"/>
+<circle class="pill" cx="740" cy="40" r="11"/>
+<text class="tb mid" x="740" y="44">4</text>
+<text class="ts start" x="24" y="360">1 source asserts. 2 trap accepted; strobe clears the edge latch and does nothing to a level source. 3 software clears the source. 4 MRET restores MIE.</text>
+<text class="ts start" x="24" y="376">The strobe always comes first. The peripheral clear can only happen inside the handler.</text>
+</svg>
+<figcaption><b>Figure 4.</b> Clear ordering. The strobe at marker 2 clears the edge latch but cannot clear a level source; only the software clear at marker 3 can. Returning at marker 4 with the level still high re-traps.</figcaption>
+</figure>
+<p>The obligation that survives is therefore about responsibility. For latched sources the handler needs a new rising edge, or for a compare, a re-arm. For level sources the handler must clear the peripheral before doing anything else, since a handler that reads status before writing it re-traps.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Regime</th><th>Case</th><th>Expected</th><th>Failure caught</th></tr></thead>
+<tbody>
+<tr><td>CO-A</td><td>Level (IS-2, IS-4)</td><td>Strobe first, peripheral clear second</td><td>Trap count 2 over one handler and one MRET; one more per further MRET without a clear</td><td>Re-trap storm; count 1 means the observation point is misplaced</td></tr><tr><td>CO-B</td><td>Edge</td><td>Peripheral re-arms before the handler reads status</td><td>Exactly 1 trap per new edge; two edges give 2, never 3</td><td>Double delivery across a trap boundary</td></tr><tr><td>CO-C</td><td>Edge, Timer 0 compare (Rev B)</td><td>Compare left true across the handler</td><td>Rev B: 1 trap then silence, a lost real-time interrupt</td><td>On disk Timer 0 is event mode, so this case may become a storm instead <span class="tag open">OPEN</span></td></tr><tr><td>CO-D</td><td>Both</td><td>Strobe suppressed or duplicated</td><td>One-hot, one cycle per accepted interrupt, zero for exceptions</td><td>Lost clear or spurious clear (IC-8)</td></tr>
+</tbody>
+</table></div>
+<p>IC-8 grades the structural half (one-hot, one cycle, zero for exceptions). IC-20 grades the behavioural half and is the only check that can tell a double delivery from a lost interrupt, since both otherwise present as no finding.</p>
+
+<h2 id="s10">10. The watchdog class</h2>
+<p>The AON watchdog is specified and not integrated. The block is real RTL instantiated nowhere; its host port is TileLink, not APB; <code>soft_rst_ni</code> is an external pin driven by nothing inside the SoC. D-75 assigns it class 2, level mode, lowest within class 2 (order ASSUMED, and a parameter of the arbiter model, not a constant). Because it is level-mode, the gateway cannot clear it and its own status must be cleared by software first. No IC-n is executable for it; IC-24 exists only so the row cannot vanish. On disk there is no cause 28 slot, so integration would widen the vectors as well.</p>
+
+<h2 id="s11">11. Pre-emption and nesting</h2>
+<p>Rev B's contract: depth limit 2; pre-emption only by a strictly higher class or at depth 0; at depth 0 nothing is gated; irq_pending_o is zero at depth 2, so the maximum nesting is 2. Figure 2 draws the cases; the table lists them with expected counts. Every negative case needs an executed directed instance, because a negative proof with no case is a hole in the interrupt dimension of coverage; N-N4 separates a working depth gate from a counter that is merely present.</p>
+<figure>
+<svg viewBox="0 0 1040 372" role="img" aria-label="Timeline of Rev B pre-emption and nesting: class 0 taken, same class blocked, class 1 pre-empts, everything blocked at depth 2, then two returns">
+
+<text class="tm end" x="176" y="134">depth 2</text>
+<text class="tm end" x="176" y="174">depth 1</text>
+<text class="tm end" x="176" y="214">depth 0</text>
+<line class="grp" x1="190" y1="210" x2="1000" y2="210"/>
+<line class="grp" x1="190" y1="170" x2="1000" y2="170"/>
+<line class="grp" x1="190" y1="130" x2="1000" y2="130"/>
+<rect class="pill" x="176" y="40" width="88" height="24" rx="12"/>
+<text class="tb mid" x="220" y="56">A class 0</text>
+<line class="grp" x1="220" y1="64" x2="220" y2="262"/>
+<rect class="bx-mem" x="164" y="262" width="112" height="40" rx="6"/>
+<text class="tb mid" x="220" y="286.0">trap taken</text>
+<rect class="pill" x="296" y="40" width="88" height="24" rx="12"/>
+<text class="tb mid" x="340" y="56">B class 0</text>
+<line class="grp" x1="340" y1="64" x2="340" y2="262"/>
+<rect class="bx-ctrl" x="284" y="262" width="112" height="40" rx="6"/>
+<text class="tb mid" x="340" y="286.0">0 traps N-N3</text>
+<rect class="pill" x="416" y="40" width="88" height="24" rx="12"/>
+<text class="tb mid" x="460" y="56">C class 1</text>
+<line class="grp" x1="460" y1="64" x2="460" y2="262"/>
+<rect class="bx-mem" x="404" y="262" width="112" height="40" rx="6"/>
+<text class="tb mid" x="460" y="286.0">taken N-P2</text>
+<rect class="pill" x="556" y="40" width="88" height="24" rx="12"/>
+<text class="tb mid" x="600" y="56">D any</text>
+<line class="grp" x1="600" y1="64" x2="600" y2="262"/>
+<rect class="bx-ctrl" x="544" y="262" width="112" height="40" rx="6"/>
+<text class="tb mid" x="600" y="286.0">0 traps N-N4</text>
+<rect class="pill" x="696" y="40" width="88" height="24" rx="12"/>
+<text class="tb mid" x="740" y="56">E MRET</text>
+<line class="grp" x1="740" y1="64" x2="740" y2="262"/>
+<rect class="bx-mem" x="684" y="262" width="112" height="40" rx="6"/>
+<text class="tb mid" x="740" y="286.0">depth 1 N-P4</text>
+<rect class="pill" x="836" y="40" width="88" height="24" rx="12"/>
+<text class="tb mid" x="880" y="56">F MRET</text>
+<line class="grp" x1="880" y1="64" x2="880" y2="262"/>
+<rect class="bx-mem" x="824" y="262" width="112" height="40" rx="6"/>
+<text class="tb mid" x="880" y="286.0">depth 0 N-P5</text>
+<path class="ln" d="M190 210 H220 V170 H460 V130 H740 V170 H880 V210 H1000"/>
+<text class="ts start" x="24" y="336">Rev B nesting contract: pre-emption only by a strictly higher class, nothing at depth 2. Request A is taken at depth 0, so it enters depth 1.</text>
+<text class="ts start" x="24" y="352">The file on disk gates by the mintprio threshold instead of a depth counter; this timeline then becomes a software sequence (see section 4).</text>
+</svg>
+<figcaption><b>Figure 2.</b> Rev B pre-emption and nesting timeline. Request B (same class) and request D (any source at depth 2) must produce zero traps; the return at F must restore depth 0.</figcaption>
+</figure><div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Case (Rev B)</th><th>Expected (Rev B)</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td>N-P1</td><td>Class 2 asserted at depth 0</td><td>1 trap, depth 1</td><td>IC-21</td></tr><tr><td>N-P2</td><td>Class 0 handler at depth 1, class 1 asserted</td><td>1 trap, depth 2, class 0 recorded on the stack</td><td>IC-21</td></tr><tr><td>N-P3</td><td>Class 0 handler, class 2 asserted</td><td>1 trap, depth 2</td><td>IC-21</td></tr><tr><td>N-P4</td><td>MRET from depth 2</td><td>Depth 1, context restored from index 0, exactly one pop</td><td>IC-7, IC-21</td></tr><tr><td>N-P5</td><td>MRET from depth 1</td><td>Depth 0, class 0</td><td>IC-7</td></tr><tr><td>N-N1</td><td>Class 1 while class 1 handler runs</td><td>Zero traps; taken after MRET</td><td>IC-22</td></tr><tr><td>N-N2</td><td>Class 0 while class 1 handler runs</td><td>Zero traps</td><td>IC-22</td></tr><tr><td>N-N3</td><td>Class 0 while class 0 handler runs</td><td>Zero traps; round-robin pointer does not move</td><td>IC-22, IC-4</td></tr><tr><td>N-N4</td><td>Any source at depth 2</td><td>Zero traps for all, <code>irq_pending_o</code> low every cycle</td><td>IC-21</td></tr><tr><td>N-N5</td><td>Both class-2 members together</td><td>Cause 27 wins (Rev B)</td><td>IC-23 <span class="tag open">OPEN</span></td></tr><tr><td>N-N6</td><td>Synchronous exception in the deepest handler</td><td>Exception trap, depth unchanged, no push</td><td>IC-6, IC-21</td></tr><tr><td>N-N7</td><td>Pushed M operation interrupted, then MRET</td><td>Destination written once, after MRET</td><td>IC-10</td></tr>
+</tbody>
+</table></div>
+<p>The full interrupt-by-pipeline-state cross lives in the core lock-step section (Rev B Table 16.11) and is consumed there, not repeated. All N-cases assume a depth counter; on disk they would be restated against <code>mintprio</code> thresholds (OPEN).</p>
+
+<h2 id="s12">12. The check register</h2>
+<p>IC-1 to IC-9 are Rev A's, restated with RTL corrections; IC-10 is registered by the lock-step section; IC-11 to IC-24 are new. Every row carries an executable flag so a specified-only row cannot be reported green. Figure 3 shows the structure. Summaries by group:</p>
+<figure>
+<svg viewBox="0 0 1040 300" role="img" aria-label="Structure of the interrupt check register IC-1 to IC-24 grouped into seven families with executable flags">
+
+<rect class="bx-ctrl" x="24" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="90" y="58.5">Gateway</text>
+<text class="ts mid" x="90" y="73.5">6 checks</text>
+
+<rect class="bx" x="24" y="108" width="132" height="110" rx="6"/>
+<text class="t mid" x="90" y="132">IC-1 yes</text>
+<text class="t mid" x="90" y="147">IC-8 yes</text>
+<text class="t mid" x="90" y="162">IC-9 yes</text>
+<text class="t mid" x="90" y="177">IC-18 yes</text>
+<text class="t mid" x="90" y="192">IC-19 yes</text>
+<text class="t mid" x="90" y="207">IC-20 yes</text>
+<path class="ln" d="M90 84 V108"/>
+<rect class="bx-ctrl" x="168" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="234" y="58.5">Arbiter</text>
+<text class="ts mid" x="234" y="73.5">5 checks</text>
+
+<rect class="bx" x="168" y="108" width="132" height="95" rx="6"/>
+<text class="t mid" x="234" y="132">IC-2 yes</text>
+<text class="t mid" x="234" y="147">IC-3 yes</text>
+<text class="t mid" x="234" y="162">IC-4 yes</text>
+<text class="t mid" x="234" y="177">IC-5 yes</text>
+<text class="t mid" x="234" y="192">IC-23 yes</text>
+<path class="ln" d="M234 84 V108"/>
+<rect class="bx-ctrl" x="312" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="378" y="58.5">Trap context</text>
+<text class="ts mid" x="378" y="73.5">3 checks</text>
+
+<rect class="bx" x="312" y="108" width="132" height="65" rx="6"/>
+<text class="t mid" x="378" y="132">IC-6 yes</text>
+<text class="t mid" x="378" y="147">IC-7 yes</text>
+<text class="t mid" x="378" y="162">IC-10 yes</text>
+<path class="ln" d="M378 84 V108"/>
+<rect class="bx-ctrl" x="456" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="522" y="58.5">Gates</text>
+<text class="ts mid" x="522" y="73.5">2 checks</text>
+
+<rect class="bx" x="456" y="108" width="132" height="50" rx="6"/>
+<text class="t mid" x="522" y="132">IC-14 yes</text>
+<text class="t mid" x="522" y="147">IC-15 yes</text>
+<path class="ln" d="M522 84 V108"/>
+<rect class="bx-ctrl" x="600" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="666" y="58.5">mtvec</text>
+<text class="ts mid" x="666" y="73.5">2 checks</text>
+
+<rect class="bx" x="600" y="108" width="132" height="50" rx="6"/>
+<text class="t mid" x="666" y="132">IC-16 yes</text>
+<text class="tb mid" x="666" y="147">IC-17 NO</text>
+<path class="ln" d="M666 84 V108"/>
+<rect class="bx-ctrl" x="744" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="810" y="58.5">Nesting, stack</text>
+<text class="ts mid" x="810" y="73.5">4 checks</text>
+
+<rect class="bx" x="744" y="108" width="132" height="80" rx="6"/>
+<text class="t mid" x="810" y="132">IC-11 yes, force</text>
+<text class="tb mid" x="810" y="147">IC-12 NO</text>
+<text class="t mid" x="810" y="162">IC-21 yes</text>
+<text class="t mid" x="810" y="177">IC-22 yes</text>
+<path class="ln" d="M810 84 V108"/>
+<rect class="bx-ctrl" x="888" y="40" width="132" height="44" rx="6"/>
+<text class="tb mid" x="954" y="58.5">Specified only</text>
+<text class="ts mid" x="954" y="73.5">3 checks</text>
+
+<rect class="bx" x="888" y="108" width="132" height="65" rx="6"/>
+<text class="t mid" x="954" y="132">IC-13 yes (char.)</text>
+<text class="tb mid" x="954" y="147">IC-13S NO</text>
+<text class="tb mid" x="954" y="162">IC-24 NO</text>
+<path class="ln" d="M954 84 V108"/>
+<text class="ts start" x="24" y="260">NO means not executable today in Rev B (waits on a design change or on an unbuilt block). IC-11 needs a recorded hierarchical force. 25 rows in total including IC-13S.</text>
+<text class="ts start" x="24" y="278">Every IC-n is graded in the integrated SoC configuration (CFG-S) only.</text>
+</svg>
+<figcaption><b>Figure 3.</b> Check register by family. Groups mirror Rev B Table 13.8; the flag is Rev B's.</figcaption>
+</figure><div class="tablewrap"><table>
+<thead><tr><th>Group</th><th>Checks</th><th>What they establish</th></tr></thead>
+<tbody>
+<tr><td>Gateway</td><td>IC-1, 8, 9, 18, 19, 20</td><td>Edges never lost; strobe one-hot and one cycle; level and edge re-trap behaviour; spurious cases; clear-order cases CO-A to CO-D</td></tr><tr><td>Arbiter</td><td>IC-2, 3, 4, 5, 23</td><td>Winner equals the model for all ordered pairs; alternation over 8 simultaneous assertions; pointers move only on matching commit; pre-emption legality; class-2 priority</td></tr><tr><td>Trap context</td><td>IC-6, 7, 10</td><td>mcause, mepc, mtval at entry; MRET restores; a pushed M operation writes its destination once</td></tr><tr><td>Gates</td><td>IC-14, 15</td><td>Gate matrix and clear-while-pending</td></tr><tr><td>mtvec</td><td>IC-16, 17</td><td>Direct target for all causes and read-back of reserved modes; vectored target (not executable)</td></tr><tr><td>Nesting, stack</td><td>IC-11, 12, 21, 22</td><td>Overflow characterisation with a force and the specified cure (not executable); depth and negative nesting cases</td></tr><tr><td>Specified only</td><td>IC-13, 13S, 24</td><td>MSIP never traps today (characterised for 1000 cycles); specified MSIP delivery; AON row</td></tr>
+</tbody>
+</table></div>
+<h2 id="s13">13. Configuration scope and limits</h2>
+<p>Every IC-n is graded in the integrated SoC configuration only. The core-only compliance tree uses a different interrupt design and has no gateway or arbiter, and the core-less configuration has no trap at all. A green IC-n reported in either is a harness defect, not a pass.</p>
+<p>This page does not claim any interrupt reaches the sources Rev B lists as unrouted, does not claim lock-step grades nesting, and does not supply a third oracle for the timers (D-19: a cycle-accurate counter and compare model, raised to the peripheral owners). The decisions follow with their status against the file on disk.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Decision (summary)</th><th>Status in Rev B</th><th>Against disk</th></tr></thead>
+<tbody>
+<tr><td>D-70</td><td>Shadow stack 3 deep; overflow raises mcause 24 (10 edits, one file)</td><td>REFUTED as implemented; SPECIFIED</td><td>No shadow stack exists <span class="tag open">OPEN</span></td></tr><tr><td>D-71</td><td>mtvec.MODE bit 0 writable, reserved modes legalise to Direct (2 edits)</td><td>REFUTED as implemented</td><td>Still true</td></tr><tr><td>D-72</td><td>Peripheral clears first; strobe is a consequence of trap commit</td><td>Confirmed by RTL</td><td>Strobe still comes from the trap-commit controller</td></tr><tr><td>D-73</td><td>Minimum edge pulse 1 cycle; no re-assert without a new edge</td><td>Confirmed by RTL</td><td>Edge mode now GPIO only</td></tr><tr><td>D-74</td><td>mip[3], mip[11] have no delivery path; MSIP to become deliverable</td><td>Confirmed; fix SPECIFIED</td><td>Still true</td></tr><tr><td>D-75</td><td>AON watchdog class 2, level, lowest in class 2 (order ASSUMED)</td><td>SPECIFIED, not integrated</td><td>Still true</td></tr><tr><td>D-76</td><td>Spurious requests are asymmetric: edge taken, level not</td><td>Confirmed by RTL</td><td>Holds for latched sources</td></tr><tr><td>D-77</td><td>Pending-while-gated is a property of the regime</td><td>Confirmed by RTL</td><td>Holds</td></tr><tr><td>D-78</td><td>Depth limit 2; overflow latent</td><td>Confirmed by RTL</td><td>No depth counter <span class="tag open">OPEN</span></td></tr><tr><td>D-79</td><td>Family extended to IC-1 to IC-24; four rows not executable</td><td>Confirmed</td><td>Four rows depend on absent logic, more may follow</td></tr>
+</tbody>
+</table></div>
+<div class="sources"><b>Sources read:</b> Rev B section 13 (<code>_src/RevB_plan.txt</code> lines 3109-3690); <code>riscv_core/rtl/irq_gateway.v</code> and <code>irq_arbiter.v</code> (whole files); <code>riscv_core/rtl/top.v</code> (header, lines 196-250, 548-551); <code>riscv_core/rtl/csr_regfile.v</code> (greps); <code>riscv_core/rtl/wb_trap_mret_commit_controller.v</code> (greps); <code>RTL_SOC/riscforge_soc_subsystem.sv</code> lines 1268-1291; <code>Verification/status/PHASE_STATUS.md</code>. Not re-read: <code>mstatus</code> write mask, <code>execute_cycle.v</code> accept path.</div>
+
+</div>
+</body>
+</html>

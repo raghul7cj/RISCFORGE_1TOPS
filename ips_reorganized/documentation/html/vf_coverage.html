@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coverage Plan</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / Coverage</span></div>
+<div class="wrap">
+
+<h1>Coverage Plan: Closure, Not Reporting</h1>
+<p class="lead">How Rev B turns coverage into a closure mechanism: one tool of record, one merged database per candidate, four families that partition obligations, a loop that classifies every unhit bin before work starts, and five closure rules that gate G4 consumes. For engineers who will build the coverage model and for reviewers who must decide whether a bin is really closed.</p>
+<p class="meta">Scope: SoC Verification Plan Rev B section 10, plus the gate G2/G4 definitions of section 6 where they bound coverage | Sources: Rev B text, <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/step4_checkers</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Position of this plan, and current status</a></li>
+<li><a href="#s2">Tool of record and database merge</a></li>
+<li><a href="#s3">The XSim constraint on cover property</a></li>
+<li><a href="#s4">Code coverage</a></li>
+<li><a href="#s5">Combining code and functional coverage</a></li>
+<li><a href="#s6">The closure loop</a></li>
+<li><a href="#s7">Coverage dimensions</a></li>
+<li><a href="#s8">Closure rules CR-1 to CR-5</a></li>
+<li><a href="#s9">How gate G4 consumes bins, waivers and exclusions</a></li>
+<li><a href="#s10">Decisions and open points</a></li>
+</ol></div>
+
+<h2 id="s1">1. Position of this plan, and current status</h2>
+<p>Rev B declares four coverage families: functional, structural, code and assertion. The central property is that they <b>partition</b> obligations. Every obligation belongs to exactly one family, and no family may discharge another's. Consequently no combined coverage score exists in the plan, and a proposal to produce one is a defect (CR-5).</p>
+<p>An unhit bin has exactly three possible causes: the bin is unreachable, the stimulus is absent, or the mechanism that could report is absent. Only the second is cured by writing a test. Classifying before working is what keeps a coverage campaign from becoming an unbounded test-writing exercise.</p>
+<div class="warn"><b>Current status.</b> <span class="tag specified">SPECIFIED</span> Everything in Rev B section 10 is a plan. <code>Verification/status/PHASE_STATUS.md</code> (snapshot 2026-10-31) shows P0 Bring-up IN PROGRESS and P4.1 Coverage model, P4.2 Checker viability and P4.4 Candidate-scale regression all NOT STARTED, with gates G2, G4 and G6 evaluated at the P4 exit. ACT-006, deciding the simulator of record and coverage tool (DEC-A), is still open there. No merged coverage database, waiver ledger or exclusion register was found in the repository. Coverage evidence is never a percentage of requirements; it is a statement for a stated boundary.</div>
+
+<h2 id="s2">2. Tool of record and database merge</h2>
+<p>Rev B 10.1 names three execution domains: interactive bring-up on Windows (XSim), headless ISA compliance under WSL2 (Icarus with RISCOF), and a nightly regression on a remote server. Only one can be the tool of record, because only one yields a database that merges across a campaign.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Domain</th><th>Role in coverage</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Remote server, Synopsys VCS U-2023.03 (<code>vcs</code>, licence via <code>SNPSLMD_LICENSE_FILE</code>)</td><td><b>Tool of record</b></td><td>Only simulator with host, install path and licence server all recorded, so a run is reproducible; and the only one of the three supporting bind, the DUT-side injection mechanism INJ-1, without which gate G2 cannot be evaluated.</td></tr>
+<tr><td>Interactive XSim</td><td>Bring-up only; no coverage artefact that counts</td><td>Bind is unavailable in it (see section 3).</td></tr>
+<tr><td>Icarus compliance (core-only DUT)</td><td>Reported separately; never merged into the tool-of-record database</td><td>Produces signatures for RISCOF, not a mergeable database.</td></tr>
+<tr><td>Second tool (Xcelium), if ever adopted</td><td>Functional bins only, reconciled bin by bin; gate evaluated on the tool of record only</td><td>No host, install path or licence recorded: availability TBD(D-30). Databases of two vendors do not share a schema and are never merged or averaged.</td></tr>
+</tbody></table></div>
+<p>Rev B states the VCS choice as a decision; the project status still lists the simulator-of-record decision as an open action (ACT-006). Treat the VCS choice as <span class="tag open">OPEN</span> in the project record until DEC-A is recorded in Table 5.1.</p>
+
+<figure>
+<svg viewBox="0 0 960 400" role="img" aria-label="Per-run VCS coverage databases pass an RTL identity check, are merged into one database per candidate and consumed by gate G4; other domains are never merged">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ver" x="16" y="24" width="176" height="56" rx="6"/><text class="tb mid" x="104" y="48">Run database 1</text><text class="ts mid" x="104" y="66">vcs, manifest + RTL id</text>
+<rect class="bx-ver" x="16" y="104" width="176" height="56" rx="6"/><text class="tb mid" x="104" y="128">Run database 2</text><text class="ts mid" x="104" y="146">vcs, manifest + RTL id</text>
+<rect class="bx-ver" x="16" y="184" width="176" height="56" rx="6"/><text class="tb mid" x="104" y="208">Run database n</text><text class="ts mid" x="104" y="226">vcs, manifest + RTL id</text>
+<path class="ln" d="M192 52 H224"/><path class="ln" d="M192 132 H224"/><path class="ln" d="M192 212 H224"/><path class="ln" d="M224 52 V212"/>
+<path class="ar-ver" d="M224 132 H256"/>
+<rect class="bx-ctrl" x="256" y="88" width="176" height="96" rx="6"/><text class="tb mid" x="344" y="124">Identity check</text><text class="ts mid" x="344" y="142">same SHA-256 on every</text><text class="ts mid" x="344" y="156">input manifest?</text>
+<path class="ar-bad" d="M344 184 V208"/>
+<rect class="bx-ext" x="256" y="208" width="176" height="56" rx="6"/><text class="tb mid" x="344" y="232">Rejected by harness</text><text class="ts mid" x="344" y="250">mixed identity, no merge</text>
+<path class="ar-ver" d="M432 136 H488"/><text class="ts mid" x="460" y="128">yes</text>
+<rect class="bx-bus" x="488" y="104" width="152" height="64" rx="6"/><text class="tb mid" x="564" y="130">Merge</text><text class="ts mid" x="564" y="148">tool's own merge step</text>
+<path class="ar-ver" d="M640 136 H680"/>
+<rect class="bx-mem" x="680" y="104" width="136" height="64" rx="6"/><text class="tb mid" x="748" y="130">Merged database</text><text class="ts mid" x="748" y="148">one per candidate</text>
+<path class="ar-ver" d="M816 136 H848"/>
+<rect class="bx-ver" x="848" y="104" width="96" height="64" rx="6"/><text class="tb mid" x="896" y="130">Gate G4</text><text class="ts mid" x="896" y="148">per candidate</text>
+<rect class="bx-ctrl" x="792" y="208" width="152" height="56" rx="6"/><text class="tb mid" x="868" y="232">Waivers, exclusions</text><text class="ts mid" x="868" y="250">ledger and register</text>
+<path class="ar-ver" d="M896 208 V168"/>
+<rect class="grp" x="8" y="296" width="760" height="96" rx="8"/>
+<text class="ts" x="20" y="314">Never merged into the tool-of-record database</text>
+<rect class="bx-ext" x="24" y="328" width="224" height="52" rx="6"/><text class="tb mid" x="136" y="350">XSim bring-up</text><text class="ts mid" x="136" y="367">no counting artefact</text>
+<rect class="bx-ext" x="272" y="328" width="224" height="52" rx="6"/><text class="tb mid" x="384" y="350">Icarus compliance</text><text class="ts mid" x="384" y="367">reported separately</text>
+<rect class="bx-ext" x="520" y="328" width="232" height="52" rx="6"/><text class="tb mid" x="636" y="350">Second tool, TBD(D-30)</text><text class="ts mid" x="636" y="367">bin-by-bin reconcile only</text>
+</svg>
+<figcaption><b>Figure 1.</b> Database merge flow. Merging across two RTL identities is prohibited and the harness rejects, rather than reports, a merge whose manifests disagree. The RTL identity is a SHA-256 over the canonical filelist plus four anchor files (decision D-22), because no version-control baseline was available to Rev B. Source: Rev B 10.1.</figcaption>
+</figure>
+
+<h2 id="s3">3. The XSim constraint on cover property</h2>
+<p>XSim, the interactive simulator used today, cannot evaluate <code>cover property</code>. This is a measured fact in the repository, not an inference:</p>
+<ul>
+<li><span class="tag exists">EXISTS</span> The retained Step 4 self-proof README (<code>Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/README.md</code>) states that XSim reports unsupported <code>cover property</code> statements in the SVA files, and that the run therefore verifies the procedural checker and fault matrix, not functional coverage closure.</li>
+<li><span class="tag exists">EXISTS</span> <code>Verification/step4_checkers</code> carries a <code>cover property</code> next to each assertion in <code>step4_axi_sva.sv</code> and <code>step4_apb_sva.sv</code> (11 and 12 occurrences by text search). Step 4's exit criterion 2, "every assertion has a cover", is recorded as done in STEP4_SPEC section 13, but those covers cannot be hit-counted in XSim. STEP4_SPEC section 10 records that its listed XSim tool constraints do not affect VCS or Xcelium.</li>
+<li><span class="tag exists">EXISTS</span> <code>run_step4.ps1 -Coverage</code> invokes XSim's own coverage and <code>xcrg</code> report. Rev B calls XSim a bring-up tool that produces no counting artefact, so that output is useful for debugging and does not feed G4.</li>
+</ul>
+<p>Consequences for the plan: assertion-family bins (check evaluated, <code>antecedent_satisfied_count >= 1</code>) can only be closed in the tool of record. Until a VCS or Xcelium run exists, the Step 4 covers prove nothing about stimulus, and a covered assertion in an XSim log must not be cited as a hit. Rev B does not list this as a decision; it is a current constraint recorded here.</p>
+
+<h2 id="s4">4. Code coverage</h2>
+<p>Rev A declared three families and no code coverage. Rev B adds it as a fourth, reported family with four metrics and an explicit scope. The in-scope set is every module reachable from <code>riscforge_soc_subsystem</code> in the <b>generated</b> filelist, not <code>soc_subsystem.f</code>, which is known to be incomplete (the UART pulls in OBI modules the file says were removed, decision D-15). A module in the generated set but missing from <code>soc_subsystem.f</code> is in scope and is also reported as a harness defect; scope is never narrowed to hide a filelist defect.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Metric</th><th>Unit</th><th>Notable exclusions (each needs a justification)</th><th>Target</th></tr></thead>
+<tbody>
+<tr><td>Line</td><td>One executable line</td><td>ifdef-selected alternative clock or reset paths; <code>ifndef SYNTHESIS</code> memory-init blocks; all testbench, VIP, BFM, monitor and model code. The reset-synchroniser chains are <b>in scope</b> as a named sub-group <code>reset_sync_chains</code>; the earlier exclusion was deleted.</td><td>100% of in-scope lines after exclusions; shortfall needs a waiver naming the line</td></tr>
+<tr><td>Branch</td><td>One outcome of an if, case, casex or casez</td><td>As Line, plus branches whose condition is constant at elaboration</td><td>100% after exclusions</td></tr>
+<tr><td>Condition</td><td>One atomic sub-condition</td><td>As Branch; bins with a don't-care predicate from casex/casez are reported as x-predicate, never as hit</td><td>100% after exclusions; count at least the branch count</td></tr>
+<tr><td>Toggle</td><td>0-to-1 and 1-to-0 of one named net</td><td>Constant-by-construction nets, excluded by name only (modem tie-off, mip[11], mip[3], <code>fast_intr_core[10:4]</code>); asynchronous reset pins. A wildcard exclusion is a defect.</td><td>TBD(D-31)</td></tr>
+</tbody></table></div>
+<p><b>Why toggle is deferred.</b> Toggle density is a property of a campaign, not of a run, so a per-run threshold would be unreachable or vacuous. The rule is binding and the number is set per net class after the first full-campaign merge; until then the merged figure is reported with no gate input.</p>
+<p><b>Reset dominance is a rule, not an exclusion.</b> The core is held in reset until the bootloader releases it (reset hold of 4 cycles, flash power-up wait of 30,000 cycles), so no core flop toggles for that whole interval. Core toggle is therefore merged over the campaign and evaluated at G4, never per run. Excluding the core because it is in reset for most of the run is exactly how a dead core would produce a green run.</p>
+
+<h2 id="s5">5. Combining code coverage with the functional model</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Family</th><th>Unit</th><th>What closes an item</th><th>What it may never close</th></tr></thead>
+<tbody>
+<tr><td>Code (line, branch, condition, toggle)</td><td>One RTL item in the generated filelist</td><td>Reached by at least one run in the manifest, after Table 10.1 exclusions</td><td>A functional bin, an assertion record, a waiver</td></tr>
+<tr><td>Structural</td><td>One FSM state, decode region, arbitration outcome or timeout bin</td><td>Hit count at least 1</td><td>A bin in another dimension; a code item</td></tr>
+<tr><td>Functional</td><td>One declared cross-instance bin</td><td>Hit count at least 1</td><td>Proof that an RTL item is reachable; an assertion record</td></tr>
+<tr><td>Assertion</td><td>One check ID</td><td>Evaluated (<code>antecedent_satisfied_count >= 1</code>) and non-vacuous per Table 6.2. The unmetered-bootloader-port check closes on zero hits.</td><td>Any coverage item. A check that is evaluated with no viability record is vacuous and blocks G2.</td></tr>
+</tbody></table></div>
+<p>Four precedence rules settle overlaps: (1) a code hole is never waived by pointing at a functional bin, because a bin records an architectural combination and a line records an executed instruction; (2) a functional bin that coincides with a single RTL branch may carry a link, which closes nothing but re-opens the bin for review when the branch changes; (3) evaluated is not non-vacuous: a check sampled all campaign against a fault never injected is invisible to every percentage; (4) the sign-off predicate is a conjunction of four separately reported predicates, never a weighted total, because each fails for a different reason and names a different owner.</p>
+
+<h2 id="s6">6. The closure loop</h2>
+<figure>
+<svg viewBox="0 0 960 360" role="img" aria-label="Closure loop: measure, classify the hole, act, re-run with fresh seed at same RTL identity, close the bin">
+<rect class="bx-ver" x="16" y="152" width="152" height="64" rx="6"/><text class="tb mid" x="92" y="178">Measure</text><text class="ts mid" x="92" y="196">four families, last run</text>
+<path class="ar-ver" d="M168 184 H216"/>
+<rect class="bx-ctrl" x="216" y="152" width="152" height="64" rx="6"/><text class="tb mid" x="292" y="178">Classify the hole</text><text class="ts mid" x="292" y="196">before any work</text>
+<path class="ln" d="M368 184 H396"/><path class="ln" d="M396 84 V284"/>
+<path class="ar-ver" d="M396 84 H424"/><path class="ar-ver" d="M396 184 H424"/><path class="ar-ver" d="M396 284 H424"/>
+<rect class="bx" x="424" y="56" width="144" height="56" rx="6"/><text class="tb mid" x="496" y="80">Unreachable bin</text><text class="ts mid" x="496" y="98">no stimulus can hit it</text>
+<rect class="bx" x="424" y="156" width="144" height="56" rx="6"/><text class="tb mid" x="496" y="180">Absent stimulus</text><text class="ts mid" x="496" y="198">reachable, never driven</text>
+<rect class="bx" x="424" y="256" width="144" height="56" rx="6"/><text class="tb mid" x="496" y="280">Absent mechanism</text><text class="ts mid" x="496" y="298">no checker can report</text>
+<path class="ar-ver" d="M568 84 H608"/><path class="ar-ver" d="M568 184 H608"/><path class="ar-ver" d="M568 284 H608"/>
+<rect class="bx-ctrl" x="608" y="56" width="176" height="56" rx="6"/><text class="tb mid" x="696" y="80">Waive</text><text class="ts mid" x="696" y="98">owner, reason, review date</text>
+<rect class="bx-core" x="608" y="156" width="176" height="56" rx="6"/><text class="tb mid" x="696" y="180">Add stimulus</text><text class="ts mid" x="696" y="198">new test or constraint</text>
+<rect class="bx-ver" x="608" y="256" width="176" height="56" rx="6"/><text class="tb mid" x="696" y="280">Build checker</text><text class="ts mid" x="696" y="298">mechanism and viability</text>
+<path class="ln" d="M784 84 H812"/><path class="ln" d="M784 284 H812"/><path class="ln" d="M812 84 V284"/>
+<path class="ar-ver" d="M784 184 H836"/>
+<rect class="bx-bus" x="836" y="152" width="104" height="64" rx="6"/><text class="tb mid" x="888" y="178">Re-run</text><text class="ts mid" x="888" y="196">fresh seed</text><text class="ts mid" x="888" y="209">same RTL id</text>
+<path class="ar-ver" d="M888 152 V16 H92 V152"/>
+<path class="ar" d="M888 216 V296"/>
+<rect class="bx-mem" x="824" y="296" width="120" height="56" rx="6"/><text class="tb mid" x="884" y="320">Close bin</text><text class="ts mid" x="884" y="338">capable mechanism</text>
+</svg>
+<figcaption><b>Figure 2.</b> Coverage closure loop. A bin closes only when it is hit by a mechanism that is provably capable of reporting. The re-run keeps the same RTL identity so the delta is attributable. Rev B notes that its own figure's measure step names three families and must be re-cut to name four, including code coverage. Source: Rev B 10.4.</figcaption>
+</figure>
+
+<h2 id="s7">7. Coverage dimensions</h2>
+<p>Figure 3 groups the dimensions of Rev B Table 10.4 by family. Three corrections are recorded in Rev B: "Spill and latency paths" is removed because the crossbar has no spill path or latency mode (replaced by arbitration and grant distribution); "Registers" is scoped to the derived 55 identities, not "every register"; and "Interrupts" excludes seven wired-but-dropped sources (Timer 0 channels to mip[20..22] and all four Timer 1 lines to mip[23..26]) until the specified RTL change lands. Those seven bins are G4-excluded with a four-field UNREACHABLE-BY-DESIGN record (decision D-054).</p>
+<figure>
+<svg viewBox="0 0 960 470" role="img" aria-label="Coverage dimensions grouped under functional, structural, code and assertion families">
+<rect class="bx-core" x="16" y="16" width="208" height="48" rx="6"/><text class="tb mid" x="120" y="38">Functional</text><text class="ts mid" x="120" y="54">hit count at least 1</text>
+<rect class="bx-bus" x="256" y="16" width="208" height="48" rx="6"/><text class="tb mid" x="360" y="38">Structural</text><text class="ts mid" x="360" y="54">hit count at least 1</text>
+<rect class="bx-mem" x="496" y="16" width="208" height="48" rx="6"/><text class="tb mid" x="600" y="38">Code</text><text class="ts mid" x="600" y="54">reached, after exclusions</text>
+<rect class="bx-ver" x="736" y="16" width="208" height="48" rx="6"/><text class="tb mid" x="840" y="38">Assertion</text><text class="ts mid" x="840" y="54">evaluated and non-vacuous</text>
+<!-- functional -->
+<rect class="bx" x="16" y="88" width="208" height="40" rx="6"/><text class="tb mid" x="120" y="106">Bus</text><text class="ts mid" x="120" y="121">6 slots x dir x wait x resp</text>
+<rect class="bx" x="16" y="140" width="208" height="40" rx="6"/><text class="tb mid" x="120" y="158">Registers</text><text class="ts mid" x="120" y="173">55 ids x r/w x lane x error</text>
+<rect class="bx" x="16" y="192" width="208" height="40" rx="6"/><text class="tb mid" x="120" y="210">Interrupts</text><text class="ts mid" x="120" y="225">source x class x edge x depth</text>
+<rect class="bx" x="16" y="244" width="208" height="40" rx="6"/><text class="tb mid" x="120" y="262">Reset</text><text class="ts mid" x="120" y="277">5 domains x release x state</text>
+<rect class="bx" x="16" y="296" width="208" height="40" rx="6"/><text class="tb mid" x="120" y="314">Peripherals</text><text class="ts mid" x="120" y="329">mode x error x recovery</text>
+<rect class="bx" x="16" y="348" width="208" height="40" rx="6"/><text class="tb mid" x="120" y="366">Fabric routes</text><text class="ts mid" x="120" y="381">2 masters x 3 targets x resp</text>
+<!-- structural -->
+<rect class="bx" x="256" y="88" width="208" height="40" rx="6"/><text class="tb mid" x="360" y="106">FSM states</text><text class="ts mid" x="360" y="121">module x state x entry</text>
+<rect class="bx" x="256" y="140" width="208" height="40" rx="6"/><text class="tb mid" x="360" y="158">Decode space</text><text class="ts mid" x="360" y="173">region x hit/miss x master</text>
+<rect class="bx" x="256" y="192" width="208" height="40" rx="6"/><text class="tb mid" x="360" y="210">Arbitration</text><text class="ts mid" x="360" y="225">master x grant x RR advance</text>
+<rect class="bx" x="256" y="244" width="208" height="40" rx="6"/><text class="tb mid" x="360" y="262">Timeout paths</text><text class="ts mid" x="360" y="277">9 bins, Table 10.3</text>
+<!-- code -->
+<rect class="bx" x="496" y="88" width="208" height="40" rx="6"/><text class="tb mid" x="600" y="106">Line, branch, condition</text><text class="ts mid" x="600" y="121">100% of in-scope items</text>
+<rect class="bx" x="496" y="140" width="208" height="40" rx="6"/><text class="tb mid" x="600" y="158">Toggle</text><text class="ts mid" x="600" y="173">TBD(D-31), campaign-merged</text>
+<!-- assertion -->
+<rect class="bx" x="736" y="88" width="208" height="40" rx="6"/><text class="tb mid" x="840" y="106">Per assertion</text><text class="ts mid" x="840" y="121">per check ID</text>
+<rect class="bx" x="736" y="140" width="208" height="40" rx="6"/><text class="tb mid" x="840" y="158">Per layer</text><text class="ts mid" x="840" y="173">7 layers, 1+ mechanism each</text>
+<rect class="bx" x="736" y="192" width="208" height="40" rx="6"/><text class="tb mid" x="840" y="210">Negative proof</text><text class="ts mid" x="840" y="225">17 cases, reachable pairs</text>
+<rect class="bx-ctrl" x="16" y="412" width="928" height="40" rx="6"/><text class="tb mid" x="480" y="430">No combined coverage score</text><text class="ts mid" x="480" y="445">each family fails for a different reason and names a different owner (CR-5)</text>
+</svg>
+<figcaption><b>Figure 3.</b> Coverage dimension model. Dimensions are grouped by owning family; targets are 100% except toggle (TBD(D-31)). Cross points are abbreviated; full forms are in the table below. Source: Rev B 10.5, Table 10.4.</figcaption>
+</figure>
+<div class="tablewrap"><table>
+<thead><tr><th>Family</th><th>Dimension</th><th>Cross points (Rev B Table 10.4)</th></tr></thead>
+<tbody>
+<tr><td>Functional</td><td>Bus</td><td>6 slots x direction x wait-state count x response code</td></tr>
+<tr><td>Functional</td><td>Registers</td><td>Register identity x read/write x bit lane x error response, over the 55 identities</td></tr>
+<tr><td>Functional</td><td>Interrupts</td><td>Software-visible source x class x edge or level x nesting depth x outcome</td></tr>
+<tr><td>Functional</td><td>Reset</td><td>5 domains x release point x activity state at assertion</td></tr>
+<tr><td>Functional</td><td>Peripherals</td><td>Mode x error path x recovery path, one instance per APB window</td></tr>
+<tr><td>Functional</td><td>Fabric routes</td><td>2 masters x 3 targets x response code</td></tr>
+<tr><td>Structural</td><td>FSM states</td><td>Module x state x entry condition; the boot FSM alone has 16 states</td></tr>
+<tr><td>Structural</td><td>Decode space</td><td>Region x hit or miss x master over <code>0x4000_0000</code> to <code>0x4000_5FFF</code>, including the hole <code>0x4000_3800</code> to <code>0x4000_3FFF</code></td></tr>
+<tr><td>Structural</td><td>Arbitration</td><td>Master x grant distribution x round-robin pointer advance</td></tr>
+<tr><td>Structural</td><td>Timeout paths</td><td>Monitor x threshold x abort outcome</td></tr>
+<tr><td>Code</td><td>Line, branch, condition / Toggle</td><td>In-scope RTL item after exclusions / named net x direction</td></tr>
+<tr><td>Assertion</td><td>Per assertion, per layer, negative proof</td><td>Check ID / layer / (fault class, check ID) incidence over reachable pairs</td></tr>
+</tbody></table></div>
+
+<h3>The two formerly empty placeholders</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Dimension</th><th>Content</th><th>Bins</th></tr></thead>
+<tbody>
+<tr><td>Timeout paths (structural)</td><td>Seven monitor-threshold bins (six APB monitors; one AXI-Lite monitor covering both its 64-cycle and 131072-cycle thresholds in one bin), plus two abort-outcome bins (APB abort answered PREADY=1, PSLVERR=1, <code>0xDEADBEEF</code>; AXI abort answered SLVERR surfacing as mcause 5 or 7). The deliberately unmetered bootloader AXI port is not a bin; it is an assertion-family check closing on zero attributable timeouts.</td><td>9</td></tr>
+<tr><td>Negative proof (assertion)</td><td>Twelve fault-class bins (one per class of Table 9.5, closing only when the named check has reported its unique-ID finding in an executed negative case) plus nine negative-case bins N1, N2, N3, N4a, N4b, N4c, N5, N6, N7. N3 and N4a are the two that prove the error policy is inconsistent.</td><td>21</td></tr>
+</tbody></table></div>
+<div class="open"><span class="tag open">OPEN</span> The caption under Rev B's own figure says "10 timeout bins and 19 negative-proof bins", while Table 10.3 and its derivation give 9 and 21. This page follows the table. The caption is a Rev B wording error awaiting correction. The register-layer and fault-case sides of the same dimension are explained in <a href="vf_checking_scoreboards.html">Checking and scoreboards</a>.</div>
+
+<h2 id="s8">8. Closure rules CR-1 to CR-5</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Rule</th><th>Meaning in practice</th></tr></thead>
+<tbody>
+<tr><td>CR-1</td><td>A bin closes only when its owning family has recorded a hit; for the assertion family the check must also be non-vacuous (Table 6.2). Evaluated alone never closes an assertion bin. One declared exception: the unmetered-bootloader-port check, which closes on zero attributable timeouts over the campaign.</td></tr>
+<tr><td>CR-2</td><td>A waiver records that a bin is unreachable and why. It never replaces hitting a bin, and a code item cannot be waived by pointing at a functional bin.</td></tr>
+<tr><td>CR-3</td><td>Every waiver has an owner, a justification and a review date; the requester is not the approver. A toggle exclusion is a waiver and must name the net.</td></tr>
+<tr><td>CR-4</td><td>Code and functional coverage are reported per run and merged per candidate at one RTL identity. A regression in any bin or in-scope code item between candidates is a failure against Table 6.1 and is not offset by a gain elsewhere.</td></tr>
+<tr><td>CR-5</td><td>"Coverage is high" is not a closure criterion. No combined score exists, and none may be built by weighting or summing the four families.</td></tr>
+</tbody></table></div>
+
+<h2 id="s9">9. How gate G4 consumes bins, waivers and exclusions</h2>
+<p>G4 ("Coverage closed") is a per-candidate gate. Its published predicate is <code>bins_declared - bins_hit - bins_waived - bins_excluded == 0</code>, over the merged coverage database, the waiver ledger and the exclusion register, owned by the closure owner (<a href="vf_regression_gates.html">Regression and gates</a>). Each way a bin can leave the "open" state has a different evidence requirement:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Bin state</th><th>Evidence G4 requires</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td>Hit</td><td>Hit count at least 1 in the owning family; for assertion bins, <code>antecedent_satisfied_count >= 1</code> and not classified vacuously true by the tool</td><td>CR-1</td></tr>
+<tr><td>Waived</td><td>Owner, reason and review date; requester is not the approver</td><td>CR-2, CR-3</td></tr>
+<tr><td>Excluded</td><td>UNREACHABLE-BY-DESIGN four-field record (rule, RTL locator, owning agent, review date) per D-054; used for sources that reach no mip bit and for CFG-F-only checks that cannot be stimulated in CFG-S</td><td>Section 10.5, D-054</td></tr>
+</tbody></table></div>
+<p>The boundary with G2 is hard. G2 asks whether a checker <em>can</em> report, using fault-injection or self-test evidence; G4 asks whether the behaviour was <em>observed</em>, using bin counts. A check can pass G4 and fail G2 (evaluated all campaign, never injected), or pass G2 and fail G4 (proved capable once, behaviour never reached). A bin that corresponds to a check ID contributes to G4 only; it never discharges G2. Code coverage items feed G4 through the same predicate, and core toggle is evaluated there on the campaign merge, not per run. G2, G4 and G6 are evaluated on the merged week and never stamped per run. An untestable gate is reported untested, and untested is not a pass.</p>
+<p>No G4 evaluation exists yet: the status snapshot lists P4.1 Coverage model as NOT STARTED, and the declared-bin count is not published anywhere I found. The nine timeout and twenty-one negative-proof bins above are therefore the only bin counts Rev B states directly.</p>
+
+<h2 id="s10">10. Decisions and open points</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Subject</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>D-27</td><td>Device-model clause and mutation catalogue counts not derivable until device mode lists exist</td><td>TBD</td></tr>
+<tr><td>D-28</td><td>Assertion, interrupt and privilege clause columns unverified Rev A figures</td><td>Flagged</td></tr>
+<tr><td>D-29</td><td>Whether any injection-enable port exists in the design</td><td>Unknown</td></tr>
+<tr><td>D-30</td><td>Second simulator identity unrecorded</td><td>TBD</td></tr>
+<tr><td>D-31</td><td>Toggle target set per net class after first full-campaign merge</td><td>Deferred</td></tr>
+<tr><td>D-32</td><td>Injection effort figures are planning values</td><td>Assumed</td></tr>
+</tbody></table></div>
+<ul>
+<li>Rev B decision text says "19 derived fault cases" (D-28) where its tables derive 17; this page uses 17.</li>
+<li>The simulator-of-record choice is stated as decided in Rev B and still open as ACT-006 in the status snapshot.</li>
+<li>This page reports no coverage numbers because none were found. It states no hit rate for any family.</li>
+</ul>
+<p>Related pages: <a href="vf_overview.html">Verification plan overview</a>, <a href="vf_regression_gates.html">Regression and gates</a>, <a href="vf_checking_scoreboards.html">Checking and scoreboards</a>, <a href="verif_fabric.html">Verification of the fabric</a>, <a href="vf_fabric_peripheral.html">Fabric and peripheral plan</a>, <a href="index.html">Index</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B section 10 and the decisions D-27 to D-32 (<code>documentation/html/_src/RevB_plan.txt</code> lines 1939 to 2123), Rev B section 6 gate table and Table 6.2 (lines 1010 to 1065); <code>Verification/status/PHASE_STATUS.md</code>; <code>Verification/step4_checkers/STEP4_SPEC.md</code>; <code>Verification/step4_checkers/run_step4.ps1</code> (coverage lines); <code>Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/README.md</code> (grep); text search for <code>cover property</code> and <code>covergroup</code> under <code>Verification</code>.</div>
+</div>
+</body>
+</html>

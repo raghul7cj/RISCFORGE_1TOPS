@@ -1,0 +1,29 @@
+{
+  "purpose": "Expected watchdog failure using NOP compile fixture, relative copied inputs; no benchmark PASS expected",
+  "commands": [
+    {
+      "command": [
+        "C:\\Xilinx\\Vivado\\2022.2\\bin\\xsim.bat",
+        "soc_benchmark_snapshot",
+        "-R",
+        "-testplusarg",
+        "+IMEM_HEX=imem.hex",
+        "-testplusarg",
+        "+DMEM_HEX=dmem.hex",
+        "-testplusarg",
+        "+RESULT_JSON=negative_timeout_result_fixed.json",
+        "-testplusarg",
+        "+BENCHMARK_ID=1",
+        "-testplusarg",
+        "+TIMEOUT_CYCLES=1000"
+      ],
+      "cwd": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\benchmarks\\build\\runs\\smoke_20261104T060907Z_cee2871f",
+      "log": "C:\\Users\\cj\\Desktop\\1TOPS project\\RISCFORGE_1TOPS-main\\rtl\\ips\\benchmarks\\docs\\evidence\\negative_timeout_fixed.log",
+      "timeout_seconds": 120,
+      "duration_seconds": 0.875,
+      "return_code": 1
+    }
+  ],
+  "simulator_exit_code": 1,
+  "raw_result": null
+}

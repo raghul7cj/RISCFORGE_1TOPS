@@ -1,0 +1,34 @@
+{
+  "real_builds_accepted": [
+    {
+      "benchmark": "smoke",
+      "provenance": {
+        "source_files_verified": 8,
+        "output_files_verified": 5
+      }
+    },
+    {
+      "benchmark": "counter_probe",
+      "provenance": {
+        "source_files_verified": 8,
+        "output_files_verified": 5
+      }
+    },
+    {
+      "benchmark": "coremark",
+      "provenance": {
+        "source_files_verified": 13,
+        "output_files_verified": 6
+      }
+    },
+    {
+      "benchmark": "dhrystone",
+      "provenance": {
+        "source_files_verified": 13,
+        "output_files_verified": 7
+      }
+    }
+  ],
+  "incomplete_coremark_rejected": true,
+  "rejection_reason": "missing required coremark ports source hashes: ports/coremark/core_portme.c, ports/coremark/core_portme.h"
+}

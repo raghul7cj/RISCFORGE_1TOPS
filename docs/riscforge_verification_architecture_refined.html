@@ -1,0 +1,543 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RISCFORGE | Verification Architecture &amp; Engineering Notes · Rev B</title>
+<meta name="description" content="Editable architecture and evidence model for RISCFORGE verification. Rev B intended state, with detailed engineering notes and traceability.">
+<style>
+:root{--bg:#f5f7f8;--paper:#fff;--ink:#182b3a;--body:#34495a;--muted:#617585;--line:#dce4e9;--accent:#1b627a;--tint:#eef4f6;--mono:#486476}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--body);background:var(--bg);font:15px/1.65 Arial,Helvetica,sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+:focus-visible{outline:3px solid #5a98b4;outline-offset:2px}
+.layout{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh}
+aside{background:#fff;border-right:1px solid var(--line);padding:32px 19px;min-height:100%;}
+.side-stick{position:sticky;top:22px;max-height:calc(100vh - 44px);overflow:auto;scrollbar-width:thin}
+.brand{font-size:16px;font-weight:800;letter-spacing:.11em;color:#243d50;padding:0 13px 16px;border-bottom:1px solid var(--line)}
+.nav-cap{display:block;color:#7e8c95;font-weight:700;font-size:10px;letter-spacing:.16em;margin:20px 13px 9px}
+nav a{display:block;font-size:12.5px;color:#596b79;padding:7px 13px;border-radius:5px;line-height:1.3}
+nav a:hover{background:#eff4f6;color:#244b61;text-decoration:none}
+nav a.major{font-weight:700;color:#2d5368}
+.rev{margin:28px 13px;font-size:11px;color:#788994;line-height:1.5}
+.page{padding:38px clamp(24px,4.5vw,86px) 100px;min-width:0;max-width:1890px}
+.mast{display:flex;justify-content:space-between;gap:12px;align-items:center;font-size:11px;letter-spacing:.12em;color:#587386;font-weight:800;border-bottom:1px solid #d4dfe5;padding-bottom:18px}
+.header-side{display:flex;gap:14px;align-items:center}
+.header-side a{color:#43677a;border:1px solid #d0dee4;letter-spacing:.02em;text-transform:none;padding:7px 11px;border-radius:5px}
+h1{font-size:clamp(32px,3.2vw,48px);color:var(--ink);line-height:1.14;letter-spacing:-.035em;font-weight:700;margin:42px 0 14px}
+.dek{font-size:17px;max-width:780px;line-height:1.55;color:#546878;margin-bottom:27px}
+.meta-row{border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:5px 37px;padding:15px 0;margin-bottom:35px}
+.meta-row .value{color:#263e51;font-weight:700}.meta-row small{display:block;color:#7b8a94;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.chapter{font-size:11px;letter-spacing:.17em;color:#6a7e89;font-weight:700;margin-bottom:10px}
+.intro{max-width:950px;line-height:1.62;margin-bottom:22px}
+.figure-shell{border:1px solid #d0dbe2;background:#fff;box-shadow:0 3px 15px rgba(22,44,59,.035);border-radius:10px;overflow:hidden}
+.figure-top{padding:17px 23px;border-bottom:1px solid #e0e7eb;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.figure-top strong{color:#21394c;font-size:15px}.figure-top small{display:block;color:#7b8a95;font-size:12px}
+.figure-top a{display:inline-flex;gap:7px;align-items:center;border:1px solid #bfced7;border-radius:5px;padding:7px 12px;font-size:12px;font-weight:700;white-space:nowrap}
+.svg-scroll{width:100%;overflow-x:auto;background:#fff}.svg-scroll svg{width:100%;min-width:1135px;display:block;height:auto}
+.caption{font-size:12.5px;color:#617582;margin:11px 4px 23px;max-width:1050px}
+.route-table{margin:23px 0 40px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.route-table article{background:#fff;padding:20px 24px}.route-table b{display:block;color:#233c4d;font-size:14px}
+.route-table p{font-size:13px;color:#526b7a;margin:8px 0 0;line-height:1.56}
+.status-note{background:#f1f6f8;border-left:3px solid #618aa0;color:#4d6474;padding:15px 20px;font-size:13px;line-height:1.6;margin-bottom:40px}
+.section-label{font-size:11px;font-weight:800;letter-spacing:.14em;color:#6d8391;margin:38px 0 4px}
+.doc section{scroll-margin-top:20px}
+h2{font-size:26px;line-height:1.28;letter-spacing:-.02em;color:#243b4e;margin:52px 0 13px;border-top:1px solid var(--line);padding-top:26px;scroll-margin-top:18px}
+h2 small{font-size:13px;letter-spacing:0;color:#778b98;font-weight:400;margin-left:9px}
+h3.grp{font-size:17px;color:#30495b;margin:28px 0 12px}
+p{margin:10px 0}.lead{max-width:1050px;color:#526678;font-size:14px;line-height:1.66;margin:8px 0 16px}
+.facts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:14px}
+.fact{padding:16px 12px;border-right:1px solid var(--line)}.fact:last-child{border-right:0}
+.fact b{display:block;font-size:22px;letter-spacing:-.03em;color:#243e50;line-height:1.24}.fact span{font-size:11.5px;color:#6c7d89;line-height:1.4;display:block;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0 30px; margin:14px 0 23px}
+.card{padding:18px 0 17px;border-top:1px solid #dce4e8;background:none;min-width:0}
+.card h3{font-size:15px;font-weight:750;line-height:1.45;color:#2b4558;margin:0 0 7px}
+.card p{font-size:13.4px;margin:5px 0 0;color:#536778;line-height:1.62}
+.tag{font-size:10px;font-weight:700;color:#6a8291;letter-spacing:.035em;border:1px solid #cdd9df;padding:3px 6px;border-radius:4px;margin-left:6px;white-space:nowrap}
+.tag.warn{color:#937241;border-color:#d9c7a6}
+.mono,.m{font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;font-size:.95em}
+.tablewrap{overflow-x:auto;margin:15px 0 23px;border:1px solid #d9e3e8;border-radius:6px;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:13.2px;min-width:760px}
+th,td{text-align:left;vertical-align:top;border-bottom:1px solid #e5ebef;padding:11px 12px;line-height:1.48}
+th{background:#f0f4f6;color:#365469;letter-spacing:.055em;text-transform:uppercase;font-weight:800;font-size:10.5px}
+tr:last-child td{border-bottom:0}td{color:#445c6d}td:first-child{font-weight:600;color:#2b4759}
+.note{background:#f0f4f6;border:1px solid #d9e3e8;padding:18px 22px;border-radius:6px;font-size:13.5px;color:#456071}
+.note ul{padding-left:19px}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.ph{border:1px solid #d8e3e7;background:#fff;padding:13px 15px;border-radius:5px;font-size:12.5px;color:#60727e}
+.ph b{display:block;color:#304a5b;font-size:14px}.gx{font-weight:700;color:#536c7d}
+.source{font-size:12px;line-height:1.6;color:#697d88;padding-top:15px;border-top:1px solid var(--line);margin-top:50px}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}aside{padding:12px 20px;border-right:0;border-bottom:1px solid var(--line)}.side-stick{position:static;max-height:none}.brand{display:inline-block;border:0;padding:0 14px 0 0}nav{display:none}.nav-cap,.rev{display:none}.page{padding:24px 20px 70px}.route-table{grid-template-columns:1fr}.facts{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.mast{align-items:flex-start}.header-side{gap:5px;flex-wrap:wrap}.header-side a{font-size:10px;padding:5px 7px}.meta-row{gap:14px}.facts{grid-template-columns:repeat(2,1fr)}.fact:nth-child(2n){border-right:0}.grid{grid-template-columns:1fr}.figure-top{padding:13px 16px}h2 small{display:block;margin:2px 0}}
+@media print{@page{size:A3 landscape;margin:14mm}body{background:#fff}.layout{display:block}aside,.header-side,.figure-top a{display:none}.page{padding:0;max-width:100%}.svg-scroll svg{min-width:0}.figure-shell{break-inside:avoid}.route-table,.facts,.card,tr{break-inside:avoid}h2{break-after:avoid}a{text-decoration:none}}
+</style></head><body>
+<div class="layout"><aside><div class="side-stick"><div class="brand">R I S C F O R G E</div><div class="nav-cap">DOCUMENT</div>
+<nav aria-label="Section navigation"><a href="#overview" class="major">Architecture overview</a><a href="#figure" class="major">System diagram</a><a href="#routes">Three configuration paths</a><a href="#reference" class="major">Technical reference</a><a href="#principles">Principles and evidence</a><a href="#stimulus">Stimulus generation</a><a href="#configs">DUT configurations</a><a href="#observation">Observation mechanisms</a><a href="#checking">Checkers and oracles</a><a href="#closure">Closure infrastructure</a><a href="#gates">Gate register G0–G6</a><a href="#tools">Tools and regressions</a><a href="#identity">Run / RTL identity</a><a href="#phases">Project phases</a><a href="#changes">Post-freeze re-runs</a><a href="#ownership">Ownership and defects</a><a href="#limitations">Open gaps and decisions</a></nav><p class="rev">ENGINEERING NOTE / VERIFICATION<br>REV B · 2026-10-05<br>Intended state; not evidence of execution.</p></div></aside>
+<main class="page" id="overview"><div class="mast"><span>SYSTEMS ENGINEERING / DESIGN VERIFICATION</span><div class="header-side"><span>TECHNICAL ARCHITECTURE · REV B</span><a href="riscforge_verification_architecture.svg" download>Editable SVG</a></div></div>
+<h1>Verification architecture<br>and evidence model</h1><p class="dek">A configuration-aware view of the RISCFORGE SoC verification system. The diagram describes how tests exercise three distinct DUT environments, how observations are checked, and how retained evidence is qualified for release.</p>
+<div class="meta-row"><div><small>Design</small><span class="value">riscforge_soc_subsystem</span></div><div><small>Scope</small><span class="value">RV32IM_Zicsr SoC</span></div><div><small>Source of authority</small><span class="value">Verification Plan · Rev B</span></div><div><small>Build state</small><span class="value">Target / intended</span></div></div>
+<div id="figure" class="chapter">FIGURE 01 / ARCHITECTURE</div><div class="figure-shell"><div class="figure-top"><div><strong>Execution, observation and evidence qualification</strong><small>Five functions · three DUT contexts · one release process</small></div><span style="display:flex;gap:8px;flex-wrap:wrap"><a href="riscforge_verification_architecture.svg" target="_blank" rel="noopener">Open full size ↗</a><a href="riscforge_verification_architecture.svg" download>Save editable SVG ↓</a></span></div><div class="svg-scroll" tabindex="0" aria-label="Scrollable architecture diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1024" role="img" aria-labelledby="architectureTitle architectureDesc" id="verification-architecture">
+<title id="architectureTitle">RISCFORGE verification architecture — end-state, Rev B</title>
+<desc id="architectureDesc">Three separate configuration-valid verification paths feed recorded evidence. A candidate's evidence and identities are evaluated through per-run, per-candidate and release gates. Formal verification is a parallel input to release, not a gate itself.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L9 5L0 10Z" fill="#657b8d"/></marker></defs>
+<style>
+svg{font-family:Arial,Helvetica,sans-serif;background:#fff}
+.eyebrow{font-weight:700;font-size:13px;letter-spacing:1.65px;fill:#667c8b}
+.header{font-weight:700;font-size:15px;fill:#324e62;letter-spacing:.25px}
+.card-title{font-weight:700;font-size:17px;fill:#1f3345}
+.card-copy{font-size:14px;fill:#536574}
+.rowlabel{font-size:13px;font-weight:700;fill:#6b7b87;letter-spacing:1.25px}
+.pill-text{font-size:11.5px;font-weight:700;fill:#8e642e}
+.gate-id{font-size:18px;font-weight:700;fill:#35536a}
+.gate-title{font-size:17px;font-weight:700;fill:#243849}
+.gate-copy{font-size:14px;fill:#596b78}
+.small{font-size:13px;fill:#72828d}
+.formal-title{font-size:16px;fill:#283e51;font-weight:700}
+.formal-copy{font-size:13px;fill:#556978}
+</style>
+<rect width="1600" height="1024" fill="#fff"/>
+
+<text x="42" y="35" class="eyebrow">EXECUTION PATHS  /  CONFIGURATION-VALID CHECKS</text>
+<text x="1556" y="35" class="eyebrow" text-anchor="end">REV B  ·  INTENDED STATE</text>
+<path d="M42 48 L1558 48" stroke="#dde4e8" stroke-width="1" fill="none"/>
+<text x="44" y="89" class="header">01  STIMULUS</text>
+<text x="336" y="89" class="header">02  DUT WRAPPER</text>
+<text x="632" y="89" class="header">03  OBSERVE</text>
+<text x="930" y="89" class="header">04  CHECK / ORACLE</text>
+<text x="1290" y="89" class="header">05  RETAINED EVIDENCE</text>
+<path d="M44 105 L1556 105" stroke="#dbe3e8" stroke-width="1" fill="none"/>
+<g id="path-cfg-c" class="configuration-path">
+<rect x="26" y="111" width="1547" height="164" rx="8" fill="#f7f9fa" stroke="#ebeff2" stroke-width="1"/>
+<text x="45" y="133" class="rowlabel">CFG-C  /  Core / ISA</text>
+<g id="cfg-c-1" class="component" aria-label="RISCOF suite">
+<rect x="44" y="143" width="230" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="44" y="143" width="3" height="132" rx="1.5" fill="#71889a"/>
+<text x="61" y="168" class="card-title">RISCOF suite</text>
+<text x="61" y="194" class="card-copy">Directed ISA tests</text>
+<text x="61" y="213" class="card-copy">69 applicable / 162 total</text>
+</g>
+<path d="M281 209 H328" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-c-2" class="component" aria-label="Core-only wrapper">
+<rect x="336" y="143" width="232" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="336" y="143" width="3" height="132" rx="1.5" fill="#294d6b"/>
+<text x="353" y="168" class="card-title">Core-only wrapper</text>
+<text x="353" y="194" class="card-copy">RV32IM_Zicsr core</text>
+<text x="353" y="213" class="card-copy">Flat I/D memory model</text>
+</g>
+<path d="M575 209 H624" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-c-3" class="component" aria-label="Architectural capture">
+<rect x="632" y="143" width="234" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="632" y="143" width="3" height="132" rx="1.5" fill="#428786"/>
+<text x="649" y="168" class="card-title">Architectural capture</text>
+<text x="649" y="194" class="card-copy">Retirement and trap state</text>
+<text x="649" y="213" class="card-copy">No deployed AXI / IRQ path</text>
+</g>
+<path d="M873 209 H922" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-c-4" class="component" aria-label="Compliance checks">
+<rect x="930" y="143" width="296" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="930" y="143" width="3" height="132" rx="1.5" fill="#665f85"/>
+<text x="947" y="168" class="card-title">Compliance checks</text>
+<text x="947" y="194" class="card-copy">CO-1…CO-8  ·  ISA semantics</text>
+<text x="947" y="213" class="card-copy">ISS replay not graded here</text>
+</g>
+<path d="M1233 209 H1282" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-c-5" class="component" aria-label="ISA run artefacts">
+<rect x="1290" y="143" width="266" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="1290" y="143" width="3" height="132" rx="1.5" fill="#9a7c49"/>
+<text x="1307" y="168" class="card-title">ISA run artefacts</text>
+<text x="1307" y="194" class="card-copy">Compliance pass/fail + scope</text>
+<text x="1307" y="213" class="card-copy">Wrapper identity evidence</text>
+</g>
+</g>
+<g id="path-cfg-f" class="configuration-path">
+<rect x="26" y="281" width="1547" height="164" rx="8" fill="#f7f9fa" stroke="#ebeff2" stroke-width="1"/>
+<text x="45" y="303" class="rowlabel">CFG-F  /  Fabric / contention</text>
+<g id="cfg-f-1" class="component" aria-label="Master / target BFMs">
+<rect x="44" y="313" width="230" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="44" y="313" width="3" height="132" rx="1.5" fill="#71889a"/>
+<text x="61" y="338" class="card-title">Master / target BFMs</text>
+<text x="61" y="364" class="card-copy">Directed + random contention</text>
+<text x="61" y="383" class="card-copy">Fault and response injection</text>
+</g>
+<path d="M281 379 H328" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-f-2" class="component" aria-label="Isolated interconnect">
+<rect x="336" y="313" width="232" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="336" y="313" width="3" height="132" rx="1.5" fill="#294d6b"/>
+<text x="353" y="338" class="card-title">Isolated interconnect</text>
+<text x="353" y="364" class="card-copy">Crossbar, bridge, SRAM muxes</text>
+<text x="353" y="383" class="card-copy">Both master ports modelled</text>
+</g>
+<path d="M575 379 H624" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-f-3" class="component" aria-label="Bus transaction capture">
+<rect x="632" y="313" width="234" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="632" y="313" width="3" height="132" rx="1.5" fill="#428786"/>
+<text x="649" y="338" class="card-title">Bus transaction capture</text>
+<text x="649" y="364" class="card-copy">Protocol + timeout monitors</text>
+<text x="649" y="383" class="card-copy">CP taps valid in CFG-F</text>
+</g>
+<path d="M873 379 H922" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-f-4" class="component" aria-label="Fabric checks">
+<rect x="930" y="313" width="296" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="930" y="313" width="3" height="132" rx="1.5" fill="#665f85"/>
+<text x="947" y="338" class="card-title">Fabric checks</text>
+<text x="947" y="364" class="card-copy">L1 / L2 + fabric obligations</text>
+<text x="947" y="383" class="card-copy">Contention, error and path rules</text>
+</g>
+<path d="M1233 379 H1282" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-f-5" class="component" aria-label="Fabric run artefacts">
+<rect x="1290" y="313" width="266" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="1290" y="313" width="3" height="132" rx="1.5" fill="#9a7c49"/>
+<text x="1307" y="338" class="card-title">Fabric run artefacts</text>
+<text x="1307" y="364" class="card-copy">Assertion and path verdicts</text>
+<text x="1307" y="383" class="card-copy">Drain + timeout records</text>
+</g>
+</g>
+<g id="path-cfg-s" class="configuration-path">
+<rect x="26" y="451" width="1547" height="164" rx="8" fill="#f7f9fa" stroke="#ebeff2" stroke-width="1"/>
+<text x="45" y="473" class="rowlabel">CFG-S  /  Integrated SoC</text>
+<g id="cfg-s-1" class="component" aria-label="Firmware + device VIP">
+<rect x="44" y="483" width="230" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="44" y="483" width="3" height="132" rx="1.5" fill="#71889a"/>
+<text x="61" y="508" class="card-title">Firmware + device VIP</text>
+<text x="61" y="534" class="card-copy">Boot image, external IRQs</text>
+<text x="61" y="553" class="card-copy">Directed / random scenarios</text>
+</g>
+<path d="M281 549 H328" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-s-2" class="component" aria-label="Full SoC subsystem">
+<rect x="336" y="483" width="232" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="336" y="483" width="3" height="132" rx="1.5" fill="#294d6b"/>
+<text x="353" y="508" class="card-title">Full SoC subsystem</text>
+<text x="353" y="534" class="card-copy">Five reset domains</text>
+<text x="353" y="553" class="card-copy">Core, SRAM and peripherals</text>
+</g>
+<path d="M575 549 H624" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-s-3" class="component" aria-label="System capture">
+<rect x="632" y="483" width="234" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="632" y="483" width="3" height="132" rx="1.5" fill="#428786"/>
+<text x="649" y="508" class="card-title">System capture</text>
+<text x="649" y="534" class="card-copy">MMIO, pins, boot and mailbox</text>
+<text x="649" y="553" class="card-copy">Retire trace for planned ISS</text>
+</g>
+<path d="M873 549 H922" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-s-4" class="component" aria-label="System-level checks">
+<rect x="930" y="483" width="296" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="930" y="483" width="3" height="132" rx="1.5" fill="#665f85"/>
+<text x="947" y="508" class="card-title">System-level checks</text>
+<text x="947" y="534" class="card-copy">Valid L1–L7 check families</text>
+<text x="947" y="553" class="card-copy">ISS lock-step: specified</text>
+<rect x="1152.6" y="493" width="61.4" height="22" rx="5" fill="#f8f2e8" stroke="#d8c8a6" stroke-width="1"/>
+<text x="1183.3" y="508" class="pill-text" text-anchor="middle">PLANNED</text>
+</g>
+<path d="M1233 549 H1282" fill="none" stroke="#74899a" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<g id="cfg-s-5" class="component" aria-label="SoC run artefacts">
+<rect x="1290" y="483" width="266" height="132" rx="8" fill="#ffffff" stroke="#cad4db" stroke-width="1"/>
+<rect x="1290" y="483" width="3" height="132" rx="1.5" fill="#9a7c49"/>
+<text x="1307" y="508" class="card-title">SoC run artefacts</text>
+<text x="1307" y="534" class="card-copy">Functional + firmware verdicts</text>
+<text x="1307" y="553" class="card-copy">Traces, logs and findings</text>
+</g>
+</g>
+<rect x="44" y="631" width="1512" height="43" rx="6" fill="#f4f7f8" stroke="#dfe6ea" stroke-width="1"/>
+<text x="62" y="658" class="rowlabel">CONFIGURATION GUARDRAIL</text>
+<text x="306" y="658" class="card-copy">Checks are graded only where Table 16.2 marks their families VALID; PARTIAL and INVALID are not a pass.</text>
+<text x="44" y="711" class="eyebrow">CLOSURE PATH  /  ONE FROZEN RTL IDENTITY</text>
+<path d="M44 722 L1556 722" stroke="#dbe3e8" stroke-width="1" fill="none"/>
+<g id="run-manifest" class="gate-unit">
+<rect x="44" y="752" width="358" height="110" rx="7" fill="#ffffff" stroke="#cbd5dc" stroke-width="1"/>
+<rect x="44" y="752" width="50" height="110" rx="7" fill="#e8eef2" stroke="#e8eef2" stroke-width="1"/>
+<text x="69" y="783" class="gate-id" text-anchor="middle">00</text>
+<text x="110" y="780" class="gate-title">Run provenance</text>
+<text x="110" y="803" class="gate-copy">RTL hash · filelist · simulator version</text>
+<text x="110" y="821" class="gate-copy">Seed, scenario, plusargs, artefact URI</text>
+</g>
+<g id="per-run" class="gate-unit">
+<rect x="444" y="752" width="327" height="110" rx="7" fill="#ffffff" stroke="#cbd5dc" stroke-width="1"/>
+<rect x="444" y="752" width="50" height="110" rx="7" fill="#e8eef2" stroke="#e8eef2" stroke-width="1"/>
+<text x="469" y="783" class="gate-id" text-anchor="middle">01</text>
+<text x="510" y="780" class="gate-title">Per-run verdict</text>
+<text x="510" y="803" class="gate-copy">G0  harness integrity</text>
+<text x="510" y="821" class="gate-copy">G1  reach  ·  G3  checker pass</text>
+</g>
+<g id="per-candidate" class="gate-unit">
+<rect x="813" y="752" width="346" height="110" rx="7" fill="#ffffff" stroke="#cbd5dc" stroke-width="1"/>
+<rect x="813" y="752" width="50" height="110" rx="7" fill="#e8eef2" stroke="#e8eef2" stroke-width="1"/>
+<text x="838" y="783" class="gate-id" text-anchor="middle">02</text>
+<text x="879" y="780" class="gate-title">Candidate closure</text>
+<text x="879" y="803" class="gate-copy">G2  checker viability</text>
+<text x="879" y="821" class="gate-copy">G4  coverage  ·  G6  traceability</text>
+</g>
+<g id="release" class="gate-unit">
+<rect x="1201" y="752" width="355" height="110" rx="7" fill="#ffffff" stroke="#cbd5dc" stroke-width="1"/>
+<rect x="1201" y="752" width="50" height="110" rx="7" fill="#e8eef2" stroke="#e8eef2" stroke-width="1"/>
+<text x="1226" y="783" class="gate-id" text-anchor="middle">03</text>
+<text x="1267" y="780" class="gate-title">Release qualification</text>
+<text x="1267" y="803" class="gate-copy">G5  compliance + formal closed</text>
+<text x="1267" y="821" class="gate-copy">P6 sign-off  ·  frozen manifest</text>
+</g>
+<path d="M410 809 H435" fill="none" stroke="#74899a" stroke-width="2" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M779 809 H804" fill="none" stroke="#74899a" stroke-width="2" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1167 809 H1192" fill="none" stroke="#74899a" stroke-width="2" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M1556 209 H1574" fill="none" stroke="#9a7c49" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1574" cy="209" r="3.3" fill="#9a7c49"/>
+<path d="M1556 379 H1574" fill="none" stroke="#9a7c49" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1574" cy="379" r="3.3" fill="#9a7c49"/>
+<path d="M1556 549 H1574" fill="none" stroke="#9a7c49" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1574" cy="549" r="3.3" fill="#9a7c49"/>
+<path d="M1574 209 V690 H223 V749" fill="none" stroke="#9a7c49" stroke-width="1.8" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="596" y="679" width="410" height="22" rx="0" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="801" y="694" class="small" text-anchor="middle">All configuration-valid result streams  →  manifest</text>
+<path d="M44 890 L1556 890" stroke="#e0e6ea" stroke-width="1" fill="none"/>
+<text x="44" y="920" class="eyebrow">PARALLEL TRACK</text>
+<text x="250" y="920" class="formal-title">FORMAL F</text>
+<text x="395" y="920" class="formal-copy">Property register, proof / vacuity evidence · tool of record TBD(D-038)</text>
+<path d="M1030 915 H1273" fill="none" stroke="#8a91a3" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#arrow)" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="1295" y="920" class="formal-copy">Input to G5, not a gate</text>
+<path d="M44 960 L1556 960" stroke="#dbe3e8" stroke-width="1" fill="none"/>
+<text x="44" y="986" class="small">Diagram encodes intended verification architecture only. It is not an execution-status report.</text>
+<text x="1556" y="986" class="small" text-anchor="end">SOURCE: VERIFICATION PLAN REV B  ·  §§4–6, 8–10, 16, 18–21</text>
+</svg></div></div>
+<p class="caption">Figure 01 — Solid horizontal arrows indicate stimulus-to-evidence progression within the same configuration. The evidence aggregation route links those results to the shared qualification process. The parallel formal track supplies an input to G5; it does not independently stamp a gate. Sources: Rev B §§4–6, 16, 18–21.</p>
+<div class="chapter" id="routes">HOW TO READ THE THREE PATHS</div><div class="route-table">
+<article><b>CFG-C — architectural compliance</b><p>Core-only test wrapper. Produces ISA compliance evidence; it cannot establish SoC bus-error, peripheral or deployed interrupt behaviour. 69 applicable cases are the target, not an executed pass count.</p></article>
+<article><b>CFG-F — fabric stress</b><p>Bus-functional models replace both bus masters and the targets. This exposes arbitration, contention and SRAM control that are not reachable in the integrated SoC configuration.</p></article>
+<article><b>CFG-S — shipped integration</b><p>Boot, SRAM, reset release, peripherals, firmware and interrupts coexist. Traces, mailbox, pins and bus observations support configuration-valid checking. ISS lock-step remains specified.</p></article></div>
+<div class="status-note"><strong>Status and independence rule.</strong> The source plan explicitly says no check in the plan has been executed. “SPECIFIED” means required but not implemented; “TBD” identifies an unresolved decision. A checker must use an independent oracle and demonstrate viability, not merely remain silent. Configuration validity is defined by Rev B Table 16.2, not by the diagram's apparent proximity.</div>
+<div class="chapter" id="reference">TECHNICAL REFERENCE / REV B</div>
+<div class="facts"><div class="fact"><b>4 bands</b><span>Stimulus · observe · check · close</span></div><div class="fact"><b>7 layers</b><span>Protocol through firmware</span></div><div class="fact"><b>3 DUT contexts</b><span>CFG-C · CFG-F · CFG-S</span></div><div class="fact"><b>G0–G6</b><span>Run, candidate, release</span></div><div class="fact"><b>69 / 162</b><span>Applicable ISA test inventory</span></div><div class="fact"><b>1 RTL identity</b><span>Independent evidence, pinned tools</span></div></div>
+<div class="doc"><h2 id="principles">How the infrastructure hangs together</h2>
+<p class="lead">Three ideas organise it. <b>Independence:</b> every checker and model names an artefact or external specification it was not derived from, and the author of a check may not be the author of the RTL it judges. <b>Anti-vacuity:</b> a check must be shown able to fail before its silence counts as evidence. <b>Identity:</b> every result is tied to a recorded RTL hash, filelist hash, tool version, seed and plusargs, so a log missing any of them is not evidence.</p>
+<p class="lead">Work is described in two orthogonal ways that must not be mixed. A <b>band</b> says what kind of work it is (stimulus, observe, check, close), and a <b>layer</b> (L1–L7) says where in the design it applies. The diagram's columns are the bands. The check column is split by layer.</p>
+<h2 id="stimulus">Stimulus <small>BAND-1 · what drives the DUT</small></h2>
+<div class="grid">
+<article class="card c1">
+<h3>Firmware suites + BSP <span class="tag">L7</span></h3>
+<p>Self-checking firmware that writes attestation words into a mailbox in DSRAM. The harness reads them as the firmware-level oracle, and G1 needs at least one per partition. The CFG-S image length is a compile-time constant of 64 instruction words and 0 data words (D-052), which most random streams and C suites exceed unless it is raised.</p>
+</article>
+<article class="card c1">
+<h3>Constrained-random + directed</h3>
+<p>Random stream volume follows the convergence rule in Table 6.5, so the number of seeds is derived rather than chosen. Volumes for the directed, reset, fault and interrupt scenarios are TBD(D-025): the rules are binding, the numbers are not.</p>
+</article>
+<article class="card c1">
+<h3>RISCOF compliance suite</h3>
+<p>69 applicable tests out of 162 in the vendored tree (38 I, 8 M, 7 Zicsr, 16 privilege). The other 93 are out of scope, each with a recorded reason. It runs against the core-only configuration on Icarus Verilog.</p>
+</article>
+<article class="card c1">
+<h3>BFMs and device VIPs</h3>
+<p>Master-side and target-side bus-functional models with configurable waits and responses drive the fabric configuration. External slave models exist for I2C and SPI, plus an SPI NOR flash model for boot.</p>
+</article>
+<article class="card c1">
+<h3>Fault injection <span class="tag">INJ-1…4</span></h3>
+<p>Four mechanisms: bind, force, model mutation and an injection port. They produce 17 derived fault cases and are how checkers get their negative cases. INJ-1 needs a simulator that can bind, so it runs only on VCS. Any hierarchical force must appear in the run manifest or the result is irreproducible.</p>
+</article>
+<article class="card c1">
+<h3>Fast-boot backdoor</h3>
+<p>A testbench deposit of the image straight into SRAM, skipping the SPI boot path (§12.9). Eligibility is declared per check, and equivalence obligations apply so the backdoor cannot hide a boot defect.</p>
+</article>
+</div>
+<h2 id="configs">DUT configurations <small>one RTL source, three ways to wrap it</small></h2>
+<div class="tablewrap">
+<table>
+<tr><th>Config</th><th>Under test</th><th>Replaced or modelled</th><th>Use it for</th><th>Cannot show</th></tr>
+<tr><td class="mono">CFG-C</td><td>Core only (rv32im_zicsr_5stage_exc_nointr plus tb_riscof.v), one reset domain</td><td>Flat 4 MB instruction and data memories; no AXI target; interrupt inputs tied to 0</td><td>RISCOF compliance, 69 of 69</td><td>AXI error responses, any MMIO or peripheral, the deployed interrupt path</td></tr>
+<tr><td class="mono">CFG-F</td><td>Crossbar, error slave, bridge, both sram_mux, both SRAM interfaces, the 7 timeout monitors; sys_rst_n only</td><td>Both AXI masters are master-side BFMs; the three targets are target-side BFMs</td><td>Fabric under contention, error paths, SRAM gates</td><td>Instruction execution, CSR/privilege/trap state, real SRAM arrays, peripherals</td></tr>
+<tr><td class="mono">CFG-S</td><td>The complete subsystem, five reset domains, core held in reset during image load</td><td>Only the SPI flash contents and the off-chip interrupt pins</td><td>Firmware, boot, peripherals and interrupts as delivered</td><td>Fabric contention, which the design makes unreachable</td></tr>
+</table>
+</div>
+<p class="lead" style="margin-top:10px">Every check family is marked VALID, PARTIAL or INVALID per configuration in Table 16.2, and a check must not be reported green where its stimulus cannot be produced. For example IC-1…IC-9 are INVALID in CFG-C because that core tree has a different, fixed-priority interrupt design. The compliance core is not the shipping core: nine core files differ, and the plan makes that a gate (CO-1).</p>
+<h2 id="observation">Observation <small>BAND-2 · how the environment sees the DUT</small></h2>
+<div class="grid">
+<article class="card c3">
+<h3>Observation points <span class="tag">CP-1…CP-12</span></h3>
+<p>Twelve attachment points on the MMIO and SRAM paths where required checks sit (Table 8.2). A per-slot observation tap on the SoC MMIO path is fixed in phase P1b.</p>
+</article>
+<article class="card c3">
+<h3>Bus and timeout monitors</h3>
+<p>Six timeout monitors on the APB slots and one on the core's AXI-Lite master, all in <span class="mono">sys_rst_n</span>. The bootloader's own AXI master is unmetered. P5 requires all seven to be observed expiring.</p>
+</article>
+<article class="card c3">
+<h3>Retire trace <span class="tag warn">SPECIFIED</span></h3>
+<p>The record of committed instructions that lock-step consumes. Its port (ISS-14) is required but not built, so the testbench extracts retirement hierarchically in the meantime.</p>
+</article>
+<article class="card c3">
+<h3>Pin-level monitors</h3>
+<p>For UART, GPIO and both timers there is no external slave model, only a monitor against the port contract. The plan records this as an open limitation of layer L4.</p>
+</article>
+<article class="card c3">
+<h3>Mailbox + attestation</h3>
+<p>Words the firmware writes to DSRAM through the BSP mailbox, read by the harness. Intent must trace to a record that is not the test itself.</p>
+</article>
+<article class="card c3">
+<h3>Reset and boot observation</h3>
+<p>Reset release order, the 16-state boot FSM, and the timeout expiries feed the reset properties (RP-n) and boot checks (BOOT-nn, plus the specified integrity rows BOOT-S1…S6 and negative cases BOOT-N1…N9).</p>
+</article>
+</div>
+<h2 id="checking">Checking <small>BAND-3 · seven layers, each judged against an independent source</small></h2>
+<div class="tablewrap">
+<table>
+<tr><th>Layer</th><th>Mechanism</th><th>Accountable</th><th>Question it answers</th><th>Independence source</th></tr>
+<tr><td><b>L1</b> Protocol</td><td>Immediate and concurrent assertions</td><td>Block checker owner</td><td>Is every bus transaction legal?</td><td>The pinned upstream implementation the fabric came from; no AMBA release is cited</td></tr>
+<tr><td><b>L2</b> Path</td><td>End-to-end path scoreboard</td><td>Partition owner</td><td>Does one request produce exactly one effect?</td><td>The software view of the map (Sw/bsp/link.ld); the bootloader's address generator as a second observer</td></tr>
+<tr><td><b>L3</b> Register</td><td>Register reference model</td><td>Block checker owner</td><td>Does every register hold and return the right value?</td><td>The _reg_pkg declarations. No datasheet exists, so this is the weakest independence claim, recorded as a stated limitation</td></tr>
+<tr><td><b>L4</b> Device</td><td>Behavioural VIP plus pin monitor</td><td>Block checker owner</td><td>Does the device behave as described?</td><td>External slave models for I2C and SPI; only a pin-level monitor for UART, GPIO and both timers</td></tr>
+<tr><td><b>L5</b> Interrupt</td><td>Arbiter and gateway model</td><td>Block checker owner</td><td>Is the right source granted, at the right time, with the right context?</td><td>RISC-V privileged semantics plus the intended map in Table 14.1. Specification version TBD</td></tr>
+<tr><td><b>L6</b> Privilege</td><td>CSR and trap model plus compliance</td><td>Compliance owner</td><td>Are traps and CSR effects architecturally correct?</td><td>RISC-V privileged specification, semantics only. Version TBD: the plan's largest specification gap</td></tr>
+<tr><td><b>L7</b> Firmware</td><td>Self-checking firmware plus mailbox oracle</td><td>Partition owner</td><td>Did the software observe the behaviour it intended?</td><td>Intent traced to a record that is not the test itself (design owner's registers, Tables 3.3 and 1.5)</td></tr>
+</table>
+</div>
+<p class="lead" style="margin-top:10px">Accountable role is the one named in Table 4.1; the design owner is the second accountable party for the L5–L7 rows.</p>
+<div class="grid" style="margin-top:14px">
+<article class="card c4">
+<h3>Lock-step against Spike <span class="tag warn">SPECIFIED</span></h3>
+<p>Per-committed-instruction comparison of the DUT against an instruction-set simulator (§16, checks ISS-n). No Spike binary or source is in the repository, and interrupt replay needs a patched Spike. Rev B also uses the term "Sail-derived C model" for CT-2 in Table 21.2; resolve its relationship to the Spike reference before implementing the lock-step flow.</p>
+</article>
+<article class="card c4">
+<h3>Formal track F <span class="tag warn">TBD(D-038)</span></h3>
+<p>Runs in parallel rather than as a phase: a property register with covers, bounded-liveness encodings, proof runs and vacuity records. Eleven FRM properties are registered for the fabric and interrupt interface (Table 18.1). The tool of record is not yet established, and it feeds G5 rather than being a gate itself.</p>
+</article>
+<article class="card c4">
+<h3>Check population</h3>
+<p>432 checks plus a to-be-determined remainder (Table 9.6). Families include FP-1…11 (fabric), IC-1…24 (interrupts), ISS-n (lock-step), BOOT-nn, RP-n, CDC-nnnn, PC-1…9 (peripheral sign-off) and DEV-nnnn (per-device). Each check carries a status such as EXECUTABLE, MUST-FAIL, SPECIFIED-ONLY, NEGATIVE-PROOF, BLOCKED, VACUITY-SELFTEST or FORCE-REQUIRED (Table A.3).</p>
+</article>
+</div>
+<h2 id="closure">Closure <small>BAND-4 · turning evidence into a verdict</small></h2>
+<div class="grid">
+<article class="card c5">
+<h3>Coverage <span class="tag">VCS U-2023.03</span></h3>
+<p>Four families that never substitute for each other: <b>code</b> (line, branch, condition, toggle over the generated filelist), <b>structural</b> (FSM states, decode regions, arbitration outcomes, timeout bins), <b>functional</b> (declared cross-instance bins) and <b>assertion</b> (a check ID that is evaluated and non-vacuous). Reported per run and merged per candidate at one RTL identity. "Coverage is high" is not a closure criterion and no combined score exists (CR-5).</p>
+</article>
+<article class="card c5">
+<h3>Viability ledger</h3>
+<p>The evidence a check can report: <span class="mono">negative_case_pass</span> or <span class="mono">vacuity_proved</span>. A check that was <i>evaluated</i> (antecedent satisfied) but has no viability record is <i>vacuous</i>. G2 asks whether the checker can report; G4 asks whether the behaviour was observed.</p>
+</article>
+<article class="card c5">
+<h3>Failure reporter + triage</h3>
+<p>The single harness path every finding passes through. The triage owner assigns, within one working day, a primary owner, class and severity. Severity is set at triage, never at closure and never by the fixer.</p>
+</article>
+<article class="card c5">
+<h3>Traceability matrix</h3>
+<p>Six links from requirement to defect, generated rather than typed. G6 fails on any orphan requirement, check, test or defect, and every defect must link to a regression test.</p>
+</article>
+<article class="card c5">
+<h3>Waivers</h3>
+<p>A waiver records unreachability and never substitutes for a hit. It needs an owner, justification and review date, and the requester and approver differ. It returns to review when it expires, when the RTL identity changes, or when the masked defect is re-filed.</p>
+</article>
+</div>
+<h2 id="gates">Gates <small>Table 6.1 · the only place gate predicates are defined</small></h2>
+<div class="tablewrap">
+<table>
+<tr><th>Gate</th><th>Name</th><th>Tier</th><th>Passes when</th><th>Owner</th></tr>
+<tr><td><b>G0</b></td><td>Harness integrity</td><td>per run</td><td>No unresolved or extra modules against the canonical module set; pinned tool version; the artefact write test passes</td><td>Harness-CI owner</td></tr>
+<tr><td><b>G1</b></td><td>Stimulus reached the DUT</td><td>per run</td><td>Instructions retired, AXI transfers, APB transfers and mailbox attestation words are all non-zero for the partition</td><td>Harness-CI owner</td></tr>
+<tr><td><b>G2</b></td><td>Checker viability</td><td>per candidate</td><td>Every bound check ID has a current viability record</td><td>Block checker owner; consolidated by closure owner</td></tr>
+<tr><td><b>G3</b></td><td>Checkers all pass</td><td>per run</td><td>No open findings; no unexplained ring drops; scoreboards drained at run end</td><td>Partition owner</td></tr>
+<tr><td><b>G4</b></td><td>Coverage closed</td><td>per candidate</td><td>Every declared bin is hit, waived, or excluded as unreachable-by-design with a record; an assertion bin counts only if non-vacuous</td><td>Closure owner</td></tr>
+<tr><td><b>G5</b></td><td>Compliance and formal closed</td><td>release</td><td>All applicable compliance tests pass (69 of 69) and every formal goal is proved, waived with owner and date, or converted to a directed test</td><td>Compliance owner; formal owner</td></tr>
+<tr><td><b>G6</b></td><td>Traceability complete</td><td>per candidate</td><td>No orphan requirement, check, test or defect; every defect links to a regression test</td><td>Traceability owner</td></tr>
+</table>
+</div>
+<p class="lead" style="margin-top:10px">Per-run gates (G0, G1, G3) are re-run whenever the run is re-run. Per-candidate gates (G2, G4, G6) are decided over a frozen manifest and need G0, G1 and G3 on every run in it. G5 is stamped once, in P6. <b>untested</b> is a distinct verdict meaning the evidence could not be produced: it is never a pass and never a waiver, and six gates satisfied with one unknown is not signed off.</p>
+<h2 id="tools">Tools and regression</h2>
+<div class="tablewrap">
+<table>
+<tr><th>Domain</th><th>Simulator</th><th>Host</th><th>May not be used for</th></tr>
+<tr><td>Regression; compile and lint gate</td><td>Verilator</td><td>Linux / WSL2</td><td>Being the coverage tool of record: it produces no merged coverage database</td></tr>
+<tr><td>Windows object-oriented testbenches</td><td>Vivado XSim 2022.2</td><td>Windows</td><td>Any gate needing the compliance DUT; producing countable coverage (no checker bind)</td></tr>
+<tr><td>ISA compliance (RISCOF)</td><td>Icarus Verilog (vvp)</td><td>WSL2</td><td>Elaborating the SoC; its coverage is reported separately and never merged</td></tr>
+<tr><td><b>Coverage of record; checker binding; fault injection INJ-1</b></td><td><b>Synopsys VCS U-2023.03</b></td><td>Remote server</td><td>Being cited as a local execution domain</td></tr>
+<tr><td>Formal</td><td>TBD(D-038)</td><td>Remote Cadence server</td><td>Being cited as a tool of record until D-038 closes</td></tr>
+</table>
+</div>
+<p class="lead" style="margin:10px 0 14px">A second commercial simulator is also listed as TBD(D-30): no host, licence or install path is recorded.</p>
+<div class="tablewrap">
+<table>
+<tr><th>Partition</th><th>Content</th><th>Gates evaluated</th><th>Cadence</th><th>Budget</th></tr>
+<tr><td><b>Smoke</b></td><td>One boot test, one peripheral test, checker self-proof, harness integrity</td><td>G0, G1, G3</td><td>Every commit</td><td>under 10 min</td></tr>
+<tr><td><b>Nightly</b></td><td>Full firmware suites; constrained-random seeds sized by the convergence rule; fault injection; the compliance sweep as an input artefact</td><td>G0, G1, G3 per run</td><td>Every night</td><td>under 4 h</td></tr>
+<tr><td><b>Weekly</b></td><td>Nightly plus coverage merge, viability-ledger reconciliation and formal re-run</td><td>G0, G1, G3 per run; G2, G4, G6 provisional</td><td>Weekly</td><td>under 12 h</td></tr>
+<tr><td><b>Release</b></td><td>Everything, plus soak and cold-boot cycling</td><td>All seven; G5 stamped once</td><td>Each release</td><td>under 48 h</td></tr>
+</table>
+</div>
+<p class="lead" style="margin-top:10px">Budgets are ASSUMED(D-024) planning values: an overrun is a capacity observation, not a gate failure.</p>
+<h2 id="identity">Run identity and RTL identity</h2>
+<p class="lead">Each run records eight fields: RTL hash, filelist hash, tool and version, plusargs, seed, scenario identifier, verdict and artefact locator. Reproducibility (QG-10) measures the four that affect reproduction. The repository has no git history, so identity is a hash recipe (Table 21.10):</p>
+<ol class="steps">
+<li>Take the 105 non-comment entries of <span class="mono">RTL_SOC/soc_subsystem.f</span> (a filelist, not a directory walk).</li>
+<li>Resolve every entry. Any unresolved entry means no hash, and the run is untested.</li>
+<li>Rewrite paths to repository-relative POSIX form and SHA-256 each file's raw bytes.</li>
+<li>Build a sorted manifest. Its SHA-256 is <b>H_rtl</b>; the hash of the relativised filelist is <b>H_filelist</b>.</li>
+<li>Stamp every header with three identity checks: <b>ID-1</b> no divergent duplicate module names reachable from a testbench filelist, <b>ID-2</b> no unresolved filelist entries, <b>ID-3</b> no absolute paths.</li>
+</ol>
+<p class="lead" style="margin-top:10px">Table 5.2 describes the hash more loosely (filelist plus four anchor files). Use Table 21.10 as the recipe. Two different <span class="mono">timer.sv</span> files exist and different filelists compile each, which is why ID-1 treats a divergent duplicate as an identity failure.</p>
+<h2 id="phases">Phases <small>Table 21.3 · effort figures are assumed planning values with a ±40–70% band</small></h2>
+<div class="phases">
+<div class="ph"><b>P0 Bring-up</b>one reproducible run end to end<br/>exit: <span class="gx">G0 G1</span> · 8–14 d</div>
+<div class="ph"><b>P1a Core trust</b>CT-1…CT-5 on the core<br/>exit: <span class="gx">G0 G1 G3</span> · 15–30 d</div>
+<div class="ph f"><b>P1b SoC structural</b>MMIO path bound; <b>RTL freeze F declared</b><br/>exit: <span class="gx">G0 G1 G3</span> · 10–20 d</div>
+<div class="ph"><b>P2 Model completion</b>full register model, 6 instances; VIPs reachable<br/>exit: <span class="gx">G3</span> · 25–45 d</div>
+<div class="ph"><b>P3.1–3.4 Architectural</b>reset/clock, interrupts, fabric/bridge, firmware oracle<br/>exit: <span class="gx">G3</span> · 45–83 d</div>
+<div class="ph"><b>P4.1–4.5 Closure</b>coverage, viability, traceability, candidate regression, compliance re-run<br/>exit: <span class="gx">G2 G4 G6</span> · 38–76 d</div>
+<div class="ph f"><b>F Formal track</b>runs in parallel, feeds G5<br/>30–60 d, overlapped</div>
+<div class="ph"><b>P5 Convergence + soak</b>Table 6.5 convergence, cold-boot cycling, timeouts expire<br/>feeds G4, G5 · 10–20 d</div>
+<div class="ph"><b>P6 Release</b>G5 stamped once; sign-off statement<br/>exit: <span class="gx">G5</span> · 5–10 d</div>
+</div>
+<p class="lead" style="margin-top:10px">Summing the ranges gives roughly 186–358 engineer-days, a total the plan does not state itself. Team size and calendar dates are TBD. A phase starts only when every condition in its Table 21.4 row holds at one named RTL identity. CT-1…CT-5 (core trust) are a phase-entry condition, not a gate.</p>
+<h2 id="changes">After the freeze: what must be re-run <small>Table 21.12</small></h2>
+<p class="lead">No gate verdict transfers across an RTL identity change. This matrix bounds how much has to be re-run, because the rule applied naively would be unaffordable.</p>
+<div class="tablewrap">
+<table>
+<tr><th>Class</th><th>Files</th><th>Must be re-run</th><th>Need not be re-run</th></tr>
+<tr><td><b>A</b> core</td><td class="mono">riscv_core/rtl/ and the core DUT filelist</td><td>CT-1…CT-3 in full (69 compliance tests, lock-step, core assertions); critical-path formal goals; smoke at once; G2, G4, G6 re-derived on a fresh merged campaign</td><td>Peripheral suites whose devices did not change, unless expected values derive from core-visible behaviour</td></tr>
+<tr><td><b>B</b> fabric, reset, boot</td><td class="mono">axi_lite_xbar/, axi_lite_to_apb/, bus_monitors/, sram_mux, sram_sp, boot_rom, instr_fetch_demux, bootloader</td><td>P3.1 and P3.3 in full; the 39 path-scoreboard rules; the 7 timeout monitors; CT-5; the candidate campaign restarts</td><td>CT-1…CT-3, unless the change alters core_rst_n release timing (then it is Class A)</td></tr>
+<tr><td><b>C</b> peripheral</td><td>The six peripheral directories</td><td>That device's suite and critical-path bins; ID-1 for its module namespace</td><td>CT-1…CT-3 and formal goals, provided its interrupt path into mip is unchanged</td></tr>
+<tr><td><b>D</b> harness, TB, spec</td><td>Testbenches, VIPs, monitors, models, check-ID registry, filelists, generators, BSP, the plan</td><td>G0 only; authored checks are re-reviewed for authorship conflicts</td><td>Every other gate, since H_rtl is unchanged</td></tr>
+<tr><td><b>X</b> hygiene</td><td>Any filelist; any file added, moved, renamed or deleted</td><td>ID-1, ID-2 and ID-3 in full</td><td>Everything else</td></tr>
+</table>
+</div>
+<p class="lead" style="margin-top:10px">A broader trigger beats the narrowest class: any change to core_rst_n release timing, to the fast_irq_i or fast_intr_core widths, or to mip_w is Class A whatever file carries it. Class X is additive and never removes an obligation.</p>
+<h2 id="ownership">People, defects and waivers</h2>
+<div class="tablewrap">
+<table>
+<tr><th>Role</th><th>Accountable for</th></tr>
+<tr><td><b>PL</b> Project lead</td><td>Schedule and capacity; arbitrates decisions the design owner may not</td></tr>
+<tr><td><b>DO</b> Design owner</td><td>The specification and intended-state register; signs the design half of sign-off</td></tr>
+<tr><td><b>HC</b> Harness-CI owner</td><td>Filelists, generators, CI pipeline, identity checks ID-1…ID-3; G0 and G1 verdicts</td></tr>
+<tr><td><b>PO</b> Partition owner</td><td>One regression partition: scenarios, seeds, per-run verdicts, the G3 verdict</td></tr>
+<tr><td><b>BCO</b> Block checker owner</td><td>A block's check population: authoring, binding, negative cases; input to G2</td></tr>
+<tr><td><b>CO</b> Compliance owner</td><td>The RISCOF flow; the denominator of 69; the recorded reason for each of the 93 out-of-scope tests</td></tr>
+<tr><td><b>FO</b> Formal owner</td><td>Property register, proof runs, vacuity records, closure of track F</td></tr>
+<tr><td><b>CLO</b> Closure owner</td><td>Merged coverage database; G2 and G4 consolidation; the waiver register</td></tr>
+<tr><td><b>TO</b> Traceability owner</td><td>Requirement register, generated traceability matrix, the G6 verdict</td></tr>
+<tr><td><b>TR</b> Triage owner</td><td>Every filed finding within one working day: primary owner, contributors, class, severity</td></tr>
+<tr><td><b>FX</b> Fixer</td><td>Not a standing role: any engineer for one defect; may not close it</td></tr>
+<tr><td><b>WA</b> Waiver approver</td><td>Approves or rejects waivers; never the requester; at least two named people</td></tr>
+<tr><td><b>RA</b> Release approver</td><td>Signs the sign-off statement in three capacities (design, verification, project) held by three different people</td></tr>
+</table>
+</div>
+<p class="lead" style="margin:10px 0 14px">Ten separation-of-duty rules (SD-1…SD-10) back this, for example check author ≠ RTL author (SD-1), waiver requester ≠ approver (SD-2), and three distinct sign-off signatories (SD-8). Where a small team cannot separate a block, the escape is a recorded waiver, not silence.</p>
+<div class="grid">
+<article class="card cg">
+<h3>Severity</h3>
+<p><b>S1</b> release-blocking, not waivable, needs a linked regression test and a second signature to close. <b>S2</b> major, blocks the dependent phase exit, waivable only with a review date within one release cycle. <b>S3</b> minor, close or waive before the release in which it was filed. <b>S4</b> observability, no effect on any gate. <b>S5</b> observation, trend only.</p>
+</article>
+<article class="card cg">
+<h3>Defect class: where the fault lies</h3>
+<p><b>C-DUT</b> RTL wrong. <b>C-TB</b> checker, VIP, monitor or model wrong. <b>C-HARNESS</b> filelist, generator, CI or run-identity recording wrong. <b>C-SPEC</b> specification ambiguous or contradicted, closed by a decision rather than a code change. <b>C-ENV</b> tool, licence or environment. <b>C-EXPECT</b> expected value wrong while DUT and specification are right.</p>
+</article>
+</div>
+<h2 id="limitations">Not yet established <small>gaps the plan itself declares</small></h2>
+<div class="tablewrap">
+<table>
+<tr><th>Item</th><th>State</th></tr>
+<tr><td>Privileged-specification version</td><td>TBD. No version string in the repository (tree described as 2.1.12-era). L5 and L6 depend on it, and the plan calls it its largest specification gap</td></tr>
+<tr><td>Reference ISS (Spike)</td><td>SPECIFIED. No Spike binary or source in the repository; interrupt replay needs a patched Spike</td></tr>
+<tr><td>Formal tool of record</td><td>TBD(D-038)</td></tr>
+<tr><td>Second commercial simulator</td><td>TBD(D-30): no host, licence or install path recorded</td></tr>
+<tr><td>Retire-trace port</td><td>SPECIFIED (ISS-14); hierarchical extraction in the meantime</td></tr>
+<tr><td>Scenario volumes</td><td>TBD(D-025) for directed, reset, fault and interrupt scenarios</td></tr>
+<tr><td>Device mode lists</td><td>Not yet derivable (D-27); the device-model clause counts and mutation catalogue wait on them</td></tr>
+<tr><td>CFG-S image capacity</td><td>64 instruction words and 0 data words are compile-time constants (D-052)</td></tr>
+<tr><td>Boot integrity</td><td>SPECIFIED: BOOT-S1…S6 with negative cases BOOT-N1…N9</td></tr>
+<tr><td>Technology library, netlist, DFT, power intent, clock frequency</td><td>Absent. Late-stage equivalence is "the slot that does not exist". All time quantities are clk_i cycle counts</td></tr>
+<tr><td>Version control</td><td>No .git exists; identity is by hash recipe (D-22), so no commit id can be cited</td></tr>
+<tr><td>Team size and calendar</td><td>TBD (D-GR02, D-GR03); no calendar date appears and effort figures are assumptions</td></tr>
+</table>
+</div></div>
+<div class="source"><strong>Document basis:</strong> <i>RISCFORGE SoC Verification Plan</i>, Rev B (2026-10-05), notably Tables 1.2, 4.1, 5.1–5.2, 6.1, 16.1–16.2, 21.3 and Annex D. The original technical text was retained and re-typeset for navigability; the architecture diagram is a new explanatory synthesis, not a replacement for normative per-check requirements. The SVG is embedded inline and supplied separately for independent editing. No external assets, runtime libraries or image-generated content.</div>
+</main></div></body></html>

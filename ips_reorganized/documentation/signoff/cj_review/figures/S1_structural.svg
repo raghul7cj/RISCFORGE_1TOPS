@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 840" class="dg" role="img" aria-labelledby="title desc">
+<title id="title">S1 — Shared SoC fetch, data, loader and SPI topology</title>
+<desc id="desc">Named source instances, register boundaries and directed interfaces. Solid blue: payload or request. Teal: response or result feedback. Dashed amber: control or incomplete hook. Dotted gray: passive observation or testbench backdoor; labels distinguish these uses.</desc>
+<defs>
+  <marker id="ah-core" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#2d56c8"/></marker>
+  <marker id="ah-mem"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#0c8577"/></marker>
+  <marker id="ah-bus"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#7445bd"/></marker>
+  <marker id="ah-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#a8660c"/></marker>
+  <marker id="ah-irq"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#c92c37"/></marker>
+  <marker id="ah-obs"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#626d7f"/></marker>
+  <marker id="ah-mute" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#98a0ac"/></marker>
+  <marker id="ah"      viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#475063"/></marker>
+</defs>
+<style>
+  :root {
+    --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+    --ground: #ffffff; --paper: #ffffff; --ink: #18202c; --ink-2: #475063; --ink-3: #7a8394;
+    --rule: #e0e5ec; --rule-2: #cbd5e1; --tint: #f8fafc;
+    --core: #2d56c8; --core-f: rgba(45,86,200,.08);
+    --mem:  #0c8577; --mem-f:  rgba(12,133,119,.08);
+    --bus:  #7445bd; --bus-f:  rgba(116,69,189,.08);
+    --per:  #a8660c; --per-f:  rgba(190,120,20,.09);
+    --irq:  #c92c37; --irq-f:  rgba(201,44,55,.08);
+    --tb:   #626d7f; --tb-f:   rgba(98,109,127,.08);
+    --todo: #b45309; --todo-f: rgba(180,83,9,.08);
+  }
+  text { font-family: Arial, Helvetica, sans-serif; fill: #18202c; font-size: 11px; }
+  .tt { font-weight: 600; font-size: 12.5px; fill: #18202c; }
+  .ts { font-size: 10.5px; fill: #475063; }
+  .tm { font-family: Consolas, "Courier New", monospace; font-size: 10px; fill: #475063; }
+  .ti { font-family: Consolas, "Courier New", monospace; font-size: 9.5px; fill: #c92c37; font-weight: 500; }
+  .tbus { font-size: 10.5px; font-weight: 600; fill: #7445bd; letter-spacing: .04em; }
+  .tlab { font-size: 10px; fill: #475063; font-style: italic; }
+  .tmu { fill: #7a8394; }
+  .tbadge { font-family: Consolas, "Courier New", monospace; font-size: 9px; font-weight: 600; }
+  rect { stroke-width: 1.2; }
+  .n-core  { fill: #eff2fc; stroke: #2d56c8; }
+  .n-stage { fill: #ffffff;       stroke: #2d56c8; stroke-width: 1.3; }
+  .n-mem   { fill: #edf7f6;  stroke: #0c8577;  }
+  .n-bus   { fill: #f3eff9;  stroke: #7445bd;  }
+  .n-per   { fill: #faf5ed;  stroke: #a8660c;  }
+  .n-irq   { fill: #fbf0f1;  stroke: #c92c37;  }
+  .n-tb    { fill: #f2f3f5;   stroke: #626d7f;   }
+  .n-todo  { fill: #faf3eb; stroke: #b45309; stroke-dasharray: 5 3; }
+  .n-frame { fill: none;          stroke: #cbd5e1; stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .n-badge { stroke-width: 1; rx: 3px; }
+  .e-core { fill: none; stroke: #2d56c8; stroke-width: 1.6; }
+  .e-mem  { fill: none; stroke: #0c8577;  stroke-width: 1.5; }
+  .e-bus  { fill: none; stroke: #7445bd;  stroke-width: 1.5; }
+  .e-apb  { fill: none; stroke: #7445bd;  stroke-width: 2.4; }
+  .e-ctrl { fill: none; stroke: #b45309; stroke-width: 1.4; stroke-dasharray: 6 4; }
+  .e-irq  { fill: none; stroke: #c92c37;  stroke-width: 1.4; stroke-dasharray: 5 4; }
+  .e-irqs { fill: none; stroke: #c92c37;  stroke-width: 1.5; }
+  .e-obs  { fill: none; stroke: #626d7f;   stroke-width: 1.2; stroke-dasharray: 3 3; }
+  .e-thin { fill: none; stroke: #cbd5e1; stroke-width: 1; stroke-dasharray: 2 3; }
+</style>
+<rect width="1240" height="840" fill="#ffffff"/>
+<text x="24" y="28" class="tt" style="font-size:14px; letter-spacing:-0.01em;">S1 · Shared SoC fetch, data, loader and SPI topology</text>
+<rect class="n-frame" x="15" y="45" width="1210" height="780" rx="6"/>
+<text class="tt tmu" x="27" y="63" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">riscforge_soc_subsystem  ·  defaults: ISRAM/DSRAM 8192 × 32; core RESET_PC=0</text>
+<rect class="n-core" x="40" y="100" width="240" height="280" rx="4"/>
+<text class="tt" x="50" y="118">i_riscv_core : top</text>
+<text class="ts" x="50" y="134">Fetch SRAM style</text>
+<text class="ts" x="50" y="149">Memory.lsunit → LSU</text>
+<text class="ts" x="50" y="164">core_rst_n</text>
+<rect class="n-bus" x="350" y="80" width="240" height="75" rx="4"/>
+<text class="tt" x="360" y="98">i_instr_fetch_demux</text>
+<text class="ts" x="360" y="114">word → byte address</text>
+<path class="e-core" d="M 280,125 L 350,125" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="281" y="107" width="68" height="16" rx="3"/>
+<text class="tbadge" x="315" y="119" text-anchor="middle" fill="#2d56c8">addr/en →</text>
+<path class="e-mem" d="M 350,145 L 280,145" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="269" y="147" width="92" height="16" rx="3"/>
+<text class="tbadge" x="315" y="159" text-anchor="middle" fill="#0c8577">← rdata[31:0]</text>
+<rect class="n-mem" x="350" y="185" width="240" height="60" rx="4"/>
+<text class="tt" x="360" y="203">i_boot_rom</text>
+<text class="ts" x="360" y="219">16 × 32 @ 0</text>
+<path class="e-core" d="M 420,155 L 420,185" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="377" y="162" width="86" height="16" rx="3"/>
+<text class="tbadge" x="420" y="174" text-anchor="middle" fill="#2d56c8">cs / index →</text>
+<path class="e-mem" d="M 500,185 L 500,155" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="463" y="162" width="74" height="16" rx="3"/>
+<text class="tbadge" x="500" y="174" text-anchor="middle" fill="#0c8577">← ROM data</text>
+<rect class="n-bus" x="700" y="80" width="220" height="75" rx="4"/>
+<text class="tt" x="710" y="98">i_isram_mux</text>
+<text class="ts" x="710" y="114">p0 fetch / p1 AXI</text>
+<path class="e-core" d="M 590,105 L 700,105" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="584" y="87" width="122" height="16" rx="3"/>
+<text class="tbadge" x="645" y="99" text-anchor="middle" fill="#2d56c8">ISRAM request → p0</text>
+<path class="e-mem" d="M 700,135 L 590,135" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="578" y="137" width="134" height="16" rx="3"/>
+<text class="tbadge" x="645" y="149" text-anchor="middle" fill="#0c8577">← data / gnt / valid</text>
+<rect class="n-mem" x="990" y="80" width="220" height="75" rx="4"/>
+<text class="tt" x="1000" y="98">i_isram</text>
+<text class="tm" x="1000" y="114">0x10000–0x17fff</text>
+<path class="e-core" d="M 920,105 L 990,105" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="933" y="87" width="44" height="16" rx="3"/>
+<text class="tbadge" x="955" y="99" text-anchor="middle" fill="#2d56c8">req →</text>
+<path class="e-mem" d="M 990,135 L 920,135" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="927" y="137" width="56" height="16" rx="3"/>
+<text class="tbadge" x="955" y="149" text-anchor="middle" fill="#0c8577">← rdata</text>
+<rect class="n-core" x="350" y="280" width="240" height="95" rx="4"/>
+<text class="tt" x="360" y="298">i_core_data_if</text>
+<text class="ts" x="360" y="314">hybrid_mem_interface</text>
+<text class="ts" x="360" y="329">DSRAM direct / MMIO AXI</text>
+<text class="ts" x="360" y="344">bad address → LSU err</text>
+<path class="e-core" d="M 280,305 L 350,305" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="281" y="287" width="68" height="16" rx="3"/>
+<text class="tbadge" x="315" y="299" text-anchor="middle" fill="#2d56c8">LSU req →</text>
+<path class="e-mem" d="M 350,345 L 280,345" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="257" y="347" width="116" height="16" rx="3"/>
+<text class="tbadge" x="315" y="359" text-anchor="middle" fill="#0c8577">← rdata/stall/err</text>
+<rect class="n-bus" x="700" y="280" width="220" height="75" rx="4"/>
+<text class="tt" x="710" y="298">i_dsram_mux</text>
+<text class="ts" x="710" y="314">p0 LSU / p1 AXI</text>
+<path class="e-core" d="M 590,305 L 700,305" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="587" y="287" width="116" height="16" rx="3"/>
+<text class="tbadge" x="645" y="299" text-anchor="middle" fill="#2d56c8">direct DSRAM → p0</text>
+<path class="e-mem" d="M 700,335 L 590,335" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="599" y="337" width="92" height="16" rx="3"/>
+<text class="tbadge" x="645" y="349" text-anchor="middle" fill="#0c8577">← DSRAM rdata</text>
+<rect class="n-mem" x="990" y="280" width="220" height="75" rx="4"/>
+<text class="tt" x="1000" y="298">i_dsram</text>
+<text class="tm" x="1000" y="314">0x20000–0x27fff</text>
+<path class="e-core" d="M 920,305 L 990,305" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="933" y="287" width="44" height="16" rx="3"/>
+<text class="tbadge" x="955" y="299" text-anchor="middle" fill="#2d56c8">req →</text>
+<path class="e-mem" d="M 990,335 L 920,335" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="927" y="337" width="56" height="16" rx="3"/>
+<text class="tbadge" x="955" y="349" text-anchor="middle" fill="#0c8577">← rdata</text>
+<rect class="n-bus" x="350" y="415" width="240" height="65" rx="4"/>
+<text class="tt" x="360" y="433">AXI timeout monitor</text>
+<text class="ts" x="360" y="449">core master only</text>
+<path class="e-core" d="M 470,375 L 470,415" marker-start="url(#ah-core)" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="406" y="387" width="128" height="16" rx="3"/>
+<text class="tbadge" x="470" y="399" text-anchor="middle" fill="#2d56c8">MMIO AXI req / resp</text>
+<rect class="n-bus" x="660" y="415" width="290" height="95" rx="4"/>
+<text class="tt" x="670" y="433">i_axi_lite_xbar</text>
+<text class="ts" x="670" y="449">SLV0 core / SLV1 loader</text>
+<text class="ts" x="670" y="464">MST0 I / 1 D / 2 APB</text>
+<path class="e-core" d="M 590,450 L 660,450" marker-start="url(#ah-core)" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="600" y="432" width="50" height="16" rx="3"/>
+<text class="tbadge" x="625" y="444" text-anchor="middle" fill="#2d56c8">SLV[0]</text>
+<rect class="n-bus" x="700" y="185" width="220" height="50" rx="4"/>
+<text class="tt" x="710" y="203">i_isram_axi_if</text>
+<rect class="n-bus" x="700" y="375" width="220" height="50" rx="4"/>
+<text class="tt" x="710" y="393">i_dsram_axi_if</text>
+<path class="e-bus" d="M 750,415 L 750,235" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="725" y="312" width="50" height="16" rx="3"/>
+<text class="tbadge" x="750" y="324" text-anchor="middle" fill="#7445bd">MST[0]</text>
+<path class="e-bus" d="M 810,185 L 810,155" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="785" y="162" width="50" height="16" rx="3"/>
+<text class="tbadge" x="810" y="174" text-anchor="middle" fill="#7445bd">I p1 ↔</text>
+<path class="e-bus" d="M 810,415 L 810,425" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="785" y="412" width="50" height="16" rx="3"/>
+<text class="tbadge" x="810" y="424" text-anchor="middle" fill="#7445bd">MST[1]</text>
+<path class="e-bus" d="M 810,375 L 810,355" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="785" y="357" width="50" height="16" rx="3"/>
+<text class="tbadge" x="810" y="369" text-anchor="middle" fill="#7445bd">D p1 ↔</text>
+<rect class="n-bus" x="990" y="415" width="220" height="95" rx="4"/>
+<text class="tt" x="1000" y="433">i_axi_lite_to_apb</text>
+<text class="ts" x="1000" y="449">6 slots / timeout monitors</text>
+<text class="ts" x="1000" y="464">slot 4 → loader slave</text>
+<path class="e-bus" d="M 950,465 L 990,465" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="945" y="447" width="50" height="16" rx="3"/>
+<text class="tbadge" x="970" y="459" text-anchor="middle" fill="#7445bd">MST[2]</text>
+<rect class="n-frame" x="40" y="545" width="800" height="175" rx="6"/>
+<text class="tt tmu" x="52" y="563" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">i_bootloader : bootloader</text>
+<rect class="n-core" x="60" y="580" width="330" height="95" rx="4"/>
+<text class="tt" x="70" y="598">Cold FSM / warm_boot_q</text>
+<text class="ts" x="70" y="614">APB programs SPI / reads RX FIFO</text>
+<text class="ts" x="70" y="629">byte reversal → AXI SRAM writes</text>
+<rect class="n-bus" x="450" y="580" width="360" height="95" rx="4"/>
+<text class="tt" x="460" y="598">APB ownership mux</text>
+<text class="tm" x="460" y="614">cold FSM / runtime APB[4]</text>
+<text class="ts" x="460" y="629">apb_mst_req_o / resp_i</text>
+<path class="e-core" d="M 390,610 L 430,610 L 430,480 L 660,480" marker-start="url(#ah-core)" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="444" y="472" width="152" height="16" rx="3"/>
+<text class="tbadge" x="520" y="484" text-anchor="middle" fill="#2d56c8">loader AXI / B → SLV[1]</text>
+<path class="e-bus" d="M 1100,510 L 1100,550 L 630,550 L 630,580" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="772" y="542" width="176" height="16" rx="3"/>
+<text class="tbadge" x="860" y="554" text-anchor="middle" fill="#7445bd">APB[4] runtime req / return</text>
+<path class="e-bus" d="M 390,640 L 450,640" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="389" y="622" width="62" height="16" rx="3"/>
+<text class="tbadge" x="420" y="634" text-anchor="middle" fill="#7445bd">cold APB</text>
+<rect class="n-core" x="890" y="580" width="320" height="95" rx="4"/>
+<text class="tt" x="900" y="598">i_apb_spi_master</text>
+<text class="ts" x="900" y="614">APB / TX and RX FIFOs</text>
+<text class="ts" x="900" y="629">serial controller / pins</text>
+<path class="e-bus" d="M 810,630 L 890,630" marker-start="url(#ah-bus)" marker-end="url(#ah-bus)"/>
+<rect class="n-bus n-badge" x="816" y="612" width="68" height="16" rx="3"/>
+<text class="tbadge" x="850" y="624" text-anchor="middle" fill="#7445bd">SPI APB ↔</text>
+<rect class="n-tb" x="890" y="735" width="320" height="55" rx="4"/>
+<text class="tt" x="900" y="753">External SPI peer</text>
+<path class="e-core" d="M 970,675 L 970,735" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="906" y="697" width="128" height="16" rx="3"/>
+<text class="tbadge" x="970" y="709" text-anchor="middle" fill="#2d56c8">SCLK / CS0 / MOSI →</text>
+<path class="e-mem" d="M 1120,735 L 1120,675" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="1095" y="697" width="50" height="16" rx="3"/>
+<text class="tbadge" x="1120" y="709" text-anchor="middle" fill="#0c8577">← MISO</text>
+<text x="50" y="755" class="ts">AXI/APB ↔ = request + response bundles.</text>
+<text x="50" y="775" class="ts">ISRAM AXI rejects writes after boot_done; BootROM sets stack and jumps.</text>
+</svg>

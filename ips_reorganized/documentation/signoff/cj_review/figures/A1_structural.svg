@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 680" class="dg" role="img" aria-labelledby="title desc">
+<title id="title">A1 — Concurrent pipeline and feedback</title>
+<desc id="desc">Named source instances, register boundaries and directed interfaces. Solid blue: payload or request. Teal: response or result feedback. Dashed amber: control or incomplete hook. Dotted gray: passive observation or testbench backdoor; labels distinguish these uses.</desc>
+<defs>
+  <marker id="ah-core" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#2d56c8"/></marker>
+  <marker id="ah-mem"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#0c8577"/></marker>
+  <marker id="ah-bus"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#7445bd"/></marker>
+  <marker id="ah-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#a8660c"/></marker>
+  <marker id="ah-irq"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#c92c37"/></marker>
+  <marker id="ah-obs"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#626d7f"/></marker>
+  <marker id="ah-mute" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#98a0ac"/></marker>
+  <marker id="ah"      viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#475063"/></marker>
+</defs>
+<style>
+  :root {
+    --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+    --ground: #ffffff; --paper: #ffffff; --ink: #18202c; --ink-2: #475063; --ink-3: #7a8394;
+    --rule: #e0e5ec; --rule-2: #cbd5e1; --tint: #f8fafc;
+    --core: #2d56c8; --core-f: rgba(45,86,200,.08);
+    --mem:  #0c8577; --mem-f:  rgba(12,133,119,.08);
+    --bus:  #7445bd; --bus-f:  rgba(116,69,189,.08);
+    --per:  #a8660c; --per-f:  rgba(190,120,20,.09);
+    --irq:  #c92c37; --irq-f:  rgba(201,44,55,.08);
+    --tb:   #626d7f; --tb-f:   rgba(98,109,127,.08);
+    --todo: #b45309; --todo-f: rgba(180,83,9,.08);
+  }
+  text { font-family: Arial, Helvetica, sans-serif; fill: #18202c; font-size: 11px; }
+  .tt { font-weight: 600; font-size: 12.5px; fill: #18202c; }
+  .ts { font-size: 10.5px; fill: #475063; }
+  .tm { font-family: Consolas, "Courier New", monospace; font-size: 10px; fill: #475063; }
+  .ti { font-family: Consolas, "Courier New", monospace; font-size: 9.5px; fill: #c92c37; font-weight: 500; }
+  .tbus { font-size: 10.5px; font-weight: 600; fill: #7445bd; letter-spacing: .04em; }
+  .tlab { font-size: 10px; fill: #475063; font-style: italic; }
+  .tmu { fill: #7a8394; }
+  .tbadge { font-family: Consolas, "Courier New", monospace; font-size: 9px; font-weight: 600; }
+  rect { stroke-width: 1.2; }
+  .n-core  { fill: #eff2fc; stroke: #2d56c8; }
+  .n-stage { fill: #ffffff;       stroke: #2d56c8; stroke-width: 1.3; }
+  .n-mem   { fill: #edf7f6;  stroke: #0c8577;  }
+  .n-bus   { fill: #f3eff9;  stroke: #7445bd;  }
+  .n-per   { fill: #faf5ed;  stroke: #a8660c;  }
+  .n-irq   { fill: #fbf0f1;  stroke: #c92c37;  }
+  .n-tb    { fill: #f2f3f5;   stroke: #626d7f;   }
+  .n-todo  { fill: #faf3eb; stroke: #b45309; stroke-dasharray: 5 3; }
+  .n-frame { fill: none;          stroke: #cbd5e1; stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .n-badge { stroke-width: 1; rx: 3px; }
+  .e-core { fill: none; stroke: #2d56c8; stroke-width: 1.6; }
+  .e-mem  { fill: none; stroke: #0c8577;  stroke-width: 1.5; }
+  .e-bus  { fill: none; stroke: #7445bd;  stroke-width: 1.5; }
+  .e-apb  { fill: none; stroke: #7445bd;  stroke-width: 2.4; }
+  .e-ctrl { fill: none; stroke: #b45309; stroke-width: 1.4; stroke-dasharray: 6 4; }
+  .e-irq  { fill: none; stroke: #c92c37;  stroke-width: 1.4; stroke-dasharray: 5 4; }
+  .e-irqs { fill: none; stroke: #c92c37;  stroke-width: 1.5; }
+  .e-obs  { fill: none; stroke: #626d7f;   stroke-width: 1.2; stroke-dasharray: 3 3; }
+  .e-thin { fill: none; stroke: #cbd5e1; stroke-width: 1; stroke-dasharray: 2 3; }
+</style>
+<rect width="1060" height="680" fill="#ffffff"/>
+<text x="24" y="28" class="tt" style="font-size:14px; letter-spacing:-0.01em;">A1 · Concurrent pipeline and feedback</text>
+<rect class="n-frame" x="15" y="45" width="1030" height="620" rx="6"/>
+<text class="tt tmu" x="27" y="63" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">i_riscv_core : top · concurrent stages · clk / active-low rst</text>
+<rect class="n-bus" x="270" y="70" width="755" height="60" rx="4"/>
+<text class="tt" x="280" y="88">Forwarding_block : hazard_unit</text>
+<text class="ts" x="280" y="104">dependencies / memory wait / MDU / redirect inputs</text>
+<rect class="n-core" x="35" y="215" width="170" height="260" rx="4"/>
+<text class="tt" x="45" y="233">Fetch</text>
+<text class="ts" x="45" y="249">PC / next-PC</text>
+<text class="ts" x="45" y="264">u_imem_ctrl</text>
+<text class="ts" x="45" y="279">demux interface</text>
+<rect class="n-core" x="240" y="215" width="170" height="260" rx="4"/>
+<text class="tt" x="250" y="233">Decode</text>
+<text class="tm" x="250" y="249">rf: Register_File</text>
+<text class="ts" x="250" y="264">GPR decode (x0..x31)</text>
+<text class="ts" x="250" y="279">operand selection</text>
+<rect class="n-core" x="445" y="215" width="170" height="260" rx="4"/>
+<text class="tt" x="455" y="233">Execute</text>
+<text class="ts" x="455" y="249">operand muxes</text>
+<text class="ts" x="455" y="264">ALU / JB / CSR</text>
+<text class="ts" x="455" y="279">m_unit (MDU)</text>
+<rect class="n-core" x="650" y="215" width="170" height="260" rx="4"/>
+<text class="tt" x="660" y="233">Memory</text>
+<text class="tm" x="660" y="249">lsunit: ls_unit</text>
+<text class="ts" x="660" y="264">load / store</text>
+<text class="ts" x="660" y="279">LSU ↔ S1</text>
+<rect class="n-core" x="855" y="215" width="170" height="260" rx="4"/>
+<text class="tt" x="865" y="233">WriteBack</text>
+<text class="ts" x="865" y="249">result mux</text>
+<text class="ts" x="865" y="264">ALU / load / PC+4</text>
+<text class="ts" x="865" y="279">oldCSR / commit</text>
+<rect class="n-stage" x="43" y="380" width="154" height="85" rx="4"/>
+<text class="tt" x="53" y="398">IF/ID</text>
+<text class="ts" x="53" y="414">Instr / PC</text>
+<text class="ts" x="53" y="429">valid / exc</text>
+<rect class="n-stage" x="248" y="380" width="154" height="85" rx="4"/>
+<text class="tt" x="258" y="398">ID/EX</text>
+<text class="ts" x="258" y="414">operands / PC</text>
+<text class="ts" x="258" y="429">valid / exc</text>
+<rect class="n-stage" x="453" y="380" width="154" height="85" rx="4"/>
+<text class="tt" x="463" y="398">EX/MEM</text>
+<text class="ts" x="463" y="414">ALU_ResultM</text>
+<text class="ts" x="463" y="429">valid / exc</text>
+<rect class="n-stage" x="658" y="380" width="154" height="85" rx="4"/>
+<text class="tt" x="668" y="398">MEM/WB</text>
+<text class="ts" x="668" y="414">rd / PC / CSR</text>
+<text class="ts" x="668" y="429">valid / exc</text>
+<path class="e-core" d="M 197,420 L 248,420" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="204" y="404" width="32" height="16" rx="3"/>
+<text class="tbadge" x="220" y="416" text-anchor="middle" fill="#2d56c8">[1]</text>
+<path class="e-core" d="M 402,420 L 453,420" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="409" y="404" width="32" height="16" rx="3"/>
+<text class="tbadge" x="425" y="416" text-anchor="middle" fill="#2d56c8">[2]</text>
+<path class="e-core" d="M 607,420 L 658,420" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="614" y="404" width="32" height="16" rx="3"/>
+<text class="tbadge" x="630" y="416" text-anchor="middle" fill="#2d56c8">[3]</text>
+<path class="e-core" d="M 812,420 L 863,420" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="819" y="404" width="32" height="16" rx="3"/>
+<text class="tbadge" x="835" y="416" text-anchor="middle" fill="#2d56c8">[4]</text>
+<path class="e-ctrl" d="M 120,130 L 120,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="95" y="164" width="50" height="16" rx="3"/>
+<text class="tbadge" x="120" y="176" text-anchor="middle" fill="var(--ctrl)">StallF</text>
+<path class="e-ctrl" d="M 325,130 L 325,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="282" y="164" width="86" height="16" rx="3"/>
+<text class="tbadge" x="325" y="176" text-anchor="middle" fill="var(--ctrl)">D hold/flush</text>
+<path class="e-ctrl" d="M 530,130 L 530,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="487" y="164" width="86" height="16" rx="3"/>
+<text class="tbadge" x="530" y="176" text-anchor="middle" fill="var(--ctrl)">E hold/flush</text>
+<path class="e-ctrl" d="M 735,130 L 735,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="692" y="164" width="86" height="16" rx="3"/>
+<text class="tbadge" x="735" y="176" text-anchor="middle" fill="var(--ctrl)">M hold/flush</text>
+<path class="e-ctrl" d="M 940,130 L 940,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="915" y="164" width="50" height="16" rx="3"/>
+<text class="tbadge" x="940" y="176" text-anchor="middle" fill="var(--ctrl)">FlushW</text>
+<path class="e-ctrl" d="M 990,130 L 990,195 L 590,195 L 590,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="731" y="187" width="98" height="16" rx="3"/>
+<text class="tbadge" x="780" y="199" text-anchor="middle" fill="var(--ctrl)">ForwardAE / BE</text>
+<path class="e-ctrl" d="M 470,215 L 470,150 L 65,150 L 65,215" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="209" y="142" width="122" height="16" rx="3"/>
+<text class="tbadge" x="270" y="154" text-anchor="middle" fill="var(--ctrl)">PCSrcE / PCTargetE</text>
+<path class="e-mem" d="M 602,455 L 630,455 L 630,505 L 510,505 L 510,475" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="527" y="497" width="86" height="16" rx="3"/>
+<text class="tbadge" x="570" y="509" text-anchor="middle" fill="#0c8577">MEM ALU → EX</text>
+<path class="e-mem" d="M 940,475 L 940,535 L 555,535 L 555,475" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="695" y="527" width="110" height="16" rx="3"/>
+<text class="tbadge" x="750" y="539" text-anchor="middle" fill="#0c8577">ResultW → EX mux</text>
+<path class="e-mem" d="M 940,535 L 940,565 L 325,565 L 325,475" marker-end="url(#ah-mem)"/>
+<rect class="n-mem n-badge" x="337" y="557" width="206" height="16" rx="3"/>
+<text class="tbadge" x="440" y="569" text-anchor="middle" fill="#0c8577">ResultW / RDW / gated write → rf</text>
+<rect class="n-core" x="650" y="585" width="375" height="65" rx="4"/>
+<text class="tt" x="660" y="603">wb_commit</text>
+<text class="ts" x="660" y="619">trap / MRET authority → A2</text>
+<path class="e-core" d="M 890,475 L 890,585" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="856" y="522" width="68" height="16" rx="3"/>
+<text class="tbadge" x="890" y="534" text-anchor="middle" fill="#2d56c8">WB packet</text>
+<path class="e-ctrl" d="M 650,615 L 105,615 L 105,475" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="259" y="607" width="242" height="16" rx="3"/>
+<text class="tbadge" x="380" y="619" text-anchor="middle" fill="var(--ctrl)">wb_trap_redirect / trap_target → Fetch</text>
+<path class="e-core" d="M 20,245 L 35,245" marker-end="url(#ah-core)"/>
+<path class="e-mem" d="M 35,275 L 20,275" marker-end="url(#ah-mem)"/>
+<text x="35" y="655" class="ts">1–4: stage payload / valid / exception bundles; IMEM ports at Fetch; LSU ports at Memory.</text>
+</svg>

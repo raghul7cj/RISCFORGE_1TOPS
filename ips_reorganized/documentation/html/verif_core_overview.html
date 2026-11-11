@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Verification Overview</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Core verification</span></div>
+<div class="wrap">
+
+<h1>Core Verification Overview</h1>
+<p class="lead">What verification of the RV32IM_Zicsr five-stage core exists in the repository today, what Rev B requires before the core can be trusted, and the one core defect (DEF-001) found so far. Written for engineers who need to know which core claims have evidence behind them.</p>
+<p class="meta">Scope: core verification assets, core-trust condition CT-1..CT-5, DEF-001 | Sources: files listed at the foot of the page | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Summary of the position</a></li>
+<li><a href="#s2">Inventory of retained core assets</a></li>
+<li><a href="#s3">Layered view of core verification</a></li>
+<li><a href="#s4">Core-trust condition CT-1..CT-5</a></li>
+<li><a href="#s5">DEF-001: the core defect found by the Stage 3 proof</a></li>
+<li><a href="#s6">What this page does not claim</a></li>
+</ol></div>
+
+<h2 id="s1">1. Summary of the position</h2>
+<ul>
+<li>The only core-level evidence with a result attached is a RISCOF report of 47 entries (46 Passed, 1 Failed). It carries no RTL identity, and the DUT directory its plugin names does not exist in the tree (section 2).</li>
+<li>No lock-step comparison, no core assertions and no formal goals exist. Rev B specifies all three (Rev B 16, 21.2).</li>
+<li>No dedicated hazard-unit test exists. The Stage 3 firmware proof exercises the DEF-001 sequence indirectly.</li>
+<li>Phase P1a (core trust) is NOT STARTED and its entry criteria are not met (<code>Verification/status/PHASE_STATUS.md</code>, phase table).</li>
+</ul>
+<div class="note">Verification evidence in this project is "PASS for a stated boundary". Nothing on this page is a percentage of requirements verified.</div>
+
+<h2 id="s2">2. Inventory of retained core assets</h2>
+<p>Paths are relative to <code>rtl/ips/</code> unless they start with <code>../</code>, which means <code>rtl/</code>. The older core verification lives in <code>../verification</code>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Asset</th><th>Where</th><th>What it is and what it can show</th><th>Current evidence found</th><th>Label</th></tr></thead>
+<tbody>
+<tr><td>RISCOF harness</td><td><code>../verification/riscof/</code> (<code>config.ini</code>, <code>run_riscof.sh</code>, <code>riscforge/</code> plugin, <code>sail_cSim/</code>, <code>compare_signatures.py</code>, test lists)</td><td>Compiles each architectural test, runs the core under Icarus Verilog, dumps a signature region and diffs it against the Sail reference. A diff says a run diverged, never where (Rev B 17.1).</td><td>Harness scripts present. The plugin builds from <code>rv32im_zicsr_5stage_exc_nointr</code> (<code>riscof_riscforge.py:88</code>). That directory is absent; only <code>rv32im_zicsr_5stage_exc_nointr_old</code> and <code>riscv_core/rtl</code> exist. The RTL identity of any retained result is therefore OPEN.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Retained RISCOF report</td><td><code>../verification/riscof/report.html</code> (153,450 bytes, OS timestamp 03-06-2026)</td><td>Result table of one past run.</td><td>47 entries: 38 I tests, 8 M tests, 1 privilege test. 46 Passed. 1 Failed: <code>misalign1-jalr-01</code>, signature word 0 differs (DUT <code>xxxxxxxx</code> in one lane, reference <code>00000017</code>). No Zicsr entry. No RTL hash.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Zicsr compliance suite</td><td><code>../verification/riscv-arch-test/riscv-test-suite/rv32i_m/Zicsr/</code>, <code>../verification/ZICSR_INTEGRATION_REPORT.md</code></td><td>Seven CSR instruction tests (<code>csr-01</code>, <code>csrrw-01</code>, <code>csrrwi-01</code>, <code>csrs-01</code>, <code>csrrsi-01</code>, <code>csrci-01</code>, <code>csrrci-01</code>) plus Makefile and test list.</td><td>The report (dated 2026-06-12) records integration only. All seven <code>references/*.reference_output</code> files are 0 bytes. No Zicsr result is retained.</td><td><span class="tag exists">EXISTS</span> (no result)</td></tr>
+<tr><td>Privilege tests</td><td><code>.../rv32i_m/privilege/src/</code></td><td>16 files: <code>ecall</code>, <code>ebreak</code>, 14 misalignment tests.</td><td>Only <code>misalign1-jalr-01</code> appears in the retained report (failed).</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>ELF-to-hex helper</td><td><code>../verification/generate_branch_jump_hex.py</code></td><td>Converts a compiled ELF to instruction and data hex (<code>IMEM_BASE</code> 0x80000000, <code>DMEM_BASE</code> 0x80001000). A stimulus helper; it checks nothing.</td><td>First 25 lines read.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Debug images</td><td><code>../riscof_assembly_debug_env/</code></td><td>Hex images for <code>ecall</code>, <code>ebreak</code>, <code>misalign-beq-01</code> and others, used to debug single tests.</td><td>Directory listing only.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Interrupt testbench</td><td><code>Verification/tb1_interrupts.sv</code>, <code>tb1_test1..7_*.hex</code>, <code>tb1_interrupts.f</code></td><td>Seven directed tests on the core with the interrupt path: timer, all sources, priority, mintprio, DIV-stall collision (named "hazard"), collision, MRET. Checks trap entry through hierarchical references such as <code>dut.csr_file.mcause_r</code>.</td><td>Self-checking PASS/FAIL messages in source (tests 1 to 5 read). No retained result log found. Test 5 checks only that <code>irq_accept_E</code> stays low during <code>stallMUL</code>; it is not a forwarding or load-use test.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Firmware stage suites and proofs</td><td><code>Verification/tests/suites/stage1..7</code>, <code>Verification/artifacts/stage_proofs/</code></td><td>Bare-metal programs on the SoC. The core is exercised only through their visible effects.</td><td>Two proof folders: <code>20261024_stage2_watchdog</code> and <code>20261024_stage3_monitor_count</code>. Stage 3 is recorded PASSED after the DEF-001 fix.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Step 4 checkers</td><td><code>Verification/step4_checkers/</code></td><td>APB and AXI assertions, a path scoreboard, a disassembler and fault injection. Bus-level, not core-internal.</td><td>Report layer names include CPU-STATE; no core-internal check was identified in the files read.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Datapath verification</td><td><code>datapath_verification/</code> (<code>common</code>, <code>i2c0</code>, <code>spi0</code>, <code>timer0</code>, <code>UART0</code>)</td><td>Peripheral work. Not core verification.</td><td>Listing only.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Older core testbenches</td><td><code>../../5_stage_trap_exc_intr_no_mul/tb/</code> (<code>tb_csr_regfile.sv</code>, <code>tb_wb_commit_ctrl.sv</code>, <code>tb_top_exceptions.sv</code>, <code>tb_top_mret.sv</code>, three <code>.mem</code> programs) and <code>Documentation/04_Verification/</code></td><td>Unit and top-level tests for CSR file, commit controller, exceptions and MRET. See <a href="verif_csr_trap.html">CSR and trap verification</a>.</td><td>Port lists predate the current RTL (section 4 of that page). No retained result found.</td><td><span class="tag exists">EXISTS</span> (stale)</td></tr>
+<tr><td>Single-cycle core</td><td><code>../../single_cycle/</code></td><td>A single-cycle RTL variant with a memory file.</td><td>No testbench found in the listing.</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Lock-step ISS, core assertions, formal</td><td>none</td><td>Specified in Rev B 16, 21.2 and track F.</td><td>No source found. A search of <code>riscv_core/rtl/*.v</code> for "assert" or "property" matched only comments.</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. Layered view of core verification</h2>
+<p>Figure 1 lists the verification layers Rev B expects for the core, from stimulus-level checks at the top to proof-level checks at the bottom. Solid boxes have something in the repository; dashed boxes have nothing usable yet.</p>
+<figure>
+<svg viewBox="0 0 960 540" role="img" aria-label="Seven layers of core verification with the status of each">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<text class="th" x="40" y="32">Layer</text>
+<text class="th" x="352" y="32">Evidence in the repository (2026-11-03)</text>
+
+<rect class="bx-ver" x="40" y="48" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="68">L1 Directed ISA signature (riscof)</text>
+<text class="ts" x="52" y="86">EXISTS, partial</text>
+<rect class="bx-ver" x="352" y="48" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="68">46 of 47 retained entries pass, 1 fails (misalign1-jalr-01)</text>
+<text class="ts" x="364" y="86">No Zicsr result retained; RTL identity of the run unknown</text>
+
+<rect class="bx-ver" x="40" y="112" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="132">L2 Interrupt testbench (tb1)</text>
+<text class="ts" x="52" y="150">EXISTS</text>
+<rect class="bx-ver" x="352" y="112" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="132">7 directed tests with hex images, self-checking in source</text>
+<text class="ts" x="364" y="150">No retained result log found</text>
+
+<rect class="bx-ext" x="40" y="176" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="196">L3 Hazard and forwarding tests</text>
+<text class="ts" x="52" y="214">OPEN, none dedicated</text>
+<rect class="bx-ext" x="352" y="176" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="196">Indirect only: Stage 3 firmware proof, riscof side effects</text>
+<text class="ts" x="364" y="214">Regression for DEF-001 still owed (ACT-010)</text>
+
+<rect class="bx-ext" x="40" y="240" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="260">L4 Trap and CSR directed tests</text>
+<text class="ts" x="52" y="278">EXISTS in an older tree, stale</text>
+<rect class="bx-ext" x="352" y="240" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="260">4 testbenches in 5_stage_trap_exc_intr_no_mul/tb</text>
+<text class="ts" x="364" y="278">Port lists differ from current RTL; no retained result</text>
+
+<rect class="bx-ext" x="40" y="304" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="324">L5 Lock-step ISS comparison</text>
+<text class="ts" x="52" y="342">SPECIFIED (CT-2)</text>
+<rect class="bx-ext" x="352" y="304" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="324">Rev B 16: compare every retired instruction with an ISS</text>
+<text class="ts" x="364" y="342">Not built; locates where a divergence starts</text>
+
+<rect class="bx-ext" x="40" y="368" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="388">L6 Core structural assertions</text>
+<text class="ts" x="52" y="406">SPECIFIED (CT-3)</text>
+<rect class="bx-ext" x="352" y="368" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="388">No assertion found in riscv_core/rtl</text>
+<text class="ts" x="364" y="406">Would report core defects at cycle level</text>
+
+<rect class="bx-ext" x="40" y="432" width="296" height="48" rx="6"/>
+<text class="tb" x="52" y="452">L7 Formal goals (track F)</text>
+<text class="ts" x="52" y="470">SPECIFIED (CT-4)</text>
+<rect class="bx-ext" x="352" y="432" width="568" height="48" rx="6"/>
+<text class="t" x="364" y="452">Critical-path goals in Rev B Table 21.5</text>
+<text class="ts" x="364" y="470">Track F: NOT STARTED</text>
+
+<rect class="bx-ver" x="40" y="500" width="24" height="16" rx="3"/>
+<text class="ts" x="72" y="512">something exists</text>
+<rect class="bx-ext" x="240" y="500" width="24" height="16" rx="3"/>
+<text class="ts" x="272" y="512">nothing usable yet</text>
+</svg>
+<figcaption><b>Figure 1.</b> Seven layers of core verification. Only the top two have retained artefacts, and neither has a result tied to a recorded RTL identity.</figcaption>
+</figure>
+
+<h2 id="s4">4. Core-trust condition CT-1..CT-5</h2>
+<p>Rev B 21.2 makes core trust a set of phase-entry conditions, not a gate. Every firmware-observable result in the plan runs on the core, so a core defect would corrupt all of them in the same direction. Figure 2 shows the five conditions and where each stands; the table gives the predicates.</p>
+<figure>
+<svg viewBox="0 0 960 352" role="img" aria-label="Five core-trust conditions CT-1 to CT-5 feeding the P1a exit">
+<rect class="bx-ver" x="24" y="40" width="160" height="176" rx="6"/>
+<text class="tb mid" x="104" y="64">CT-1 Compliance</text>
+<text class="ts mid" x="104" y="92">applicable_failed +</text>
+<text class="ts mid" x="104" y="108">not_run == 0</text>
+<text class="ts mid" x="104" y="132">Retained: 46/47 pass</text>
+<text class="ts mid" x="104" y="148">1 fail, 0 Zicsr run</text>
+<text class="ts mid" x="104" y="164">RTL tree unrecorded</text>
+<text class="tb mid" x="104" y="200">NOT MET</text>
+
+<rect class="bx-ext" x="212" y="40" width="160" height="176" rx="6"/>
+<text class="tb mid" x="292" y="64">CT-2 Lock-step</text>
+<text class="ts mid" x="292" y="92">mismatched retire</text>
+<text class="ts mid" x="292" y="108">events == 0 vs ISS</text>
+<text class="ts mid" x="292" y="140">Not built</text>
+<text class="tb mid" x="292" y="200">SPECIFIED</text>
+
+<rect class="bx-ext" x="400" y="40" width="160" height="176" rx="6"/>
+<text class="tb mid" x="480" y="64">CT-3 Assertions</text>
+<text class="ts mid" x="480" y="92">Each bound check ID</text>
+<text class="ts mid" x="480" y="108">holds a viability</text>
+<text class="ts mid" x="480" y="124">record</text>
+<text class="ts mid" x="480" y="148">No core assertions</text>
+<text class="ts mid" x="480" y="164">found in RTL</text>
+<text class="tb mid" x="480" y="200">SPECIFIED</text>
+
+<rect class="bx-ext" x="588" y="40" width="160" height="176" rx="6"/>
+<text class="tb mid" x="668" y="64">CT-4 Formal</text>
+<text class="ts mid" x="668" y="92">open_critical_formal</text>
+<text class="ts mid" x="668" y="108">_goals == 0</text>
+<text class="ts mid" x="668" y="140">Track F: NOT</text>
+<text class="ts mid" x="668" y="156">STARTED</text>
+<text class="tb mid" x="668" y="200">SPECIFIED</text>
+
+<rect class="bx-ext" x="776" y="40" width="160" height="176" rx="6"/>
+<text class="tb mid" x="856" y="64">CT-5 Boot entry</text>
+<text class="ts mid" x="856" y="92">Cold and warm boot</text>
+<text class="ts mid" x="856" y="108">reach S_DONE</text>
+<text class="ts mid" x="856" y="140">Boot path is not</text>
+<text class="ts mid" x="856" y="156">core-owned; no</text>
+<text class="ts mid" x="856" y="172">evidence read</text>
+<text class="tb mid" x="856" y="200">OPEN</text>
+
+<path class="ar" d="M104 216 V272"/>
+<path class="ar" d="M292 216 V272"/>
+<path class="ar" d="M480 216 V272"/>
+<path class="ar" d="M668 216 V272"/>
+<path class="ar" d="M856 216 V272"/>
+<rect class="bx-ctrl" x="24" y="272" width="912" height="56" rx="6"/>
+<text class="tb mid" x="480" y="296">P1a exit evidence, and entry condition for P2, P3.x, P4.x, track F and P6</text>
+<text class="ts mid" x="480" y="314">PHASE_STATUS: P1a NOT STARTED, entry met NO</text>
+</svg>
+<figcaption><b>Figure 2.</b> The five core-trust conditions. Only CT-1 has partial evidence, and it does not satisfy its predicate.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Predicate (Rev B 21.2, Table 21.2)</th><th>Current status</th><th>Gap</th></tr></thead>
+<tbody>
+<tr><td>CT-1 compliance</td><td>applicable_failed + applicable_not_run == 0 at the stated RTL identity; denominator 69 (38 I + 8 M + 7 Zicsr + 16 privilege), Rev B 17.2.</td><td><span class="tag open">OPEN</span> Retained report: 47 entries, 46 Passed, 1 Failed. It has no Zicsr entry and 15 of the 16 privilege tests are missing, so about 22 applicable tests are unrun or unrecorded. Zicsr references are empty.</td><td>Re-run at the final identity (ACT-011); generate Zicsr references; resolve the <code>misalign1-jalr-01</code> failure; restore or repoint the DUT directory in the plugin.</td></tr>
+<tr><td>CT-2 lock-step</td><td>mismatched_retire_events == 0 and instruction counts equal over the compliance image set.</td><td><span class="tag specified">SPECIFIED</span></td><td>Build the comparator. Rev B 16 names Spike while Rev B 21.2 says a Sail-derived C model: which ISS is the reference is <span class="tag open">OPEN</span>.</td></tr>
+<tr><td>CT-3 assertions</td><td>Every bound core check ID holds a viability record (negative case or vacuity proof) and fires at least once.</td><td><span class="tag specified">SPECIFIED</span> No core assertion exists.</td><td>Write and bind the core assertion family; see the assertion ideas on the <a href="verif_hazard_unit.html">hazard unit</a> and <a href="verif_csr_trap.html">CSR and trap</a> pages.</td></tr>
+<tr><td>CT-4 formal</td><td>open_critical_formal_goals == 0 (Table 21.5).</td><td><span class="tag specified">SPECIFIED</span> Track F NOT STARTED.</td><td>Property register and proofs.</td></tr>
+<tr><td>CT-5 boot entry</td><td>One cold and one warm boot reach S_DONE with attestation words written and AXI beats seen.</td><td><span class="tag open">OPEN</span> Not examined for this page.</td><td>Owned by the boot partition, not the core owner.</td></tr>
+</tbody></table></div>
+<p>Related: <a href="vf_core_lockstep_compliance.html">lock-step and compliance plan</a>, <a href="core_overview.html">core overview</a>, <a href="core_hazards_csr_traps.html">hazards, CSRs and traps</a>.</p>
+
+<h2 id="s5">5. DEF-001: the core defect found by the Stage 3 proof</h2>
+<p>DEF-001 is the only core (C-DUT) defect in <code>Verification/status/defects.csv</code>. Its status is FIXED-UNVERIFIED: the fix is in the current <code>riscv_core/rtl/hazard_unit.v</code> but no regression test exists.</p>
+<ol>
+<li><b>Symptom.</b> In the Stage 3 firmware run, <code>proof_mmio_reads</code> reached 12 instead of 14 and <code>proof_mmio_writes</code> held a corrupted <code>0x00010001</code> instead of 4 (Stage 3 README, section 4).</li>
+<li><b>Cause.</b> An MMIO access held the pipeline with <code>mem_stall_i</code>. A DSRAM load in EX whose result the next instruction needed raised <code>lwstall</code>. <code>FlushE</code> included <code>lwstall</code> ungated, and in <code>decode_cycle.v</code> the flush has priority over the stall, so the held load was turned into a bubble and never executed. The failing sequence appears in <code>stage3.dis</code> at 0x109c4 to 0x109cc: <code>lw a7,0(a0)</code>, <code>lw a5,736(a2)</code>, <code>addi a5,a5,1</code>.</li>
+<li><b>Fix.</b> <code>hazard_unit.v:192</code> now masks <code>lwstall</code>, <code>csr_gpr_stall</code> and <code>csr_stall</code> with <code>~mem_stall_i</code> inside <code>FlushE</code>.</li>
+<li><b>Owed.</b> A directed regression that fails on the old RTL and passes on the fixed one (ACT-010), a second-person closer, and a CT-1/2/3 re-run because the change is Class A under Rev B Table 21.12. ACT-007 asks that the Stage 3 proof be tied to the current file by hash.</li>
+</ol>
+<figure>
+<svg viewBox="0 0 960 232" role="img" aria-label="DEF-001 lifecycle from discovery to owed regression and re-run">
+<rect class="bx-ver" x="24" y="48" width="160" height="96" rx="6"/>
+<text class="tb mid" x="104" y="72">Found</text>
+<text class="ts mid" x="104" y="96">stage3_monitor_count</text>
+<text class="ts mid" x="104" y="112">2026-10-24</text>
+<text class="ts mid" x="104" y="128">counters 12 and 0x10001</text>
+
+<rect class="bx-core" x="212" y="48" width="160" height="96" rx="6"/>
+<text class="tb mid" x="292" y="72">Root cause</text>
+<text class="ts mid" x="292" y="96">lwstall not masked by</text>
+<text class="ts mid" x="292" y="112">mem_stall_i; FlushE</text>
+<text class="ts mid" x="292" y="128">beat StallE in decode</text>
+
+<rect class="bx-ver" x="400" y="48" width="160" height="96" rx="6"/>
+<text class="tb mid" x="480" y="72">Fix in file</text>
+<text class="ts mid" x="480" y="96">3 terms gated with</text>
+<text class="ts mid" x="480" y="112">~mem_stall_i</text>
+<text class="ts mid" x="480" y="128">hazard_unit.v:192</text>
+
+<rect class="bx-ext" x="588" y="48" width="160" height="96" rx="6"/>
+<text class="tb mid" x="668" y="72">Regression owed</text>
+<text class="ts mid" x="668" y="96">ACT-010: fails on old</text>
+<text class="ts mid" x="668" y="112">RTL, passes on fixed;</text>
+<text class="ts mid" x="668" y="128">second-person review</text>
+
+<rect class="bx-ext" x="776" y="48" width="160" height="96" rx="6"/>
+<text class="tb mid" x="856" y="72">Re-run owed</text>
+<text class="ts mid" x="856" y="96">CT-1, CT-2, CT-3</text>
+<text class="ts mid" x="856" y="112">Class A change</text>
+<text class="ts mid" x="856" y="128">ACT-011</text>
+
+<path class="ar" d="M184 96 H212"/>
+<path class="ar" d="M372 96 H400"/>
+<path class="ar" d="M560 96 H588"/>
+<path class="ar" d="M748 96 H776"/>
+<text class="tb" x="24" y="184">Tracker status: FIXED-UNVERIFIED (defects.csv). Closed only when the dashed boxes exist.</text>
+<text class="ts" x="24" y="204">The test design is on the hazard unit page.</text>
+</svg>
+<figcaption><b>Figure 3.</b> DEF-001 lifecycle. The two dashed boxes are the work that remains before the defect can be closed.</figcaption>
+</figure>
+<p>The regression design, with expected and failing behaviour, is on <a href="verif_hazard_unit.html">Hazard unit verification</a>.</p>
+
+<h2 id="s6">6. What this page does not claim</h2>
+<ul>
+<li>It does not say the core is correct or incorrect. It says which checks exist.</li>
+<li>The 46-of-47 figure is a count from one retained report, not a compliance percentage, and it is not tied to current RTL.</li>
+<li>Other pages: <a href="verif_rv32m.html">RV32M verification</a>, <a href="verif_lsu_memif.html">LSU and memory interface</a>, <a href="verif_interrupt_unit.html">interrupt unit</a>.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/status/defects.csv</code>, <code>Verification/artifacts/stage_proofs/20261024_stage3_monitor_count/README.md</code> and <code>stimuli/stage3.dis</code>, <code>riscv_core/rtl/hazard_unit.v</code>, <code>../verification/README.md</code>, <code>../verification/ZICSR_INTEGRATION_REPORT.md</code>, <code>../verification/riscof/report.html</code>, <code>riscof/riscforge/riscof_riscforge.py</code>, <code>Verification/tb1_interrupts.sv</code>, <code>Verification/step4_checkers/step4_report.txt</code>, directory listings of <code>5_stage_trap_exc_intr_no_mul</code> and <code>single_cycle</code>, Rev B 16, 17, 21.2.</div>
+</div>
+</body>
+</html>

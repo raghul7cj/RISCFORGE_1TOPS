@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Three isolated RTL failures</title><style>
+body{margin:0;font:15px/1.6 "IBM Plex Sans",system-ui;color:var(--foreground,#18202c)}h2{font:650 22px/1.25 Archivo,system-ui;margin:12px 0}p{margin:12px 0}nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}button{font:inherit;padding:9px 12px;border:1px solid var(--border,#ccc);border-radius:7px;background:var(--secondary,#eee);color:inherit;cursor:pointer}button[aria-selected=true]{border-color:var(--primary,#456);font-weight:700}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.65 "IBM Plex Mono",Consolas,monospace;padding:16px;border-radius:8px;background:var(--code-background,#eee)}small{color:var(--muted-foreground,#666)}[hidden]{display:none}table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:9px 6px;border-bottom:1px solid var(--border,#ddd);overflow-wrap:anywhere}th:first-child,td:first-child{width:20%}code{font:12px "IBM Plex Mono",Consolas,monospace}</style>
+<body><h2>Three RTL behaviors reproduced</h2><p>Fresh full-SoC XSim waveforms. No RTL, testbench, firmware, or expected answers changed. All 109 design-baseline hashes match.</p>
+<nav role="tablist"><button role="tab" aria-selected="true" onclick="pick(0)">1 · Lost MDU result</button><button role="tab" aria-selected="false" onclick="pick(1)">2 · Lost older load</button><button role="tab" aria-selected="false" onclick="pick(2)">3 · Repeated retirement</button></nav>
+<section><p><b>Condition:</b> MDU stall flushes EX validity; completion later restores result/write intent while packet validity still follows the cleared EX stage.</p>
+<pre>// hazard_unit.v:192 — full expression ends in:
+assign FlushE = /* other flush causes */ ... | stallMUL;
+// decode_cycle.v:297 — inside FlushE branch:
+valid_E_r &lt;= 1'b0;
+// execute_cycle.v:330–331,424:
+RegWriteE1 = /* ... */ (m_valid_out) ? 1'b1 : RegWriteE;
+valid_M_r &lt;= valid_E;
+// top.v:285:
+assign RegWriteW_gated =
+    RegWriteW &amp; valid_W &amp; ~exc_valid_W &amp; ~mret_commit;</pre>
+<p><b>Executed smoke instruction:</b> <code>0x1095c: mul s3,s3,a4</code>, inputs <code>0x6789 × 0x12345</code>.</p>
+<table><tr><th>Time · ns</th><th>Observed immediately before rising edge</th></tr><tr><td>7695</td><td>Issue, destination x19.</td></tr><tr><td>7725</td><td>Completion = 0x75cca2ed, correct; valid_E = 0.</td></tr><tr><td>7735</td><td>MEM write intent = 1; valid_M = 0.</td></tr><tr><td>7745</td><td>WB carries correct result, but valid_W = 0 and write enable = 0.</td></tr></table>
+<p><b>Reproduced:</b> all 10 smoke, 5 CoreMark and 3 completed Dhrystone MDU operations before termination.</p>
+<p><b>Trap chains:</b> CoreMark uses stale a4 = 1 after its multiply, forms pointer 0x2092d, then traps on a store. Dhrystone retains an old digit-index/address after suppressed results; the next address add produces 0x40231 and traps.</p></section>
+<section hidden><p><b>Condition:</b> a valid older load waits in MEM when a younger MDU instruction starts. Both StallM and FlushM assert; flush has priority.</p>
+<pre>// hazard_unit.v:175,199:
+assign StallM = wb_redirect ? 1'b0 : mem_stall_i;
+assign FlushM =
+    wb_redirect | flush_pipeline_onehot[2] | stallMUL;
+// execute_cycle.v:368–389:
+end else if (FlushM) begin
+    // clears EX/MEM, including valid_M_r
+end else if (StallM) begin
+    // holds EX/MEM
+</pre><pre>// Executed smoke sequence:
+0x10958: lw   a5,4(sp)       // divisor = 0x1357
+0x1095c: mul  s3,s3,a4
+0x10960: lw   s4,0(sp)
+0x10964: lw   s5,4(sp)
+0x10968: divu s2,s2,a5</pre>
+<table><tr><th>Time · ns</th><th>Observed immediately before rising edge</th></tr><tr><td>7695</td><td>Older lw a5 valid in MEM; StallM = 1, FlushM = 1.</td></tr><tr><td>7705</td><td>MEM cleared; intended a5 load never reaches valid WB.</td></tr><tr><td>7765</td><td>divu accepts 0x12345678 / stale 0x9a.</td></tr><tr><td>8115</td><td>Quotient 0x1e430e is correct for the wrong divisor; then finding 1 suppresses its write.</td></tr></table>
+<p><b>Reproduced:</b> twice in smoke; once in Dhrystone, where <code>lbu a3,0(a3)</code> is cleared by the following <code>divu</code>. CoreMark does not need this overlap to fail.</p></section>
+<section hidden><p><b>Condition:</b> MEM/WB holds a valid non-excepting packet during a memory stall, while the CSR retirement input remains asserted.</p>
+<pre>// memory_cycle.v:260:
+else if (core_stall_gated) begin
+    // Holds all MEM/WB registers, including valid_W_r.
+end
+// top.v:572:
+.instr_retired_i(valid_W &amp; ~exc_valid_W),
+// csr_regfile.v:154:
+if (instr_retired_i)
+    minstret_r &lt;= minstret_r + 1'b1;</pre>
+<pre>// Executed smoke context:
+0x10924: sw a2,0(a4)
+0x10928: lw a5,0(a4)
+0x1092c: lw a4,0(a4)</pre>
+<table><tr><th>Time · ns</th><th>Held packet / counter state before edge</th></tr><tr><td>6095</td><td>WB PC 0x10924, StallM = 1, valid_W = 1, minstret = 315.</td></tr><tr><td>6105</td><td>Same held WB packet, valid_W = 1, minstret = 316.</td></tr><tr><td>6115</td><td>WB advances to 0x10928; minstret = 317.</td></tr></table>
+<p>The same held packet increments the counter on both edges. This uses the actual hold signal, not repeated PC alone.</p><p><b>Observed held-packet increments:</b> smoke 82; CoreMark 12; Dhrystone 183. These are not a complete retirement oracle or a score-correction factor.</p></section>
+<p><small>Artifacts: full VCD, pre-edge CSV, ELF/disassembly, raw result, simulator logs and source hashes. Detailed report includes exact run IDs, commands, focused CSV windows and diagnostic evidence checks. No reduced standalone test or patched counterfactual run was performed.</small></p>
+<script>function pick(n){document.querySelectorAll('section').forEach((e,i)=>e.hidden=i!==n);document.querySelectorAll('button').forEach((e,i)=>e.setAttribute('aria-selected',String(i===n)));}console.log('sections',document.querySelectorAll('section').length);</script></body></html>

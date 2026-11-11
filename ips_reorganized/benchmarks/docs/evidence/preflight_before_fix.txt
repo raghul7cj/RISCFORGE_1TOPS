@@ -1,0 +1,53 @@
+test_implicit_increment_cannot_escape_sram (test_preflight.FirmwarePreflightTests.test_implicit_increment_cannot_escape_sram) ... FAIL
+test_metadata_lists_do_not_break_identity_search (test_preflight.FirmwarePreflightTests.test_metadata_lists_do_not_break_identity_search) ... ERROR
+test_repeated_word_address_is_rejected (test_preflight.FirmwarePreflightTests.test_repeated_word_address_is_rejected) ... FAIL
+test_sparse_address_cannot_escape_sram (test_preflight.FirmwarePreflightTests.test_sparse_address_cannot_escape_sram) ... FAIL
+test_sparse_words_inside_sram_are_accepted (test_preflight.FirmwarePreflightTests.test_sparse_words_inside_sram_are_accepted) ... ok
+test_unknown_bits_are_not_firmware (test_preflight.FirmwarePreflightTests.test_unknown_bits_are_not_firmware) ... ok
+
+======================================================================
+ERROR: test_metadata_lists_do_not_break_identity_search (test_preflight.FirmwarePreflightTests.test_metadata_lists_do_not_break_identity_search)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\cj\Desktop\1TOPS project\RISCFORGE_1TOPS-main\rtl\ips\benchmarks\tests\test_preflight.py", line 23, in test_metadata_lists_do_not_break_identity_search
+    self.assertEqual(_find_values(metadata, {"benchmark_id"}), [3])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cj\Desktop\1TOPS project\RISCFORGE_1TOPS-main\rtl\ips\benchmarks\tools\run_benchmark.py", line 50, in _find_values
+    found.extend(_find_values(value, keys))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\cj\Desktop\1TOPS project\RISCFORGE_1TOPS-main\rtl\ips\benchmarks\tools\run_benchmark.py", line 53, in _find_values
+    found.extend(_find_values(value, keys, parent))
+                                           ^^^^^^
+NameError: name 'parent' is not defined. Did you mean: 'print'?
+
+======================================================================
+FAIL: test_implicit_increment_cannot_escape_sram (test_preflight.FirmwarePreflightTests.test_implicit_increment_cannot_escape_sram)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\cj\Desktop\1TOPS project\RISCFORGE_1TOPS-main\rtl\ips\benchmarks\tests\test_preflight.py", line 33, in test_implicit_increment_cannot_escape_sram
+    with self.assertRaises(PreflightError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PreflightError not raised
+
+======================================================================
+FAIL: test_repeated_word_address_is_rejected (test_preflight.FirmwarePreflightTests.test_repeated_word_address_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\cj\Desktop\1TOPS project\RISCFORGE_1TOPS-main\rtl\ips\benchmarks\tests\test_preflight.py", line 37, in test_repeated_word_address_is_rejected
+    with self.assertRaises(PreflightError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PreflightError not raised
+
+======================================================================
+FAIL: test_sparse_address_cannot_escape_sram (test_preflight.FirmwarePreflightTests.test_sparse_address_cannot_escape_sram)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\cj\Desktop\1TOPS project\RISCFORGE_1TOPS-main\rtl\ips\benchmarks\tests\test_preflight.py", line 29, in test_sparse_address_cannot_escape_sram
+    with self.assertRaises(PreflightError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PreflightError not raised
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.041s
+
+FAILED (failures=3, errors=1)

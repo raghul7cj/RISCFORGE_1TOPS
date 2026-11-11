@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boot Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan Rev B / Boot</span></div>
+<div class="wrap">
+
+<h1>Boot Verification</h1>
+<p class="lead">How Rev B section 12 plans to verify the path from flash to the first fetched instruction: every loader state, every failure branch, the handoff to the core, and the cost of a boot. The loader design itself is on <a href="soc_bootloader.html">the bootloader page</a>; this page covers only what is checked.</p>
+<p class="meta">Scope: Rev B section 12 | Sources: Rev B plan, <code>bootloader/bootloader.sv</code>, <code>RTL_SOC/riscforge_soc_subsystem.sv</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">The asymmetry that shapes the plan</a></li>
+<li><a href="#s2">Boot chain table</a></li>
+<li><a href="#s3">Image source and transport</a></li>
+<li><a href="#s4">Bootloader FSM checks</a></li>
+<li><a href="#s5">Integrity checking</a></li>
+<li><a href="#s6">Failure paths</a></li>
+<li><a href="#s7">Handoff to the core</a></li>
+<li><a href="#s8">SPI release versus image source</a></li>
+<li><a href="#s9">Cycle budget and the fast-boot backdoor</a></li>
+<li><a href="#s10">Memory initialisation</a></li>
+<li><a href="#s11">Decisions and limits</a></li>
+</ol></div>
+
+<div class="warn"><b>Rev B versus the RTL on disk.</b> Rev B line numbers for the SoC top come from an earlier file; the loader line numbers used here still match the current <code>bootloader.sv</code>. The current SoC also filters <code>soft_rst_ni</code> before it reaches the loader (<code>soc:1395</code>), which touches the warm-boot path; see <a href="vf_reset_clock.html">reset and clock verification</a>. No check on this page has been run; P0 is in progress (13 of 20 exit criteria met per <code>Verification/status/PHASE_STATUS.md</code>).</div>
+
+<h2 id="s1">1. The asymmetry that shapes the plan</h2>
+<p>The loader can run from reset and nothing else can. Until it reaches <code>S_CLEAN_RELEASE</code> the SPI master is the only peripheral out of reset; I2C, both timers, UART and GPIO are held by <code>periph_rst_n</code>. So at the moment a load fails there is no LED, UART or GPIO signature available, and any externally observable failure behaviour needs an RTL change. That is why Rev B specifies a failure signature (BOOT-S4) rather than observing one. The release order is on <a href="vf_reset_clock.html">the reset page</a>.</p>
+
+<h2 id="s2">2. Boot chain table</h2>
+<p>Figure 1 shows the chain with the check points; the table gives each link, its locator and whether it exists. "Specified" means Rev B requires it and the RTL does not have it.</p>
+<figure>
+<svg viewBox="0 0 1040 416" role="img" aria-label="Boot chain from flash through the SPI master, loader FSM and crossbar into the SRAMs, then reset release and first fetch, with check points">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ext" x="24" y="90" width="150" height="56" rx="6"/>
+<text class="tb mid" x="99" y="114.5">SPI NOR flash</text>
+<text class="ts mid" x="99" y="129.5">CS0, opcode 0x03</text>
+<rect class="bx-ver" x="24" y="24" width="150" height="36" rx="6"/>
+<text class="tb mid" x="99" y="46.0">BOOT-01, BOOT-07</text>
+<path class="ar-ver" d="M99 60 V90"/>
+<rect class="bx-per" x="214" y="90" width="150" height="56" rx="6"/>
+<text class="tb mid" x="289" y="114.5">SPI master</text>
+<text class="ts mid" x="289" y="129.5">APB slot 4</text>
+<rect class="bx-ver" x="214" y="24" width="150" height="36" rx="6"/>
+<text class="tb mid" x="289" y="46.0">BOOT-05,06,15,17</text>
+<path class="ar-ver" d="M289 60 V90"/>
+<rect class="bx-ctrl" x="404" y="90" width="150" height="56" rx="6"/>
+<text class="tb mid" x="479" y="114.5">Bootloader FSM</text>
+<text class="ts mid" x="479" y="129.5">16 states</text>
+<rect class="bx-ver" x="404" y="24" width="150" height="36" rx="6"/>
+<text class="tb mid" x="479" y="46.0">BOOT-02..04, 10..12</text>
+<path class="ar-ver" d="M479 60 V90"/>
+<rect class="bx-bus" x="594" y="90" width="150" height="56" rx="6"/>
+<text class="tb mid" x="669" y="114.5">Crossbar SLV1</text>
+<text class="ts mid" x="669" y="129.5">AXI-Lite, priv writes</text>
+<rect class="bx-ver" x="594" y="24" width="150" height="36" rx="6"/>
+<text class="tb mid" x="669" y="46.0">BOOT-03,08,09,18</text>
+<path class="ar-ver" d="M669 60 V90"/>
+<rect class="bx-mem" x="784" y="90" width="232" height="56" rx="6"/>
+<text class="tb mid" x="900" y="114.5">ISRAM 32 KB, DSRAM 32 KB</text>
+<text class="ts mid" x="900" y="129.5">written word by word</text>
+<rect class="bx-ver" x="784" y="24" width="232" height="36" rx="6"/>
+<text class="tb mid" x="900" y="46.0">PATH-0008 to 0010 (consumed)</text>
+<path class="ar-ver" d="M900 60 V90"/>
+<path class="ar" d="M174 118 H214"/>
+<path class="ar" d="M364 118 H404"/>
+<path class="ar" d="M554 118 H594"/>
+<path class="ar" d="M744 118 H784"/>
+<path class="ar" d="M479 146 V198 H119 V250"/>
+<text class="ts mid" x="300" y="192">after the last word</text>
+<rect class="bx-ctrl" x="24" y="250" width="190" height="56" rx="6"/>
+<text class="tb mid" x="119" y="274.5">S_CLEAN_RELEASE</text>
+<text class="ts mid" x="119" y="289.5">core, periph, spi high</text>
+<rect class="bx-ver" x="24" y="330" width="190" height="36" rx="6"/>
+<text class="tb mid" x="119" y="352.0">BOOT-11 to 13</text>
+<path class="ar-ver" d="M119 330 V306"/>
+<rect class="bx-ctrl" x="254" y="250" width="150" height="56" rx="6"/>
+<text class="tb mid" x="329" y="274.5">boot_done_o</text>
+<text class="ts mid" x="329" y="289.5">one cycle later</text>
+<rect class="bx-ver" x="254" y="330" width="150" height="36" rx="6"/>
+<text class="tb mid" x="329" y="352.0">BOOT-14</text>
+<path class="ar-ver" d="M329 330 V306"/>
+<rect class="bx-mem" x="444" y="250" width="170" height="56" rx="6"/>
+<text class="tb mid" x="529" y="274.5">BootROM at 0x0</text>
+<text class="ts mid" x="529" y="289.5">lui sp; jal</text>
+<rect class="bx-ver" x="444" y="330" width="170" height="36" rx="6"/>
+<text class="tb mid" x="529" y="352.0">BOOT-13, PATH-0001 to 3</text>
+<path class="ar-ver" d="M529 330 V306"/>
+<rect class="bx-mem" x="654" y="250" width="190" height="56" rx="6"/>
+<text class="tb mid" x="749" y="274.5">ISRAM base 0x0001_0000</text>
+<text class="ts mid" x="749" y="289.5">first loaded word</text>
+<rect class="bx-ver" x="654" y="330" width="190" height="36" rx="6"/>
+<text class="tb mid" x="749" y="352.0">BOOT-13</text>
+<path class="ar-ver" d="M749 330 V306"/>
+<rect class="bx-bus" x="884" y="250" width="132" height="56" rx="6"/>
+<text class="tb mid" x="950" y="274.5">ISRAM locked</text>
+<text class="ts mid" x="950" y="289.5">writes rejected</text>
+<rect class="bx-ver" x="884" y="330" width="132" height="36" rx="6"/>
+<text class="tb mid" x="950" y="352.0">PATH-0009, 0010</text>
+<path class="ar-ver" d="M950 330 V306"/>
+<path class="ar" d="M214 278 H254"/>
+<path class="ar" d="M404 278 H444"/>
+<path class="ar" d="M614 278 H654"/>
+<path class="ar" d="M844 278 H884"/>
+<text class="ts start" x="24" y="396">Teal boxes are check points. Row 1 is the load phase; row 2 is the handoff. Every BOOT-n check needs a real boot (backdoor-ineligible).</text>
+</svg>
+<figcaption><b>Figure 1.</b> Boot chain. Row 1 is the load (flash to SRAM); row 2 is the handoff. Teal boxes name the checks that observe each link; none of them can run from a backdoor-loaded image.</figcaption>
+</figure><div class="tablewrap"><table>
+<thead><tr><th>Link</th><th>What exists in RTL</th><th>Locator</th><th>State</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td>Image source</td><td>SPI NOR flash, chip select 0, opcode 0x03, 24-bit address from byte 0; length is a compile-time parameter pair, not a header</td><td><code>bootloader/bootloader.sv:151,155,174</code></td><td><span class="tag exists">EXISTS</span></td><td>BOOT-01, 07</td></tr><tr><td>Transport, control</td><td>Loader is APB master to <code>apb_spi_master</code> on slot 4; the bridge reaches the SPI master through the loader's passthrough</td><td><code>bootloader.sv:493-516</code></td><td><span class="tag exists">EXISTS</span></td><td>BOOT-05, 06, 15</td></tr><tr><td>Transport, data</td><td>Loader is AXI-Lite master on crossbar SLV1, privileged writes only, into both SRAMs; RX words byte-swapped</td><td><code>bootloader.sv:548,655-659</code></td><td><span class="tag exists">EXISTS</span></td><td>BOOT-03, 08, 09</td></tr><tr><td>Chunking</td><td>One trigger per chunk of at most <code>MAX_CHUNK_WORDS</code>; deployed image is one chunk</td><td><code>bootloader.sv:172,681-693</code></td><td><span class="tag exists">EXISTS</span></td><td>BOOT-06, 07</td></tr><tr><td>FSM</td><td>16 states, no error state, one absorbing terminal state</td><td><code>bootloader.sv:309-326</code></td><td><span class="tag exists">EXISTS</span></td><td>BOOT-01 to 16</td></tr><tr><td>Integrity check</td><td>None: no magic, length field, checksum or signature</td><td><code>bootloader.sv:282-303</code> (assertions only)</td><td><span class="tag specified">SPECIFIED</span> ASSUMED(D-029)</td><td>BOOT-S1, S2</td></tr><tr><td>Error-response checking</td><td><code>pslverr</code> and AXI <code>b.resp</code> are never examined; advance is on PREADY or <code>b_valid</code> alone</td><td><code>bootloader.sv</code>: <code>pslverr</code> appears only at lines 119 and 510</td><td><span class="tag exists">EXISTS</span> absence confirmed; checking <span class="tag specified">SPECIFIED</span></td><td>BOOT-19, S6</td></tr><tr><td>Failure path</td><td>None; the <code>default</code> arm is unreachable</td><td><code>bootloader.sv:309-326</code></td><td><span class="tag specified">SPECIFIED</span></td><td>BOOT-S3, S4</td></tr><tr><td>Load-phase timeout</td><td>None on the AXI side (loader port excluded from the monitor); the SPI slot monitor can only complete a transfer with garbage</td><td>Rev B 12.2 (<code>soc:1306-1307,468</code> in its numbering)</td><td><span class="tag open">OPEN</span> not re-read at current line numbers</td><td>BOOT-18, S5</td></tr><tr><td>Handoff</td><td><code>core_rst_n</code>, <code>periph_rst_n</code>, <code>spi_rst_n</code> high in <code>S_CLEAN_RELEASE</code>; <code>boot_done_o</code> one cycle later</td><td><code>bootloader.sv:733-738</code></td><td><span class="tag exists">EXISTS</span></td><td>BOOT-13, 14</td></tr><tr><td>Core state at handoff</td><td><code>mstatus</code> and <code>mtvec</code> at reset value 0; MIE = 0</td><td><code>riscv_core/rtl/csr_regfile.v:142</code> (mtvec); mstatus per Rev B</td><td><span class="tag exists">EXISTS</span> mtvec; mstatus not re-read</td><td>BOOT-13, N9</td></tr><tr><td>First fetch</td><td>Reset PC 0 wired at the core; BootROM holds <code>lui sp</code> then <code>jal</code> to 0x0001_0000</td><td><code>RTL_SOC/riscforge_soc_subsystem.sv:1245</code></td><td><span class="tag exists">EXISTS</span> PC; image per Rev B</td><td>BOOT-13, PATH-0001 to 3</td></tr><tr><td>Post-handoff lockout</td><td>ISRAM AXI port rejects accesses once <code>boot_done_o</code> is high; DSRAM does not</td><td><code>soc:818</code> (<code>reject_i</code>)</td><td><span class="tag exists">EXISTS</span></td><td>PATH-0009, 0010</td></tr>
+</tbody>
+</table></div>
+<p>Related: <a href="soc_memory_boot_path.html">memory and boot path</a>, <a href="soc_architecture.html">SoC architecture</a>.</p>
+
+<h2 id="s3">3. Image source and transport</h2>
+<p>The only image source is SPI NOR flash; the loader is the sole reader and the core is held in reset for the whole load. Transport has two halves. Control is APB through slot 4: the loader sits between the bridge and the SPI master and answers its own slave port with ready, zero data and no error because the core is in reset. During the load the direction of the path scoreboard is therefore bridge-to-loader, not bridge-to-peripheral, and Rev B asks the architecture owner to tell the scoreboard which is live. Data is AXI-Lite on crossbar SLV1, write-only, every write privileged so it can pass the ISRAM privilege gate that rejects the core's own writes.</p>
+<p>The image length is a build parameter, 64 instruction words and 0 data words as deployed (<code>soc:242-243</code> in the current file). The generator writes one little-endian stream with no header, so nothing in the medium can be checked. A second transport, a hardware image-load port for a backdoor, is specified only (ASSUMED(D-028)).</p>
+
+<h2 id="s4">4. Bootloader FSM checks</h2>
+<p>The FSM is a 16-value enum on 4 bits. Only one wait has a bound, and it is a fixed count, not a timeout.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>State</th><th>Leaves when</th><th>Bound</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td><code>S_RESET</code></td><td>Warm flag set goes to <code>S_CLEAN_ASSERT</code>; else to <code>S_CLEAR_SRAM</code> or <code>S_FLASH_WAIT</code></td><td>1 cycle</td><td>BOOT-01, 02</td></tr><tr><td><code>S_CLEAR_SRAM</code></td><td><code>b_valid</code> and word counter at 16384</td><td>Unbounded</td><td>BOOT-03, 18</td></tr><tr><td><code>S_FLASH_WAIT</code></td><td>Counter reaches <code>FLASH_POWERUP_CYCLES</code> (30000 deployed)</td><td>Fixed count, simulation alignment</td><td>BOOT-04</td></tr><tr><td><code>S_INIT_CLKDIV</code>, <code>_SPICMD</code>, <code>_SPIDUM</code></td><td>APB phase and PREADY</td><td>Unbounded</td><td>BOOT-05</td></tr><tr><td><code>S_INIT_SPILEN</code>, <code>S_CFG_SPIADR</code>, <code>S_TRIGGER</code></td><td>APB phase and PREADY, once per chunk</td><td>Unbounded</td><td>BOOT-06, 07</td></tr><tr><td><code>S_READ_FIFO</code></td><td>APB read PREADY; stalls as long as the SPI master needs</td><td>Unbounded</td><td>BOOT-08, 19, N4</td></tr><tr><td><code>S_WRITE_SRAM</code></td><td><code>b_valid</code></td><td>Unbounded</td><td>BOOT-09, 18</td></tr><tr><td><code>S_CHECK_DONE</code></td><td>Counter at <code>TOTAL_WORDS</code> goes to clean-slate; else next chunk or word</td><td>1 cycle per word</td><td>BOOT-10, 07</td></tr><tr><td><code>S_CLEAN_ASSERT</code></td><td>Unconditionally; drives three resets low</td><td>1 cycle</td><td>BOOT-11</td></tr><tr><td><code>S_CLEAN_HOLD</code></td><td><code>RESET_HOLD_CYCLES</code> = 4 reached</td><td>Fixed count</td><td>BOOT-12</td></tr><tr><td><code>S_CLEAN_RELEASE</code></td><td>Unconditionally; drives three resets high</td><td>1 cycle</td><td>BOOT-13</td></tr><tr><td><code>S_DONE</code></td><td>Never; APB passthrough, <code>boot_done_o</code> high</td><td>Absorbing</td><td>BOOT-15, 16</td></tr>
+</tbody>
+</table></div>
+<p>Three structural properties each need a check because no waveform at one moment proves them:</p>
+<ul>
+<li><b>BOOT-17:</b> <code>spi_rst_n</code> is high in every load state and low only before <code>S_RESET</code> exits and inside the clean-slate window.</li>
+<li><b>BOOT-19:</b> no state has a failure exit; every advance is conditional on presence, never quality.</li>
+<li><b>BOOT-18:</b> two states (<code>S_CLEAR_SRAM</code>, <code>S_WRITE_SRAM</code>) wait forever on <code>b_valid</code> and the loader's port is excluded from the AXI timeout monitor. This is recorded as a known hole; BOOT-S5 adds the bound.</li>
+</ul>
+<p>The <code>default</code> arm is unreachable (16 members on 4 bits) and must not be described as an abort path.</p>
+
+<h2 id="s5">5. Integrity checking</h2>
+<p>There is none. An exhaustive search of the loader for crc, checksum, magic, verify and integrity finds only elaboration-time parameter assertions. A garbled, short or absent image therefore produces the same observable outcome as a good one: the counter reaches its target and the core is released. Rev B specifies the minimum that makes failure detectable and visible (ASSUMED(D-029)); a signature scheme is out of scope.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Check</th><th>Specified mechanism</th><th>Required observable</th><th>RTL changes</th></tr></thead>
+<tbody>
+<tr><td>BOOT-S1</td><td>Magic word and length field at the head of the image; length replaces compiled-in count</td><td>Core not released</td><td>1</td></tr><tr><td>BOOT-S2</td><td>Checksum or CRC over the payload, compared before the clean-slate sequence</td><td>Core not released; failure recorded</td><td>1</td></tr><tr><td>BOOT-S3</td><td>A failure terminal state distinct from <code>S_DONE</code></td><td><code>boot_done_o</code> low, ISRAM lockout stays closed</td><td>1</td></tr><tr><td>BOOT-S4</td><td>A failure signature the loader can emit: early <code>periph_rst_n</code> release or a boot-status output</td><td>Distinguishable pattern, stable until reset</td><td>1</td></tr><tr><td>BOOT-S5</td><td>Load-phase timeout on the loader's AXI port and on the whole load</td><td>Loader enters BOOT-S3</td><td>1</td></tr><tr><td>BOOT-S6</td><td>Check <code>pslverr</code> and <code>b.resp</code> on every load transfer</td><td>Loader enters BOOT-S3</td><td>1</td></tr>
+</tbody>
+</table></div>
+<p>Six RTL changes. BOOT-S4 is the only one with a fabric-visible effect, because releasing <code>periph_rst_n</code> early changes the release order, so it must be raised as a change to that order. A failure path without BOOT-S4 is one no test can observe.</p>
+
+<h2 id="s6">6. Failure paths</h2>
+<p>Rev B Table 12.3 is exhaustive over the six causes in the finding it answers, plus three the RTL makes reachable. Figure 2 shows where each ends up; Figure 3 shows what today's RTL does and what each needs. A row whose today and required behaviour agree passes now; any other row is a directed negative test that must fail until the change lands, then be re-baselined.</p>
+<figure>
+<svg viewBox="0 0 1040 452" role="img" aria-label="Failure-path tree: nine boot failure causes lead to three outcomes, each needing a specified response">
+
+<rect class="bx-ctrl" x="24" y="190" width="150" height="56" rx="6"/>
+<text class="tb mid" x="99" y="207.0">Failure causes</text>
+<text class="ts mid" x="99" y="222.0">none has a detector</text>
+<text class="ts mid" x="99" y="237.0">in RTL (except N3)</text>
+<line class="ln" x1="209" y1="48" x2="209" y2="408"/>
+<path class="ln" d="M174 218 H209"/>
+<rect class="bx" x="244" y="30" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="52.0">N1 bad magic</text>
+<path class="ar" d="M209 48 H244"/>
+<rect class="bx" x="244" y="74" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="96.0">N2 short image (length)</text>
+<path class="ar" d="M209 92 H244"/>
+<rect class="bx" x="244" y="118" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="140.0">N3 image longer than SRAM</text>
+<path class="ar" d="M209 136 H244"/>
+<rect class="bx" x="244" y="162" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="184.0">N4 bad checksum or word</text>
+<path class="ar" d="M209 180 H244"/>
+<rect class="bx" x="244" y="206" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="228.0">N5 SPI never ready (timeout)</text>
+<path class="ar" d="M209 224 H244"/>
+<rect class="bx" x="244" y="250" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="272.0">N6 image absent, error reply</text>
+<path class="ar" d="M209 268 H244"/>
+<rect class="bx" x="244" y="294" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="316.0">N7 transfer never completes</text>
+<path class="ar" d="M209 312 H244"/>
+<rect class="bx" x="244" y="338" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="360.0">N8 SRAM AXI path wedged</text>
+<path class="ar" d="M209 356 H244"/>
+<rect class="bx" x="244" y="382" width="230" height="36" rx="6"/>
+<text class="tb mid" x="359" y="404.0">N9 trap before mtvec written</text>
+<path class="ar" d="M209 400 H244"/>
+<line class="ln" x1="509" y1="48" x2="509" y2="268"/>
+<line class="ln" x1="509" y1="312" x2="509" y2="356"/>
+<line class="ln" x1="474" y1="48" x2="509" y2="48"/>
+<line class="ln" x1="474" y1="92" x2="509" y2="92"/>
+<line class="ln" x1="474" y1="136" x2="509" y2="136"/>
+<line class="ln" x1="474" y1="180" x2="509" y2="180"/>
+<line class="ln" x1="474" y1="224" x2="509" y2="224"/>
+<line class="ln" x1="474" y1="268" x2="509" y2="268"/>
+<line class="ln" x1="474" y1="312" x2="509" y2="312"/>
+<line class="ln" x1="474" y1="356" x2="509" y2="356"/>
+<path class="ar-bad" d="M509 158 H544"/>
+<path class="ar-bad" d="M509 334 H544"/>
+<path class="ar-bad" d="M474 408 H544"/>
+<rect class="bx-per" x="544" y="128" width="260" height="60" rx="6"/>
+<text class="tb mid" x="674" y="147.0">Core released with bad image</text>
+<text class="ts mid" x="674" y="162.0">N5: monitor completes the read</text>
+<text class="ts mid" x="674" y="177.0">with 0xDEAD_BEEF</text>
+<rect class="bx-per" x="544" y="306" width="260" height="56" rx="6"/>
+<text class="tb mid" x="674" y="330.5">Boot hangs, nothing visible</text>
+<text class="ts mid" x="674" y="345.5">no timeout on the load</text>
+<rect class="bx-per" x="544" y="388" width="260" height="40" rx="6"/>
+<text class="tb mid" x="674" y="412.0">Core wedges after handoff</text>
+<rect class="bx-mem" x="844" y="128" width="172" height="300" rx="6"/>
+<text class="tb mid" x="930" y="252.0">Required response</text>
+<text class="ts mid" x="930" y="267.0">BOOT-S3 failure state</text>
+<text class="ts mid" x="930" y="282.0">core stays in reset</text>
+<text class="ts mid" x="930" y="297.0">BOOT-S4 signature</text>
+<text class="ts mid" x="930" y="312.0">BOOT-S1 to S6</text>
+<path class="ar-ver" d="M804 158 H844"/>
+<path class="ar-ver" d="M804 334 H844"/>
+<path class="ar-ver" d="M804 408 H844"/>
+</svg>
+<figcaption><b>Figure 2.</b> Failure-path tree. Eight of the nine causes have no detection point in RTL; N3 is caught only at elaboration. All three outcomes need the same required response.</figcaption>
+</figure><figure>
+<svg viewBox="0 0 1040 504" role="img" aria-label="Matrix of boot scenarios showing today's RTL behaviour and the change each needs">
+
+<text class="tb" x="24" y="36">Scenario</text><text class="tb" x="340" y="36">Today (RTL)</text><text class="tb" x="660" y="36">Needs</text><text class="tb" x="930" y="36">Real boot</text>
+<rect class="lane" x="16" y="48" width="1008" height="32"/>
+<text class="t" x="24" y="69">BOOT-N1 bad magic</text>
+<rect class="bx-per" x="340" y="53" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="68">released silently</text>
+<text class="t" x="660" y="69">BOOT-S1, S3, S4</text>
+<text class="t mid" x="960" y="69">yes</text>
+<text class="t" x="24" y="101">BOOT-N2 short image</text>
+<rect class="bx-per" x="340" y="85" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="100">reads past end, released</text>
+<text class="t" x="660" y="101">BOOT-S1</text>
+<text class="t mid" x="960" y="101">yes</text>
+<rect class="lane" x="16" y="112" width="1008" height="32"/>
+<text class="t" x="24" y="133">BOOT-N3 image too long</text>
+<rect class="bx-ctrl" x="340" y="117" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="132">elaboration assert only</text>
+<text class="t" x="660" y="133">BOOT-S1, S6</text>
+<text class="t mid" x="960" y="133">yes</text>
+<text class="t" x="24" y="165">BOOT-N4 corrupted word</text>
+<rect class="bx-per" x="340" y="149" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="164">released silently</text>
+<text class="t" x="660" y="165">BOOT-S2</text>
+<text class="t mid" x="960" y="165">yes</text>
+<rect class="lane" x="16" y="176" width="1008" height="32"/>
+<text class="t" x="24" y="197">BOOT-N5 SPI never ready</text>
+<rect class="bx-per" x="340" y="181" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="196">monitor completes, garbage</text>
+<text class="t" x="660" y="197">BOOT-S6</text>
+<text class="t mid" x="960" y="197">yes</text>
+<text class="t" x="24" y="229">BOOT-N6 image absent</text>
+<rect class="bx-per" x="340" y="213" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="228">stores whatever prdata is</text>
+<text class="t" x="660" y="229">BOOT-S6, S2</text>
+<text class="t mid" x="960" y="229">yes</text>
+<rect class="lane" x="16" y="240" width="1008" height="32"/>
+<text class="t" x="24" y="261">BOOT-N7 load never ends</text>
+<rect class="bx-ctrl" x="340" y="245" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="260">core held forever</text>
+<text class="t" x="660" y="261">BOOT-S5, S4</text>
+<text class="t mid" x="960" y="261">yes</text>
+<text class="t" x="24" y="293">BOOT-N8 SRAM path wedged</text>
+<rect class="bx-ctrl" x="340" y="277" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="292">hang, no fault raised</text>
+<text class="t" x="660" y="293">BOOT-S5</text>
+<text class="t mid" x="960" y="293">yes</text>
+<rect class="lane" x="16" y="304" width="1008" height="32"/>
+<text class="t" x="24" y="325">BOOT-N9 early trap</text>
+<rect class="bx-ctrl" x="340" y="309" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="324">silent hang at handoff</text>
+<text class="t" x="660" y="325">firmware sets mtvec first</text>
+<text class="t mid" x="960" y="325">yes</text>
+<text class="t" x="24" y="357">BOOT-17 SPI release order</text>
+<rect class="bx-mem" x="340" y="341" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="356">holds by construction</text>
+<text class="t" x="660" y="357">keep as a check</text>
+<text class="t mid" x="960" y="357">yes</text>
+<rect class="lane" x="16" y="368" width="1008" height="32"/>
+<text class="t" x="24" y="389">BOOT-14 one-cycle window</text>
+<rect class="bx-mem" x="340" y="373" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="388">holds by construction</text>
+<text class="t" x="660" y="389">keep as a check</text>
+<text class="t mid" x="960" y="389">yes</text>
+<text class="t" x="24" y="421">Cycle budget measurement</text>
+<rect class="bx-ext" x="340" y="405" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="420">estimate only</text>
+<text class="t" x="660" y="421">directed measurement test</text>
+<text class="t mid" x="960" y="421">yes</text>
+<rect class="lane" x="16" y="432" width="1008" height="32"/>
+<text class="t" x="24" y="453">Backdoor equivalence</text>
+<rect class="bx-ext" x="340" y="437" width="260" height="22" rx="4"/>
+<text class="ts mid" x="470" y="452">backdoor not built</text>
+<text class="t" x="660" y="453">D-028, comparator</text>
+<text class="t mid" x="960" y="453">yes</text>
+<text class="ts start" x="24" y="488">Red: boot completes or hangs with no detection. Amber: partial or elaboration-only. Green: passes today. Grey: not yet built.</text>
+</svg>
+<figcaption><b>Figure 3.</b> Boot scenario matrix. All thirteen rows are real-boot-only. The two green rows pass by construction and exist to keep them that way.</figcaption>
+</figure>
+<p><b>BOOT-N5 inverts the usual expectation.</b> The SPI slot's 65536-cycle timeout monitor answers a stuck read with ready, an error and the value 0xDEAD_BEEF; the loader ignores the error and writes that word into ISRAM as an instruction. The monitor then latches the slot as blocked, so the rest of the image is deposited in a few cycles and the boot completes normally. The monitor must not be cited as boot protection.</p>
+<p><b>BOOT-N9 is a silent hang, not a fault.</b> <code>mtvec</code> resets to 0, the BootROM base; the handler runs off the 16-word ROM into an address in neither fetch range, where there is no grant, no data and no error. It is distinct from the range-coverage check PATH-0002, which catches the same defect class at the demux; triage must keep them apart.</p>
+
+<h2 id="s7">7. Handoff to the core</h2>
+<p><b>Release.</b> The loader releases the core in <code>S_CLEAN_RELEASE</code>; <code>boot_done_o</code> rises one cycle later. For exactly one cycle the core is running and the ISRAM lockout is not yet closed; that window is BOOT-14.</p>
+<p><b>What the core sees.</b> <code>mstatus</code> and <code>mtvec</code> are at reset value 0, so MIE is 0 and an interrupt asserted during or after the load is pending but not taken until firmware enables it. The trap vector is the BootROM base, so firmware must write <code>mtvec</code> before any instruction that can trap; that obligation belongs in the firmware specification.</p>
+<p><b>Where it starts.</b> Reset PC is 0 (<code>soc:1245</code>), the BootROM's first word is available without a bubble, <code>lui sp</code> places the stack at the top of DSRAM, and <code>jal</code> enters the ISRAM base. PATH-0001 to PATH-0003 score the fetch path and PATH-0009 and PATH-0010 the lockout; this page consumes them and does not redefine them. Interrupt behaviour after handoff is on <a href="vf_interrupt_verification.html">the interrupt page</a>.</p>
+<p><b>Correction owed.</b> The dedicated ISRAM write-protection test describes writing a pattern through the core's data port. That is not executable: the core cannot write ISRAM by any route, because its accesses reach the ISRAM interface unprivileged and are rejected. The check is sound; its stimulus is not, and the fix belongs to the owner of the SRAM-path scoreboard.</p>
+
+<h2 id="s8">8. SPI release versus image source</h2>
+<p>The architecture diagram places the SPI release after the boot image source. Because the image comes from SPI flash, that order would deadlock on the first fetch. The required order is: <code>spi_rst_n</code> released, and the SPI master clocking, before the first APB access (<code>S_INIT_CLKDIV</code>); in state terms, released on leaving <code>S_RESET</code>. The RTL does this (<code>bootloader.sv:720-726</code>), BOOT-17 keeps it so, and the correct overall order is: <code>sys_rst_n</code>, then <code>spi_rst_n</code>, then <code>core_rst_n</code> and <code>periph_rst_n</code> together. A second reason decides it if argued: the SPI master is the only peripheral available during the load, so any failure signature must come from it or from a dedicated output, and the cheapest route is an early <code>periph_rst_n</code> release (BOOT-S4).</p>
+
+<h2 id="s9">9. Cycle budget and the fast-boot backdoor</h2>
+<p>This section owns the boot cost; the soak campaign cites it. The budget below is a derived estimate and must be replaced by a directed measurement from reset release to the first retired instruction at address 0 for the deployed image. Until then no phase plan may cite a boot duration as evidence.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>Value</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>Flash power-up wait</td><td>30000 cycles at <code>clk_i</code></td><td>Simulation alignment to a vendor model; not in a silicon budget</td></tr><tr><td>SRAM clear</td><td>16384 words x AXI-Lite write cost</td><td>Dominant term; skipped on warm boot</td></tr><tr><td>Image transfer</td><td>64 x (320 + 8) cycles</td><td>32 bits x 2 x (SPI_CLK_DIV + 1) = 320 serial cycles per word at divider 4; 8 overhead assumed</td></tr><tr><td>Clean-slate sequence</td><td>4 + 3 cycles</td><td>Hold count plus three single-cycle states</td></tr><tr><td>Total, cold boot</td><td>About 133000 cycles at <code>clk_i</code></td><td>30000 + 16384 x 5 + 64 x 328 + 7 = 132919. Budget, not measurement; coefficients 5 and 8 are ASSUMED(D-027)</td></tr>
+</tbody>
+</table></div>
+<p>The RTL comment of about 121k cycles carries the same divisor error and is not independent corroboration.</p>
+<p><b>Backdoor equivalence.</b> A backdoor that deposits the image and releases the core is close to mandatory for any campaign of hundreds of tests, and is also the easiest way to pass everything while proving nothing about start-up. Equivalence therefore means all of the following match:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>What must match</th><th>Oracle</th></tr></thead>
+<tbody>
+<tr><td>Every word of both SRAMs at the release edge (all 16384 words)</td><td>Boot equivalence comparator diffing a real boot against a backdoor run under the same seed</td></tr><tr><td>Cycle of <code>core_rst_n</code> rising and the other two reset levels in that cycle</td><td>Same comparator, on recorded transition cycles</td></tr><tr><td>SPI master state: clocked, out of reset, burst drained, FIFO empty</td><td>SPI device-state model comparison; differences declared and dependent checks excluded</td></tr><tr><td>First retired instructions from 0x0</td><td>Retire-map signature over the first N retirements</td></tr><tr><td>Boot-time observables the fast path skips</td><td>None possible: eligibility is a declaration</td></tr>
+</tbody>
+</table></div>
+<p><b>Eligibility rule.</b> Every BOOT-01 to BOOT-20 check, every failure-path row and every FSM state is backdoor-ineligible. A regression green from backdoor runs only has executed none of them and must be reported untested. The manifest carries a per-test boot mode, and an unhit boot check counts as absent stimulus, not as closed.</p>
+
+<h2 id="s10">10. Memory initialisation</h2>
+<p>Three memories are initialised three ways, two of them in simulation only; a testbench that relies on power-on content relies on something the design does not provide.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Memory</th><th>Initialisation</th><th>Hardware power-on content</th></tr></thead>
+<tbody>
+<tr><td>BootROM, 64 B</td><td>Initial block fills NOP then overlays the hex image by relative path; a missing file leaves a NOP sled silently, so the first two words must be compared at run time</td><td>Designed (ROM)</td></tr><tr><td>ISRAM, 32 KB</td><td>Simulation only: NOP fill and <code>$readmemh</code> under <code>ifndef SYNTHESIS</code></td><td>Undefined; <code>S_CLEAR_SRAM</code> is the only thing that defines it</td></tr><tr><td>DSRAM, 32 KB</td><td>None: no reset, initial block or readmem; X from elaboration</td><td>Undefined; deployed image has no data words, so the zeroing pass alone defines it</td></tr>
+</tbody>
+</table></div>
+<p>Not initialised, as a list: BootROM words 2 to 15 are NOP by design; ISRAM is NOP in simulation and undefined in hardware; DSRAM is undefined in both. A few peripheral identity registers reset non-zero (GPIO info, UART line status and divisor, SPI status). The loader's own state, including its three reset outputs, resets to a defined low value (<code>bootloader.sv:589-591</code>). Firmware that assumes a zeroed data section relies on the loader, and the firmware contract should say so.</p>
+
+<h2 id="s11">11. Decisions and limits</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Decision</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>D-027</td><td>Boot budget coefficients</td><td>5 cycles per AXI write, 8 per word of overhead</td></tr><tr><td>D-028</td><td>Fast-boot backdoor transport</td><td>Testbench deposit; a hardware port costs one RTL change</td></tr><tr><td>D-029</td><td>Integrity and failure requirements</td><td>As BOOT-S1 to S6, six RTL changes</td></tr>
+</tbody>
+</table></div>
+<p>This page does not claim any boot check has passed, does not specify the loader's design, and does not restate the release order. Rev B's SoC line numbers for the timeout monitor and the generator output were not re-read against the current file. See also <a href="vf_overview.html">verification overview</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B section 12 (<code>_src/RevB_plan.txt</code> lines 2731-3108); <code>bootloader/bootloader.sv</code> (state enum, reset outputs, parameters, soft-reset chain, <code>pslverr</code> search); <code>RTL_SOC/riscforge_soc_subsystem.sv</code> (parameters, loader connection, reset PC, lockout); <code>riscv_core/rtl/csr_regfile.v</code> (mtvec reset).</div>
+
+</div>
+</body>
+</html>

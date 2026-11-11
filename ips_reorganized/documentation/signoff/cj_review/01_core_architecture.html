@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Core, CSR and interrupt architecture — CJ review</title>
+  <link rel="stylesheet" href="report.css">
+</head>
+<body>
+<main class="sheet">
+<header>
+  <p class="eyebrow">RISCFORGE 1TOPS · CJ current documentation review · 11 November 2026</p>
+  <h1>Core, CSR and interrupt architecture</h1>
+  <p class="lede">A source-traced snapshot of the active pipeline, memory boundary and thirteen-source interrupt controller. Architecture decisions and qualification remain open.</p>
+  <p class="note"><strong>Review snapshot, not technical signoff.</strong> Static source and retained-evidence inspection only. No RTL/TB changes or new simulation. <a href="01_core_architecture.md">Detailed Markdown source</a> contains the full contracts, limitations and next actions.</p>
+  <p class="meta">Reviewed baseline: <code>verification_infra/ips_reorganized</code> at <code>a91edb7e666d5c374af70809703f52eb5513d96f</code>. Local <code>ips/</code> is an augmented offline copy, not a Git checkout; parent review collects current fingerprints.</p>
+</header>
+<nav aria-label="CJ review topics">
+  <a href="index.html">Review index</a>
+  <a href="01_core_architecture.html" aria-current="page">01 Core architecture</a>
+  <a href="02_verification_architecture.html">02 Verification architecture</a>
+  <a href="03_benchmark_spi_evidence.html">03 Benchmark and SPI evidence</a>
+  <a href="04_gate_readiness.html">04 Gate readiness</a>
+<a href="diagram_index.html">Structural views</a></nav>
+
+<section id="scope">
+<h2>1. Implementation is not an approved freeze</h2>
+<div class="facts">
+  <div><strong>As coded</strong><p>Five-stage RV32IM/Zicsr path; machine-only execution, no compressed decoder.</p></div>
+  <div><strong>Open contract</strong><p>ISA policy, M-only CSR semantics, precise effects, nesting and PLIC/CLINT/CLIC disposition.</p></div>
+  <div><strong>Evidence boundary</strong><p>Focused retained development checks and SoC elaboration; no broad campaign or signoff closure.</p></div>
+</div>
+<p>The <a href="../../../Verification/signoff/1TOPS_PROJECT_CHECKLIST.md">checklist index</a> supplies requirement names, not a replacement for the workbook. Its old status cells are historical. The <a href="../evidence_review_20261102/VERBAL_DECISIONS.md">verbal-decision record</a> supplies no per-item approval scope/person/date. This review assigns no approvals or waivers. CJ retains model, stimulus, coverage and closure ownership.</p>
+<table>
+<colgroup><col style="width:19%"><col style="width:39%"><col style="width:42%"></colgroup>
+<thead><tr><th>Requirements</th><th>Current source basis</th><th>Remaining decision / qualification</th></tr></thead>
+<tbody>
+<tr><td>G1 1.1 / 1.3</td><td>RV32IM/Zicsr; machine-only execution.</td><td>Freeze ISA revision, extension/encoding policy and MPP behavior.</td></tr>
+<tr><td>G1 1.4 / 1.5</td><td>CSR map, trap packet and WB redirect exist.</td><td>Approve masks/access failures, trap ordering and resume/nesting contract.</td></tr>
+<tr><td>G1 1.9</td><td>Cause 7 plus 16–27; capture modes and priority traced.</td><td>Freeze source/subevent map and rearm/service obligations.</td></tr>
+<tr><td>G2 2.7 / 2.9</td><td>LSU, CSR and trap logic coded; selected checks retained.</td><td>Independent sizes/errors/races/effects checking remains incomplete.</td></tr>
+<tr><td>G2 2.10</td><td>No C decoder; four-byte alignment; retained build uses RV32IM_Zicsr and norvc.</td><td>Explicit no-C N/A disposition still required; not inferred approved.</td></tr>
+<tr><td>G3 3.4 / 3.6</td><td>Custom controller; no integrated PLIC, CLINT or CLIC.</td><td>Mandatory wording mismatch: record accepted alternative or separately plan implementation.</td></tr>
+</tbody></table>
+</section><section id="structural-views"><figure class="structural-figure" id="fig-A1"><p class="view-original">Scroll horizontally on small screens, or <a href="figures/A1_structural.svg" aria-label="Open figure A1 as a scalable vector">open scalable original and zoom</a>.</p><div class="artwork"><img src="figures/A1_structural.svg" alt="Figure A1: Concurrent core pipeline, state and feedback"></div><figcaption><strong>Figure A1 — Concurrent core pipeline, state and feedback.</strong> Nested state bands are the stage-owned IF/ID, ID/EX, EX/MEM and MEM/WB registers. Result selection and trap commit are distinct instances.</figcaption><div class="interface-key"><p><strong>Interface key.</strong> Blue payload; teal result feedback; dashed amber hold/flush/redirect and forwarding selectors. IMEM has no core ready/valid handshake; LSU returns data/stall/error. System memory topology is shared in S1.</p><p><strong>Source key.</strong> <a href="../../../riscv_core/rtl/top.v">Core top</a> · <a href="../../../riscv_core/rtl/fetch_cycle.v">Fetch</a> · <a href="../../../riscv_core/rtl/decode_cycle.v">Decode</a> · <a href="../../../riscv_core/rtl/execute_cycle.v">Execute</a> · <a href="../../../riscv_core/rtl/memory_cycle.v">Memory</a> · <a href="../../../riscv_core/rtl/writeback_cycle.v">Result mux</a></p><p><strong>Accomplishment / evidence limit.</strong> Integrated owner/hold/cancel, load-preservation and redirect changes are present. Retained 10-Nov focused core-port 13 configurations and MDU-owner checks cover selected cases; no full workload, IRQ coincidence or unique-effect closure. <a href="../../../../artifacts/verification_infra_sync_20261110/validation/core/results.json">10-Nov core results</a> · <a href="../../../../artifacts/verification_infra_sync_20261110/validation/leaf/tb_mdu_owner.log">MDU owner checks</a></p></div></figure><figure class="structural-figure" id="fig-A2"><p class="view-original">Scroll horizontally on small screens, or <a href="figures/A2_structural.svg" aria-label="Open figure A2 as a scalable vector">open scalable original and zoom</a>.</p><div class="artwork"><img src="figures/A2_structural.svg" alt="Figure A2: IRQ capture, packet transport and CSR authority"></div><figcaption><strong>Figure A2 — IRQ capture, packet transport and CSR authority.</strong> Winner selection becomes a trap only through Execute acceptance, registered packet transport and WB commit. All shown control instances are inside top.</figcaption><div class="interface-key"><p><strong>Interface key.</strong> Raw bit 0 maps cause 7; bits 12:1 map causes 27:16. Pending also feeds CSR interrupt inputs. CSR read belongs to Execute; normal WB, trap and MRET update ports are separate. CSR mtvec/mepc/mstatus sidebands supply WB target/state (see top wiring).</p><p><strong>Source key.</strong> <a href="../../../riscv_core/rtl/top.v">Core integration</a> · <a href="../../../riscv_core/rtl/execute_cycle.v">EX acceptance</a> · <a href="../../../riscv_core/rtl/wb_trap_mret_commit_controller.v">WB controller</a> · <a href="../../../riscv_core/rtl/csr_regfile.v">CSR</a> · <a href="../../../RTL_SOC/riscforge_soc_subsystem.sv">SoC source map</a></p><p><strong>Accomplishment / evidence limit.</strong> Capture, selection, committed clear and RR feedback are implemented. Historical IRQ-unit evidence is scoped to separately driven blocks; real peripheral subevents, current-source integration and older CSR-write/IRQ ordering remain unqualified. <a href="../../../Verification/artifacts/xcelium_irq_20261030_004317/functional_summary.txt">IRQ functional summary</a> · <a href="../irq_event_commit_plan_20261104/PLAN.md">Real-event plan</a></p></div></figure></section>
+
+<section id="active">
+<h2>2. Active hierarchy and integrated parameters</h2>
+<p>The retained SoC check used <a href="../../../Verification/filelists/tier3_soc/soc_subsystem.f">the tier3 filelist</a>, with paths resolved from local <code>ips/</code>. It selects the actual <a href="../../../RTL_SOC/riscforge_soc_subsystem.sv#L1244">SoC core instance</a>, all core stages, IRQ/CSR controls and the external data router. It includes the UART OBI chain omitted by the <a href="../../../RTL_SOC/soc_subsystem.f">older convenience list</a>; copied headers claiming the chain is absent are stale. The duplicate core-local AXI package and legacy core/stub are not this active path.</p>
+<table><colgroup><col style="width:28%"><col style="width:72%"></colgroup><thead><tr><th>Boundary</th><th>Integrated setting / obligation</th></tr></thead><tbody>
+<tr><td>Reset and vector</td><td>Core default RESET_PC 0x80000000 is overridden to 0x0; demux vector also 0x0. ROM, demux and data router share core reset. Soft reset has two-flop synchronization and default 16-cycle filter; system/hard-only release chains have four flops.</td></tr>
+<tr><td>Fetch map</td><td>Checks enabled for [0,0x40) and [0x10000,0x18000) at default memory sizes. ROM is 64 B; ISRAM is 32 KiB.</td></tr>
+<tr><td>Data map</td><td>DSRAM [0x20000,0x28000); MMIO 0x40000000–0x4fffffff inclusive. ROM/ISRAM are not core data targets.</td></tr>
+</tbody></table>
+<p>See <a href="../../../RTL_SOC/riscforge_soc_subsystem.sv#L529">reset generation</a>, <a href="../../../RTL_SOC/instr_fetch_demux.sv">demux reset selection</a> and <a href="../../../RTL_SOC/boot_rom.sv">ROM address reset</a>. Startup depends on word-zero data and matching selector/vector reset. This is not reset/CDC signoff.</p>
+</section>
+
+<section id="isa-memory">
+<h2>3. ISA, JALR and memory contracts</h2>
+<p><a href="../../../riscv_core/rtl/Control_Unit_Top.v#L114">Field guards</a> now constrain opcode/funct3/funct7 and exact SYSTEM encodings, including ECALL, EBREAK, MRET and WFI. Older opcode-only descriptions are superseded. CSR-address policy remains separate. FENCE/FENCE.I have no dedicated fence action; WFI has no dedicated wait state. Their accepted encoding does not settle the intended extension/platform contract.</p>
+<div class="note"><strong>JALR #17 withdrawn.</strong> The mask already exists upstream of the EX alignment check. A raw sum ending 01 becomes 00; one ending 11 becomes 10 and still misaligns without C. Dedicated runtime low-bit coverage remains pending.</div>
+<pre aria-label="JALR decoder to alignment path">JALR opcode 1100111 (funct3 000)
+ Main_Decoder: ALUOp=11, immediate operand, PC+4 link
+ → ALU_Decoder: control 0110
+ → ALU: (forwarded rs1 + immediate) &amp; ~32'd1
+ → JB_unit JALR target selection → EX checks masked target[1:0]
+ aligned &amp; !StallM: redirect; otherwise taken misalignment: cause 0</pre>
+<p>Trace: <a href="../../../riscv_core/rtl/Main_Decoder.v">Main_Decoder</a> → <a href="../../../riscv_core/rtl/ALU_Decoder.v">ALU_Decoder</a> → <a href="../../../riscv_core/rtl/ALU.v#L46">ALU mask</a> → <a href="../../../riscv_core/rtl/execute_cycle.v#L280">execute target</a>. <a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/17">#17</a> is not an open missing-mask fix.</p>
+<div class="split">
+<div class="card"><h3>Fetch</h3><p><a href="../../../riscv_core/rtl/imem_controller.v">Controller</a> presents PC_next, or repeats PC when stalled; redirects bypass the address hold. A registered spec_tag causes the following drain hold. <a href="../../../riscv_core/rtl/fetch_cycle.v#L188">Map checks</a> use PCF; fallback alignment uses PC_next. Map miss wins and reports cause 1 with PCF as PC/tval. There is still no physical error/grant response into the core. <a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/19">#19</a> remains a timing investigation, not a new observed failure here.</p></div>
+<div class="card"><h3>Load/store</h3><p><a href="../../../riscv_core/rtl/memory_cycle.v">MEM</a> holds one LSU packet; <a href="../../../riscv_core/rtl/ls_unit.v">LSU</a> formats little-endian lanes. LB/LBU and SB allow all offsets; LH/LHU and SH allow 0/2; LW/SW allow 0. Alignment faults suppress bus issue. Address/bus errors report causes 5/7; misalignments 4/6. Data/error must be valid on nonstalled completion.</p></div>
+</div>
+<p>The <a href="../../../riscv_core/rtl/hybrid_mem_interface.sv">hybrid router</a> adds one native SRAM read stall interval, no native store wait, and waits for MMIO R/B completion with independent AW/W acceptance. Requests and payload stay stable while the pipeline holds. Full offsets, byte enables, latency/error cases and external accepted effects remain unqualified.</p>
+</section>
+
+<section id="csrs">
+<h2>4. CSR table and trap boundary</h2>
+<p>All stored CSRs reset to zero. <code>mip</code> reflects live inputs as well as reset-zero MSIP storage. Reads occur in EX; normal writes commit at WB. The following are <strong>implemented masks, not approved WARL conformance</strong>. Source: <a href="../../../riscv_core/rtl/csr_regfile.v">csr_regfile</a>.</p>
+<table><colgroup><col style="width:21%"><col style="width:29%"><col style="width:50%"></colgroup><thead><tr><th>Address / CSR</th><th>Normal write</th><th>Review detail</th></tr></thead><tbody>
+<tr><td>300 mstatus</td><td>Mask 0x188A</td><td>MIE, MPIE, writable MPP and SIE-position bit 1. MPP reset 00; trap/MRET set 11 without privilege transition.</td></tr>
+<tr><td>304 mie</td><td>Mask 0xFFFF0888</td><td>Only bits 7,27:16 affect arbitration.</td></tr>
+<tr><td>305 mtvec</td><td>Mask 0xFFFFFFFC</td><td>Direct-only via normal software writes. Vectored calculation exists but MODE=01 is not normally reachable.</td></tr>
+<tr><td>340 mscratch</td><td>Full RW</td><td>No context stack.</td></tr>
+<tr><td>341 mepc</td><td>Low two bits cleared</td><td>PR15 normal-write correction present; trap path copies packet PC directly. MRET target also masks low bits.</td></tr>
+<tr><td>342 mcause / 343 mtval</td><td>Full RW</td><td>Trap overwrites cause/value; interrupt tval is zero.</td></tr>
+<tr><td>344 mip</td><td>MSIP bit 3 only</td><td>Other pending bits are inputs; commit clears captured gateway events, not a mip write.</td></tr>
+<tr><td>7C0 mintprio</td><td>Low two bits</td><td>Software threshold; trap and MRET leave it unchanged.</td></tr>
+<tr><td>B00/B80 mcycle/h</td><td>RW counter halves</td><td>64-bit increment each nonreset clock; selected write half overrides its scheduled increment.</td></tr>
+<tr><td>B02/B82 minstret/h</td><td>RW counter halves</td><td>Counts valid_W &amp; ~exc_valid_W; held packet overcount remains open <a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/16">#16</a>.</td></tr>
+</tbody></table>
+<p><code>misa</code>, ID CSRs, user counter aliases, PMP, delegation, <code>mintlvl</code> and <code>mintctl</code> are absent from the inspected map. Unsupported reads return zero and unsupported writes are dropped; <code>csr_valid_o</code> is unconnected in top. CSR-address/RO policy requires an agreed expectation (<a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/20">#20</a>).</p>
+<p><a href="../../../riscv_core/rtl/wb_trap_mret_commit_controller.v#L64">WB</a> commits a trap on valid_W &amp; exc_valid_W, or MRET on valid_W &amp; is_mret_W &amp; ~exc_valid_W. It redirects and flushes all four pipeline register boundaries. Trap entry wins over MRET, then normal CSR writes in the main CSR update chain; counter increments and separate MSIP storage need their own collision expectations. Traps write live mepc/mcause/mtval, clear MIE and save it to MPIE. MRET restores MIE from MPIE, sets MPIE/MPP and uses live mepc.</p>
+<p>Implemented exceptions are causes 0/1/2/3/4/5/6/7/11. Synchronous packets preserve their faulting PC and cause-specific tval. IRQ acceptance replaces the valid EX instruction, carries its PC for replay after MRET, and reaches WB before architectural trap/ack. Propagated faults precede IRQ acceptance; MEM preserves an incoming fault before local misalignment/access faults. This structure is not complete precision proof: younger store/MMIO effects and older gating-CSR writes remain <a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/21">#21</a> qualification risks.</p>
+</section>
+
+<section id="interrupts">
+<h2>5. Current thirteen-source interrupt model</h2>
+<table><colgroup><col style="width:14%"><col style="width:45%"><col style="width:21%"><col style="width:20%"></colgroup><thead><tr><th>Cause</th><th>SoC source</th><th>Capture</th><th>Class</th></tr></thead><tbody>
+<tr><td>7</td><td>Timer0 ch0 compare</td><td>Event</td><td>2 fixed</td></tr>
+<tr><td>16</td><td>GPIO global</td><td>Rising edge</td><td>0 RR</td></tr>
+<tr><td>17</td><td>I2C</td><td>Level</td><td>0 RR</td></tr>
+<tr><td>18</td><td>SPI TX/RX threshold (event[0])</td><td>Event</td><td>1 RR</td></tr>
+<tr><td>19</td><td>UART</td><td>Level</td><td>1 RR</td></tr>
+<tr><td>20 / 21 / 22</td><td>Timer0 ch0 overflow / ch1 overflow / ch1 compare</td><td>Event each</td><td>2 fixed</td></tr>
+<tr><td>23 / 24 / 25 / 26</td><td>Timer1 ch0 overflow / compare / ch1 overflow / compare</td><td>Event each</td><td>2 fixed</td></tr>
+<tr><td>27</td><td>SPI end of transfer (event[1])</td><td>Event</td><td>1 RR</td></tr>
+</tbody></table>
+<p><a href="../../../RTL_SOC/riscforge_soc_subsystem.sv#L1280">Wiring</a> matches gateway cause 7 at bit 0, causes 16–27 at bits 1–12. Masks: edge 0x0002, event 0x1fe9. Capture wins over same-edge clear; events coalesce, not count. Levels pass through and need source deassertion; GPIO needs a new global rising edge. Only mie[7], mie[27:16] and mstatus.MIE participate.</p>
+<p>Class 2 fixed order is <strong>7,22,24,26,20,21,23,25</strong>. Class 1 cycles <strong>19→18→27</strong>, reset first 19; class 0 cycles <strong>17→16</strong>, reset first 17. RR moves after the committed source, not selection. Threshold 0 admits all; 1 admits classes 1/2; 2 admits only 2; 3 blocks all. Fixed priority does not establish starvation freedom.</p>
+<p class="note">MEIP/MSIP are tied off at the SoC and absent from arbitration. Even stored MSIP plus MSIE does not deliver a trap. No PLIC claim/complete or integrated CLINT/CLIC exists; directory presence is not integration. Mandatory 3.4/3.6 still need exact disposition. The documented IRQ predictor mismatch (<a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/25">#25</a>) prevents using its historical pass as current-controller qualification.</p>
+</section>
+
+<section id="ordering">
+<h2>6. Nesting and the unresolved ordering contract</h2>
+<p><strong>Nesting is software managed.</strong> There is one live trap context; no shadow stack, CUR/PREV fields or NEST_EN. Trap/MRET never change mintprio. Software must preserve/restore context and threshold and control MIE; synchronous handler exceptions also overwrite context. A threshold alone cannot restore a nested frame. This describes obligations, not an approved handler or race-free sequence.</p>
+<p>Static example: no stalls; MIE/source enable set; class-1 IRQ pending; threshold initially 0. An older write of threshold 2 is in WB while instruction P is in EX.</p>
+<table><colgroup><col style="width:20%"><col style="width:80%"></colgroup><thead><tr><th>Order</th><th>As-coded prediction, not observed waveform</th></tr></thead><tbody>
+<tr><td>Before E0</td><td>Old threshold 0 admits class 1; EX accepts IRQ for P.</td></tr>
+<tr><td>At E0</td><td>Older write sets threshold 2; EX/MEM captures IRQ packet and cancels P's normal effects. No ack/RR yet.</td></tr>
+<tr><td>At E1</td><td>Packet advances to MEM/WB. Newly selected class 1 would now be excluded.</td></tr>
+<tr><td>At E2</td><td>WB commits stored packet without rechecking eligibility; mepc=P, MIE clears, stored cause drives ack/RR.</td></tr>
+</tbody></table>
+<p>The expected ordering rule remains to be approved. RTL comments mention serialization/recheck/replay options; none is adopted by this document. A distinguishing future check needs CSR commit, EX acceptance, packet identity, WB trap/ack/RR and external-effect observations against an independent expected order.</p>
+</section>
+
+<section id="evidence">
+<h2>7. Retained evidence and historical corrections</h2>
+<table><colgroup><col style="width:29%"><col style="width:39%"><col style="width:32%"></colgroup><thead><tr><th>Existing evidence</th><th>Bounded support</th><th>Limit</th></tr></thead><tbody>
+<tr><td><a href="../../../../artifacts/verification_infra_sync_20261110/validation/POST_SYNC_VALIDATION.json">Post-sync manifest</a> / <a href="../../../../artifacts/verification_infra_sync_20261110/validation/core/results.json">core results</a></td><td>13 directed configurations: selected MDU/load/redirect waits, legality/fetch/mepc/trap cases.</td><td>Core harness IRQ/error inputs tied off; no full SoC workload proof.</td></tr>
+<tr><td><a href="../../../../artifacts/verification_infra_sync_20261110/validation/leaf/tb_legality.log">Legality log</a></td><td>131,072 field combinations plus exact SYSTEM guards.</td><td>Not CSR-address/state/privilege completeness.</td></tr>
+<tr><td><a href="../../../../artifacts/verification_infra_sync_20261110/validation/leaf/tb_mdu_owner.log">MDU owner log</a></td><td>Four hold/owner/cancellation checks, including new DIV after cancelled MUL.</td><td>Not every IRQ/kill/completion overlap.</td></tr>
+<tr><td><a href="../../../../artifacts/verification_infra_sync_20261110/validation/soc_lint.log">SoC Verilator log</a></td><td>Recorded exit zero, 107 retained warnings; -DXSIM / -Wno-fatal.</td><td>Elaboration, not clean accepted-tool signoff or simulation.</td></tr>
+</tbody></table>
+<p><a href="../../../Verification/core_port_20261109/run_tests.py">Focused firmware</a> compares explicit expected values; its <a href="../../../Verification/core_port_20261109/tb_core_port.sv">harness</a> requires success store 1 and has a watchdog. These are retained development checks, not a complete retirement/effects oracle. A newer RISCOF pass is engineer-reported, not candidate-bound here; historical RISC-DV 193/215 pass and 22 fail are GPR-comparator outcomes, not current bug count/rate.</p>
+<p>Preserved <a href="../Core_Microarchitecture.md">Core_Microarchitecture</a>, <a href="../CSR_and_Trap_Model.md">CSR_and_Trap_Model</a> and <a href="../SoC_Architecture_Map_Boot.md">SoC map</a> predate integrated legality/MDU/redirect/mepc/fetch corrections. <a href="../../ARCHITECTURE_SUMMARY.md">ARCHITECTURE_SUMMARY</a> and <a href="../../RISCFORGE%20IRQ%20Architecture.html">old IRQ architecture</a> describe absent shadow stacks, old priority/source counts and unimplemented custom CSR fields. Preserve them as history; use this source trace for current code. The <a href="../../core/MALAY_CORE_PORT_20261109.md">port note's correction banner</a> withdraws its original JALR allegation.</p>
+<p>Open bug-labelled records remain #16, #18, #25, #26, #27; #19 is a timing investigation, #20/#21 contract/qualification work. Follow <a href="../CJ_FINDING_RECONCILIATION_20261110.md">the current reconciliation</a> and <a href="../CJ_REMAINING_WORK_20261110.md">remaining work</a>. No original seed/workload closure or approval follows from the focused checks.</p>
+<p class="note"><strong>Next decisions:</strong> freeze ISA/no-C applicability; approve CSR/M-only and IRQ ordering/nesting policy; freeze source/subevent/capture map; resolve 3.4/3.6 alternatives. CJ can then implement independent checking and bounded current-source qualification. <strong>Learning checkpoint:</strong> distinguish winner selection, EX acceptance, WB trap, acknowledgement and RR update in E0–E2; identify which saved software frame MRET uses after nesting.</p>
+</section>
+<footer>Current documentation review · no technical signoff · <a href="01_core_architecture.md">Detailed source and traceability</a></footer>
+</main>
+</body>
+</html>

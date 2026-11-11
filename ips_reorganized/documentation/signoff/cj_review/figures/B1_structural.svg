@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 740" class="dg" role="img" aria-labelledby="title desc">
+<title id="title">B1 — Warm benchmark host, testbench and DUT boundary</title>
+<desc id="desc">Named source instances, register boundaries and directed interfaces. Solid blue: payload or request. Teal: response or result feedback. Dashed amber: control or incomplete hook. Dotted gray: passive observation or testbench backdoor; labels distinguish these uses.</desc>
+<defs>
+  <marker id="ah-core" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#2d56c8"/></marker>
+  <marker id="ah-mem"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#0c8577"/></marker>
+  <marker id="ah-bus"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#7445bd"/></marker>
+  <marker id="ah-ctrl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#a8660c"/></marker>
+  <marker id="ah-irq"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#c92c37"/></marker>
+  <marker id="ah-obs"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#626d7f"/></marker>
+  <marker id="ah-mute" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#98a0ac"/></marker>
+  <marker id="ah"      viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L10,5 L0,9 z" fill="#475063"/></marker>
+</defs>
+<style>
+  :root {
+    --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+    --ground: #ffffff; --paper: #ffffff; --ink: #18202c; --ink-2: #475063; --ink-3: #7a8394;
+    --rule: #e0e5ec; --rule-2: #cbd5e1; --tint: #f8fafc;
+    --core: #2d56c8; --core-f: rgba(45,86,200,.08);
+    --mem:  #0c8577; --mem-f:  rgba(12,133,119,.08);
+    --bus:  #7445bd; --bus-f:  rgba(116,69,189,.08);
+    --per:  #a8660c; --per-f:  rgba(190,120,20,.09);
+    --irq:  #c92c37; --irq-f:  rgba(201,44,55,.08);
+    --tb:   #626d7f; --tb-f:   rgba(98,109,127,.08);
+    --todo: #b45309; --todo-f: rgba(180,83,9,.08);
+  }
+  text { font-family: Arial, Helvetica, sans-serif; fill: #18202c; font-size: 11px; }
+  .tt { font-weight: 600; font-size: 12.5px; fill: #18202c; }
+  .ts { font-size: 10.5px; fill: #475063; }
+  .tm { font-family: Consolas, "Courier New", monospace; font-size: 10px; fill: #475063; }
+  .ti { font-family: Consolas, "Courier New", monospace; font-size: 9.5px; fill: #c92c37; font-weight: 500; }
+  .tbus { font-size: 10.5px; font-weight: 600; fill: #7445bd; letter-spacing: .04em; }
+  .tlab { font-size: 10px; fill: #475063; font-style: italic; }
+  .tmu { fill: #7a8394; }
+  .tbadge { font-family: Consolas, "Courier New", monospace; font-size: 9px; font-weight: 600; }
+  rect { stroke-width: 1.2; }
+  .n-core  { fill: #eff2fc; stroke: #2d56c8; }
+  .n-stage { fill: #ffffff;       stroke: #2d56c8; stroke-width: 1.3; }
+  .n-mem   { fill: #edf7f6;  stroke: #0c8577;  }
+  .n-bus   { fill: #f3eff9;  stroke: #7445bd;  }
+  .n-per   { fill: #faf5ed;  stroke: #a8660c;  }
+  .n-irq   { fill: #fbf0f1;  stroke: #c92c37;  }
+  .n-tb    { fill: #f2f3f5;   stroke: #626d7f;   }
+  .n-todo  { fill: #faf3eb; stroke: #b45309; stroke-dasharray: 5 3; }
+  .n-frame { fill: none;          stroke: #cbd5e1; stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .n-badge { stroke-width: 1; rx: 3px; }
+  .e-core { fill: none; stroke: #2d56c8; stroke-width: 1.6; }
+  .e-mem  { fill: none; stroke: #0c8577;  stroke-width: 1.5; }
+  .e-bus  { fill: none; stroke: #7445bd;  stroke-width: 1.5; }
+  .e-apb  { fill: none; stroke: #7445bd;  stroke-width: 2.4; }
+  .e-ctrl { fill: none; stroke: #b45309; stroke-width: 1.4; stroke-dasharray: 6 4; }
+  .e-irq  { fill: none; stroke: #c92c37;  stroke-width: 1.4; stroke-dasharray: 5 4; }
+  .e-irqs { fill: none; stroke: #c92c37;  stroke-width: 1.5; }
+  .e-obs  { fill: none; stroke: #626d7f;   stroke-width: 1.2; stroke-dasharray: 3 3; }
+  .e-thin { fill: none; stroke: #cbd5e1; stroke-width: 1; stroke-dasharray: 2 3; }
+</style>
+<rect width="1100" height="740" fill="#ffffff"/>
+<text x="24" y="28" class="tt" style="font-size:14px; letter-spacing:-0.01em;">B1 · Warm benchmark host, testbench and DUT boundary</text>
+<rect class="n-frame" x="20" y="45" width="1060" height="140" rx="6"/>
+<text class="tt tmu" x="32" y="63" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">Host tools (outside simulator DUT)</text>
+<rect class="n-tb" x="45" y="75" width="290" height="85" rx="4"/>
+<text class="tt" x="55" y="93">build / contract.json</text>
+<text class="ts" x="55" y="109">ELF / map / I + D hex</text>
+<text class="ts" x="55" y="124">config / source metadata</text>
+<path class="e-tb" d="M 335,118 L 415,118" marker-end="url(#ah-tb)"/>
+<rect class="n-tb n-badge" x="341" y="100" width="68" height="16" rx="3"/>
+<text class="tbadge" x="375" y="112" text-anchor="middle" fill="#626d7f">artifacts</text>
+<rect class="n-tb" x="415" y="75" width="290" height="85" rx="4"/>
+<text class="tt" x="425" y="93">run_benchmark.py</text>
+<text class="ts" x="425" y="109">stage inputs / plusargs</text>
+<text class="ts" x="425" y="124">filelists / simulator launch</text>
+<rect class="n-tb" x="775" y="75" width="280" height="85" rx="4"/>
+<text class="tt" x="785" y="93">analyze_results.py</text>
+<text class="ts" x="785" y="109">ABI + TB JSON → verdict</text>
+<text class="ts" x="785" y="124">correct result before score</text>
+<rect class="n-frame" x="20" y="215" width="1060" height="505" rx="6"/>
+<text class="tt tmu" x="32" y="233" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">soc_benchmark_tb: actual SoC instance, warm preload; no serial flash model</text>
+<rect class="n-tb" x="45" y="255" width="290" height="185" rx="4"/>
+<text class="tt" x="55" y="273">TB reset / warm preload</text>
+<text class="ts" x="55" y="289">hard reset release; soft reset held</text>
+<text class="ts" x="55" y="304">wait i_bootloader.warm_boot_q</text>
+<text class="ts" x="55" y="319">clear and $readmemh BOTH arrays</text>
+<text class="ts" x="55" y="334">soft reset release → core runs</text>
+<rect class="n-frame" x="380" y="255" width="680" height="280" rx="6"/>
+<text class="tt tmu" x="392" y="273" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">dut : riscforge_soc_subsystem  ·  hardware topology S1</text>
+<rect class="n-mem" x="405" y="295" width="300" height="85" rx="4"/>
+<text class="tt" x="415" y="313">ISRAM · mem_array</text>
+<text class="ts" x="415" y="329">IMEM hex deposit</text>
+<text class="ts" x="415" y="344">fetch via demux / mux</text>
+<rect class="n-mem" x="745" y="295" width="290" height="85" rx="4"/>
+<text class="tt" x="755" y="313">i_dsram.mem</text>
+<text class="ts" x="755" y="329">DMEM hex deposit</text>
+<text class="tm" x="755" y="344">first 64 words: result ABI</text>
+<rect class="n-core" x="405" y="420" width="300" height="85" rx="4"/>
+<text class="tt" x="415" y="438">Loader / reset inputs</text>
+<text class="ts" x="415" y="454">hard_rst_ni / soft_rst_ni</text>
+<text class="ts" x="415" y="469">core_rst_n / boot_done_o</text>
+<rect class="n-core" x="745" y="420" width="290" height="85" rx="4"/>
+<text class="tt" x="755" y="438">Core / SoC observations</text>
+<text class="ts" x="755" y="454">trap commit cause / PC / tval</text>
+<text class="ts" x="755" y="469">valid_W / hold / timeouts</text>
+<rect class="n-tb" x="380" y="565" width="680" height="125" rx="4"/>
+<text class="tt" x="390" y="583">TB guards / completion</text>
+<text class="ts" x="390" y="599">RUNNING → terminal ABI; identity / errors / watchdog</text>
+<text class="ts" x="390" y="614">trap / APB &amp; AXI sticky timeout failures; held-WB observations</text>
+<text class="ts" x="390" y="629">firmware checks on DUT; no independent scoreboard</text>
+<path class="e-core" d="M 560,160 L 560,205 L 190,205 L 190,255" marker-end="url(#ah-core)"/>
+<rect class="n-core n-badge" x="308" y="197" width="134" height="16" rx="3"/>
+<text class="tbadge" x="375" y="209" text-anchor="middle" fill="#2d56c8">staged images / args</text>
+<path class="e-obs" d="M 335,335 L 405,335" marker-end="url(#ah-obs)"/>
+<rect class="n-obs n-badge" x="327" y="317" width="86" height="16" rx="3"/>
+<text class="tbadge" x="370" y="329" text-anchor="middle" fill="var(--obs)">IMEM deposit</text>
+<path class="e-obs" d="M 335,375 L 365,375 L 365,240 L 890,240 L 890,295" marker-end="url(#ah-obs)"/>
+<rect class="n-obs n-badge" x="545" y="232" width="170" height="16" rx="3"/>
+<text class="tbadge" x="630" y="244" text-anchor="middle" fill="var(--obs)">DMEM deposit (TB backdoor)</text>
+<path class="e-ctrl" d="M 190,440 L 190,465 L 405,465" marker-end="url(#ah-ctrl)"/>
+<rect class="n-ctrl n-badge" x="216" y="457" width="158" height="16" rx="3"/>
+<text class="tbadge" x="295" y="469" text-anchor="middle" fill="var(--ctrl)">reset / release controls</text>
+<path class="e-obs" d="M 555,505 L 555,565" marker-end="url(#ah-obs)"/>
+<rect class="n-obs n-badge" x="473" y="527" width="164" height="16" rx="3"/>
+<text class="tbadge" x="555" y="539" text-anchor="middle" fill="var(--obs)">warm / reset / boot state</text>
+<path class="e-obs" d="M 890,380 L 890,405 L 730,405 L 730,565" marker-end="url(#ah-obs)"/>
+<rect class="n-obs n-badge" x="776" y="397" width="68" height="16" rx="3"/>
+<text class="tbadge" x="810" y="409" text-anchor="middle" fill="var(--obs)">ABI reads</text>
+<path class="e-obs" d="M 890,505 L 890,565" marker-end="url(#ah-obs)"/>
+<rect class="n-obs n-badge" x="823" y="527" width="134" height="16" rx="3"/>
+<text class="tbadge" x="890" y="539" text-anchor="middle" fill="var(--obs)">trap / WB / timeouts</text>
+<path class="e-obs" d="M 1060,620 L 1080,620 L 1080,118 L 1055,118" marker-end="url(#ah-obs)"/>
+<rect class="n-obs n-badge" x="1019" y="362" width="122" height="16" rx="3"/>
+<text class="tbadge" x="1080" y="374" text-anchor="middle" fill="var(--obs)">result JSON + logs</text>
+<text x="50" y="475" class="ts">spi_sdi1_i = 0</text>
+<text x="50" y="498" class="ts">MISO=0; no flash responder.</text>
+<text x="50" y="521" class="ts">Warm deposit bypasses SPI.</text>
+<text x="50" y="565" class="ts">#16 remains open: WB classification</text>
+<text x="50" y="585" class="ts">does not establish unique retirement.</text>
+</svg>

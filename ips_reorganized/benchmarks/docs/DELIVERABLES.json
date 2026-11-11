@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "recorded_utc": "2026-11-04T06:57:03.823280+00:00",
+  "scope": "benchmark infrastructure engineering checks on current full SoC; design RTL unchanged",
+  "agent_selection": {
+    "provider": "codex",
+    "model": "gpt-6-luna",
+    "reasoningEffort": "xhigh"
+  },
+  "host_tests": {
+    "passed": 39,
+    "log": "docs/evidence/final_host_tests.txt"
+  },
+  "negative_guard_checks": {
+    "passed": 3,
+    "summary": "docs/evidence/tb_guards/guard_20261104T063315Z_d02d3391_summary.json"
+  },
+  "design_baseline_check": "docs/evidence/design_unchanged.json",
+  "review_reports": [
+    "docs/REVIEW_R1.md",
+    "docs/REVIEW_R2.md",
+    "docs/REVIEW_R3.md"
+  ],
+  "retirement_counter_qualified": false,
+  "published_score_claimed": false,
+  "runs": [
+    {
+      "benchmark": "smoke",
+      "id": "smoke_20261104T065353Z_7108f0a2",
+      "state": "failed",
+      "iterations": 1,
+      "reason": "firmware_status_fail",
+      "observed_clock_cycles": 1841,
+      "trap_cause": "0x00000000",
+      "trap_pc": "0x00000000",
+      "trap_tval": "0x00000000",
+      "validation_errors": 3,
+      "error_code": "0x00001001",
+      "probe_expected": 2980,
+      "probe_observed": 1016,
+      "cycle_delta": 242,
+      "raw_instret_delta_unqualified": 140,
+      "analysis_path": "runs/smoke_20261104T065353Z_7108f0a2/analysis.json",
+      "raw_path": "runs/smoke_20261104T065353Z_7108f0a2/result.json",
+      "metadata_path": "runs/smoke_20261104T065353Z_7108f0a2/run_metadata.json",
+      "sha256": {
+        "program.elf": "eb7d1e3f7e90d208b15fede8a153c40ce528e3f458ef5f0f66e609351084c88e",
+        "imem.hex": "a083292f8ec88b587fca3fb778bd1ecb3d0a791042fd5f4b8efbb78f86e83c36",
+        "dmem.hex": "57aad853e9839f4fed609ae57eac266d91214814a26fb6d45aff7ebf34aefc33",
+        "build.json": "59f8c07271299b9deffeb42e02aaaacf770437c7fd1b3b4c7d395e3f9a27e325",
+        "result.json": "77fd655dccffa12ba3212e810835ff687f2068e0b484a7f1e894362206693b42",
+        "analysis.json": "063245e927ff55a4a7674b54ab3a8212efba87cce360058d48ca2cd067e71db9",
+        "run_metadata.json": "7d16d10b64ed7988a175216bad70e98d79221fd2ff34d6cff1f2e01c84c72139",
+        "simulation.log": "ae20ef6a72eb0e60f0810823c802061fa094712fb7d48f16dd4fafa97c45b61a"
+      },
+      "source_recheck": {
+        "source_and_generated_files_rechecked": 120
+      },
+      "firmware_provenance": {
+        "source_files_verified": 8,
+        "output_files_verified": 5
+      }
+    },
+    {
+      "benchmark": "counter_probe",
+      "id": "counter_probe_20261104T065406Z_9f3abc11",
+      "state": "passed",
+      "iterations": 1,
+      "reason": "none",
+      "observed_clock_cycles": 1865,
+      "trap_cause": "0x00000000",
+      "trap_pc": "0x00000000",
+      "trap_tval": "0x00000000",
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "probe_expected": 8,
+      "probe_observed": 24,
+      "cycle_delta": 38,
+      "raw_instret_delta_unqualified": 24,
+      "analysis_path": "runs/counter_probe_20261104T065406Z_9f3abc11/analysis.json",
+      "raw_path": "runs/counter_probe_20261104T065406Z_9f3abc11/result.json",
+      "metadata_path": "runs/counter_probe_20261104T065406Z_9f3abc11/run_metadata.json",
+      "sha256": {
+        "program.elf": "7a69ec7856e68df79db4e028c87afd976d907ac547a92b38a22623b5f4724c9e",
+        "imem.hex": "1bf7bc7e3dbaa22a08c329453a97c25ed0d42b2d58e12b4df917653decf10fb3",
+        "dmem.hex": "ec46928d1b129fe0c887bfedfdfbe23b405301a97639c185dff1d8eac5afee42",
+        "build.json": "0eb4824b3e45e1d69615ff4582134d96f00685c6351f9f88e163578f8af094b2",
+        "result.json": "f7cb48cc14aee3e0901e5cadfeb33a8499136af806877d5f0c98eeee6d6e99d3",
+        "analysis.json": "cf4d8ba522f660d1f90a97926d4b28b554a9bb8d9639ea9ba629030198b2f22b",
+        "run_metadata.json": "3cb27e13c22e384514e29b051f9eb907078d1524450eb0190c5664515b8c9688",
+        "simulation.log": "a7967d6333ddb4c950ddd311612c19c605ff1b6090607e94ac8482990ac5f04a"
+      },
+      "source_recheck": {
+        "source_and_generated_files_rechecked": 120
+      },
+      "firmware_provenance": {
+        "source_files_verified": 8,
+        "output_files_verified": 5
+      }
+    },
+    {
+      "benchmark": "coremark",
+      "id": "coremark_20261104T065419Z_d28e58b8",
+      "state": "failed",
+      "iterations": 1,
+      "reason": "unexpected_synchronous_trap",
+      "observed_clock_cycles": 4293,
+      "trap_cause": "0x00000006",
+      "trap_pc": "0x00010fa4",
+      "trap_tval": "0x0002092d",
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "probe_expected": 0,
+      "probe_observed": 0,
+      "cycle_delta": 0,
+      "raw_instret_delta_unqualified": 0,
+      "analysis_path": "runs/coremark_20261104T065419Z_d28e58b8/analysis.json",
+      "raw_path": "runs/coremark_20261104T065419Z_d28e58b8/result.json",
+      "metadata_path": "runs/coremark_20261104T065419Z_d28e58b8/run_metadata.json",
+      "sha256": {
+        "program.elf": "cadbb0ef81a55b0651f5c3d0c5ec3aff16fc646d72b3d980b42ffd8d322c685e",
+        "imem.hex": "4f76cf48a4cd4742dc8029f237171071581633165bd38a463896c39ac9189ccd",
+        "dmem.hex": "065506d6c44e9475fce7c9927539708dc712a708a8499567eb9052bb29575116",
+        "build.json": "fee5e9a8f4f2e2e63965352f8c6bac3e81a10d1d69de31f18793cc0c8aaf64b8",
+        "result.json": "f99d62e9aeaa42ffc22a95320624c300ec30f5cb7cd35c3f34fa1859f9d470b8",
+        "analysis.json": "37f9e5bb090207a0a12827e05b65e775708c269c48308bfcf310bf43e379f4c4",
+        "run_metadata.json": "e245e9825545fe1316a27246149bbe05ecd4e70c6ab975557249018f1c8b1df7",
+        "simulation.log": "1acd33acadf5dd711301c5bbb00c8ddf2634138e6e4a676c0ddbbe0897ac6b11"
+      },
+      "source_recheck": {
+        "source_and_generated_files_rechecked": 120
+      },
+      "firmware_provenance": {
+        "source_files_verified": 13,
+        "output_files_verified": 6
+      }
+    },
+    {
+      "benchmark": "dhrystone",
+      "id": "dhrystone_20261104T065432Z_8cffc712",
+      "state": "failed",
+      "iterations": 10,
+      "reason": "unexpected_synchronous_trap",
+      "observed_clock_cycles": 22470,
+      "trap_cause": "0x00000005",
+      "trap_pc": "0x00010088",
+      "trap_tval": "0x00040231",
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "probe_expected": 0,
+      "probe_observed": 0,
+      "cycle_delta": 0,
+      "raw_instret_delta_unqualified": 0,
+      "analysis_path": "runs/dhrystone_20261104T065432Z_8cffc712/analysis.json",
+      "raw_path": "runs/dhrystone_20261104T065432Z_8cffc712/result.json",
+      "metadata_path": "runs/dhrystone_20261104T065432Z_8cffc712/run_metadata.json",
+      "sha256": {
+        "program.elf": "81ed7fe927cd1c3a8da2e0f90ecfdceb87f4895a1af221b3c38d6229ab44c9fe",
+        "imem.hex": "65a0e0f8d4514a924f6ab18a84ca62385508ea22cb538668b71a071980052355",
+        "dmem.hex": "ea36cef94c2d219a72101bbf7e48952d6047467b619a035c572eb4547dc04349",
+        "build.json": "044d70f4ea45bcb00f3c3bae70181432387384c9554b88ef7e13d96ec80c546c",
+        "result.json": "baca1ee5cdd199502b02f78b1a4fe000aac22e2e0413116626cd97efc305caee",
+        "analysis.json": "f41d37c01035a23a891d77c902d76bdf6bdf696102fa86b100c21de2664b0520",
+        "run_metadata.json": "43bbaa01fa4e3776123b200378d599d09e61247fc17ef4981d31f03ebb2cce9d",
+        "simulation.log": "1c8b8e73567102a85e463ef9e24a0449de36bab9c0dca40ec0f54a96019805a0"
+      },
+      "source_recheck": {
+        "source_and_generated_files_rechecked": 120
+      },
+      "firmware_provenance": {
+        "source_files_verified": 13,
+        "output_files_verified": 7
+      }
+    }
+  ],
+  "review_status": "three review rounds complete; all reported infrastructure findings addressed with directed closure checks",
+  "final_provenance_closure": "docs/evidence/r3_closure_check.json"
+}

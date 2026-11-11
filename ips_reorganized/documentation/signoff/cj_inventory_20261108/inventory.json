@@ -1,0 +1,735 @@
+{
+  "as_of": "2026-11-08",
+  "review_deadline": "2026-11-12",
+  "scope": "18 CJ checklist items; no new simulation or RTL edits",
+  "official_workbook_sha256": "d14dab56e3c358add7759e36374313aaf01bb1fad6af41f361516391c706bffa",
+  "items": [
+    {
+      "id": "1.1",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet4.xml",
+        "row": "5",
+        "title": "Core ISA frozen",
+        "criterion": "One of RV32I / RV32IM / RV32IMC declared in writing",
+        "status": "In Progress",
+        "cells": {
+          "A": "1.1",
+          "B": "Core ISA frozen",
+          "C": "One of RV32I / RV32IM / RV32IMC declared in writing",
+          "D": "In Progress",
+          "E": "",
+          "F": "Core_Microarchitecture.md",
+          "G": "",
+          "H": "",
+          "I": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Documented; freeze pending",
+      "planning_state": "Generic freeze steps only",
+      "existing_work": "RV32IM + Zicsr and no C are described.",
+      "pending": "Confirm exact ISA string/extensions, unsupported-encoding policy and approved revision.",
+      "sources": [
+        "ARCH",
+        "OLDPLAN"
+      ]
+    },
+    {
+      "id": "1.3",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet4.xml",
+        "row": "7",
+        "title": "Privilege modes frozen",
+        "criterion": "Machine mode minimum; Supervisor + MMU only if targeting Linux",
+        "status": "In Progress",
+        "cells": {
+          "A": "1.3",
+          "B": "Privilege modes frozen",
+          "C": "Machine mode minimum; Supervisor + MMU only if targeting Linux",
+          "D": "In Progress",
+          "E": "",
+          "F": "CSR_and_Trap_Model.md",
+          "G": "",
+          "H": "",
+          "I": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Documented; freeze pending",
+      "planning_state": "Generic freeze steps only",
+      "existing_work": "M-mode-only implementation is described.",
+      "pending": "Resolve MPP/WARL behavior against the intended M-only contract; record reviewed scope.",
+      "sources": [
+        "CSR",
+        "OLDPLAN"
+      ]
+    },
+    {
+      "id": "1.4",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet4.xml",
+        "row": "8",
+        "title": "CSR list frozen",
+        "criterion": "Table of implemented CSRs with reset values and access type (RW/RO/WARL)",
+        "status": "In Progress",
+        "cells": {
+          "A": "1.4",
+          "B": "CSR list frozen",
+          "C": "Table of implemented CSRs with reset values and access type (RW/RO/WARL)",
+          "D": "In Progress",
+          "E": "",
+          "F": "CSR_and_Trap_Model.md",
+          "G": "",
+          "H": "",
+          "I": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Table exists; decisions pending",
+      "planning_state": "CSR test plan exists; freeze incomplete",
+      "existing_work": "CSR addresses, reset values and access masks are tabulated as coded.",
+      "pending": "Agree intended WARL/read-only/unimplemented-CSR behavior, resolve observations, then freeze the table.",
+      "sources": [
+        "CSR",
+        "CSRPLAN"
+      ]
+    },
+    {
+      "id": "1.5",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet4.xml",
+        "row": "9",
+        "title": "Trap and interrupt model defined",
+        "criterion": "mtvec mode, mepc/mcause behaviour, nested-interrupt policy and trap boundary written down",
+        "status": "In Progress",
+        "cells": {
+          "A": "1.5",
+          "B": "Trap and interrupt model defined",
+          "C": "mtvec mode, mepc/mcause behaviour, nested-interrupt policy and trap boundary written down",
+          "D": "In Progress",
+          "E": "",
+          "F": "CSR_and_Trap_Model.md",
+          "G": "",
+          "H": "",
+          "I": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Model exists; decisions pending",
+      "planning_state": "Detailed corner plan exists",
+      "existing_work": "Trap/MRET boundary, direct mtvec and IRQ ordering are documented as coded.",
+      "pending": "Approve the intended trap priority, resume PC, nesting and CSR-write race rules; verify independently.",
+      "sources": [
+        "CSR",
+        "CSRPLAN"
+      ]
+    },
+    {
+      "id": "1.9",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet4.xml",
+        "row": "13",
+        "title": "Interrupt map frozen",
+        "criterion": "Every source numbered and mapped to a PLIC/CLINT input, with priority scheme stated",
+        "status": "In Progress",
+        "cells": {
+          "A": "1.9",
+          "B": "Interrupt map frozen",
+          "C": "Every source numbered and mapped to a PLIC/CLINT input, with priority scheme stated",
+          "D": "In Progress",
+          "E": "",
+          "F": "SoC_Architecture_Map_Boot.md",
+          "G": "",
+          "H": "",
+          "I": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Map exists; alternative unresolved",
+      "planning_state": "Detailed event plan exists",
+      "existing_work": "Cause 7 and local causes 16\u201327, gateway modes and priority are described.",
+      "pending": "Freeze source/subevent map and approved controller alternative; retain exact exception to PLIC/CLINT wording.",
+      "sources": [
+        "SOC",
+        "IRQPLAN",
+        "DECISIONS"
+      ]
+    },
+    {
+      "id": "2.7",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet5.xml",
+        "row": "11",
+        "title": "Memory interface unit coded",
+        "criterion": "Byte enables, store alignment, load sign/zero extension, one outstanding transaction",
+        "status": "In Progress",
+        "cells": {
+          "A": "2.7",
+          "B": "Memory interface unit coded",
+          "C": "Byte enables, store alignment, load sign/zero extension, one outstanding transaction",
+          "D": "",
+          "E": "In Progress",
+          "F": "",
+          "G": "Core_Microarchitecture.md",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "RTL exists; current qualification pending",
+      "planning_state": "Partial: legacy LSU + hazard scenarios",
+      "existing_work": "LSU/interface RTL exists; older LSU infrastructure can be reused.",
+      "pending": "Audit current byte-enable/size/offset/sign/zero-extension/alignment/one-outstanding behavior; adapt legacy checks and run current source, including stalls/errors.",
+      "sources": [
+        "ARCH",
+        "HAZARD",
+        "CSRPLAN"
+      ]
+    },
+    {
+      "id": "2.9",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet5.xml",
+        "row": "13",
+        "title": "CSR block and trap logic coded",
+        "criterion": "Matches the CSR table and trap model frozen in G1",
+        "status": "In Progress",
+        "cells": {
+          "A": "2.9",
+          "B": "CSR block and trap logic coded",
+          "C": "Matches the CSR table and trap model frozen in G1",
+          "D": "",
+          "E": "In Progress",
+          "F": "",
+          "G": "CSR_and_Trap_Model.md",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "RTL exists; open correctness findings",
+      "planning_state": "Detailed plan; skeleton only",
+      "existing_work": "CSR/trap RTL and reset-held skeleton exist.",
+      "pending": "Resolve approved contract versus implementation; implement independent checking and scenarios for WARL, CSR operations/races, trap/MRET and precise effects. No current corner-suite pass.",
+      "sources": [
+        "CSR",
+        "CSRPLAN",
+        "CSRREADY",
+        "DV",
+        "ISOLATION"
+      ]
+    },
+    {
+      "id": "2.10",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet5.xml",
+        "row": "14",
+        "title": "Compressed decoder coded (if C extension)",
+        "criterion": "16-bit instructions expand correctly; misaligned fetch handled",
+        "status": "",
+        "cells": {
+          "A": "2.10",
+          "B": "Compressed decoder coded (if C extension)",
+          "C": "16-bit instructions expand correctly; misaligned fetch handled",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": ""
+        }
+      },
+      "assessment": "N/A candidate; disposition pending",
+      "planning_state": "No decoder work needed if no C is frozen",
+      "existing_work": "Architecture document states no compressed decoder.",
+      "pending": "Record N/A tied to the frozen ISA and build flags; keep applicable instruction-alignment/illegal-encoding checks. Do not mark waived by inference.",
+      "sources": [
+        "ARCH"
+      ]
+    },
+    {
+      "id": "3.4",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet6.xml",
+        "row": "8",
+        "title": "PLIC integrated (mandatory)",
+        "criterion": "16-32 sources supported; every peripheral interrupt wired in",
+        "status": "",
+        "cells": {
+          "A": "3.4",
+          "B": "PLIC integrated (mandatory)",
+          "C": "16-32 sources supported; every peripheral interrupt wired in",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": ""
+        }
+      },
+      "assessment": "Architecture disposition pending",
+      "planning_state": "Gap identified; no final disposition",
+      "existing_work": "Current plans describe a custom in-core gateway/arbiter rather than integrated PLIC.",
+      "pending": "Record explicit approved alternative with item/scope/reason/person/date, or define implementation work. Verbal report is not a per-item waiver.",
+      "sources": [
+        "SOC",
+        "IRQPLAN",
+        "DECISIONS"
+      ]
+    },
+    {
+      "id": "3.6",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet6.xml",
+        "row": "10",
+        "title": "CLINT / CLIC integrated (mandatory)",
+        "criterion": "Timer and software interrupts reach the core",
+        "status": "",
+        "cells": {
+          "A": "3.6",
+          "B": "CLINT / CLIC integrated (mandatory)",
+          "C": "Timer and software interrupts reach the core",
+          "D": "",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": ""
+        }
+      },
+      "assessment": "Architecture disposition pending",
+      "planning_state": "Gap identified; no final disposition",
+      "existing_work": "No qualifying integrated CLINT/CLIC established; software IRQ delivery is an identified gap.",
+      "pending": "Resolve timer/software delivery and custom-controller alternative. Tests cannot repair tied-off/unserviced IRQ paths.",
+      "sources": [
+        "SOC",
+        "IRQPLAN",
+        "DECISIONS"
+      ]
+    },
+    {
+      "id": "4.12",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet7.xml",
+        "row": "16",
+        "title": "Reset and interrupt entry verified",
+        "criterion": "Fetch starts at RESET_PC; IRQ taken at a clean boundary; mtvec jump and mepc save correct",
+        "status": "In Progress",
+        "cells": {
+          "A": "4.12",
+          "B": "Reset and interrupt entry verified",
+          "C": "Fetch starts at RESET_PC; IRQ taken at a clean boundary; mtvec jump and mepc save correct",
+          "D": "VCS",
+          "E": "In Progress",
+          "F": "",
+          "G": "CSR_and_Trap_Model.md",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Planned; no current core pass established",
+      "planning_state": "Detailed plan; skeleton only",
+      "existing_work": "Reset/entry rules and CSR/trap and pipeline harnesses exist. Hazard semantic compilation is recorded.",
+      "pending": "Execute RESET_PC, clean acceptance, mtvec redirect, mepc save, MRET/resume and IRQ/CSR-race checks on current core. Compilation and arbiter-unit coverage do not close this.",
+      "sources": [
+        "CSRPLAN",
+        "CSRREADY",
+        "HAZVALID",
+        "IRQUNIT"
+      ]
+    },
+    {
+      "id": "5.2",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet8.xml",
+        "row": "6",
+        "title": "Official RISC-V ISA tests pass",
+        "criterion": "100% pass on rv32ui, plus rv32um if M and rv32uc if C are supported",
+        "status": "In Progress",
+        "cells": {
+          "A": "5.2",
+          "B": "Official RISC-V ISA tests pass",
+          "C": "100% pass on rv32ui, plus rv32um if M and rv32uc if C are supported",
+          "D": "VCS",
+          "E": "In Progress",
+          "F": "",
+          "G": "report.html",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Engineer reports pass; current evidence unqualified",
+      "planning_state": "Generic rerun step; run binding missing",
+      "existing_work": "Passing RISCOF was reported in the planning chat; the retained local report is older and includes a failure.",
+      "pending": "Locate reported passing bundle and exact DUT/plugin/filelist/ISA/simulator; identify full applicable suite and exclusions; reproduce on candidate after fixes. Preserve older failure.",
+      "sources": [
+        "RISCOF",
+        "RISCONF",
+        "OLDPLAN"
+      ]
+    },
+    {
+      "id": "5.3",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet8.xml",
+        "row": "7",
+        "title": "Privileged / trap tests pass",
+        "criterion": "Minimal machine-mode trap and interrupt tests pass",
+        "status": "In Progress",
+        "cells": {
+          "A": "5.3",
+          "B": "Privileged / trap tests pass",
+          "C": "Minimal machine-mode trap and interrupt tests pass",
+          "D": "VCS",
+          "E": "In Progress",
+          "F": "",
+          "G": "run_compliance.bat",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Reported RISCOF scope; additional checks pending",
+      "planning_state": "Detailed CSR/trap plan; skeleton only",
+      "existing_work": "Engineer reports privilege/trap testing in RISCOF; no current qualifying pipeline/IRQ corner run established.",
+      "pending": "Map actual tests to machine trap and asynchronous IRQ obligations; execute uncovered causes, ordering, MRET and CSR races. CSR tests alone do not prove interrupt entry.",
+      "sources": [
+        "RISCOF",
+        "CSRPLAN",
+        "CSRREADY",
+        "IRQPLAN"
+      ]
+    },
+    {
+      "id": "5.7",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet8.xml",
+        "row": "11",
+        "title": "Benchmarks run",
+        "criterion": "Dhrystone and/or CoreMark complete with correct results; score recorded",
+        "status": "",
+        "cells": {
+          "A": "5.7",
+          "B": "Benchmarks run",
+          "C": "Dhrystone and/or CoreMark complete with correct results; score recorded",
+          "D": "VCS",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": ""
+        }
+      },
+      "assessment": "Infrastructure complete; benchmark runs failing",
+      "planning_state": "Detailed plan implemented; RTL closure pending",
+      "existing_work": "Firmware/ports, full-SoC harness, result checks, retained runs and reviews exist. Counter diagnostic ran; smoke/CoreMark/Dhrystone failed.",
+      "pending": "Correct and reverify validity/older-load ordering; qualify measurement window and counters; obtain correct benchmark completion, validated result and score with reproducible configuration.",
+      "sources": [
+        "BENCH",
+        "BENCHPLAN",
+        "BENCHDONE",
+        "BENCHFAIL",
+        "ISOLATION",
+        "REPRO"
+      ]
+    },
+    {
+      "id": "5.10",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet8.xml",
+        "row": "14",
+        "title": "Core bug list closed",
+        "criterion": "All P0/P1 bugs fixed and re-verified; open P2/P3 listed with justification",
+        "status": "In Progress",
+        "cells": {
+          "A": "5.10",
+          "B": "Core bug list closed",
+          "C": "All P0/P1 bugs fixed and re-verified; open P2/P3 listed with justification",
+          "D": "",
+          "E": "In Progress",
+          "F": "",
+          "G": "PHASE_STATUS.md",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Open bugs; closure pending",
+      "planning_state": "Separate investigations; unified closure campaign missing",
+      "existing_work": "Illegal-decode, younger-MDU-after-trap, benchmark validity/load-loss/counter findings have evidence. Fetch extra hold was statically analyzed.",
+      "pending": "Agree priorities and individual experiments, preserve before/after bundles, close all P0/P1 on the same candidate; justify any open P2/P3. Do not merge related-looking findings without evidence.",
+      "sources": [
+        "DV",
+        "ISOLATION",
+        "OLDPLAN"
+      ]
+    },
+    {
+      "id": "6.5",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet9.xml",
+        "row": "9",
+        "title": "Interrupt path verified end to end",
+        "criterion": "Every source verified from peripheral event to controller input; masking and priority checked",
+        "status": "In Progress",
+        "cells": {
+          "A": "6.5",
+          "B": "Interrupt path verified end to end",
+          "C": "Every source verified from peripheral event to controller input; masking and priority checked",
+          "D": "VCS",
+          "E": "In Progress",
+          "F": "",
+          "G": "IRQ_UNIT_COVERAGE_PLAN.md",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Planned; source-to-core proof pending",
+      "planning_state": "Detailed plan and file map; no TB implementation",
+      "existing_work": "Peripheral event/subevent map, hardware observation layers and proposed TB files are specified. IRQ unit work is separate.",
+      "pending": "Implement planned shell and engineer-owned scenarios/checkers/coverage; prove each real peripheral event through masking/priority/routing. Add acceptance/handler/MRET evidence where required.",
+      "sources": [
+        "IRQPLAN",
+        "IRQFILES",
+        "IRQBRIEF",
+        "IRQUNIT"
+      ]
+    },
+    {
+      "id": "6.10",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet9.xml",
+        "row": "14",
+        "title": "Boot from external SPI flash passes",
+        "criterion": "Boot mode pin = 1: code fetched from the SPI flash model and executed",
+        "status": "In Progress",
+        "cells": {
+          "A": "6.10",
+          "B": "Boot from external SPI flash passes",
+          "C": "Boot mode pin = 1: code fetched from the SPI flash model and executed",
+          "D": "VCS",
+          "E": "In Progress",
+          "F": "",
+          "G": "SoC_Architecture_Map_Boot.md",
+          "H": "",
+          "I": "",
+          "J": "Partial evidence; see gate review."
+        }
+      },
+      "assessment": "Historical unit and SoC passes; refresh pending",
+      "planning_state": "Historical procedure; focused qualification plan missing",
+      "existing_work": "Unit verdict reports PASS for 1,539 words; Oct 19 full-SoC boot/Timer0 run reports 52/52 checks.",
+      "pending": "Define current-candidate external image/flash settings, load/handoff/SRAM execution and pass proof; reproduce without preloading the payload in place of SPI transfer. Resolve boot-mode-pin departure and tool acceptance.",
+      "sources": [
+        "BOOT",
+        "BOOTUNIT",
+        "SOC"
+      ]
+    },
+    {
+      "id": "6.13",
+      "owner": "CJ",
+      "official": {
+        "xml_part": "xl/worksheets/sheet9.xml",
+        "row": "17",
+        "title": "Trap robustness under load passes",
+        "criterion": "Interrupts during load/store/branch-dense code; nested interrupt policy exercised if supported",
+        "status": "",
+        "cells": {
+          "A": "6.13",
+          "B": "Trap robustness under load passes",
+          "C": "Interrupts during load/store/branch-dense code; nested interrupt policy exercised if supported",
+          "D": "VCS",
+          "E": "",
+          "F": "",
+          "G": "",
+          "H": "",
+          "I": "",
+          "J": ""
+        }
+      },
+      "assessment": "Scenarios planned; execution pending",
+      "planning_state": "Detailed cross-layer plans; implementations incomplete",
+      "existing_work": "CSR/trap plan and IRQ event plan include memory/branch/M-operation overlap and ordering cases.",
+      "pending": "Finish scenarios/reference checks and legal latency model; demonstrate precise effects, bounded progress, correct return and declared nesting policy under load.",
+      "sources": [
+        "CSRPLAN",
+        "IRQPLAN",
+        "HAZARD",
+        "DV",
+        "ISOLATION"
+      ]
+    }
+  ],
+  "sources": {
+    "ARCH": {
+      "label": "Core architecture",
+      "path": "ips/documentation/signoff/Core_Microarchitecture.md",
+      "sha256": "90f618d2d161275cf27bf116e2ec1251f8a942aa543bf013bd00d0f688973cbf"
+    },
+    "CSR": {
+      "label": "CSR and trap model",
+      "path": "ips/documentation/signoff/CSR_and_Trap_Model.md",
+      "sha256": "0c5746e4ee4c8f9d9ba4666fa4564b0f1a6f78ac15537a1a438dedceb54e9b51"
+    },
+    "SOC": {
+      "label": "SoC architecture, interrupt map and boot",
+      "path": "ips/documentation/signoff/SoC_Architecture_Map_Boot.md",
+      "sha256": "e87e14b29855c19f1345d73fe860323695e291b84b9a56952b15802c4c21a7eb"
+    },
+    "DECISIONS": {
+      "label": "Original verbal-decision record",
+      "path": "ips/documentation/signoff/evidence_review_20261102/VERBAL_DECISIONS.md",
+      "sha256": "f22a90318ad33667b019cee0b710a60bdf7be4ded23754e11dc2382b056bc1a5"
+    },
+    "OLDPLAN": {
+      "label": "Earlier overall action plan; dates superseded",
+      "path": "ips/documentation/signoff/SIGNOFF_ACTION_PLAN.md",
+      "sha256": "41f92bd79d814d7150eb4107fd21e2c0c92de520218742ad7170f6b307d3738e"
+    },
+    "CSRPLAN": {
+      "label": "CSR/trap scenario plan",
+      "path": "ips/Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md",
+      "sha256": "65bcbc445161a26198021d3d23c96fa40d616978392e218f605177fe29d48f70"
+    },
+    "CSRBRIEF": {
+      "label": "CSR/trap skeleton brief",
+      "path": "ips/Verification/doc/CSR_TRAP_SKELETON_BRIEF.md",
+      "sha256": "ccf02e4c0a68ed0ff9338f7b34d99344d4cc13860c9770e5110bac30b825a563"
+    },
+    "CSRHTML": {
+      "label": "CSR/trap architecture guide",
+      "path": "ips/Verification/doc/CSR_TRAP_TESTBENCH_ARCHITECTURE.html",
+      "sha256": "dfa9adcbb324582a917edbc3124c6c095463531ee81b8b75e1bb4f052e39deec"
+    },
+    "CSRREADY": {
+      "label": "CSR/trap skeleton state and extension points",
+      "path": "ips/Verification/infrastructure/tb/csr_trap/README.md",
+      "sha256": "7bfbd49c9ce6bea728dda4af295aa5a27a65d065d40b80a72aa898563a5ecd23"
+    },
+    "HAZARD": {
+      "label": "Hazard and pipeline skeleton entry point",
+      "path": "ips/Verification/hazard_tb/README.md",
+      "sha256": "f42aa5e9d134089a7d8643feba754354498d5eb9a03b16162ad19a5615c0603b"
+    },
+    "HAZHTML": {
+      "label": "Hazard and pipeline architecture",
+      "path": "ips/Verification/hazard_tb/docs/architecture.html",
+      "sha256": "3653e93dab8082efc2416092da1e3e07cfff00004f079f109e5f3de96f23452a"
+    },
+    "HAZVALID": {
+      "label": "Hazard skeleton compilation and runtime limits",
+      "path": "ips/Verification/hazard_tb/docs/validation.md",
+      "sha256": "ce5d5c5b23c407a099cdf5bb570604609791a24af4de9489b558d2a9e9a75511"
+    },
+    "IRQPLAN": {
+      "label": "Peripheral-event and interrupt-commit scenario plan",
+      "path": "ips/documentation/signoff/irq_event_commit_plan_20261104/PLAN.md",
+      "sha256": "465be18c2579a6ea922e123b728816d7431944df9d8ab23a8f365e4c85eb80bd"
+    },
+    "IRQFILES": {
+      "label": "Peripheral-event proposed TB file plan",
+      "path": "ips/documentation/signoff/irq_event_commit_plan_20261104/TB_FILE_PLAN.md",
+      "sha256": "9b9ecf0f126c50fdf9571d92a62368fab298bf84af42cfaa4462d231cf7e8128"
+    },
+    "IRQBRIEF": {
+      "label": "Peripheral-event delegation briefs; not executed",
+      "path": "ips/documentation/signoff/irq_event_commit_plan_20261104/DELEGATION_BRIEFS.md",
+      "sha256": "2abfd0087233aef7ac66c715dc372315df9b3c4a5384ac1ed8b7cf1978a2feab"
+    },
+    "IRQUNIT": {
+      "label": "IRQ unit scope and coverage plan",
+      "path": "ips/Verification/IRQ_UNIT_COVERAGE_PLAN.md",
+      "sha256": "f5a93d691b1d9aacdb8a353422d2db71f13b8e4d8c4b8a5f7fc5d4d1c427a541"
+    },
+    "IRQFUNC": {
+      "label": "Retained IRQ unit functional coverage",
+      "path": "ips/Verification/artifacts/xcelium_irq_20261030_004317/functional_summary.txt",
+      "sha256": "eb374acdf83ef8a394b7d91927d4027fbba0858e29fcd15e0aa986802fb74bf7"
+    },
+    "IRQCODE": {
+      "label": "Retained IRQ unit code coverage and scope limits",
+      "path": "ips/Verification/artifacts/xcelium_irq_20261030_004317/code_summary.txt",
+      "sha256": "9bfb77b3d225e71e0a65e6f4ea072192942e41628925d89e5b1a46014be3a54d"
+    },
+    "DV": {
+      "label": "Saved RISC-DV failures and proposed closure checks",
+      "path": "ips/documentation/core/RISCV_DV_FAILURE_AUDIT.md",
+      "sha256": "9ed1edda39c1d8c737290570918334a87281b33ca80953a0aaedf23c3df184d0"
+    },
+    "DVHTML": {
+      "label": "RISC-DV failure report",
+      "path": "ips/documentation/core/RISCV_DV_FAILURE_AUDIT.html",
+      "sha256": "385d43a088a7145e935828c7e0d4813e6b877db1047b74b0ab0048f00d11a382"
+    },
+    "RISCOF": {
+      "label": "Historical local RISCOF report",
+      "path": "verification/riscof/report.html",
+      "sha256": "d18b4fd0647af40078c10df35c10e8bff29cb384a423122b58b06ef7916531dc"
+    },
+    "RISCONF": {
+      "label": "Historical RISCOF configuration",
+      "path": "verification/riscof/config.ini",
+      "sha256": "b6a444ef586f774d48e690b264a843ed2d9fa7e31399688b4f9f82f9dbbc3336"
+    },
+    "BENCH": {
+      "label": "Benchmark workflow",
+      "path": "ips/benchmarks/README.md",
+      "sha256": "4385ed24b519b75fe7378939066a8380c6691a9ca9648ae597ced8c245fe8770"
+    },
+    "BENCHPLAN": {
+      "label": "Benchmark infrastructure plan",
+      "path": "ips/benchmarks/docs/PLAN.md",
+      "sha256": "9457a935d9e6bc03e956f7d2ad88b69b978a8f8aeb38929896c2d0df050f9bc2"
+    },
+    "BENCHDONE": {
+      "label": "Benchmark deliverables, runs and evidence index",
+      "path": "ips/benchmarks/docs/DELIVERABLES.md",
+      "sha256": "4455dc0f72272e8dc7bfa1d6fbac15ef5bfb8f31e5164e902022ee1438e1b4d2"
+    },
+    "BENCHFAIL": {
+      "label": "Benchmark runtime outcomes",
+      "path": "ips/benchmarks/docs/KNOWN_FAILURES.md",
+      "sha256": "d406861b2fd2664ad74bf77cd0c40ff07bdb09f8b7de9c88a7e76ad0b9f91c2d"
+    },
+    "ISOLATION": {
+      "label": "Waveform-based RTL failure isolation",
+      "path": "ips/benchmarks/docs/RTL_FAILURE_ISOLATION.md",
+      "sha256": "55c81da7c2a63ae543463a430230a5295f323182401a44f654a9b7f69022ffd2"
+    },
+    "REPRO": {
+      "label": "Benchmark failure reproduction bundle",
+      "path": "ips/benchmarks/deliverables/RTL_failure_isolation_20261104.zip",
+      "sha256": "cce56b49a2b0001d9a54d3adcd225314555326305ccf31ccef3218c0bf810af5"
+    },
+    "BOOT": {
+      "label": "Historical full-SoC SPI boot evidence and limits",
+      "path": "ips/Verification/components/memory/boot_path.md",
+      "sha256": "f9f5448487bb749345a75a8b9f8fbf0bf011882803e9c782b2bca7cb1654a68b"
+    },
+    "BOOTUNIT": {
+      "label": "SPI bootloader unit passing verdict",
+      "path": "ips/Verification/artifacts/runs/tb_bootloader_20261031_183859_f178e58b/verdict.json",
+      "sha256": "e9cbc96502a590dacfc92922e4ba4c360383f600d7076e676fa11f2c2e4d004a"
+    }
+  }
+}

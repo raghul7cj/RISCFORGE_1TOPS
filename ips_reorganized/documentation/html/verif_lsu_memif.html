@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LSU and Memory Interface Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ VERIFICATION</span></div>
+<div class="wrap">
+
+<h1>Verification of the load/store unit and the hybrid memory interface</h1>
+<p class="lead">What must be checked on <code>ls_unit</code>, the misalignment and fault logic in <code>memory_cycle</code>, and <code>hybrid_mem_interface</code>: alignment, extension, SRAM versus MMIO routing, stalls, bus errors and exactly-once MMIO effects. For core and SoC verification engineers.</p>
+<p class="meta">Scope: LSU, memory stage fault logic, hybrid memory interface | Sources: riscv_core/rtl/ls_unit.v, memory_cycle.v, hybrid_mem_interface.sv, hazard_unit.v, Rev B 8.5 and 16.10 | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Scope and status</a></li>
+<li><a href="#s2">What the RTL does</a></li>
+<li><a href="#s3">Bus error to access fault</a></li>
+<li><a href="#s4">Exactly-once MMIO</a></li>
+<li><a href="#s5">Check architecture</a></li>
+<li><a href="#s6">Test plan</a></li>
+<li><a href="#s7">Existing evidence</a></li>
+<li><a href="#s8">Not claimed</a></li>
+</ol></div>
+
+
+<h2 id="s1">1. Scope and status</h2>
+<p>This page covers <code>ls_unit</code> (byte enables, store alignment, load extension), the misalignment and access-fault logic in <code>memory_cycle.v</code>, and <code>hybrid_mem_interface</code> (SRAM versus AXI4-Lite MMIO routing, handshakes, stalls, errors). Status: <span class="tag exists">EXISTS</span> <b>none of these three has a dedicated unit testbench</b>. Indirect evidence is limited to the RISCOF load/store alignment tests (older RTL), an interrupt testbench that uses the SRAM path with the AXI side tied off, and a structural LSU-to-AXI-to-APB monitor run in a stub harness. Rev B specifies much more (CP-8, MMIO exactly-once) and none of that is built.</p>
+<div class="warn"><b>Live defect.</b> DEF-001, a load-use flush inserted during an MMIO memory stall that dropped loads, is fixed in <code>hazard_unit.v</code> (FlushE gated by <code>~mem_stall_i</code>, <code>hazard_unit.v:192</code>) but its status in <code>Verification/status/defects.csv</code> is FIXED-UNVERIFIED: no regression test proves it. Test LM-12 below is that regression.</div>
+
+<h2 id="s2">2. What the RTL does</h2>
+<h3>2.1 Byte enables and store alignment</h3>
+<p><span class="tag exists">EXISTS</span> <code>ls_unit.v:123-159</code>. The offset is <code>core_addr[1:0]</code>. Stores shift the register value into the addressed lane; for any non-store the byte enable is 0000.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Store</th><th>addr[1:0]</th><th>mem_be</th><th>mem_wdata</th></tr></thead>
+<tbody>
+<tr><td>SB (000)</td><td>00 / 01 / 10 / 11</td><td>0001 / 0010 / 0100 / 1000</td><td>rs2, rs2 &lt;&lt; 8, rs2 &lt;&lt; 16, rs2 &lt;&lt; 24</td></tr>
+<tr><td>SH (001)</td><td>0x (addr[1] = 0)</td><td>0011</td><td>rs2</td></tr>
+<tr><td>SH (001)</td><td>1x (addr[1] = 1)</td><td>1100</td><td>rs2 &lt;&lt; 16</td></tr>
+<tr><td>SW (010)</td><td>00</td><td>1111</td><td>rs2</td></tr>
+<tr><td>other funct3</td><td>any</td><td>0000</td><td>0</td></tr>
+</tbody></table></div>
+
+<h3>2.2 Load formatting</h3>
+<p><span class="tag exists">EXISTS</span> <code>ls_unit.v:74-118</code>. The whole 32-bit word comes back from memory; the unit selects and extends.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Load</th><th>Selection</th><th>Extension</th><th>Output when not a load</th></tr></thead>
+<tbody>
+<tr><td>LB (000)</td><td>byte chosen by addr[1:0]</td><td>sign-extend from bit 7 of the byte</td><td>0</td></tr>
+<tr><td>LBU (100)</td><td>byte chosen by addr[1:0]</td><td>zero-extend</td><td>0</td></tr>
+<tr><td>LH (001)</td><td>halfword chosen by addr[1] only</td><td>sign-extend from bit 15 of the half</td><td>0</td></tr>
+<tr><td>LHU (101)</td><td>halfword chosen by addr[1] only</td><td>zero-extend</td><td>0</td></tr>
+<tr><td>LW (010)</td><td>whole word</td><td>none</td><td>0</td></tr>
+<tr><td>011, 110, 111</td><td>-</td><td>result 0 (fallback)</td><td>0</td></tr>
+</tbody></table></div>
+
+<p>Because LH and LHU look only at addr[1], they would silently read the wrong half on an odd address; they rely on the misalignment check below to stop the access first.</p>
+<h3>2.3 Misaligned access as implemented</h3>
+<p><span class="tag exists">EXISTS</span> <code>memory_cycle.v:115-147,177-193</code>. LW and SW trap if addr[1:0] is not 00; LH, LHU and SH trap if addr[0] is 1. Byte accesses never trap. The cause is 4 (load misaligned) or 6 (store misaligned), <code>mtval</code> source is the full address (<code>ALU_ResultM</code>), and the memory request is suppressed (<code>lsu_mem_req</code> is gated by the misalignment and by an earlier exception), so no side effect leaves the core. The misaligned stall is masked so the exception is captured instead of the pipeline holding (<code>memory_cycle.v:186-193</code>). An earlier exception propagating from a previous stage wins over a new one (<code>:144-147</code>). The misaligned cause takes priority over an access fault when both occur (<code>:134-139</code>). The core therefore <b>traps</b> on misaligned data access; it does not emulate it in hardware.</p>
+<h3>2.4 Routing, handshake and stall</h3>
+<p><span class="tag exists">EXISTS</span> <code>hybrid_mem_interface.sv:70-75,95-152,155-325,375-397</code>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Path</th><th>Behaviour as read</th></tr></thead>
+<tbody>
+<tr><td>SRAM read</td><td>One stall cycle: state IDLE with an active read raises <code>sram_stall_needed</code>; next cycle WAIT returns data with stall low (<code>:125-152</code>)</td></tr>
+<tr><td>SRAM write</td><td>Not stalled; byte mask and aligned data go straight to the SRAM port (<code>:97-103,152</code>)</td></tr>
+<tr><td>AXI write</td><td>States IDLE, WAIT_ADDR, WAIT_DATA, WAIT_RESP; aw_valid and w_valid asserted in the request cycle; stall until B response (<code>:157-214,375-378</code>). A comment at <code>:186-193</code> records an earlier deadlock caused by swapped ready checks</td></tr>
+<tr><td>AXI read</td><td>IDLE moves to WAIT_READ only when <code>ar_ready</code> is seen; r_ready only in WAIT_READ; data forwarded on the release cycle (<code>:265-291,394</code>)</td></tr>
+<tr><td>Address, data, strobe</td><td>Driven directly from the LSU bus, not from registers; stable because the pipeline is frozen (<code>:344-356</code>)</td></tr>
+<tr><td>Stall to LSU</td><td><code>mem_stall</code> = SRAM stall | write busy | read busy, combinational; <code>core_stall</code> = <code>mem_req</code> &amp; <code>mem_stall</code> (<code>ls_unit.v:50</code>)</td></tr>
+<tr><td>Error</td><td><code>mem_err</code> = addr_fault | non-OKAY B response on completion | non-OKAY R response on completion (<code>:387-389</code>)</td></tr>
+<tr><td>Range fault</td><td>A request outside both the SRAM and MMIO ranges raises addr_fault with no bus transaction; under the testbench parameterisation (SRAM from 0x8000_1000) the instruction-memory window 0x8000_0000 to 0x8000_0FFF is therefore a data fault</td></tr>
+</tbody></table></div>
+
+<figure>
+<svg viewBox="0 0 1040 264" role="img" aria-label="Request routing in hybrid_mem_interface: SRAM, AXI4-Lite MMIO, or access fault">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-core" x="40" y="100" width="150" height="56" rx="6"/>
+<text class="tb mid" x="115" y="124">ls_unit</text>
+<text class="ts mid" x="115" y="142">LSU bus</text>
+<rect class="bx-bus" x="260" y="100" width="170" height="56" rx="6"/>
+<text class="tb mid" x="345" y="124">Address decode</text>
+<text class="ts mid" x="345" y="142">hybrid_mem_interface</text>
+<rect class="bx-mem" x="520" y="28" width="200" height="56" rx="6"/>
+<text class="tb mid" x="620" y="52">SRAM path</text>
+<text class="ts mid" x="620" y="70">DMEM_BASE + MEM_DEPTH*4</text>
+<rect class="bx-bus" x="520" y="100" width="200" height="56" rx="6"/>
+<text class="tb mid" x="620" y="124">AXI4-Lite FSMs</text>
+<text class="ts mid" x="620" y="142">MMIO_BASE to MMIO_LIMIT</text>
+<rect class="bx-ctrl" x="520" y="184" width="200" height="56" rx="6"/>
+<text class="tb mid" x="620" y="208">addr_fault</text>
+<text class="ts mid" x="620" y="226">neither range matched</text>
+<rect class="bx-mem" x="800" y="28" width="200" height="56" rx="6"/>
+<text class="tb mid" x="900" y="52">Data_Memory</text>
+<text class="ts mid" x="900" y="70">sram_en, we, wmask</text>
+<rect class="bx-per" x="800" y="100" width="200" height="56" rx="6"/>
+<text class="tb mid" x="900" y="124">Crossbar and APB</text>
+<text class="ts mid" x="900" y="142">peripheral window</text>
+<rect class="bx-core" x="800" y="184" width="200" height="56" rx="6"/>
+<text class="tb mid" x="900" y="208">mem_err to memory_cycle</text>
+<text class="ts mid" x="900" y="226">cause 5 or 7</text>
+<path class="ar" d="M190 128 H260"/>
+<path class="ar" d="M430 128 H475 V56 H520"/>
+<path class="ar" d="M430 128 H520"/>
+<path class="ar" d="M430 128 H475 V212 H520"/>
+<path class="ar" d="M720 56 H800"/>
+<path class="ar" d="M720 128 H800"/>
+<path class="ar" d="M720 212 H800"/>
+</svg>
+<figcaption><b>Figure 1.</b> Request path only. The decode takes three mutually exclusive outcomes. Read data, stall and error return to the LSU through one combinational aggregation (<code>hybrid_mem_interface.sv:381-397</code>). Ranges are parameters: the defaults are DMEM_BASE_BYTE 0x8000_1000 and MMIO 0x4000_0000 to 0x4000_FFFF; the SoC parameterisation quoted by Rev B 8.5 uses an MMIO limit of 0x4FFF_FFFF.</figcaption>
+</figure>
+
+
+<h2 id="s3">3. Bus error to access fault (Rev B 8.5, CP-8)</h2>
+<p><span class="tag specified">SPECIFIED</span> Rev B 8.5 defines six error sources, ERR-1 to ERR-6, that all collapse to one signal, and seven negative cases N1 to N7. The core must take cause 5 (load) or 7 (store), <code>mepc</code> = faulting instruction, <code>mtval</code> = the data address, no shadow-stack push, and the faulting instruction must not retire (Rev B Tables 8.6 to 8.8). The RTL side is <span class="tag exists">EXISTS</span>: <code>mem_err</code> is built as in Section 2.4, <code>memory_cycle.v:132-139</code> turns <code>lsu_core_err</code> plus access type into cause 5 or 7, and <code>tval</code> is the address. Rev B grades ERR-1 to ERR-5 and N1 to N6 in the full-SoC configuration and ERR-6 and N7 only in a fabric-only configuration, because the core cannot reach those addresses. No CP-8 check is built. The decode-hole and timeout cases (ERR-1, ERR-3, ERR-4) live outside this unit (bridge, bus monitors) but end at <code>mem_err</code>, which is where this page's checks begin.</p>
+
+<h2 id="s4">4. Exactly-once MMIO effect across an interrupt (Rev B 16.10)</h2>
+<p><span class="tag specified">SPECIFIED</span> Rev B finding 30 requires that an MMIO write with a visible effect happens once even if an interrupt arrives at the worst moment. Four scenarios are named: a UART transmit write (count characters), a GPIO toggle write (parity of the output), an I2C start command (count START conditions) and a Timer 0 compare write (count interrupt acceptances). Injection points run from the store in EX, through MEM with the request already driven, to WB and one cycle after the APB handshake. Two oracles are both required: the instruction-set simulator's access stream versus the DUT's LSU stream, and a per-peripheral effect counter. <span class="tag exists">EXISTS</span> on the RTL side: while <code>mem_stall</code> holds the store in MEM the AXI request is held and stable (Section 2.4), which is the property that makes exactly-once plausible; the interaction with an accepted interrupt (flush of earlier stages, retirement of the stalled store) is not examined by any retained test. Neither oracle is built, and the reference ISS flow is planned in later phases (see the lock-step page).</p>
+<figure>
+<svg viewBox="0 0 1040 484" role="img" aria-label="Waveform of an MMIO load stalled for three cycles by the AXI-Lite read FSM">
+<text class="ts mid" x="264" y="36">c0</text>
+<text class="ts mid" x="360" y="36">c1</text>
+<text class="ts mid" x="456" y="36">c2</text>
+<text class="ts mid" x="552" y="36">c3</text>
+<text class="ts mid" x="648" y="36">c4</text>
+<text class="ts mid" x="744" y="36">c5</text>
+<text class="ts mid" x="840" y="36">c6</text>
+<text class="ts mid" x="936" y="36">c7</text>
+<path class="grp" d="M216 48 V422"/>
+<path class="grp" d="M312 48 V422"/>
+<path class="grp" d="M408 48 V422"/>
+<path class="grp" d="M504 48 V422"/>
+<path class="grp" d="M600 48 V422"/>
+<path class="grp" d="M696 48 V422"/>
+<path class="grp" d="M792 48 V422"/>
+<path class="grp" d="M888 48 V422"/>
+<path class="grp" d="M984 48 V422"/>
+<text class="tm end" x="204" y="80">clk</text>
+<text class="tm end" x="204" y="120">mem_req</text>
+<text class="tm end" x="204" y="160">mem_stall</text>
+<text class="tm end" x="204" y="200">m_axi_arvalid</text>
+<text class="tm end" x="204" y="240">ar_ready (slave)</text>
+<text class="tm end" x="204" y="280">m_axi_rready</text>
+<text class="tm end" x="204" y="320">r_valid (slave)</text>
+<text class="tm end" x="204" y="360">mem_rdata</text>
+<text class="tm end" x="204" y="400">axi_read_state</text>
+<path class="ln" d="M216 88 V64 H264 V88 H312M312 88 V64 H360 V88 H408M408 88 V64 H456 V88 H504M504 88 V64 H552 V88 H600M600 88 V64 H648 V88 H696M696 88 V64 H744 V88 H792M792 88 V64 H840 V88 H888M888 88 V64 H936 V88 H984"/>
+<path class="ln" d="M216 128 H312 V104 H408 H504 H600 H696 V128 H792 H888 H984"/>
+<path class="ln" d="M216 168 H312 V144 H408 H504 H600 V168 H696 H792 H888 H984"/>
+<path class="ln" d="M216 208 H312 V184 H408 V208 H504 H600 H696 H792 H888 H984"/>
+<path class="ln" d="M216 248 H312 V224 H408 V248 H504 H600 H696 H792 H888 H984"/>
+<path class="ln" d="M216 288 H312 H408 V264 H504 H600 H696 V288 H792 H888 H984"/>
+<path class="ln" d="M216 328 H312 H408 H504 H600 V304 H696 V328 H792 H888 H984"/>
+<path class="ln" d="M216 368 H600 M696 368 H984"/>
+<rect class="bx-ver" x="600" y="344" width="96" height="24" rx="3"/><text class="ts mid" x="648" y="360">formatted</text>
+<rect class="bx-core" x="218" y="384" width="188" height="24" rx="3"/><text class="tb mid" x="312" y="400">IDLE</text>
+<rect class="bx-bus" x="410" y="384" width="284" height="24" rx="3"/><text class="tb mid" x="552" y="400">WAIT_READ</text>
+<rect class="bx-core" x="698" y="384" width="284" height="24" rx="3"/><text class="tb mid" x="840" y="400">IDLE</text>
+<text class="ts" x="24" y="456">Illustrative case: the slave accepts the address in the request cycle (c1) and returns data in c4. Both delays are free parameters in the test plan.</text>
+</svg>
+<figcaption><b>Figure 3.</b> Stalled MMIO load, derived from the read FSM and the combinational aggregation (<code>hybrid_mem_interface.sv:272-291,375-397</code>). arvalid is driven in the cycle the request appears; mem_stall stays high until <code>axi_rd_done</code> (state WAIT_READ and r_valid), and the same cycle forwards the AXI read data on mem_rdata so the MEM stage can latch it. The pipeline must hold the instruction, its address and its data stable from c1 to c4. This is a prediction from the source, not a captured simulation.</figcaption>
+</figure>
+
+
+<h2 id="s5">5. Check architecture</h2>
+<figure>
+<svg viewBox="0 0 1040 304" role="img" aria-label="Check architecture for the load/store unit and memory interface">
+<rect class="bx-ver" x="40" y="104" width="170" height="56" rx="6"/>
+<text class="tb mid" x="125" y="128">LSU driver</text>
+<text class="ts mid" x="125" y="146">bus or program</text>
+<rect class="bx-core" x="290" y="104" width="200" height="56" rx="6"/>
+<text class="tb mid" x="390" y="128">DUT</text>
+<text class="ts mid" x="390" y="146">ls_unit + hybrid_mem_if</text>
+<rect class="bx-mem" x="610" y="24" width="190" height="56" rx="6"/>
+<text class="tb mid" x="705" y="48">SRAM model</text>
+<text class="ts mid" x="705" y="66">registered read, BE</text>
+<rect class="bx-ver" x="610" y="104" width="190" height="56" rx="6"/>
+<text class="tb mid" x="705" y="128">AXI-Lite responder</text>
+<text class="ts mid" x="705" y="146">delays, error resp</text>
+<rect class="bx-ver" x="860" y="104" width="150" height="56" rx="6"/>
+<text class="tb mid" x="935" y="128">SVA monitors</text>
+<text class="ts mid" x="935" y="146">stall, addr stable</text>
+<rect class="bx-ver" x="290" y="224" width="200" height="56" rx="6"/>
+<text class="tb mid" x="390" y="248">Reference model</text>
+<text class="ts mid" x="390" y="266">byte memory + tables</text>
+<rect class="bx-ver" x="610" y="224" width="190" height="56" rx="6"/>
+<text class="tb mid" x="705" y="248">Scoreboard</text>
+<text class="ts mid" x="705" y="266">data, BE, fault, count</text>
+<path class="ar" d="M210 132 H290"/>
+<path class="ar" d="M490 132 H550 V52 H610"/>
+<path class="ar" d="M490 132 H610"/>
+<path class="ar-ver" d="M800 132 H860"/>
+<path class="ar-ver" d="M125 160 V252 H290"/>
+<path class="ar-ver" d="M490 252 H610"/>
+<path class="ar-ver" d="M420 160 V192 H705 V224"/>
+<text class="ts" x="222" y="124">request</text>
+<text class="ts" x="500" y="244">expect</text>
+</svg>
+<figcaption><b>Figure 2.</b> Proposed check architecture. The AXI-Lite responder is a bus functional model whose ready and valid delays and response codes are programmable, which is what makes the stall, error and exactly-once cases reachable. The scoreboard compares loaded data, byte enables, the number of AXI transactions per access and the fault outcome with a reference memory model. Not built.</figcaption>
+</figure>
+
+<p>The harness is built in two layers. The first drives <code>ls_unit</code> and <code>hybrid_mem_interface</code> directly on the LSU bus, which makes every row of the truth tables in Sections 2.1 and 2.2 cheap to cover exhaustively (3 sizes x 4 offsets x data patterns). The second runs instruction sequences through the full core so that <code>memory_cycle</code> exception logic, the hazard unit and the write-back path are in the loop; it reuses the lock-step comparison planned for the core.</p>
+
+<h2 id="s6">6. Test plan</h2>
+<p>Status: <b>NOT BUILT</b>, <b>INDIRECT</b> (an artefact touches it without checking it), <b>STALE</b> (older RTL).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Scenario</th><th>Stimulus</th><th>Expected</th><th>Oracle</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>LM-01</td><td>Store byte-enable and data alignment</td><td>SB, SH, SW at each legal offset, random data</td><td>Table 2.1 exactly; mem_we high only for stores</td><td>Reference tables</td><td>INDIRECT, STALE (RISCOF sb, sh, sw align)</td></tr>
+<tr><td>LM-02</td><td>Load select and extension</td><td>LB, LBU, LH, LHU, LW at each legal offset; bytes 0x7F, 0x80, halves 0x7FFF, 0x8000</td><td>Table 2.2 exactly</td><td>Reference tables</td><td>INDIRECT, STALE (RISCOF lb, lbu, lh, lhu, lw align)</td></tr>
+<tr><td>LM-03</td><td>Undefined funct3</td><td>funct3 011, 110, 111 on the ls_unit port</td><td>Zero BE, zero data; check whether the decoder can generate it</td><td>Spec of ls_unit</td><td>NOT BUILT; OPEN (reachability unknown)</td></tr>
+<tr><td>LM-04</td><td>Misaligned traps</td><td>LW/SW at offsets 1,2,3; LH/LHU/SH at odd offsets</td><td>cause 4 or 6, mtval = address, no memory request, no write</td><td>Trap model</td><td>NOT BUILT (RISCOF privilege misalign-lh/lhu/lw tests exist in the suite; whether they were run is not shown by the retained report)</td></tr>
+<tr><td>LM-05</td><td>Byte access never traps</td><td>LB, LBU, SB at every offset</td><td>No trap</td><td>Trap model</td><td>NOT BUILT</td></tr>
+<tr><td>LM-06</td><td>SRAM protocol</td><td>Back-to-back reads, read then write, write then read</td><td>One stall on a read; none on a write; correct data</td><td>Reference memory</td><td>INDIRECT (tb1 uses LW/SW to DMEM)</td></tr>
+<tr><td>LM-07</td><td>Decode boundaries</td><td>Base-1, base, limit, limit+1 for SRAM and MMIO</td><td>Route as Figure 1; faults outside; no bus transaction on fault</td><td>Address model</td><td>NOT BUILT</td></tr>
+<tr><td>LM-08</td><td>AXI read handshake</td><td>ar_ready and r_valid delayed 0..N cycles</td><td>Stall high until data; data forwarded in the release cycle; address stable</td><td>Responder BFM + SVA</td><td>NOT BUILT; tb1 ties the AXI response to zero</td></tr>
+<tr><td>LM-09</td><td>AXI write handshake</td><td>All four {aw_ready, w_ready} combinations, b_valid delay</td><td>One AW, one W, one B per store; no deadlock (history at <code>:186-193</code>)</td><td>Responder BFM + SVA</td><td>NOT BUILT</td></tr>
+<tr><td>LM-10</td><td>Stability during stall</td><td>Hold a stalled MMIO access for many cycles</td><td>Address, data, strobe and valid unchanged</td><td>SVA</td><td>NOT BUILT</td></tr>
+<tr><td>LM-11</td><td>Bus error to fault (CP-8)</td><td>OKAY, SLVERR, DECERR on B and R; out-of-range address</td><td>Clean: no trap. Error: cause 5 or 7, mepc, mtval, no retire, no GPR write</td><td>Trap model; Rev B Tables 8.7, 8.8</td><td>NOT BUILT</td></tr>
+<tr><td>LM-12</td><td>DEF-001 regression</td><td>Load-use pair while an MMIO access stalls</td><td>Load result not dropped; one retire per instruction</td><td>Retire stream</td><td>NOT BUILT (defect is FIXED-UNVERIFIED)</td></tr>
+<tr><td>LM-13</td><td>Exactly-once MMIO writes (Rev B 16.10)</td><td>Interrupt injected at points A to D for UART, GPIO toggle, I2C command, Timer compare</td><td>Exactly one effect; ISS stream equals LSU stream</td><td>ISS plus effect counters</td><td>NOT BUILT; needs the lock-step flow</td></tr>
+<tr><td>LM-14</td><td>Interrupt during a stalled load</td><td>Interrupt arrives while mem_stall is high</td><td>Load completes once or is replayed once; mepc precise</td><td>Retire stream</td><td>NOT BUILT</td></tr>
+<tr><td>LM-15</td><td>Fault side effects</td><td>Store to a faulting address</td><td>No partial write on either path</td><td>Reference memory</td><td>NOT BUILT</td></tr>
+<tr><td>LM-16</td><td>Timeout responses</td><td>Fabric timeout monitors expire</td><td>Core sees SLVERR and takes the access fault</td><td>Rev B ERR-3, ERR-4</td><td>NOT BUILT</td></tr>
+</tbody></table></div>
+
+
+<h2 id="s7">7. Existing evidence</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Evidence</th><th>What it shows</th><th>Boundary</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>RISCOF load/store tests: lb, lbu, lh, lhu, lw, sb, sh, sw (align-01)</td><td>All eight listed as Passed</td><td>Report dated 2026-06-03; <code>ls_unit.v</code> changed 2026-09-29 and <code>memory_cycle.v</code> 2026-09-30. The suite's tests use aligned accesses.</td><td><code>../verification/riscof/report.html</code></td></tr>
+<tr><td>tb1_interrupts</td><td>Core fetch and DMEM loads and stores through <code>hybrid_mem_interface</code> into <code>Data_Memory</code></td><td>AXI response tied to zero (<code>tb1_interrupts.sv:164-166</code>), so MMIO can never complete in that bench; historical testbench</td><td><code>Verification/tb1_interrupts.sv</code></td></tr>
+<tr><td>Component-first monitor and bridge runs (2026-10-19)</td><td>Matrix row MON-01 records an exact structural LSU-to-AXI-to-APB match</td><td>Deterministic stub harness, not real firmware traffic</td><td><code>Verification/verification_matrix.csv</code>, <code>artifacts/component_first/20261019_run02</code></td></tr>
+<tr><td>Directed unit testbench for ls_unit, memory_cycle faults or hybrid_mem_interface</td><td>None exists</td><td>-</td><td>search of the repository</td></tr>
+</tbody></table></div>
+
+
+<h2 id="s8">8. What this page does not claim</h2>
+<ul>
+<li>The waveform in Figure 3 and every expected value are derived from the source and the Rev B text, not from a simulation.</li>
+<li>It does not claim misaligned handling meets the privileged specification in every detail; it describes what the RTL does.</li>
+<li>It does not describe the crossbar, bridge or peripheral registers; those are verified on the fabric pages.</li>
+</ul>
+<p>Related pages: <a href="core_execute_mem_wb.html">Execute, memory and write-back stages</a>, <a href="core_interrupts.html">Core interrupts</a>, <a href="verif_core_overview.html">Core verification overview</a>, <a href="vf_core_lockstep_compliance.html">Lock-step and compliance</a>, <a href="vf_interrupt_verification.html">Interrupt verification</a>, <a href="verif_rv32m.html">RV32M verification</a>, <a href="verif_interrupt_unit.html">Interrupt unit verification</a>, <a href="index.html">Index</a>.</p>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/ls_unit.v</code>, <code>memory_cycle.v</code> (lines 100-200), <code>hybrid_mem_interface.sv</code>, <code>hazard_unit.v</code> (170-201), <code>Verification/tb1_interrupts.sv</code>, <code>Verification/verification_matrix.csv</code>, <code>Verification/status/defects.csv</code>, <code>../verification/riscof/report.html</code>, Rev B plan sections 8.5 (line 1445 onward) and 16.10 (line 10018 onward).</div>
+</div>
+</body>
+</html>

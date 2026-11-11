@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSR and Trap Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Core verification / CSR and trap</span></div>
+<div class="wrap">
+
+<h1>CSR and Trap Verification</h1>
+<p class="lead">How the CSR file (<code>csr_regfile.v</code>) and the trap and MRET commit controller (<code>wb_trap_mret_commit_controller.v</code>) are checked today, what is stale, and what a complete check set needs. For readers planning core-trust work (CT-1, CT-3).</p>
+<p class="meta">Scope: CSR read and write behaviour, trap entry, MRET, redirect and flush | Sources: <code>riscv_core/rtl</code>, ZICSR integration report, older 5-stage testbenches | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Requirements as implemented</a></li>
+<li><a href="#s2">Existing evidence</a></li>
+<li><a href="#s3">Trap-entry check architecture</a></li>
+<li><a href="#s4">CSR write paths and priority</a></li>
+<li><a href="#s5">CSR access-type matrix</a></li>
+<li><a href="#s6">Test plan</a></li>
+<li><a href="#s7">Assertion ideas</a></li>
+<li><a href="#s8">Limits of this page</a></li>
+</ol></div>
+
+<h2 id="s1">1. Requirements as implemented</h2>
+<p>These are read from the source. They are the behaviours a checker must hold the RTL to; none is a statement that the RTL meets the RISC-V privileged specification. Section 5 lists where the implementation departs from the usual machine-mode rules.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>R-1</td><td>On <code>trap_valid_i</code>: <code>mepc</code> takes <code>trap_pc_i</code>; <code>mcause</code> takes <code>{is_interrupt, cause[30:0]}</code>; <code>mstatus.MIE</code> clears; <code>MPIE</code> takes the old MIE; <code>MPP</code> becomes 2'b11.</td><td><code>csr_regfile.v:159-167</code></td></tr>
+<tr><td>R-2</td><td><code>mtval</code> takes the fault address only when <code>trap_addr_valid_i</code>; otherwise 0. The controller asserts it only for exceptions.</td><td><code>csr_regfile.v:162</code>; <code>wb_trap_mret_commit_controller.v:76</code></td></tr>
+<tr><td>R-3</td><td>A trap commits when <code>valid_W &amp; exc_valid_W</code>. An MRET commits when <code>valid_W &amp; is_mret_W &amp; ~exc_valid_W</code>, so an exception beats MRET.</td><td>controller <code>:64-65</code></td></tr>
+<tr><td>R-4</td><td>Redirect target: trap uses the <code>mtvec</code> base; a vectored interrupt (<code>mtvec[1:0] == 01</code>) adds 4 times the cause; MRET uses <code>mepc</code> with bits [1:0] cleared.</td><td>controller <code>:94-103</code></td></tr>
+<tr><td>R-5</td><td>Trap or MRET commit drives <code>flush_pipeline_onehot</code> to 4'b1111 and <code>wb_trap_redirect_o</code> high.</td><td>controller <code>:67,106</code></td></tr>
+<tr><td>R-6</td><td>MRET: <code>MIE</code> takes <code>MPIE</code>, <code>MPIE</code> becomes 1, <code>MPP</code> becomes 2'b11; <code>mintprio</code> is untouched.</td><td>controller <code>:116-130</code>; <code>csr_regfile.v:172-179</code></td></tr>
+<tr><td>R-7</td><td>Write priority inside the CSR file: trap entry, then MRET, then instruction write. A trap in the same cycle discards the instruction write. The top level also gates instruction writes with <code>valid_W</code>, <code>~exc_valid_W</code> and <code>~mret_commit</code>.</td><td><code>csr_regfile.v:159-184</code>; <code>top.v:286</code></td></tr>
+<tr><td>R-8</td><td><code>csrrw</code> and <code>csrrwi</code> always write. <code>csrrs</code>, <code>csrrc</code> and the immediate forms write only when rs1 or uimm is non-zero.</td><td><code>execute_cycle.v:333-341</code></td></tr>
+<tr><td>R-9</td><td>Interrupt trap commit clears the gateway: cause 7 clears bit 0; causes 16 to 27 clear bit (cause - 15).</td><td>controller <code>:80-92</code></td></tr>
+<tr><td>R-10</td><td>Write masks, read-only fields and counter behaviour as in the matrix of section 5.</td><td><code>csr_regfile.v:116-200</code></td></tr>
+</tbody></table></div>
+
+<h2 id="s2">2. Existing evidence</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Evidence</th><th>What it shows</th><th>Limit</th><th>Label</th></tr></thead>
+<tbody>
+<tr><td>Zicsr compliance suite and <code>ZICSR_INTEGRATION_REPORT.md</code> (2026-06-12)</td><td>Seven CSR tests (<code>csrrw</code>, <code>csrrwi</code>, <code>csrs</code>, <code>csrrsi</code>, <code>csrci</code>, <code>csrrci</code>, <code>csr</code>) are wired into RISCOF; they touch mstatus, mtvec, mie and mip. The sample read (<code>csrrw-01.S</code>) writes mstatus, mtvec and mie and records the old values into the signature.</td><td>The report records integration only and lists reference generation as a next step. All seven reference files are 0 bytes and the retained RISCOF report has no Zicsr entry. No Zicsr result exists. The suite never writes mepc, mcause, mscratch, mintprio or the counters (in the file read).</td><td><span class="tag exists">EXISTS</span> (no result)</td></tr>
+<tr><td>Retained RISCOF report</td><td>46 of 47 entries pass. The one failure, privilege test <code>misalign1-jalr-01</code> (misaligned jalr target), is on the trap path: its signature word 0 differs from the reference.</td><td>RTL identity unknown. See <a href="verif_core_overview.html">Core verification overview</a>.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>tb1_interrupts.sv</code> tests 1 to 7</td><td>Test 1 checks, on a timer interrupt, trap commit, <code>mcause</code> 0x80000007, <code>mepc</code>, <code>mstatus.MIE</code> cleared, and return after MRET. Tests 2 to 4 check <code>mcause</code> per source.</td><td>Interrupt entries only, through hierarchical references to <code>csr_file</code>. No retained result log found. Exceptions and MPIE/MPP are not checked in the code read.</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>5_stage_trap_exc_intr_no_mul/tb/tb_csr_regfile.sv</code></td><td>Checks mscratch round trip, mstatus mask, mtvec MODE frozen, trap-entry updates, Port C mstatus write, and read-only mip bits.</td><td>Older interface. It expects the mstatus mask readback <code>0x00001888</code>; the current mask is <code>0x0000188A</code>, so that check would fail against the current file. It does not connect <code>fast_intr_i</code>, <code>mret_commit_i</code> or <code>mintprio_out_o</code>. Not run for this page; the mismatch is read from source.</td><td><span class="tag exists">EXISTS</span> (stale)</td></tr>
+<tr><td><code>.../tb/tb_wb_commit_ctrl.sv</code></td><td>Checks trap redirect and flush, MRET target and Port C values, and exception-beats-MRET.</td><td>Instantiates <code>irq_valid_i</code> and <code>irq_id_i</code> and a 5-bit cause; the current module has neither of those ports and takes a 6-bit cause plus <code>exc_class_W</code>. It would not elaborate as written.</td><td><span class="tag exists">EXISTS</span> (stale)</td></tr>
+<tr><td><code>tb_top_exceptions.sv</code>, <code>tb_top_mret.sv</code>, <code>programs/*.mem</code>, <code>Documentation/04_Verification/*.md</code></td><td>Top-level exception and MRET benches and plan documents for the older core.</td><td>Names and sizes only; not read in detail. No retained results found.</td><td><span class="tag open">OPEN</span></td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. Trap-entry check architecture</h2>
+<p>Figure 1 shows where a commit scoreboard would watch. It takes the same WB packet that drives the controller and predicts the CSR state, the redirect target and the flush, then compares them with what the three consumers receive. No such scoreboard exists; the block is <span class="tag specified">SPECIFIED</span> as a proposal.</p>
+<figure>
+<svg viewBox="0 0 960 460" role="img" aria-label="Trap-entry check: WB packet into the commit controller, three consumers, and a scoreboard observing them">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-core" x="40" y="176" width="176" height="64" rx="6"/>
+<text class="tb mid" x="128" y="198">WB packet</text>
+<text class="ts mid" x="128" y="214">valid_W exc_valid_W</text>
+<text class="ts mid" x="128" y="230">cause pc tval is_mret</text>
+
+<rect class="bx-ctrl" x="280" y="176" width="200" height="64" rx="6"/>
+<text class="tb mid" x="380" y="202">wb_trap_mret_commit</text>
+<text class="tb mid" x="380" y="220">_controller</text>
+
+<rect class="bx-core" x="584" y="80" width="200" height="56" rx="6"/>
+<text class="tb mid" x="684" y="104">csr_regfile</text>
+<text class="ts mid" x="684" y="122">mepc mcause mtval mstatus</text>
+<rect class="bx-core" x="584" y="180" width="200" height="56" rx="6"/>
+<text class="tb mid" x="684" y="204">IF redirect</text>
+<text class="ts mid" x="684" y="222">trap_target_o</text>
+<rect class="bx-core" x="584" y="264" width="200" height="56" rx="6"/>
+<text class="tb mid" x="684" y="288">hazard_unit</text>
+<text class="ts mid" x="684" y="306">flush_pipeline_onehot</text>
+
+<rect class="bx-ver" x="280" y="376" width="504" height="64" rx="6"/>
+<text class="tb mid" x="532" y="400">Commit scoreboard (SPECIFIED)</text>
+<text class="ts mid" x="532" y="420">mepc=pc, mcause, mtval, MIE to MPIE, MPP=11, target, flush=1111</text>
+
+<path class="ar" d="M216 208 H280"/>
+<path class="ar" d="M480 196 H520 V108 H584"/>
+<path class="ar" d="M480 208 H584"/>
+<path class="ar" d="M480 220 H520 V292 H584"/>
+<path class="ar-ver" d="M128 240 V408 H280"/>
+<text class="ts" x="40" y="344">same packet, predicted state</text>
+<path class="ln" d="M784 108 H840 M784 208 H840 M784 292 H840"/>
+<path class="ar-ver" d="M840 108 V408 H784"/>
+<text class="ts" x="852" y="260">observed</text>
+<text class="ts" x="852" y="276">outputs</text>
+<text class="ts" x="40" y="64">Each trap or MRET commit is one scoreboard transaction.</text>
+</svg>
+<figcaption><b>Figure 1.</b> Trap and MRET commit check. The scoreboard sees the packet that enters the controller and the three observable consequences: CSR update, fetch redirect and pipeline flush.</figcaption>
+</figure>
+
+<h2 id="s4">4. CSR write paths and priority</h2>
+<figure>
+<svg viewBox="0 0 960 336" role="img" aria-label="Priority of the three write sources inside the CSR file">
+<rect class="bx-ctrl" x="40" y="40" width="240" height="64" rx="6"/>
+<text class="tb mid" x="160" y="64">1 Trap entry</text>
+<text class="ts mid" x="160" y="84">trap_valid_i</text>
+<rect class="bx-ctrl" x="40" y="128" width="240" height="64" rx="6"/>
+<text class="tb mid" x="160" y="152">2 MRET commit</text>
+<text class="ts mid" x="160" y="172">csr_write_en_mret_i | mret_commit_i</text>
+<rect class="bx-ctrl" x="40" y="216" width="240" height="64" rx="6"/>
+<text class="tb mid" x="160" y="240">3 CSR instruction</text>
+<text class="ts mid" x="160" y="260">csr_write_en_normal_i</text>
+
+<rect class="bx-bus" x="344" y="40" width="200" height="240" rx="6"/>
+<text class="tb mid" x="444" y="140">if / else if / else if</text>
+<text class="ts mid" x="444" y="160">one winner per clock</text>
+<text class="ts mid" x="444" y="180">lower sources dropped</text>
+
+<rect class="bx-core" x="608" y="40" width="312" height="64" rx="6"/>
+<text class="tb mid" x="764" y="64">mepc, mcause, mtval</text>
+<text class="ts mid" x="764" y="84">mstatus MIE=0, MPIE, MPP=11</text>
+<rect class="bx-core" x="608" y="128" width="312" height="64" rx="6"/>
+<text class="tb mid" x="764" y="152">mstatus MIE, MPIE, MPP</text>
+<text class="ts mid" x="764" y="172">bit 1 from the Port C data word</text>
+<rect class="bx-core" x="608" y="216" width="312" height="64" rx="6"/>
+<text class="tb mid" x="764" y="240">masked write by address</text>
+<text class="ts mid" x="764" y="260">masks in section 5</text>
+
+<path class="ar" d="M280 72 H344"/>
+<path class="ar" d="M280 160 H344"/>
+<path class="ar" d="M280 248 H344"/>
+<path class="ar" d="M544 72 H608"/>
+<path class="ar" d="M544 160 H608"/>
+<path class="ar" d="M544 248 H608"/>
+<text class="ts" x="40" y="312">top.v:286 also gates source 3: csr_write_en_W &amp; valid_W &amp; ~exc_valid_W &amp; ~mret_commit.</text>
+</svg>
+<figcaption><b>Figure 2.</b> Write sources in <code>csr_regfile.v</code>. A checker must include the case where two sources are active in one cycle, because the lower one disappears silently.</figcaption>
+</figure>
+<p>The MSIP storage bit is a separate process: a Port C write to <code>mip</code> or a Port B write to <code>mip</code> sets <code>msip_r</code> from bit 3 (<code>csr_regfile.v:207-215</code>). It does not follow the trap priority, so it can update in the same cycle as a trap.</p>
+
+<h2 id="s5">5. CSR access-type matrix</h2>
+<p>All six instruction forms compute a new value from the old value and an operand (rs1 or the 5-bit immediate), then write through the mask below. <code>csrrw(i)</code>: new = operand. <code>csrrs(i)</code>: new = old | operand. <code>csrrc(i)</code>: new = old &amp; ~operand. The last column is the reach of immediate forms, which can only encode values 0 to 31.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>CSR (address)</th><th>Writable bits</th><th>Read-only or ignored</th><th>csrrw / csrrwi</th><th>csrrs, csrrc and immediates</th><th>Immediate reach</th></tr></thead>
+<tbody>
+<tr><td>mstatus (0x300)</td><td><code>0x0000188A</code>: bits 1, 3, 7, 11, 12</td><td>All other bits read 0.</td><td>Writes the masked operand. <code>csrrwi</code> clears bits 7, 11, 12 because uimm cannot reach them.</td><td>Bit-wise set or clear; no write when operand is 0.</td><td>Bits 1 and 3 only</td></tr>
+<tr><td>mie (0x304)</td><td><code>0xFFFF0888</code>: bits 3, 7, 11, 16 to 31</td><td>Other bits read 0.</td><td>As above.</td><td>As above.</td><td>Bit 3 only</td></tr>
+<tr><td>mtvec (0x305)</td><td><code>0xFFFFFFFC</code></td><td>Bits [1:0] always read 0: MODE cannot be set.</td><td>Base address written; a write of MODE bits is dropped.</td><td>As above.</td><td>Bits 2 to 4</td></tr>
+<tr><td>mscratch (0x340)</td><td>All 32 bits</td><td>None</td><td>Full word.</td><td>Bit-wise.</td><td>Bits 0 to 4</td></tr>
+<tr><td>mepc (0x341)</td><td>All 32 bits, including [1:0]</td><td>None. MRET target ignores bits [1:0].</td><td>Full word.</td><td>Bit-wise.</td><td>Bits 0 to 4</td></tr>
+<tr><td>mcause (0x342)</td><td>All 32 bits</td><td>None (no WLRL restriction)</td><td>Full word.</td><td>Bit-wise.</td><td>Bits 0 to 4</td></tr>
+<tr><td>mtval (0x343)</td><td>All 32 bits</td><td>None</td><td>Full word.</td><td>Bit-wise.</td><td>Bits 0 to 4</td></tr>
+<tr><td>mip (0x344)</td><td>Bit 3 only (stored as MSIP)</td><td>Bits 7 (timer), 11 (external), 16 to 31 (fast) mirror inputs and ignore writes. Bit 3 reads <code>msip_r | msft_intr_i</code>, so clearing MSIP does not clear the read while the software-interrupt input is high.</td><td>Bit 3 of the operand loads <code>msip_r</code>.</td><td>Only when the operand is non-zero; <code>csrrs mip, x0</code> does not touch <code>msip_r</code>.</td><td>Bit 3 (value 8)</td></tr>
+<tr><td>mintprio (0x7C0)</td><td>Bits [1:0]</td><td>[31:2] read 0, writes ignored. Trap and MRET never change it.</td><td>Low two bits.</td><td>Bit-wise on bits 0 and 1.</td><td>Bits 0, 1</td></tr>
+<tr><td>mcycle, mcycleh, minstret, minstreth (0xB00, 0xB80, 0xB02, 0xB82)</td><td>All 32 bits of each half</td><td>None</td><td>Full word. In source order the write follows the increment, so a write overrides the same-cycle increment (not tested).</td><td>Bit-wise.</td><td>Bits 0 to 4</td></tr>
+<tr><td>Any other address (for example misa 0x301, mhartid 0xF14, user counters 0xC00)</td><td>None</td><td>Reads 0; writes ignored. <code>csr_valid_o</code> is produced by the file but no connection to it was found in the core RTL, and no illegal-CSR trap source was identified.</td><td>No effect, no trap observed in source.</td><td>No effect.</td><td>n/a</td></tr>
+</tbody></table></div>
+<div class="warn"><b>Points to decide, each OPEN.</b> (1) <code>mstatus.MPP</code> bits 11 and 12 are separately writable by software, and bit 1 is writable although no supervisor mode exists. (2) <code>mtvec.MODE</code> cannot be written, so the vectored branch of the controller (<code>:98-101</code>) is unreachable through the CSR instructions; vectored mode can be tested only by forcing <code>mtvec</code>. (3) Rev B 17.2 cites a <code>misa</code> reset value of 0x40001100 in the RISCOF ISA file, but the CSR file has no <code>misa</code> address and reads 0. (4) Writes to read-only or unimplemented addresses raise no trap in the source read. Whether each is intended is not recorded.</div>
+
+<h2 id="s6">6. Test plan</h2>
+<p>Statuses: EXISTS means a test is in the repository and covers the item (possibly stale); SPECIFIED means Rev B or the older plan requires it but no current test was found; OPEN means the intended behaviour needs a decision first.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Test</th><th>Stimulus</th><th>Expected</th><th>Oracle</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>C-01</td><td>Read/write round trip, all RW CSRs</td><td>Write patterns 0, all ones, walking one via csrrw to each CSR, read back</td><td>Value passes through the mask of section 5</td><td>Mask model; ISS for system level</td><td><span class="tag exists">EXISTS</span> (stale unit test: mscratch, mstatus, mtvec only)</td></tr>
+<tr><td>C-02</td><td>All six instruction forms</td><td>csrrw, csrrs, csrrc and the three immediate forms on mstatus, mie, mscratch</td><td>new = f(old, operand) as in R-8</td><td>Sail/ISS signature</td><td><span class="tag exists">EXISTS</span> (Zicsr suite, no result)</td></tr>
+<tr><td>C-03</td><td>No write on zero operand</td><td><code>csrrs x1, mip, x0</code>, <code>csrrci</code> with uimm 0 on a CSR with side effects (mip, counters)</td><td>No write enable; <code>msip_r</code> unchanged</td><td>Mask model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>C-04</td><td>Read-only mip bits</td><td>Drive timer, external, fast inputs; write all ones to mip</td><td>Bits 7, 11, 31:16 follow inputs; bit 3 follows msip_r or software input</td><td>Mask model</td><td><span class="tag exists">EXISTS</span> (stale unit test: bits 7, 11)</td></tr>
+<tr><td>C-05</td><td>Trap entry update</td><td>Exception and interrupt packets at WB, with and without a valid address</td><td>R-1 and R-2</td><td>Commit scoreboard (Figure 1)</td><td><span class="tag exists">EXISTS</span> (interrupt, tb1 test 1) / <span class="tag specified">SPECIFIED</span> (exceptions)</td></tr>
+<tr><td>C-06</td><td>MRET round trip</td><td>Trap then MRET with MIE and MPIE initially 0 and 1 in each combination</td><td>R-6; PC returns to <code>mepc</code> aligned</td><td>Commit scoreboard</td><td><span class="tag exists">EXISTS</span> (tb1 test 7 images; older <code>tb_top_mret</code>)</td></tr>
+<tr><td>C-07</td><td>Exception beats MRET</td><td><code>exc_valid_W</code> and <code>is_mret_W</code> together</td><td>Trap taken, no Port C write</td><td>Commit scoreboard</td><td><span class="tag exists">EXISTS</span> (stale <code>tb_wb_commit_ctrl</code>)</td></tr>
+<tr><td>C-08</td><td>Priority collision</td><td>Trap in the same cycle as a CSR write to mstatus or mepc</td><td>Trap values win; instruction write dropped</td><td>Priority model (Figure 2)</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>C-09</td><td>Redirect target and alignment</td><td>mtvec with low bits set (unreachable by CSR write; force it); mepc with low bits set</td><td>Target is base or mepc with bits [1:0] cleared</td><td>Commit scoreboard</td><td><span class="tag exists">EXISTS</span> (stale)</td></tr>
+<tr><td>C-10</td><td>Vectored interrupt target</td><td>Force <code>mtvec[1:0] = 01</code>, interrupt causes 3, 7, 11, 16 to 27</td><td>Base + 4 x cause</td><td>Commit scoreboard</td><td><span class="tag open">OPEN</span> (unreachable in software; decide whether mode is to be supported)</td></tr>
+<tr><td>C-11</td><td>Gateway clear mapping</td><td>Interrupt commit for cause 7 and each of 16 to 27</td><td>One-hot clear bit per R-9; none for other causes</td><td>Mapping table</td><td><span class="tag specified">SPECIFIED</span> (see <a href="verif_interrupt_unit.html">interrupt unit</a>)</td></tr>
+<tr><td>C-12</td><td>Counter behaviour</td><td>Run N cycles with M retires; write mcycle and minstret mid-run</td><td>mcycle +1 per clock; minstret +1 per retire; write overrides</td><td>Cycle counter in the bench</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>C-13</td><td>CSR hazards in the pipeline</td><td>CSR write followed by CSR read of the same address; CSR result consumed by next instruction</td><td>Stall until the write commits; correct value read</td><td>ISS</td><td><span class="tag specified">SPECIFIED</span> (see <a href="verif_hazard_unit.html">hazard unit</a>)</td></tr>
+<tr><td>C-14</td><td>Unimplemented or read-only address access</td><td><code>csrr</code> and <code>csrw</code> to misa, mhartid, 0xC00 and an unassigned address</td><td>Decision required: trap or read-zero</td><td>Decision, then ISS</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>C-15</td><td>ecall and ebreak</td><td>Execute each in M mode</td><td>Not established: the exception sources in the execute and memory stages read for this page are misaligned target, memory fault and misaligned access</td><td>ISS</td><td><span class="tag open">OPEN</span></td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Assertion ideas</h2>
+<p>All are <span class="tag specified">SPECIFIED</span> candidates for CT-3 and need viability records.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Property in words</th></tr></thead>
+<tbody>
+<tr><td>S-1</td><td>The cycle after <code>trap_valid_i</code>: <code>mepc</code> equals the packet PC, <code>mstatus.MIE</code> is 0 and <code>MPP</code> is 11.</td></tr>
+<tr><td>S-2</td><td><code>trap_valid_o</code> and <code>csr_write_en_mret_o</code> are never high together.</td></tr>
+<tr><td>S-3</td><td><code>flush_pipeline_onehot_o</code> equals 4'b1111 exactly when <code>wb_trap_redirect_o</code> is high.</td></tr>
+<tr><td>S-4</td><td>The MRET target has bits [1:0] equal to 0 and equals <code>mepc[31:2]</code> followed by 00.</td></tr>
+<tr><td>S-5</td><td><code>mintprio</code> is unchanged across any trap or MRET cycle.</td></tr>
+<tr><td>S-6</td><td>A CSR write is never accepted in a cycle with <code>trap_valid_i</code> (instruction source dropped).</td></tr>
+<tr><td>S-7</td><td>At most one bit of <code>clear_gateway_o</code> is set, and none unless an interrupt commit occurs.</td></tr>
+<tr><td>S-8</td><td><code>mcycle</code> increments by exactly 1 per clock when no write targets it.</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Limits of this page</h2>
+<ul>
+<li>No CSR or trap test result has been produced against the current RTL as far as the repository shows.</li>
+<li>Stale-testbench statements come from comparing source text with the current ports; the benches were not compiled.</li>
+<li>Exception sources in the decode stage and the cause codes in <code>memory_cycle.v</code> were not read in full.</li>
+<li>See also <a href="core_hazards_csr_traps.html">hazards, CSRs and traps</a>, <a href="core_overview.html">core overview</a>, <a href="verif_core_overview.html">core verification overview</a>, <a href="vf_core_lockstep_compliance.html">lock-step and compliance</a>, <a href="verif_lsu_memif.html">LSU and memory interface</a>, <a href="verif_rv32m.html">RV32M</a>.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/csr_regfile.v</code>, <code>riscv_core/rtl/wb_trap_mret_commit_controller.v</code>, <code>riscv_core/rtl/execute_cycle.v</code> (CSR and exception sections), <code>riscv_core/rtl/top.v</code> (CSR wiring), <code>../verification/ZICSR_INTEGRATION_REPORT.md</code>, <code>../verification/riscv-arch-test/riscv-test-suite/rv32i_m/Zicsr/src/csrrw-01.S</code>, <code>../verification/riscof/report.html</code>, <code>Verification/tb1_interrupts.sv</code>, <code>../../5_stage_trap_exc_intr_no_mul/tb/tb_csr_regfile.sv</code> and <code>tb_wb_commit_ctrl.sv</code>, Rev B 17.2.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RISCFORGE 1TOPS SoC — Official Signoff Evidence & Verbal Decisions Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+  <style>
+    :root {
+      --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+      --display: "Archivo", "IBM Plex Sans", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+
+      /* Surfaces & Ink */
+      --ground: #0d1117;
+      --paper: #161b22;
+      --paper-card: #21262d;
+      --paper-hover: #30363d;
+      --ink: #f0f6fc;
+      --ink-2: #c9d1d9;
+      --ink-3: #8b949e;
+      --rule: #30363d;
+      --rule-2: #484f58;
+      --tint: rgba(255, 255, 255, 0.03);
+
+      /* Semantic Accents */
+      --core: #58a6ff;
+      --core-f: rgba(56, 139, 253, 0.12);
+      --pass: #3fb950;
+      --pass-f: rgba(46, 160, 67, 0.15);
+      --warn: #d29922;
+      --warn-f: rgba(187, 128, 9, 0.15);
+      --err: #f85149;
+      --err-f: rgba(248, 81, 73, 0.12);
+      --purple: #bc8cff;
+      --purple-f: rgba(163, 113, 247, 0.15);
+      --cyan: #39c5cf;
+      --cyan-f: rgba(57, 197, 207, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--sans);
+      background-color: var(--ground);
+      color: var(--ink);
+      line-height: 1.6;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Container */
+    .app-container {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 24px 32px 80px 32px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 24px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header-left {
+      max-width: 880px;
+    }
+
+    .header-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--core-f);
+      color: var(--core);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      border: 1px solid rgba(56, 139, 253, 0.25);
+    }
+
+    .header-tag .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--core);
+      box-shadow: 0 0 8px var(--core);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--ink-2);
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .save-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--pass);
+      background: var(--pass-f);
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(46, 160, 67, 0.25);
+    }
+
+    .action-btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      border: 1px solid var(--rule);
+      background: var(--paper-card);
+      color: var(--ink);
+    }
+
+    .btn:hover {
+      background: var(--paper-hover);
+      border-color: var(--rule-2);
+    }
+
+    .btn-primary {
+      background: #1f6feb;
+      color: #fff;
+      border-color: #388bfd;
+    }
+
+    .btn-primary:hover {
+      background: #388bfd;
+    }
+
+    .btn-outline-danger {
+      background: transparent;
+      color: var(--err);
+      border-color: rgba(248, 81, 73, 0.3);
+    }
+
+    .btn-outline-danger:hover {
+      background: var(--err-f);
+      border-color: var(--err);
+    }
+
+    /* Stat Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 16px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--stat-color, var(--rule-2));
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-family: var(--display);
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .stat-subtext {
+      font-size: 12px;
+      color: var(--ink-2);
+    }
+
+    /* Executive Review Banner */
+    .banner-card {
+      background: linear-gradient(180deg, rgba(33, 38, 45, 0.9) 0%, rgba(22, 27, 34, 0.9) 100%);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+
+    .banner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .banner-title {
+      font-family: var(--display);
+      font-size: 17px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+    }
+
+    .banner-toggle {
+      color: var(--ink-3);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .banner-content {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 20px;
+    }
+
+    .banner-box {
+      background: var(--tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+
+    .banner-box h4 {
+      color: var(--core);
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .banner-box ul {
+      padding-left: 18px;
+      color: var(--ink-2);
+    }
+
+    .banner-box li {
+      margin-bottom: 6px;
+    }
+
+    /* Section Headers */
+    .section-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-count {
+      font-size: 12px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: var(--core-f);
+      color: var(--core);
+      border: 1px solid rgba(56, 139, 253, 0.25);
+    }
+
+    /* Verbal Decisions Section */
+    .verbal-section {
+      background: var(--paper);
+      border: 1px solid rgba(163, 113, 247, 0.3);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .verbal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .verbal-intro {
+      font-size: 13px;
+      color: var(--ink-2);
+      margin-bottom: 20px;
+      max-width: 1000px;
+      line-height: 1.5;
+    }
+
+    .verbal-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+      gap: 16px;
+    }
+
+    .verbal-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 16px 18px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+      position: relative;
+    }
+
+    .verbal-card.active {
+      border-color: rgba(163, 113, 247, 0.5);
+      background: rgba(163, 113, 247, 0.04);
+    }
+
+    .verbal-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .custom-checkbox {
+      width: 20px;
+      height: 20px;
+      accent-color: #a371f7;
+      cursor: pointer;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .verbal-card-title-group {
+      flex: 1;
+    }
+
+    .verbal-card-title {
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .verbal-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--ink-3);
+      font-family: var(--mono);
+      flex-wrap: wrap;
+    }
+
+    .gate-tag {
+      background: var(--tint);
+      border: 1px solid var(--rule-2);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--core);
+    }
+
+    .verbal-desc {
+      font-size: 13px;
+      color: var(--ink-2);
+      margin-bottom: 12px;
+      line-height: 1.45;
+    }
+
+    .coach-notes-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px dashed var(--rule-2);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .coach-notes-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .coach-notes-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 12px;
+      resize: vertical;
+      min-height: 48px;
+      outline: none;
+      line-height: 1.4;
+    }
+
+    .coach-notes-textarea:focus {
+      border-bottom: 1px solid var(--purple);
+    }
+
+    /* Filter Toolbar */
+    .filter-toolbar {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .filter-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-box-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 9px 14px 9px 36px;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      font-family: var(--sans);
+      transition: border-color 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--core);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-3);
+      pointer-events: none;
+    }
+
+    .status-filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+      color: var(--ink-2);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn:hover {
+      background: var(--paper-hover);
+      color: var(--ink);
+    }
+
+    .filter-btn.active {
+      background: var(--core-f);
+      border-color: var(--core);
+      color: var(--core);
+      font-weight: 600;
+    }
+
+    /* Gate Tabs */
+    .gate-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .gate-tab-btn {
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+      color: var(--ink-2);
+      font-size: 12px;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gate-tab-btn:hover {
+      background: var(--paper-hover);
+      color: var(--ink);
+    }
+
+    .gate-tab-btn.active {
+      background: #1f6feb;
+      border-color: #388bfd;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .gate-tab-count {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      font-family: var(--mono);
+    }
+
+    /* Items Table / Cards */
+    .gate-group {
+      margin-bottom: 36px;
+    }
+
+    .gate-group-header {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--core);
+      border-radius: 6px 6px 0 0;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .gate-group-title {
+      font-family: var(--display);
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .gate-group-stats {
+      font-size: 12px;
+      font-family: var(--mono);
+      color: var(--ink-3);
+    }
+
+    .items-container {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+    }
+
+    .item-card {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--rule);
+      transition: background 0.1s ease;
+    }
+
+    .item-card:last-child {
+      border-bottom: none;
+    }
+
+    .item-card:hover {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .item-title-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .item-checkbox {
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: #3fb950;
+    }
+
+    .item-id-badge {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--tint);
+      border: 1px solid var(--rule-2);
+      color: var(--core);
+      white-space: nowrap;
+    }
+
+    .item-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+
+    .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tool-badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--ink-2);
+      border: 1px solid var(--rule);
+      white-space: nowrap;
+    }
+
+    .status-select {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      outline: none;
+      border: 1px solid var(--rule);
+      background: var(--paper-card);
+      color: var(--ink);
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .status-done {
+      background: var(--pass-f);
+      color: var(--pass);
+      border: 1px solid rgba(63, 185, 80, 0.3);
+    }
+
+    .status-inprogress {
+      background: var(--warn-f);
+      color: var(--warn);
+      border: 1px solid rgba(210, 153, 34, 0.3);
+    }
+
+    .status-blank {
+      background: rgba(139, 148, 158, 0.12);
+      color: var(--ink-3);
+      border: 1px solid rgba(139, 148, 158, 0.25);
+    }
+
+    .status-verbal {
+      background: var(--purple-f);
+      color: var(--purple);
+      border: 1px solid rgba(188, 140, 255, 0.3);
+    }
+
+    .status-waived {
+      background: var(--cyan-f);
+      color: var(--cyan);
+      border: 1px solid rgba(57, 197, 207, 0.3);
+    }
+
+    /* Item Details Grid */
+    .item-body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+      padding-left: 30px;
+    }
+
+    .info-block {
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+    }
+
+    .info-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .label-criterion { color: var(--core); }
+    .label-recorded { color: var(--pass); }
+    .label-missing { color: var(--err); }
+    .label-notes { color: var(--purple); }
+
+    .missing-block {
+      background: rgba(248, 81, 73, 0.05);
+      border-color: rgba(248, 81, 73, 0.25);
+    }
+
+    .user-notes-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 12px;
+      padding: 6px 10px;
+      margin-top: 4px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .user-notes-input:focus {
+      border-color: var(--purple);
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--ink-3);
+      font-size: 14px;
+    }
+
+    /* Notification Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1f6feb;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--paper);
+      border: 1px solid var(--rule-2);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 580px;
+      padding: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--ink-3);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink-2);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--core);
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .app-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      header, .banner-card, .verbal-section, .filter-toolbar, .action-btn-group, .save-indicator, .status-select, .user-notes-input, .custom-checkbox, .item-checkbox {
+        border-color: #ccc !important;
+      }
+      .action-btn-group, .filter-toolbar, .btn, .save-indicator {
+        display: none !important;
+      }
+      .item-card {
+        page-break-inside: avoid;
+        border-bottom: 1px solid #ddd !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. Historical 2 November dashboard. Prepopulated approval/waiver statements are not established per-item coach dispositions. Existing browser-local edits remain untouched and are not official gate closure. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <div class="header-tag">
+          <span class="pulse"></span>
+          1TOPS RISC-V SoC Tapeout Track &bull; Official Deliverables Review
+        </div>
+        <h1>RISCFORGE 1TOPS SoC — Signoff Evidence & Decisions Matrix</h1>
+        <div class="subtitle">
+          Inspection Date: <strong>2026-11-02</strong> &bull; Target Technology: <strong>28nm PDK</strong> &bull; Baseline ISA: <strong>RV32IM [Zicsr]</strong>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="save-indicator" id="saveStatus">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/>
+          </svg>
+          <span id="saveStatusText">Loaded Baseline (Auto-Save Active)</span>
+        </div>
+
+        <div class="action-btn-group">
+          <button class="btn btn-primary" onclick="exportProgress()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7.47 10.78a.75.75 0 0 0 1.06 0l3.75-3.75a.75.75 0 0 0-1.06-1.06L8.75 8.44V1.75a.75.75 0 0 0-1.5 0v6.69L4.78 5.97a.75.75 0 0 0-1.06 1.06l3.75 3.75Z"/><path d="M2 13c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-2a.75.75 0 0 0-1.5 0v2H3.5v-2a.75.75 0 0 0-1.5 0v2Z"/></svg>
+            Export Progress (JSON)
+          </button>
+          
+          <label class="btn" style="margin:0;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M7.47 1.22a.75.75 0 0 1 1.06 0l3.75 3.75a.75.75 0 0 1-1.06 1.06L8.75 3.56V10.25a.75.75 0 0 1-1.5 0V3.56L4.78 6.03a.75.75 0 0 1-1.06-1.06l3.75-3.75Z"/><path d="M2 13c0 .55.45 1 1 1h10c.55 0 1-.45 1-1v-2a.75.75 0 0 0-1.5 0v2H3.5v-2a.75.75 0 0 0-1.5 0v2Z"/></svg>
+            Import JSON
+            <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importProgress(event)">
+          </label>
+
+          <button class="btn" onclick="window.print()">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.75A.75.75 0 0 1 4.75 1h6.5a.75.75 0 0 1 .75.75V4h1.5A1.75 1.75 0 0 1 15.25 5.75v5.5A1.75 1.75 0 0 1 13.5 13H12v1.25a.75.75 0 0 1-.75.75h-6.5a.75.75 0 0 1-.75-.75V13H2.5A1.75 1.75 0 0 1 .75 11.25v-5.5A1.75 1.75 0 0 1 2.5 4H4V1.75Zm1.5.75v1.5h5V2.5h-5ZM2.5 5.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25H4V10.75a.75.75 0 0 1 .75-.75h6.5a.75.75 0 0 1 .75.75V11.5h1.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25H2.5ZM5.5 11.5h5V10.5h-5v1Z"/></svg>
+            Print / PDF
+          </button>
+
+          <button class="btn btn-outline-danger" onclick="resetToBaseline()">
+            Reset
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--stat-color: var(--core);">
+        <div class="stat-label">Total Checklist Items</div>
+        <div class="stat-value" id="statTotal">124</div>
+        <div class="stat-subtext">Gates G0 through G9</div>
+      </div>
+
+      <div class="stat-card" style="--stat-color: var(--pass);">
+        <div class="stat-label">Done (Static Criteria)</div>
+        <div class="stat-value" id="statDone" style="color:var(--pass);">3</div>
+        <div class="stat-subtext">2.1 (PC), 2.4 (ALU), 2.5 (Branch)</div>
+      </div>
+
+      <div class="stat-card" style="--stat-color: var(--warn);">
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value" id="statInProgress" style="color:var(--warn);">62</div>
+        <div class="stat-subtext">Active work with remaining gaps</div>
+      </div>
+
+      <div class="stat-card" style="--stat-color: var(--err);">
+        <div class="stat-label">Blank / Missing Evidence</div>
+        <div class="stat-value" id="statBlank" style="color:var(--err);">59</div>
+        <div class="stat-subtext">No qualifying proof established</div>
+      </div>
+
+      <div class="stat-card" style="--stat-color: var(--purple);">
+        <div class="stat-label">Verbal Approvals</div>
+        <div class="stat-value" id="statVerbal" style="color:var(--purple);">6</div>
+        <div class="stat-subtext">Architectural departures tracked</div>
+      </div>
+    </div>
+
+    <!-- Executive Review Banner (Collapsible) -->
+    <div class="banner-card">
+      <div class="banner-header" onclick="toggleBanner()">
+        <div class="banner-title">
+          <svg width="20" height="20" viewBox="0 0 16 16" fill="var(--core)">
+            <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+          </svg>
+          Executive Review & Integrity Protocol (README & Workbook Rules)
+        </div>
+        <div class="banner-toggle" id="bannerToggleText">
+          <span>Click to Collapse</span> &#9650;
+        </div>
+      </div>
+      
+      <div class="banner-content" id="bannerContent">
+        <div class="banner-box">
+          <h4>Official Signoff Audit Rules</h4>
+          <ul>
+            <li><strong>Current Official State:</strong> 3 Done (coding criteria), 62 In Progress, 59 blank.</li>
+            <li><strong>Workbook Blank Handling:</strong> Blank statuses in the official Excel sheet do not appear under "Not Started", so visible Dashboard formulas do not sum to 124. This interface correctly tallies all 124 items.</li>
+            <li><strong>Done Criteria Scope:</strong> Items 2.1, 2.4, and 2.5 assert static RTL coding standards only; dynamic execution and coach gate closure remain open.</li>
+          </ul>
+        </div>
+        <div class="banner-box">
+          <h4>Verification & Workspace Phasing</h4>
+          <ul>
+            <li><strong>Core Verification Base:</strong> Legacy standalone testbenches live under <code>rv32im_zicsr_5stage_exc_nointr_old</code> and <code>OLD files rtl-dv</code>.</li>
+            <li><strong>Current SoC Structure:</strong> Active system interconnect and peripherals are under <code>ips/</code>, maintained during student porting.</li>
+            <li><strong>Verification Methodology:</strong> Coach verbally approved SystemVerilog-first testbenches without requiring full UVM at this phase.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verbal Decisions Section -->
+    <div class="verbal-section">
+      <div class="verbal-header">
+        <div>
+          <div class="section-title">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="var(--purple)"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v4.5a.75.75 0 0 0 1.5 0v-4.5Zm-.75 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
+            Coach Verbal Decisions & Architecture Departures
+            <span class="badge-count" id="verbalCountBadge">6 Active</span>
+          </div>
+        </div>
+        <div>
+          <button class="btn" onclick="openAddVerbalModal()">
+            + Add Custom Decision
+          </button>
+        </div>
+      </div>
+
+      <div class="verbal-intro">
+        The engineer reports that coach-approved departures exist verbally. This module allows you to track, toggle, annotate, and locally save these decisions. Ticking an approval records your local authorization and links it directly to affected checklist gates.
+      </div>
+
+      <div class="verbal-cards-grid" id="verbalCardsContainer">
+        <!-- Generated via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Filter Toolbar -->
+    <div class="filter-toolbar">
+      <div class="filter-row-top">
+        <div class="search-box-wrapper">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z"/>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by ID, keyword, criterion, required tool, or gap..." oninput="handleSearch()">
+        </div>
+
+        <div class="status-filters">
+          <button class="filter-btn active" data-status="all" onclick="setStatusFilter('all')">All (<span id="countAll">124</span>)</button>
+          <button class="filter-btn" data-status="Done" onclick="setStatusFilter('Done')">Done (<span id="countDone">3</span>)</button>
+          <button class="filter-btn" data-status="In Progress" onclick="setStatusFilter('In Progress')">In Progress (<span id="countInProgress">62</span>)</button>
+          <button class="filter-btn" data-status="blank" onclick="setStatusFilter('blank')">Blank / Missing (<span id="countBlank">59</span>)</button>
+          <button class="filter-btn" data-status="Verbally Approved" onclick="setStatusFilter('Verbally Approved')">Verbally Approved (<span id="countVerbalApproved">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- Gate Tabs -->
+      <div class="gate-tabs" id="gateTabs">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Main Checklist Container -->
+    <div id="checklistRoot">
+      <!-- Gates and Items rendered here -->
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg>
+    <span id="toastMsg">Changes saved locally</span>
+  </div>
+
+  <!-- Add Verbal Decision Modal -->
+  <div class="modal-overlay" id="addVerbalModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Custom Verbal Decision</h3>
+        <button class="modal-close" onclick="closeAddVerbalModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Decision Title</label>
+        <input type="text" id="modalTitle" class="form-input" placeholder="e.g. UART Baudrate Divider Hardcode">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Affected Gates (Comma separated, e.g. G1, G3)</label>
+        <input type="text" id="modalGates" class="form-input" placeholder="G1, G3">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Decision Summary</label>
+        <textarea id="modalDesc" class="form-textarea" rows="2" placeholder="Describe the verbal agreement with the coach..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Coach Notes / Justification</label>
+        <textarea id="modalNotes" class="form-textarea" rows="2" placeholder="Coach verbal notes, meeting context, or rationale..."></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+        <button class="btn" onclick="closeAddVerbalModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewVerbalDecision()">Save Decision</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data and Application Script -->
+  <script>
+    const INITIAL_DATA = {"gates": [{"id": "G0", "title": "G0: recorded work and missing evidence", "count": 7, "items": [{"id": "0.1", "title": "Front-end tools installed and licensed", "criterion": "VCS, Verdi, SpyGlass, DC/Fusion Compiler and Tessent all launch and run a hello-world case", "tool": "Synopsys / Siemens/ Cadence", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No retained complete approved front-end launch/license/hello-world bundle for all named tools.", "owner": "not established; left blank."}, {"id": "0.2", "title": "Back-end tools installed and licensed", "criterion": "Innovus, PrimeTime, Conformal LEC, Calibre and Voltus all launch", "tool": "Cadence / Synopsys / Siemens", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No retained complete approved backend launch/license bundle for all named tools.", "owner": "not established; left blank."}, {"id": "0.3", "title": "RISC-V GNU toolchain installed", "criterion": "riscv32-*-elf-gcc compiles and links a bare-metal hello-world", "tool": "riscv-gnu-toolchain", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No identified current compile-and-link toolchain demonstration; firmware/source presence alone does not establish this criterion.", "owner": "not established; left blank."}, {"id": "0.4", "title": "Spike ISS built for your ISA", "criterion": "Spike runs an rv32ui test and produces an execution log", "tool": "Spike ISS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No retained Spike rv32ui execution-log demonstration identified; legacy RISCOF selects Sail.", "owner": "not established; left blank."}, {"id": "0.5", "title": "28 nm PDK, standard cells, SRAM macros and IO library received", "criterion": "Library files open in DC and Innovus without errors", "tool": "DC / Innovus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No identified accepted 28 nm PDK/cells/SRAM/IO load evidence in DC and Innovus.", "owner": "not established; left blank."}, {"id": "0.6", "title": "Version control in place", "criterion": "All RTL, TB, scripts, constraints and docs in one repo; tagged at every gate", "tool": "Git", "status": "In Progress", "recorded_work": "Repository audit and source layout exist.", "evidence": "[ips/Verification/signoff/README.md](../../../../ips/Verification/signoff/README.md)", "missing": "Verify all required assets tracked, current branch/commit/dirty state, and gate tags.", "owner": "not established; left blank."}, {"id": "0.7", "title": "Regression runnable by one command", "criterion": "'make regress' or equivalent runs the full sim suite and prints a pass/fail summary", "tool": "VCS", "status": "In Progress", "recorded_work": "Regression entry point exists.", "evidence": "[ips/Verification/regression/run_regression.ps1](../../../../ips/Verification/regression/run_regression.ps1)", "missing": "Retain one accepted-tool full-suite invocation, reliable failures and final summary on the selected RTL.", "owner": "not established; left blank."}]}, {"id": "G1", "title": "G1: recorded work and missing evidence", "count": 15, "items": [{"id": "1.1", "title": "Core ISA frozen", "criterion": "One of RV32I / RV32IM / RV32IMC declared in writing", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Written ISA, five-stage pipeline and forwarding/stall policy exist.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Record approved frozen choices and revision; resolve document caveats.", "owner": "not established; left blank."}, {"id": "1.2", "title": "Pipeline depth frozen", "criterion": "1 / 3 / 5-stage in-order declared, with hazard policy (stall-only vs forwarding) stated", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Written ISA, five-stage pipeline and forwarding/stall policy exist.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Record approved frozen choices and revision; resolve document caveats.", "owner": "not established; left blank."}, {"id": "1.3", "title": "Privilege modes frozen", "criterion": "Machine mode minimum; Supervisor + MMU only if targeting Linux", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Machine-mode, CSR reset/access table and trap/IRQ policy documented as implemented.", "evidence": "[ips/documentation/signoff/CSR_and_Trap_Model.md](../../../../ips/documentation/signoff/CSR_and_Trap_Model.md)", "missing": "Record frozen/approved specification and resolve static-trace ambiguities; implementation description is not approval.", "owner": "not established; left blank."}, {"id": "1.4", "title": "CSR list frozen", "criterion": "Table of implemented CSRs with reset values and access type (RW/RO/WARL)", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Machine-mode, CSR reset/access table and trap/IRQ policy documented as implemented.", "evidence": "[ips/documentation/signoff/CSR_and_Trap_Model.md](../../../../ips/documentation/signoff/CSR_and_Trap_Model.md)", "missing": "Record frozen/approved specification and resolve static-trace ambiguities; implementation description is not approval.", "owner": "not established; left blank."}, {"id": "1.5", "title": "Trap and interrupt model defined", "criterion": "mtvec mode, mepc/mcause behaviour, nested-interrupt policy and trap boundary written down", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Machine-mode, CSR reset/access table and trap/IRQ policy documented as implemented.", "evidence": "[ips/documentation/signoff/CSR_and_Trap_Model.md](../../../../ips/documentation/signoff/CSR_and_Trap_Model.md)", "missing": "Record frozen/approved specification and resolve static-trace ambiguities; implementation description is not approval.", "owner": "not established; left blank."}, {"id": "1.6", "title": "Memory organisation frozen", "criterion": "Instruction SRAM, data SRAM and 4 KB boot ROM sizes fixed; prefetch buffer / I-cache sizes fixed if used", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "SoC blocks, maps, memories and boot behavior documented.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve requirement differences, review exact implementation, and record approved frozen map/boot/controller policy.", "owner": "not established; left blank."}, {"id": "1.7", "title": "SoC block diagram approved", "criterion": "Shows core, interconnect, every peripheral, memories, clock and reset sources", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "SoC blocks, maps, memories and boot behavior documented.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve requirement differences, review exact implementation, and record approved frozen map/boot/controller policy.", "owner": "not established; left blank."}, {"id": "1.8", "title": "Address map frozen", "criterion": "Every slave has base address and size, no overlaps, error response defined for unmapped access", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "SoC blocks, maps, memories and boot behavior documented.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve requirement differences, review exact implementation, and record approved frozen map/boot/controller policy.", "owner": "not established; left blank."}, {"id": "1.9", "title": "Interrupt map frozen", "criterion": "Every source numbered and mapped to a PLIC/CLINT input, with priority scheme stated", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "SoC blocks, maps, memories and boot behavior documented.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve requirement differences, review exact implementation, and record approved frozen map/boot/controller policy.", "owner": "not established; left blank."}, {"id": "1.10", "title": "Clock and reset architecture defined", "criterion": "Clock sources, dividers, reset tree, async-to-sync strategy and all CDC crossings listed", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Clock/reset/CDC inventory and top-pin documentation exist.", "evidence": "[ips/documentation/signoff/Clock_Reset_CDC_and_Pinlist.md](../../../../ips/documentation/signoff/Clock_Reset_CDC_and_Pinlist.md)", "missing": "Complete reviewed crossing strategy and pad/mux information; retain frozen architecture/pin approval.", "owner": "not established; left blank."}, {"id": "1.11", "title": "Pin list / chip IO table frozen", "criterion": "Every top-level pin: name, direction, function, pad type and mux", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Clock/reset/CDC inventory and top-pin documentation exist.", "evidence": "[ips/documentation/signoff/Clock_Reset_CDC_and_Pinlist.md](../../../../ips/documentation/signoff/Clock_Reset_CDC_and_Pinlist.md)", "missing": "Complete reviewed crossing strategy and pad/mux information; retain frozen architecture/pin approval.", "owner": "not established; left blank."}, {"id": "1.12", "title": "Boot plan defined", "criterion": "Boot mode pin: 0 = internal ROM, 1 = external SPI flash; fallback behaviour stated", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "SoC blocks, maps, memories and boot behavior documented.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve requirement differences, review exact implementation, and record approved frozen map/boot/controller policy.", "owner": "not established; left blank."}, {"id": "1.13", "title": "Micro-architecture document complete", "criterion": "Per-stage datapath, control signals, hazard/forwarding logic, memory interface protocol", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Per-stage datapath, control, hazards and memory interface are documented.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Complete technical review and resolve marked ambiguities/unverified behavior before declaring document complete.", "owner": "not established; left blank."}, {"id": "1.14", "title": "Verification plan (testplan) written", "criterion": "Feature to test to coverage-item mapping across all five verification phases", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Existing verification plan and component matrix provide a starting point.", "evidence": "[ips/Verification/soc_verification_plan.md](../../../../ips/Verification/soc_verification_plan.md)", "missing": "Finish exact feature-to-test-to-coverage mapping across all five official verification phases.", "owner": "not established; left blank."}, {"id": "1.15", "title": "Area, frequency and power targets stated", "criterion": "Target clock frequency (MHz) and gate count / die area budget agreed with coach", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "Approved quantitative frequency, area/gate budget and power targets not established.", "owner": "not established; left blank."}]}, {"id": "G2", "title": "G2: recorded work and missing evidence", "count": 13, "items": [{"id": "2.1", "title": "PC generation unit coded", "criterion": "Reset PC parameterised; redirect priority (trap > branch/jump) implemented", "tool": "NA", "status": "Done", "recorded_work": "RESET_PC parameter and trap-first next-PC mux inspected.", "evidence": "[ips/riscv_core/rtl/fetch_cycle.v](../../../../ips/riscv_core/rtl/fetch_cycle.v)", "missing": "No missing coding criterion identified by static review. Simulation/reset/redirect proof belongs to G4/G5.", "owner": "not established; left blank."}, {"id": "2.2", "title": "Decoder and control unit coded", "criterion": "All declared ISA opcodes decode; I/S/B/U/J immediates generated", "tool": "NA", "status": "In Progress", "recorded_work": "Decoder/control and immediate-generation implementation documented.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Complete exact declared-ISA decode/encoding review; no exhaustive opcode evidence claimed.", "owner": "not established; left blank."}, {"id": "2.3", "title": "Register file coded", "criterion": "x0 hardwired to zero; same-cycle read/write behaviour documented and implemented", "tool": "NA", "status": "In Progress", "recorded_work": "Register file and same-cycle bypass coded.", "evidence": "[ips/riscv_core/rtl/Register_File.v](../../../../ips/riscv_core/rtl/Register_File.v)", "missing": "Confirm x0 always reads zero in the synthesis configuration: reads use Register[A] and x0 storage relies on initialization/write behavior. No fix or simulation performed.", "owner": "not established; left blank."}, {"id": "2.4", "title": "ALU coded", "criterion": "Add/sub wrap, logical vs arithmetic shift, shift-amount masking, SLT/SLTU sign handling", "tool": "Not specified in row", "status": "Done", "recorded_work": "32-bit add/sub, masked shifts, signed arithmetic shift and SLT/SLTU inspected.", "evidence": "[ips/riscv_core/rtl/ALU.v](../../../../ips/riscv_core/rtl/ALU.v)", "missing": "No missing coding criterion identified by static review. Reference-model/corner verification remains G4.4.", "owner": "not established; left blank."}, {"id": "2.5", "title": "Branch unit coded", "criterion": "BEQ, BNE, BLT, BGE, BLTU and BGEU all implemented", "tool": "Not specified in row", "status": "Done", "recorded_work": "All six signed/unsigned branch conditions inspected.", "evidence": "[ips/riscv_core/rtl/JB_unit.v](../../../../ips/riscv_core/rtl/JB_unit.v)", "missing": "No missing coding criterion identified by static review. Compare-matrix verification remains G4.5.", "owner": "not established; left blank."}, {"id": "2.6", "title": "MDU coded (if M extension)", "criterion": "MUL/DIV/REM including divide-by-zero and overflow per spec; handshake with bounded latency", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "MDU, memory/LSU and hazard/stall/forwarding implementation documented.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Review complete criterion against frozen specification, including bounded handshake latency, wait/flush and alignment semantics.", "owner": "not established; left blank."}, {"id": "2.7", "title": "Memory interface unit coded", "criterion": "Byte enables, store alignment, load sign/zero extension, one outstanding transaction", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "MDU, memory/LSU and hazard/stall/forwarding implementation documented.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Review complete criterion against frozen specification, including bounded handshake latency, wait/flush and alignment semantics.", "owner": "not established; left blank."}, {"id": "2.8", "title": "Hazard and forwarding logic coded", "criterion": "Load-use stall, flush on redirect, stall on MDU busy and on memory wait states", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "MDU, memory/LSU and hazard/stall/forwarding implementation documented.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Review complete criterion against frozen specification, including bounded handshake latency, wait/flush and alignment semantics.", "owner": "not established; left blank."}, {"id": "2.9", "title": "CSR block and trap logic coded", "criterion": "Matches the CSR table and trap model frozen in G1", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "CSR/trap RTL and static behavior documented.", "evidence": "[ips/documentation/signoff/CSR_and_Trap_Model.md](../../../../ips/documentation/signoff/CSR_and_Trap_Model.md)", "missing": "Demonstrate match to an approved frozen G1 CSR/trap specification; resolve remaining caveats.", "owner": "not established; left blank."}, {"id": "2.10", "title": "Compressed decoder coded (if C extension)", "criterion": "16-bit instructions expand correctly; misaligned fetch handled", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No C extension in documented design. Leave blank; N/A requires exact scope decision, not inference.", "owner": "not established; left blank."}, {"id": "2.11", "title": "RTL coding rules followed", "criterion": "Synthesisable subset only: no initial blocks, no delays, no latches, no multi-driven nets", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Core source and synthesis-guarded simulation initialization documented.", "evidence": "[ips/documentation/signoff/Core_Microarchitecture.md](../../../../ips/documentation/signoff/Core_Microarchitecture.md)", "missing": "Complete synthesizability/static review; exclude unintended latches and multiple drivers with retained evidence.", "owner": "not established; left blank."}, {"id": "2.12", "title": "Core lint clean", "criterion": "Zero errors; every warning fixed or waived with a written reason", "tool": "SpyGlass", "status": "In Progress", "recorded_work": "Historical SpyGlass report exists, with black-box errors.", "evidence": "[ips/spyglass/reports/spyglass_summary.rpt](../../../../ips/spyglass/reports/spyglass_summary.rpt)", "missing": "Current-core qualified SpyGlass lint, zero errors and disposition of every warning; historical report is not clean closure.", "owner": "not established; left blank."}, {"id": "2.13", "title": "Core CDC clean", "criterion": "Every crossing synchronised; zero unwaived violations (Mark N/A for core on single clocks)", "tool": "SpyGlass", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No current core CDC closure or item-specific approved single-clock N/A record.", "owner": "not established; left blank."}]}, {"id": "G3", "title": "G3: recorded work and missing evidence", "count": 16, "items": [{"id": "3.1", "title": "GPIO integrated (mandatory)", "criterion": "32-pin GPIO instantiated, registers reachable, pins routed to top level", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Peripheral instances/maps and scoped component evidence are available.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Complete each row against real current SoC integration, pins/register reachability and required interrupt/flash/slave path.", "owner": "not established; left blank."}, {"id": "3.2", "title": "UART integrated (mandatory)", "criterion": "1-2 instances; at least one dedicated to debug output", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Peripheral instances/maps and scoped component evidence are available.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Complete each row against real current SoC integration, pins/register reachability and required interrupt/flash/slave path.", "owner": "not established; left blank."}, {"id": "3.3", "title": "SPI / QSPI master integrated (mandatory)", "criterion": "Reaches external flash model and supports boot fetch", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Peripheral instances/maps and scoped component evidence are available.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Complete each row against real current SoC integration, pins/register reachability and required interrupt/flash/slave path.", "owner": "not established; left blank."}, {"id": "3.4", "title": "PLIC integrated (mandatory)", "criterion": "16-32 sources supported; every peripheral interrupt wired in", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No integrated PLIC identified. User reports verbal departures broadly; exact PLIC disposition still unrecorded.", "owner": "not established; left blank."}, {"id": "3.5", "title": "Timer integrated (mandatory)", "criterion": "System tick generates an interrupt to the core", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Peripheral instances/maps and scoped component evidence are available.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Complete each row against real current SoC integration, pins/register reachability and required interrupt/flash/slave path.", "owner": "not established; left blank."}, {"id": "3.6", "title": "CLINT / CLIC integrated (mandatory)", "criterion": "Timer and software interrupts reach the core", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No integrated CLINT/CLIC timer/software delivery established; software IRQ tied off at SoC. Exact verbal disposition unrecorded.", "owner": "not established; left blank."}, {"id": "3.7", "title": "I2C integrated (optional)", "criterion": "If present: master transactions complete against an I2C VIP or slave model", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Peripheral instances/maps and scoped component evidence are available.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Complete each row against real current SoC integration, pins/register reachability and required interrupt/flash/slave path.", "owner": "not established; left blank."}, {"id": "3.8", "title": "I2S integrated (optional)", "criterion": "If present: basic TX and RX stream verified", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No integrated I2S verification established. Optional scope/N/A decision not individually recorded.", "owner": "not established; left blank."}, {"id": "3.9", "title": "Boot ROM integrated", "criterion": "4 KB ROM with boot image; contents version-controlled and reproducible from source", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Boot ROM instantiated; active default is 16 x 32-bit words (64 bytes).", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Record exact verbal departure disposition or implement required 4 KiB; verify reproducible source image.", "owner": "not established; left blank."}, {"id": "3.10", "title": "SRAMs integrated", "criterion": "Instruction and data SRAM macros instantiated at the sizes frozen in G1", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Behavioral SRAM integration exists.", "evidence": "[ips/RTL_SOC/sram_sp.sv](../../../../ips/RTL_SOC/sram_sp.sv)", "missing": "Required foundry SRAM macro identities, instances/sizes and approved memory specification are not demonstrated.", "owner": "not established; left blank."}, {"id": "3.11", "title": "Interconnect integrated", "criterion": "AXI4-Lite core-to-peripheral path; AXI to AXI-Lite and AXI-Lite to APB bridges in place", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "AXI-Lite/APB fabric, boot/reset control and decode implementation exist.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve AXI-to-AXI-Lite/boot-control differences and verify complete current decode/error behavior and agreed controls.", "owner": "not established; left blank."}, {"id": "3.12", "title": "System control block integrated", "criterion": "Reset control, clock control, boot mode strap sampling and any ROM remap", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "AXI-Lite/APB fabric, boot/reset control and decode implementation exist.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve AXI-to-AXI-Lite/boot-control differences and verify complete current decode/error behavior and agreed controls.", "owner": "not established; left blank."}, {"id": "3.13", "title": "Address decode matches G1 map", "criterion": "Every slave responds only in its own range; unmapped access returns the defined error", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "AXI-Lite/APB fabric, boot/reset control and decode implementation exist.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Resolve AXI-to-AXI-Lite/boot-control differences and verify complete current decode/error behavior and agreed controls.", "owner": "not established; left blank."}, {"id": "3.14", "title": "Top-level SoC lint clean", "criterion": "Zero errors at SoC level; warnings fixed or waived", "tool": "SpyGlass", "status": "In Progress", "recorded_work": "Historical SoC static-check artifacts exist.", "evidence": "[ips/spyglass/reports/spyglass_summary.rpt](../../../../ips/spyglass/reports/spyglass_summary.rpt)", "missing": "Retain current-top SpyGlass clean/waived lint/connectivity results; historical errors and source identity remain unresolved.", "owner": "not established; left blank."}, {"id": "3.15", "title": "SoC CDC and RDC clean", "criterion": "All clock and reset domain crossings synchronised; zero unwaived violations", "tool": "SpyGlass", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying current SoC CDC/RDC zero-unwaived-violation report identified.", "owner": "not established; left blank."}, {"id": "3.16", "title": "Unconnected / floating nets checked", "criterion": "No unintentionally floating inputs or dangling outputs at any hierarchy level", "tool": "SpyGlass", "status": "In Progress", "recorded_work": "Historical SoC static-check artifacts exist.", "evidence": "[ips/spyglass/reports/spyglass_summary.rpt](../../../../ips/spyglass/reports/spyglass_summary.rpt)", "missing": "Retain current-top SpyGlass clean/waived lint/connectivity results; historical errors and source identity remain unresolved.", "owner": "not established; left blank."}]}, {"id": "G4", "title": "G4: recorded work and missing evidence", "count": 14, "items": [{"id": "4.1", "title": "Unit TB for PC unit", "criterion": "All directed tests pass; code coverage reviewed", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified PC unit directed pass plus reviewed code-coverage evidence identified.", "owner": "not established; left blank."}, {"id": "4.2", "title": "Unit TB for decoder / control", "criterion": "Directed test per opcode+funct combination passes; opcode x funct3 x funct7 cross coverage closed", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified complete opcode/funct decoder unit pass and cross-coverage closure identified.", "owner": "not established; left blank."}, {"id": "4.3", "title": "Unit TB for register file", "criterion": "x0-write and same-cycle read/write tests pass", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified current register-file x0 and same-cycle read/write unit results identified.", "owner": "not established; left blank."}, {"id": "4.4", "title": "Unit TB for ALU", "criterion": "Matches reference model; corners 0x8000_0000, 0x7FFF_FFFF, 0, -1 and shifts 0/1/31/>31 covered", "tool": "VCS / Verdi", "status": "In Progress", "recorded_work": "Legacy ALU SV bench/checker assets exist.", "evidence": "[OLD files rtl-dv/verif/tb_alu](../../../../OLD%20files%20rtl-dv/verif/tb_alu)", "missing": "Port/review exact current ALU contract; run accepted-tool reference/corner checks and review measured code coverage.", "owner": "not established; left blank."}, {"id": "4.5", "title": "Unit TB for branch unit", "criterion": "Full compare matrix passes; rs1<rs2, rs1=rs2, rs1>rs2 covered signed and unsigned", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified current branch-unit full signed/unsigned compare-matrix pass identified.", "owner": "not established; left blank."}, {"id": "4.6", "title": "Unit TB for MDU", "criterion": "All M-extension funct3 ops covered including divide-by-zero; backpressure sequences pass", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified all-M-op/backpressure/divide-corner unit results identified.", "owner": "not established; left blank."}, {"id": "4.7", "title": "Unit TB for MIU", "criterion": "All size x offset combinations and signed/unsigned loads covered", "tool": "VCS / Verdi", "status": "In Progress", "recorded_work": "Legacy LSU bench/checkers and retained failure log exist.", "evidence": "[OLD files rtl-dv/verif/tb_lsu/README.md](../../../../OLD%20files%20rtl-dv/verif/tb_lsu/README.md)", "missing": "Resolve missing image/stall assertion history through current-contract investigation; demonstrate complete size/offset/sign coverage.", "owner": "not established; left blank."}, {"id": "4.8", "title": "Unit TB for hazard logic", "criterion": "rs1, rs2 and both-operand hazards; ALU-to-use, LOAD-to-use and STORE-to-use sequences pass", "tool": "VCS / Verdi", "status": "In Progress", "recorded_work": "Legacy hazard SV bench exists.", "evidence": "[OLD files rtl-dv/verif/tb_hazard/tb_hazard_top.sv](../../../../OLD%20files%20rtl-dv/verif/tb_hazard/tb_hazard_top.sv)", "missing": "Review/port current hazards and demonstrate all required sequences with retained accepted-tool results.", "owner": "not established; left blank."}, {"id": "4.9", "title": "Unit regression 100% pass", "criterion": "Directed plus constrained random regression: zero failures on the final RTL", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No zero-failure final-RTL directed plus constrained-random unit regression identified.", "owner": "not established; left blank."}, {"id": "4.10", "title": "Core sanity TB built", "criterion": "I-MEM and D-MEM models, IRQ stimulus and checker in place", "tool": "VCS", "status": "In Progress", "recorded_work": "Legacy memory/exception/checker harness exists.", "evidence": "[rv32im_zicsr_5stage_exc_nointr_old/verif/misalign_exception_parallel_test/tb_riscof_soc_dual.sv](../../../../rv32im_zicsr_5stage_exc_nointr_old/verif/misalign_exception_parallel_test/tb_riscof_soc_dual.sv)", "missing": "Junior port must establish current memories, boot/reset, IRQ stimulus and self-checking current-core testbench.", "owner": "not established; left blank."}, {"id": "4.11", "title": "Core sanity tests pass", "criterion": "At least one self-checking test per class: arithmetic, branch, jump, load, store, M ops", "tool": "VCS", "status": "In Progress", "recorded_work": "Historical report records 46 passed and one failed test.", "evidence": "[verification/riscof/report.html](../../../../verification/riscof/report.html)", "missing": "Current-core accepted-tool self-checking tests for every required class; preserve historical failed JALR case and unknown revision.", "owner": "not established; left blank."}, {"id": "4.12", "title": "Reset and interrupt entry verified", "criterion": "Fetch starts at RESET_PC; IRQ taken at a clean boundary; mtvec jump and mepc save correct", "tool": "VCS", "status": "In Progress", "recorded_work": "Static trap model and legacy IRQ/exception checker concepts exist.", "evidence": "[ips/documentation/signoff/CSR_and_Trap_Model.md](../../../../ips/documentation/signoff/CSR_and_Trap_Model.md)", "missing": "Prove reset fetch and clean IRQ entry/mtvec/mepc on the current core; arbiter unit pass does not prove this.", "owner": "not established; left blank."}, {"id": "4.13", "title": "Hazard tests pass at core level", "criterion": "RAW, WAR, WAW, control and structural hazard tests all pass", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No complete current core RAW/WAR/WAW/control/structural hazard pass evidence identified.", "owner": "not established; left blank."}, {"id": "4.14", "title": "Core sanity coverage met", "criterion": "100% opcode coverage for the base ISA; every M op hit once; all load/store sizes hit", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No measured current whole-core base-opcode/M-op/load-store-size sanity coverage closure identified.", "owner": "not established; left blank."}]}, {"id": "G5", "title": "G5: recorded work and missing evidence", "count": 10, "items": [{"id": "5.1", "title": "ISS comparison flow working", "criterion": "Core log and Spike log compared automatically; a mismatch prints a clear fail", "tool": "Spike / VCS", "status": "In Progress", "recorded_work": "Legacy architectural signature comparison selects Sail.", "evidence": "[verification/riscof/config.ini](../../../../verification/riscof/config.ini)", "missing": "Current automated Spike execution-log comparison and mismatch-fail demonstration are required by the unchanged criterion. Sail alone is not this deliverable.", "owner": "not established; left blank."}, {"id": "5.2", "title": "Official RISC-V ISA tests pass", "criterion": "100% pass on rv32ui, plus rv32um if M and rv32uc if C are supported", "tool": "VCS", "status": "In Progress", "recorded_work": "Legacy architecture-test report retained; one failure recorded.", "evidence": "[verification/riscof/report.html](../../../../verification/riscof/report.html)", "missing": "100% applicable official ISA pass on the current candidate using the accepted simulator, with revision/run identity.", "owner": "not established; left blank."}, {"id": "5.3", "title": "Privileged / trap tests pass", "criterion": "Minimal machine-mode trap and interrupt tests pass", "tool": "VCS", "status": "In Progress", "recorded_work": "Legacy privilege/Zicsr/misalignment test selection exists.", "evidence": "[verification/riscof/run_compliance.bat](../../../../verification/riscof/run_compliance.bat)", "missing": "Current machine-mode trap and interrupt tests with valid reference outputs and retained passing evidence.", "owner": "not established; left blank."}, {"id": "5.4", "title": "riscv-dv integrated", "criterion": "Random instruction streams generate, compile and run against the core", "tool": "riscv-dv / VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified current-core riscv-dv generate/compile/run evidence identified.", "owner": "not established; left blank."}, {"id": "5.5", "title": "riscv-dv regression stable", "criterion": "N seeds run with a stable pass rate; N agreed with coach (typical 1k-10k)", "tool": "riscv-dv / VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No coach-agreed N and retained stable seeded current-core riscv-dv campaign identified.", "owner": "not established; left blank."}, {"id": "5.6", "title": "Memory latency randomisation run", "criterion": "Random grant and response delays; flush and backpressure stress passes", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified current-core randomized memory grant/response/flush/backpressure campaign identified.", "owner": "not established; left blank."}, {"id": "5.7", "title": "Benchmarks run", "criterion": "Dhrystone and/or CoreMark complete with correct results; score recorded", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified correct-result Dhrystone/CoreMark run with recorded score identified.", "owner": "not established; left blank."}, {"id": "5.8", "title": "Functional coverage closed at core level", "criterion": "Instruction, hazard and protocol delay-bucket coverage goals all met", "tool": "VCS / Verdi", "status": "In Progress", "recorded_work": "Scoped IRQ arbiter functional coverage exists.", "evidence": "[ips/Verification/IRQ_UNIT_COVERAGE_PLAN.md](../../../../ips/Verification/IRQ_UNIT_COVERAGE_PLAN.md)", "missing": "Whole-core instruction, hazard and protocol-delay-bin closure; unit IRQ coverage is insufficient.", "owner": "not established; left blank."}, {"id": "5.9", "title": "Code coverage >= 95% on core", "criterion": "Statement, branch and toggle; every exclusion has a written waiver", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No current whole-core statement/branch/toggle >=95% report with justified exclusions identified.", "owner": "not established; left blank."}, {"id": "5.10", "title": "Core bug list closed", "criterion": "All P0/P1 bugs fixed and re-verified; open P2/P3 listed with justification", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Defect/status register exists, including fixed-unverified findings.", "evidence": "[ips/Verification/status/PHASE_STATUS.md](../../../../ips/Verification/status/PHASE_STATUS.md)", "missing": "Reverify all P0/P1 fixes on final RTL; list and justify open P2/P3 defects.", "owner": "not established; left blank."}]}, {"id": "G6", "title": "G6: recorded work and missing evidence", "count": 19, "items": [{"id": "6.1", "title": "UVM SoC testbench built", "criterion": "AXI master agent emulating CPU accesses, IRQ VIP, peripheral VIPs and coverage model", "tool": "VCS", "status": "In Progress", "recorded_work": "SV-based SoC verification infrastructure/plans exist; user reports SV-first approach.", "evidence": "[ips/Verification/soc_verification_plan.md](../../../../ips/Verification/soc_verification_plan.md)", "missing": "Complete required agents/VIPs/checkers/coverage. UVM was not recommended yet per user; no item-specific UVM waiver or recommendation is inferred.", "owner": "not established; left blank."}, {"id": "6.2", "title": "Register tests pass", "criterion": "100% of addressable registers read and written; RW/RO/W1C behaviour verified", "tool": "VCS", "status": "In Progress", "recorded_work": "SoC register-test source and infrastructure exist.", "evidence": "[ips/RTL_SOC/soc_regtest_tb.sv](../../../../ips/RTL_SOC/soc_regtest_tb.sv)", "missing": "Retain current all-register RW/RO/W1C results and complete register inventory; source presence is not 100% pass.", "owner": "not established; left blank."}, {"id": "6.3", "title": "Register field coverage closed", "criterion": "Field-level functional coverage on enable and mode combinations met", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No complete current SoC field-level enable/mode functional-coverage closure identified.", "owner": "not established; left blank."}, {"id": "6.4", "title": "Per-IP use cases pass", "criterion": "TX and RX path exercised for each integrated peripheral against its VIP", "tool": "VCS", "status": "In Progress", "recorded_work": "Historical per-IP and staged datapath tests retained.", "evidence": "[ips/Verification/verification_matrix.csv](../../../../ips/Verification/verification_matrix.csv)", "missing": "Both TX/RX paths for each real integrated peripheral against its VIP/model, on current candidate.", "owner": "not established; left blank."}, {"id": "6.5", "title": "Interrupt path verified end to end", "criterion": "Every source verified from peripheral event to controller input; masking and priority checked", "tool": "VCS", "status": "In Progress", "recorded_work": "Arbiter unit priority/masking/fairness evidence exists.", "evidence": "[ips/Verification/IRQ_UNIT_COVERAGE_PLAN.md](../../../../ips/Verification/IRQ_UNIT_COVERAGE_PLAN.md)", "missing": "Every real peripheral event through controller/core ISR path, with source/mask/priority mapping; unit snapshots do not close end-to-end verification.", "owner": "not established; left blank."}, {"id": "6.6", "title": "Bus bridge protocol verified", "criterion": "AXI to AXI-Lite to APB: ordering, responses, alignment and byte enables correct", "tool": "VCS", "status": "In Progress", "recorded_work": "Standalone bridge/xbar and synthetic-aperture check results retained.", "evidence": "[ips/Verification/verification_matrix.csv](../../../../ips/Verification/verification_matrix.csv)", "missing": "Real current SoC path ordering/responses/alignment/byte enables and every mapped/unmapped range; resolve required bridge architecture difference.", "owner": "not established; left blank."}, {"id": "6.7", "title": "Memory map decode verified", "criterion": "Every address range hit; unmapped access returns the defined error", "tool": "VCS", "status": "In Progress", "recorded_work": "Standalone bridge/xbar and synthetic-aperture check results retained.", "evidence": "[ips/Verification/verification_matrix.csv](../../../../ips/Verification/verification_matrix.csv)", "missing": "Real current SoC path ordering/responses/alignment/byte enables and every mapped/unmapped range; resolve required bridge architecture difference.", "owner": "not established; left blank."}, {"id": "6.8", "title": "Traffic stress run", "criterion": "Long random peripheral traffic plus interrupts; no hangs, no protocol violations", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified long random real-peripheral-plus-IRQ protocol/hang-free stress result identified.", "owner": "not established; left blank."}, {"id": "6.9", "title": "Boot from internal ROM passes", "criterion": "Core fetches from ROM and reaches main()", "tool": "VCS", "status": "In Progress", "recorded_work": "ROM trampoline, SRAM loading and staged boot tests exist.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Retain full current SoC reaches-main evidence and applicable remap/continuation evidence; distinguish autonomous loading from strap-selected boot.", "owner": "not established; left blank."}, {"id": "6.10", "title": "Boot from external SPI flash passes", "criterion": "Boot mode pin = 1: code fetched from the SPI flash model and executed", "tool": "VCS", "status": "In Progress", "recorded_work": "Flash loader component checks retained.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Full boot-mode-pin=1 flash-model fetch and execution or exact approved departure; component copy checks are insufficient.", "owner": "not established; left blank."}, {"id": "6.11", "title": "SRAM load / ROM remap boot passes", "criterion": "If supported: SRAM loaded from flash, remap occurs and execution continues", "tool": "VCS", "status": "In Progress", "recorded_work": "ROM trampoline, SRAM loading and staged boot tests exist.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Retain full current SoC reaches-main evidence and applicable remap/continuation evidence; distinguish autonomous loading from strap-selected boot.", "owner": "not established; left blank."}, {"id": "6.12", "title": "Bare-metal C test suite passes", "criterion": "Memory march and walking-ones, timer/SW/external interrupts, UART/SPI/GPIO loopbacks", "tool": "VCS", "status": "In Progress", "recorded_work": "Scoped C/ASM peripheral and timer datapath tests retained.", "evidence": "[ips/Verification/verification_matrix.csv](../../../../ips/Verification/verification_matrix.csv)", "missing": "Complete memory march/walking-ones, timer/software/external IRQ and UART/SPI/GPIO loopbacks on current full SoC.", "owner": "not established; left blank."}, {"id": "6.13", "title": "Trap robustness under load passes", "criterion": "Interrupts during load/store/branch-dense code; nested interrupt policy exercised if supported", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified current SoC interrupted-load/store/branch/trap/nesting robustness results identified.", "owner": "not established; left blank."}, {"id": "6.14", "title": "SoC random and stress tests pass", "criterion": "Random arbitration, power-on reset sequences, interconnect backpressure and wait states", "tool": "VCS", "status": "In Progress", "recorded_work": "Stress runner exists.", "evidence": "[ips/Verification/infrastructure/run_freeze_stress.ps1](../../../../ips/Verification/infrastructure/run_freeze_stress.ps1)", "missing": "Retain qualified full-SoC arbitration/reset/backpressure/wait-state randomized results; a runner is not a clean stress result.", "owner": "not established; left blank."}, {"id": "6.15", "title": "SoC functional coverage closed", "criterion": "Address map, interrupt sources and boot modes all covered", "tool": "VCS / Verdi", "status": "In Progress", "recorded_work": "Component and scoped functional coverage evidence exists.", "evidence": "[ips/Verification/verification_matrix.csv](../../../../ips/Verification/verification_matrix.csv)", "missing": "Full-SoC address-map, every interrupt source and all approved boot modes coverage closure.", "owner": "not established; left blank."}, {"id": "6.16", "title": "SoC code coverage >= 95%", "criterion": "Statement, branch and toggle with written waivers", "tool": "VCS / Verdi", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No current full-SoC statement/branch/toggle >=95% report with written waivers identified.", "owner": "not established; left blank."}, {"id": "6.17", "title": "Full regression clean", "criterion": "Directed, random and software suites: zero failures on the RTL handed to synthesis", "tool": "VCS", "status": "In Progress", "recorded_work": "Regression orchestration exists.", "evidence": "[ips/Verification/regression/run_regression.ps1](../../../../ips/Verification/regression/run_regression.ps1)", "missing": "Zero-failure directed/random/software full suite on the exact RTL delivered to synthesis, accepted tool and manifest identity.", "owner": "not established; left blank."}, {"id": "6.18", "title": "No deadlocks in long runs", "criterion": "Long-run test completes; no unbounded stalls", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualified current-candidate long-run completion and bounded-stall evidence identified.", "owner": "not established; left blank."}, {"id": "6.19", "title": "RTL frozen for synthesis", "criterion": "Repo tagged; later changes need coach approval and a full regression re-run", "tool": "Git", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No demonstrated synthesis release tag with clean full regression and approved freeze/change procedure.", "owner": "not established; left blank."}]}, {"id": "G7", "title": "G7: recorded work and missing evidence", "count": 8, "items": [{"id": "7.1", "title": "SDC constraints written", "criterion": "Clocks, IO delays, false paths, multicycle paths and clock uncertainty all justified", "tool": "DC / Fusion Compiler", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Clocks, IO delays, false paths, multicycle paths and clock uncertainty all justified", "owner": "not established; left blank."}, {"id": "7.2", "title": "Synthesis runs clean", "criterion": "No unresolved references and no unintended latches", "tool": "DC / Fusion Compiler", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: No unresolved references and no unintended latches", "owner": "not established; left blank."}, {"id": "7.3", "title": "Timing met post-synthesis", "criterion": "Zero setup violations at target frequency (worst negative slack >= 0)", "tool": "DC / Fusion Compiler", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Zero setup violations at target frequency (worst negative slack >= 0)", "owner": "not established; left blank."}, {"id": "7.4", "title": "Area within budget", "criterion": "Reported area within the G1 budget, or overrun approved by the coach", "tool": "DC / Fusion Compiler", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Reported area within the G1 budget, or overrun approved by the coach", "owner": "not established; left blank."}, {"id": "7.5", "title": "DFT inserted", "criterion": "Scan chains inserted, compression decided, test clock and reset defined", "tool": "Tessent", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Scan chains inserted, compression decided, test clock and reset defined", "owner": "not established; left blank."}, {"id": "7.6", "title": "ATPG coverage met", "criterion": "Stuck-at test coverage >= 95%, or the target agreed with the coach", "tool": "Tessent", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Stuck-at test coverage >= 95%, or the target agreed with the coach", "owner": "not established; left blank."}, {"id": "7.7", "title": "Gate-level simulation passes", "criterion": "Netlist runs the boot test and a sanity software test with SDF back-annotation", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Netlist runs the boot test and a sanity software test with SDF back-annotation", "owner": "not established; left blank."}, {"id": "7.8", "title": "Post-synthesis LEC clean", "criterion": "RTL vs synthesised netlist fully equivalent; zero unresolved non-equivalent points", "tool": "Conformal LEC", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: RTL vs synthesised netlist fully equivalent; zero unresolved non-equivalent points", "owner": "not established; left blank."}]}, {"id": "G8", "title": "G8: recorded work and missing evidence", "count": 12, "items": [{"id": "8.1", "title": "Floorplan complete", "criterion": "Die size, core area, macro placement, IO/pad ring, power ring and straps defined", "tool": "Innovus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Die size, core area, macro placement, IO/pad ring, power ring and straps defined", "owner": "not established; left blank."}, {"id": "8.2", "title": "Power plan complete", "criterion": "IR drop within spec; no EM violations on the power grid", "tool": "Voltus / Innovus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: IR drop within spec; no EM violations on the power grid", "owner": "not established; left blank."}, {"id": "8.3", "title": "Placement complete", "criterion": "No overlaps, no placement DRC, congestion within limits", "tool": "Innovus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: No overlaps, no placement DRC, congestion within limits", "owner": "not established; left blank."}, {"id": "8.4", "title": "CTS complete", "criterion": "Clock skew and insertion delay within target; clock tree DRC clean", "tool": "Innovus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Clock skew and insertion delay within target; clock tree DRC clean", "owner": "not established; left blank."}, {"id": "8.5", "title": "Routing complete", "criterion": "100% routed, zero opens, zero shorts", "tool": "Innovus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: 100% routed, zero opens, zero shorts", "owner": "not established; left blank."}, {"id": "8.6", "title": "Post-route STA signoff", "criterion": "Setup and hold met across all PVT corners and modes; every waiver approved", "tool": "PrimeTime / PTSI", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Setup and hold met across all PVT corners and modes; every waiver approved", "owner": "not established; left blank."}, {"id": "8.7", "title": "Post-layout LEC clean", "criterion": "Synthesised netlist vs post-route netlist equivalent", "tool": "Conformal LEC", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Synthesised netlist vs post-route netlist equivalent", "owner": "not established; left blank."}, {"id": "8.8", "title": "DRC clean", "criterion": "Zero violations against the 28 nm foundry rule deck", "tool": "Calibre", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Zero violations against the 28 nm foundry rule deck", "owner": "not established; left blank."}, {"id": "8.9", "title": "LVS clean", "criterion": "Layout matches schematic; zero discrepancies", "tool": "Calibre", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Layout matches schematic; zero discrepancies", "owner": "not established; left blank."}, {"id": "8.10", "title": "Antenna and DFM checks clean", "criterion": "Antenna and DFM/density checks pass", "tool": "Calibre", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Antenna and DFM/density checks pass", "owner": "not established; left blank."}, {"id": "8.11", "title": "IR / EM signoff", "criterion": "Static and dynamic IR drop and EM within foundry limits", "tool": "Voltus", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Static and dynamic IR drop and EM within foundry limits", "owner": "not established; left blank."}, {"id": "8.12", "title": "Post-layout gate simulation passes", "criterion": "Boot plus sanity software test on the final netlist with post-route SDF", "tool": "VCS", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Boot plus sanity software test on the final netlist with post-route SDF", "owner": "not established; left blank."}]}, {"id": "G9", "title": "G9: recorded work and missing evidence", "count": 10, "items": [{"id": "9.1", "title": "GDSII generated", "criterion": "Final GDSII passes DRC and LVS in the same run that produced it", "tool": "Calibre", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Final GDSII passes DRC and LVS in the same run that produced it", "owner": "not established; left blank."}, {"id": "9.2", "title": "Sealring, fill and logo added", "criterion": "Per foundry and MPW requirements", "tool": "Innovus / Calibre", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Per foundry and MPW requirements", "owner": "not established; left blank."}, {"id": "9.3", "title": "Foundry tape-out checklist completed", "criterion": "Every foundry-required item ticked and signed", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Every foundry-required item ticked and signed", "owner": "not established; left blank."}, {"id": "9.4", "title": "Test patterns delivered", "criterion": "ATPG patterns in the required format, validated in gate simulation", "tool": "Tessent", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: ATPG patterns in the required format, validated in gate simulation", "owner": "not established; left blank."}, {"id": "9.5", "title": "Pin list and package plan delivered", "criterion": "Bonding diagram and package pinout agreed", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: Bonding diagram and package pinout agreed", "owner": "not established; left blank."}, {"id": "9.6", "title": "Datasheet / user guide written", "criterion": "Memory map, register map, boot modes, pin description and electrical assumptions", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Architecture/map/CSR/clock-pin source documents exist.", "evidence": "[ips/documentation/signoff/SoC_Architecture_Map_Boot.md](../../../../ips/documentation/signoff/SoC_Architecture_Map_Boot.md)", "missing": "Complete reviewed datasheet/user guide, agreed boot modes and electrical assumptions.", "owner": "not established; left blank."}, {"id": "9.7", "title": "Verification report submitted", "criterion": "Coverage summary, regression results and bug list with closure status", "tool": "Not specified in row", "status": "In Progress", "recorded_work": "Prior checklist evidence audit and component result index exist.", "evidence": "[ips/Verification/signoff/README.md](../../../../ips/Verification/signoff/README.md)", "missing": "Final verification report with current regression, code/functional coverage and complete bug dispositions.", "owner": "not established; left blank."}, {"id": "9.8", "title": "Full design database archived", "criterion": "RTL, TB, scripts, constraints, netlists, GDS, logs and reports tagged in the repo", "tool": "Git", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No qualifying final-candidate evidence identified for the complete criterion: RTL, TB, scripts, constraints, netlists, GDS, logs and reports tagged in the repo", "owner": "not established; left blank."}, {"id": "9.9", "title": "FPGA validation report (optional)", "criterion": "If done: board used, tests run and results", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "FPGA report is optional; no inspected board validation report establishes this row. A pre-implementation plan is not validation.", "owner": "not established; left blank."}, {"id": "9.10", "title": "Final coach and faculty approval", "criterion": "Both signatures captured on the Cover tab", "tool": "Not specified in row", "status": "blank", "recorded_work": "No qualifying evidence established in this inspection.", "evidence": "blank", "missing": "No final coach/faculty Cover signatures identified; verbal architecture departures do not constitute final signoff.", "owner": "not established; left blank."}]}], "status_counts": {"Done": 3, "In Progress": 62, "blank": 59}, "total_items": 124, "verbal_decisions": [{"id": "VD-01", "title": "PLIC / CLINT / CLIC Interrupt Architecture Departure", "gates": ["G1", "G3", "G5", "G6"], "affected_items": ["1.8", "1.9", "3.8", "5.8", "6.14"], "approved": true, "date": "2026-11-02", "coach": "1-TOPS Coach (verbal approval reported by student)", "description": "Standard RISC-V PLIC/CLINT/CLIC multi-core/vector interrupt controller requirement departed for initial tape-out milestone. Simplified direct IRQ routing and timer architecture approved.", "notes": "Verbally approved. Direct external IRQs wired directly to core mip/mie; full PLIC/CLINT crossbar omitted for student SoC milestone."}, {"id": "VD-02", "title": "Boot ROM 4 KB Capacity Specification Departure", "gates": ["G1", "G3"], "affected_items": ["1.11", "3.6"], "approved": true, "date": "2026-11-02", "coach": "1-TOPS Coach (verbal approval reported by student)", "description": "4 KB fixed Boot ROM requirement modified to align with available prototype on-chip memory mapping and synthesizable ROM configuration.", "notes": "Verbally approved. ROM size adapted to match student prototype integration map; execution jumps directly to SRAM/Flash vector."}, {"id": "VD-03", "title": "External Boot-Mode Pin Multi-Strap Departure", "gates": ["G1", "G3"], "affected_items": ["1.12", "3.11"], "approved": true, "date": "2026-11-02", "coach": "1-TOPS Coach (verbal approval reported by student)", "description": "Dedicated external multi-mode boot pin strapping requirement departed. Single fixed default boot mode active without external pin multiplexer logic.", "notes": "Verbally approved. Dedicated multi-mode boot selection pin waived; default reset vector points directly to preloaded memory address."}, {"id": "VD-04", "title": "Verification Framework: SystemVerilog First vs Mandatory UVM", "gates": ["G5", "G6"], "affected_items": ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7", "5.8", "5.9", "5.10", "6.1", "6.2", "6.3", "6.4"], "approved": true, "date": "2026-11-02", "coach": "1-TOPS Coach (verbal approval reported by student)", "description": "Coach did not recommend full UVM framework yet for student team. Native SystemVerilog module/class testbenches (direct and constrained random) approved as acceptable verification vehicle.", "notes": "Coach confirmed UVM is not mandatory at this stage. Native SystemVerilog testbenches with self-checking assertions and golden models accepted."}, {"id": "VD-05", "title": "EDA Toolchain Flexibility & Workstation Tool Substitution", "gates": ["G0", "G4"], "affected_items": ["0.1", "0.2", "4.1", "4.2", "4.3", "4.4"], "approved": true, "date": "2026-11-02", "coach": "1-TOPS Coach (verbal approval reported by student)", "description": "Strict vendor tool locking (Synopsys vs Cadence vs Siemens) relaxed. Teams permitted to utilize available EDA licenses (Cadence Genus/Innovus/Xcelium/JasperGold, Synopsys VCS, or approved open-source flows).", "notes": "Tool substitutions permitted per available university lab infrastructure. Evidence from Cadence JasperGold / Genus or Synopsys VCS accepted."}, {"id": "VD-06", "title": "Phased Verification: Standalone Core TBs vs Current SoC Interconnect", "gates": ["G2", "G5", "G6"], "affected_items": ["2.1", "2.10", "5.1", "6.1"], "approved": true, "date": "2026-11-02", "coach": "1-TOPS Coach (verbal approval reported by student)", "description": "Legacy core verification preserved in standalone core environment (rv32im_zicsr_5stage_exc_nointr_old and OLD files rtl-dv) while current SoC interconnect and peripheral integration (ips/) proceeds concurrently.", "notes": "Standalone core testbench inventory retained as baseline verification evidence; junior engineer actively executing SoC port."}]};
+    const STORAGE_KEY = "RISCFORGE_1TOPS_SIGNOFF_PROGRESS_V1";
+
+    let state = {
+      gates: JSON.parse(JSON.stringify(INITIAL_DATA.gates)),
+      verbal_decisions: JSON.parse(JSON.stringify(INITIAL_DATA.verbal_decisions)),
+      activeGateFilter: "all",
+      activeStatusFilter: "all",
+      searchQuery: "",
+      userOverrides: {}, // itemId -> { status, checked, notes }
+    };
+
+    // Load from localStorage if present
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.userOverrides) state.userOverrides = parsed.userOverrides;
+          if (parsed.verbal_decisions) state.verbal_decisions = parsed.verbal_decisions;
+          updateSaveIndicator("Saved state loaded from LocalStorage");
+        }
+      } catch (e) {
+        console.error("Failed to load local storage:", e);
+      }
+    }
+
+    function saveState(msg = "Changes saved to LocalStorage") {
+      try {
+        const payload = {
+          userOverrides: state.userOverrides,
+          verbal_decisions: state.verbal_decisions,
+          lastUpdated: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        updateSaveIndicator(msg);
+        showToast(msg);
+      } catch (e) {
+        console.error("Failed to save to local storage:", e);
+      }
+    }
+
+    function updateSaveIndicator(text) {
+      const el = document.getElementById("saveStatusText");
+      if (el) {
+        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        el.textContent = `${text} (${time})`;
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toastMsg");
+      toastMsg.textContent = msg;
+      toast.style.display = "flex";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3000);
+    }
+
+    function getItemEffectiveStatus(item) {
+      const override = state.userOverrides[item.id];
+      if (override && override.status) return override.status;
+      return item.status || "blank";
+    }
+
+    function isItemChecked(item) {
+      const override = state.userOverrides[item.id];
+      if (override && typeof override.checked === "boolean") return override.checked;
+      return item.status === "Done";
+    }
+
+    function getItemNotes(item) {
+      const override = state.userOverrides[item.id];
+      return (override && override.notes) ? override.notes : "";
+    }
+
+    // Calculate Stats
+    function updateStats() {
+      let total = 0;
+      let done = 0;
+      let inProgress = 0;
+      let blank = 0;
+      let verbal = 0;
+
+      state.gates.forEach(gate => {
+        gate.items.forEach(item => {
+          total++;
+          const status = getItemEffectiveStatus(item);
+          if (status === "Done") done++;
+          else if (status === "In Progress") inProgress++;
+          else if (status === "Verbally Approved") verbal++;
+          else blank++;
+        });
+      });
+
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statDone").textContent = done;
+      document.getElementById("statInProgress").textContent = inProgress;
+      document.getElementById("statBlank").textContent = blank;
+      
+      const approvedVerbalDecisions = state.verbal_decisions.filter(v => v.approved).length;
+      document.getElementById("statVerbal").textContent = `${approvedVerbalDecisions} / ${state.verbal_decisions.length}`;
+
+      document.getElementById("countAll").textContent = total;
+      document.getElementById("countDone").textContent = done;
+      document.getElementById("countInProgress").textContent = inProgress;
+      document.getElementById("countBlank").textContent = blank;
+      document.getElementById("countVerbalApproved").textContent = verbal;
+      document.getElementById("verbalCountBadge").textContent = `${approvedVerbalDecisions} Active`;
+    }
+
+    // Render Gate Tabs
+    function renderGateTabs() {
+      const container = document.getElementById("gateTabs");
+      container.innerHTML = "";
+
+      const allBtn = document.createElement("button");
+      allBtn.className = `gate-tab-btn ${state.activeGateFilter === 'all' ? 'active' : ''}`;
+      allBtn.innerHTML = `All Gates <span class="gate-tab-count">124</span>`;
+      allBtn.onclick = () => setGateFilter('all');
+      container.appendChild(allBtn);
+
+      state.gates.forEach(g => {
+        const btn = document.createElement("button");
+        btn.className = `gate-tab-btn ${state.activeGateFilter === g.id ? 'active' : ''}`;
+        btn.innerHTML = `${g.id} <span class="gate-tab-count">${g.items.length}</span>`;
+        btn.onclick = () => setGateFilter(g.id);
+        container.appendChild(btn);
+      });
+    }
+
+    // Render Verbal Decisions Cards
+    function renderVerbalDecisions() {
+      const container = document.getElementById("verbalCardsContainer");
+      container.innerHTML = "";
+
+      state.verbal_decisions.forEach((vd, idx) => {
+        const card = document.createElement("div");
+        card.className = `verbal-card ${vd.approved ? 'active' : ''}`;
+        
+        const gatesHtml = (vd.gates || []).map(g => `<span class="gate-tag">${g}</span>`).join(" ");
+
+        card.innerHTML = `
+          <div class="verbal-card-top">
+            <input type="checkbox" class="custom-checkbox" ${vd.approved ? 'checked' : ''} onchange="toggleVerbalDecision(${idx}, this.checked)">
+            <div class="verbal-card-title-group">
+              <div class="verbal-card-title">${vd.title}</div>
+              <div class="verbal-meta">
+                <span>Ref: ${vd.id}</span> &bull; 
+                <span>Gates: ${gatesHtml}</span> &bull; 
+                <span>${vd.date}</span>
+              </div>
+            </div>
+          </div>
+          <div class="verbal-desc">${vd.description}</div>
+          <div class="coach-notes-box">
+            <div class="coach-notes-label">
+              <span>Coach Notes / Scope</span>
+              <span>${vd.approved ? '✓ Verbal Approved' : 'Inactive'}</span>
+            </div>
+            <textarea class="coach-notes-textarea" onchange="updateVerbalNotes(${idx}, this.value)" placeholder="Enter coach notes...">${vd.notes || ''}</textarea>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleVerbalDecision(index, checked) {
+      state.verbal_decisions[index].approved = checked;
+      saveState(`Verbal decision "${state.verbal_decisions[index].title}" ${checked ? 'ticked' : 'unticked'}`);
+      updateStats();
+      renderVerbalDecisions();
+    }
+
+    function updateVerbalNotes(index, notes) {
+      state.verbal_decisions[index].notes = notes;
+      saveState("Updated verbal decision notes");
+    }
+
+    // Render Checklist
+    function renderChecklist() {
+      const root = document.getElementById("checklistRoot");
+      root.innerHTML = "";
+
+      const query = state.searchQuery.toLowerCase().trim();
+      let totalVisible = 0;
+
+      state.gates.forEach(gate => {
+        if (state.activeGateFilter !== "all" && state.activeGateFilter !== gate.id) return;
+
+        // Filter items
+        const matchingItems = gate.items.filter(item => {
+          const effStatus = getItemEffectiveStatus(item);
+
+          // Status filter
+          if (state.activeStatusFilter !== "all") {
+            if (state.activeStatusFilter === "blank" && effStatus !== "blank") return false;
+            if (state.activeStatusFilter !== "blank" && effStatus !== state.activeStatusFilter) return false;
+          }
+
+          // Search query
+          if (query) {
+            const matchText = `${item.id} ${item.title} ${item.criterion} ${item.tool} ${item.recorded_work} ${item.missing} ${getItemNotes(item)}`.toLowerCase();
+            if (!matchText.includes(query)) return false;
+          }
+
+          return true;
+        });
+
+        if (matchingItems.length === 0) return;
+        totalVisible += matchingItems.length;
+
+        // Gate Group
+        const groupEl = document.createElement("div");
+        groupEl.className = "gate-group";
+
+        const headerEl = document.createElement("div");
+        headerEl.className = "gate-group-header";
+        headerEl.innerHTML = `
+          <div class="gate-group-title">${gate.id} — ${gate.title}</div>
+          <div class="gate-group-stats">Showing ${matchingItems.length} of ${gate.items.length} items</div>
+        `;
+        groupEl.appendChild(headerEl);
+
+        const itemsContainer = document.createElement("div");
+        itemsContainer.className = "items-container";
+
+        matchingItems.forEach(item => {
+          const effStatus = getItemEffectiveStatus(item);
+          const checked = isItemChecked(item);
+          const userNotes = getItemNotes(item);
+
+          let statusBadgeClass = "status-blank";
+          if (effStatus === "Done") statusBadgeClass = "status-done";
+          else if (effStatus === "In Progress") statusBadgeClass = "status-inprogress";
+          else if (effStatus === "Verbally Approved") statusBadgeClass = "status-verbal";
+          else if (effStatus === "Waived") statusBadgeClass = "status-waived";
+
+          const itemEl = document.createElement("div");
+          itemEl.className = "item-card";
+          itemEl.id = `item-${item.id}`;
+
+          itemEl.innerHTML = `
+            <div class="item-header">
+              <div class="item-title-group">
+                <input type="checkbox" class="item-checkbox" ${checked ? 'checked' : ''} onchange="toggleItemChecked('${item.id}', this.checked)">
+                <span class="item-id-badge">${item.id}</span>
+                <span class="item-title">${item.title}</span>
+              </div>
+              <div class="item-controls">
+                ${item.tool ? `<span class="tool-badge">${item.tool}</span>` : ''}
+                <select class="status-select" onchange="setItemStatus('${item.id}', this.value)">
+                  <option value="blank" ${effStatus === 'blank' ? 'selected' : ''}>Blank / Missing</option>
+                  <option value="In Progress" ${effStatus === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                  <option value="Done" ${effStatus === 'Done' ? 'selected' : ''}>Done</option>
+                  <option value="Verbally Approved" ${effStatus === 'Verbally Approved' ? 'selected' : ''}>Verbally Approved</option>
+                  <option value="Waived" ${effStatus === 'Waived' ? 'selected' : ''}>Waived</option>
+                </select>
+                <span class="status-badge ${statusBadgeClass}">${effStatus}</span>
+              </div>
+            </div>
+
+            <div class="item-body">
+              <div class="info-block">
+                <span class="info-label label-criterion">Official Criterion</span>
+                <div>${item.criterion || 'Not specified'}</div>
+              </div>
+
+              <div class="info-block">
+                <span class="info-label label-recorded">Recorded Work</span>
+                <div>${item.recorded_work || 'No qualifying evidence established.'}</div>
+              </div>
+
+              <div class="info-block missing-block">
+                <span class="info-label label-missing">Missing Evidence / Remaining Gap</span>
+                <div>${item.missing || 'No documented gap entry.'}</div>
+              </div>
+
+              <div class="info-block">
+                <span class="info-label label-notes">Local Evidence Notes / Links</span>
+                <input type="text" class="user-notes-input" placeholder="e.g. ips/documentation/signoff/Core_Microarchitecture.md or TB run log..." value="${userNotes}" onchange="updateItemNotes('${item.id}', this.value)">
+              </div>
+            </div>
+          `;
+          itemsContainer.appendChild(itemEl);
+        });
+
+        groupEl.appendChild(itemsContainer);
+        root.appendChild(groupEl);
+      });
+
+      if (totalVisible === 0) {
+        root.innerHTML = `
+          <div class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 16 16" fill="var(--ink-3)" style="margin-bottom:12px;">
+              <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Z"/>
+            </svg>
+            <p>No checklist items found matching current filters or search query.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Item handlers
+    function toggleItemChecked(itemId, isChecked) {
+      if (!state.userOverrides[itemId]) state.userOverrides[itemId] = {};
+      state.userOverrides[itemId].checked = isChecked;
+      if (isChecked && (!state.userOverrides[itemId].status || state.userOverrides[itemId].status === "blank")) {
+        state.userOverrides[itemId].status = "Done";
+      } else if (!isChecked && state.userOverrides[itemId].status === "Done") {
+        state.userOverrides[itemId].status = "In Progress";
+      }
+      saveState(`Item ${itemId} updated`);
+      updateStats();
+      renderChecklist();
+    }
+
+    function setItemStatus(itemId, newStatus) {
+      if (!state.userOverrides[itemId]) state.userOverrides[itemId] = {};
+      state.userOverrides[itemId].status = newStatus;
+      state.userOverrides[itemId].checked = (newStatus === "Done");
+      saveState(`Item ${itemId} status set to ${newStatus}`);
+      updateStats();
+      renderChecklist();
+    }
+
+    function updateItemNotes(itemId, notes) {
+      if (!state.userOverrides[itemId]) state.userOverrides[itemId] = {};
+      state.userOverrides[itemId].notes = notes;
+      saveState(`Notes updated for ${itemId}`);
+    }
+
+    // Filter Handlers
+    function setGateFilter(gateId) {
+      state.activeGateFilter = gateId;
+      renderGateTabs();
+      renderChecklist();
+    }
+
+    function setStatusFilter(status) {
+      state.activeStatusFilter = status;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        if (btn.getAttribute("data-status") === status) btn.classList.add("active");
+        else btn.classList.remove("active");
+      });
+      renderChecklist();
+    }
+
+    function handleSearch() {
+      state.searchQuery = document.getElementById("searchInput").value;
+      renderChecklist();
+    }
+
+    function toggleBanner() {
+      const content = document.getElementById("bannerContent");
+      const text = document.getElementById("bannerToggleText");
+      if (content.style.display === "none") {
+        content.style.display = "grid";
+        text.innerHTML = `<span>Click to Collapse</span> &#9650;`;
+      } else {
+        content.style.display = "none";
+        text.innerHTML = `<span>Click to Expand</span> &#9660;`;
+      }
+    }
+
+    // Export / Import
+    function exportProgress() {
+      const exportData = {
+        timestamp: new Date().toISOString(),
+        project: "RISCFORGE_1TOPS_SOC",
+        userOverrides: state.userOverrides,
+        verbal_decisions: state.verbal_decisions
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `1tops_signoff_progress_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Progress successfully exported to JSON");
+    }
+
+    function importProgress(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported.userOverrides) state.userOverrides = imported.userOverrides;
+          if (imported.verbal_decisions) state.verbal_decisions = imported.verbal_decisions;
+          saveState("Imported progress loaded successfully");
+          updateStats();
+          renderVerbalDecisions();
+          renderChecklist();
+          showToast("Import successful!");
+        } catch (err) {
+          alert("Error parsing imported JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetToBaseline() {
+      if (confirm("Reset all local progress, ticked decisions, and notes back to baseline official state?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        state.userOverrides = {};
+        state.verbal_decisions = JSON.parse(JSON.stringify(INITIAL_DATA.verbal_decisions));
+        updateSaveIndicator("Reset to baseline");
+        updateStats();
+        renderVerbalDecisions();
+        renderChecklist();
+        showToast("Reset completed.");
+      }
+    }
+
+    // Add Verbal Decision Modal
+    function openAddVerbalModal() {
+      document.getElementById("addVerbalModal").style.display = "flex";
+    }
+
+    function closeAddVerbalModal() {
+      document.getElementById("addVerbalModal").style.display = "none";
+    }
+
+    function saveNewVerbalDecision() {
+      const title = document.getElementById("modalTitle").value.trim();
+      const gatesStr = document.getElementById("modalGates").value.trim();
+      const desc = document.getElementById("modalDesc").value.trim();
+      const notes = document.getElementById("modalNotes").value.trim();
+
+      if (!title) {
+        alert("Please enter a decision title.");
+        return;
+      }
+
+      const gates = gatesStr ? gatesStr.split(",").map(s => s.trim().toUpperCase()) : ["GENERAL"];
+      const newId = `VD-${String(state.verbal_decisions.length + 1).padStart(2, '0')}`;
+
+      state.verbal_decisions.push({
+        id: newId,
+        title: title,
+        gates: gates,
+        approved: true,
+        date: new Date().toISOString().slice(0, 10),
+        coach: "1-TOPS Coach (reported)",
+        description: desc || "Custom verbally approved decision.",
+        notes: notes || ""
+      });
+
+      closeAddVerbalModal();
+      document.getElementById("modalTitle").value = "";
+      document.getElementById("modalGates").value = "";
+      document.getElementById("modalDesc").value = "";
+      document.getElementById("modalNotes").value = "";
+
+      saveState(`Added custom decision "${title}"`);
+      updateStats();
+      renderVerbalDecisions();
+    }
+
+    // Initialization
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      updateStats();
+      renderGateTabs();
+      renderVerbalDecisions();
+      renderChecklist();
+    });
+  </script>
+</body>
+</html>

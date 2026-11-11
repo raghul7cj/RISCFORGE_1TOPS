@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Verification architecture · CJ review · 11 November 2026</title>
+  <link rel="stylesheet" href="report.css">
+</head>
+<body>
+<main class="sheet">
+  <header>
+    <p class="eyebrow">RISCFORGE 1TOPS · CJ documentation review · 02</p>
+    <h1>Verification architecture</h1>
+    <p class="lede">Trace the DUT, stimulus, independent expectation, observation, effective check and retained result. Keep open engineering work visible.</p>
+    <p class="meta">11 November 2026 · baseline <code>a91edb7e666d5c374af70809703f52eb5513d96f</code> · local <code>ips/</code> is an augmented offline copy, not a Git checkout.</p>
+    <p class="note"><strong>Current review snapshot, not technical signoff.</strong> No new compilation, simulation, waveform or functional change was performed. <a href="02_verification_architecture.md">Detailed maintained Markdown</a> contains the full source/evidence chain and open questions. Read the <a href="../CJ_FINDING_RECONCILIATION_20261110.md">current correction banner</a> and <a href="../CJ_REMAINING_WORK_20261110.md">remaining work</a> before using older reports.</p>
+  </header>
+  <nav aria-label="Review topics">
+    <a href="index.html">Index</a>
+    <a href="01_core_architecture.html">01 Core</a>
+    <a href="02_verification_architecture.html" aria-current="page">02 Verification</a>
+    <a href="03_benchmark_spi_evidence.html">03 Benchmark / SPI</a>
+    <a href="04_gate_readiness.html">04 Readiness</a>
+  <a href="diagram_index.html">Structural views</a></nav>
+
+  <section id="scope">
+    <h2>1. Requirement boundaries</h2>
+    <table>
+      <colgroup><col style="width:16%"><col style="width:43%"><col style="width:41%"></colgroup>
+      <thead><tr><th>Item</th><th>Recorded obligation</th><th>Current limit</th></tr></thead>
+      <tbody>
+        <tr><td>G4 4.12</td><td>RESET_PC fetch; clean IRQ boundary; correct mtvec jump and mepc save.</td><td>Selected synchronous-trap development evidence does not prove current asynchronous entry.</td></tr>
+        <tr><td>G5 5.3</td><td>Minimal machine-mode trap and interrupt tests.</td><td>Current-source architectural suite and asynchronous/collision checks remain open.</td></tr>
+        <tr><td>G6 6.5</td><td><strong>Every real peripheral event → controller input; masking and priority checked.</strong></td><td>Unit injected-vector coverage does not establish real event generation/routing. Handler/MRET is additional scope.</td></tr>
+        <tr><td>G6 6.13</td><td>IRQs during load/store/branch-dense code; nesting policy if supported.</td><td>Precise effects, progress, context and return need current legal schedules and independent checks.</td></tr>
+      </tbody>
+    </table>
+    <p class="meta">Criteria: preserved <a href="../evidence_review_20261102/G4_MISSING_EVIDENCE.md">G4</a>, <a href="../evidence_review_20261102/G5_MISSING_EVIDENCE.md">G5</a>, <a href="../evidence_review_20261102/G6_MISSING_EVIDENCE.md">G6</a>. VCS is the recorded tool; no alternative-tool/UVM/controller waiver or no-C N/A approval is inferred. Official workbook unchanged.</p>
+    </section><section id="structural-views"><figure class="structural-figure" id="fig-V1"><p class="view-original">Scroll horizontally on small screens, or <a href="figures/V1_structural.svg" aria-label="Open figure V1 as a scalable vector">open scalable original and zoom</a>.</p><div class="artwork"><img src="figures/V1_structural.svg" alt="Figure V1: Real-core pipeline harness and sampled observations"></div><figcaption><strong>Figure V1 — Real-core pipeline harness and sampled observations.</strong> pipeline_env owns the scenario, control driver and monitor; stimulus travels from scenario to driver to bus to DUT. Memory return paths are explicit.</figcaption><div class="interface-key"><p><strong>Interface key.</strong> DUT outputs IMEM address[29:0] and LSU req/we/address/wdata/BE; responders return instruction data and LSU rdata/stall/error. The passive adapter freezes input #1step before posedge and copies live state +1 ps after the edge; cycle IDs associate the phases.</p><p><strong>Source key.</strong> <a href="../../../Verification/hazard_tb/pipeline/pipeline_tb.sv">Top + hierarchy taps</a> · <a href="../../../Verification/hazard_tb/pipeline/pipeline_tb_pkg.sv">Environment</a> · <a href="../../../Verification/hazard_tb/pipeline/pipeline_probe_adapter.sv">Sampling adapter</a> · <a href="../../../Verification/hazard_tb/pipeline/user/pipeline_user_extensions.svh">User hooks</a> · <a href="../../../Verification/hazard_tb/pipeline/pipeline.f">Build filelist</a></p><p><strong>Accomplishment / evidence limit.</strong> Memory responders, control plumbing and immutable callback delivery are implemented. User scenario/checker/coverage remain unconfigured. 4-Nov Slang compile applies to an older snapshot; current core differs. No pipeline runtime qualification is claimed. <a href="../../../../artifacts/hazard_tb_skeleton_20261104/slang_pipeline_final.log">Historical pipeline compile</a> · <a href="../../../Verification/hazard_tb/docs/validation.md">Snapshot limits</a></p></div></figure><figure class="structural-figure" id="fig-V2"><p class="view-original">Scroll horizontally on small screens, or <a href="figures/V2_structural.svg" aria-label="Open figure V2 as a scalable vector">open scalable original and zoom</a>.</p><div class="artwork"><img src="figures/V2_structural.svg" alt="Figure V2: Separate CSR/trap core harness and incomplete hooks"></div><figcaption><strong>Figure V2 — Separate CSR/trap core harness and incomplete hooks.</strong> This independent top is reset-held and uses placeholder responders. Real class/mailbox plumbing does not imply functional checking.</figcaption><div class="interface-key"><p><strong>Interface key.</strong> core_if carries 30-bit IMEM word address, 32-bit instruction/LSU payload and 4-bit byte enables. TB publishes separate event objects into scheduler and scoreboard mailboxes. CSR state is sampled #1step before negedge, separately from pre-posedge event pins.</p><p><strong>Source key.</strong> <a href="../../../Verification/infrastructure/tb/tb_core_csr_trap.sv">CSR top</a> · <a href="../../../Verification/infrastructure/tb/csr_trap/core_corner_if.sv">Interface sampling</a> · <a href="../../../Verification/infrastructure/tb/csr_trap/csr_trap_env_pkg.sv">Classes + mailboxes</a> · <a href="../../../Verification/infrastructure/tb/csr_trap/core_corner_imem.sv">NOP responder</a> · <a href="../../../Verification/infrastructure/tb/csr_trap/core_corner_dmem.sv">Zero responder</a></p><p><strong>Accomplishment / evidence limit.</strong> Passive taps and mailbox fanout are connected. Program setup, independent trap model, stimulus, assertions and coverage are incomplete; checks=0 is source-defined behavior, not a newly observed run. No compile/run evidence is established for this harness. <a href="../../../Verification/infrastructure/tb/csr_trap/README.md">CSR harness scope</a> · <a href="../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md">Corner test plan</a></p></div></figure></section>
+
+  <section id="evidence">
+    <h2>2. What exists and what was established</h2>
+    <table>
+      <colgroup><col style="width:24%"><col style="width:38%"><col style="width:38%"></colgroup>
+      <thead><tr><th>Environment</th><th>Actual implementation</th><th>Retained evidence / limit</th></tr></thead>
+      <tbody>
+        <tr><td><a href="../../../Verification/infrastructure/tb/csr_trap/README.md">CSR leaf + core</a></td><td><code>tb_csr_corner_unit</code> / <code>tb_core_csr_trap</code>. Reset held; no-op model/stimulus/coverage hooks.</td><td><strong>Static inspection only.</strong> No established compile/runtime. Source-defined SKELETON/INCOMPLETE.</td></tr>
+        <tr><td><a href="../../../Verification/hazard_tb/README.md">Hazard + pipeline</a></td><td>Production hazard/core/real MDU, driver/monitor plumbing; user extensions unconfigured.</td><td>4 Nov Slang semantic compilation: unit 0 errors/0 warnings; pipeline 0/3. <strong>No runtime.</strong> Nine current RTL files differ from the old manifest.</td></tr>
+        <tr><td><a href="../../../Verification/IRQ_UNIT_COVERAGE_PLAN.md">IRQ unit</a></td><td>Separately driven gateway, arbiter, CSR and WB-controller instances; list-based expectation and checked-bin sampling.</td><td>Retained 196608 arbitration snapshots and scoped functional reports. No real peripheral, CPU program or handler proof.</td></tr>
+        <tr><td><a href="../../../Verification/core_port_20261109/README.md">Core-port development</a></td><td>Assembly checks, synchronous IMEM, selected load waits and byte writes; all IRQ pins low.</td><td><a href="../../../../artifacts/verification_infra_sync_20261110/validation/POST_SYNC_VALIDATION.json">Retained post-sync record</a>: 13 configurations, 131072 legality combinations plus SYSTEM guards, 4 owner/abort checks. Not broad qualification.</td></tr>
+        <tr><td><a href="../irq_event_commit_plan_20261104/TB_FILE_PLAN.md">Peripheral-event shell</a></td><td>Proposed <code>irq_tb/</code> files, empty engineer hooks and readiness/report contract.</td><td><strong>Planned/not built.</strong> No new event stimulus, oracle or bins established.</td></tr>
+      </tbody>
+    </table>
+    <p>The <a href="../../../Verification/hazard_tb/docs/validation.md">hazard validation record</a> retains unsupported Verilator modport-clocking errors: no executable was produced. Old Slang results are semantic-compilation evidence for their <a href="../../../../artifacts/hazard_tb_skeleton_20261104/source_manifest.json">source manifest</a>, not current-candidate VCS execution. SoC Verilator's retained zero-error/107-warning result used <code>-DXSIM -Wno-fatal</code>; warnings were not waived.</p>
+  </section>
+
+  <section id="hooks">
+    <h2>3. Sampling, memories and missing checks</h2>
+    <div class="cards">
+      <article class="card"><h3>CSR/trap skeleton</h3><p><a href="../../../Verification/infrastructure/tb/tb_core_csr_trap.sv">Core top</a> observes WB exception/commit/gated effects pre-edge and CSR state before the following falling edge. Separate phase-tagged records enter scheduler and scoreboard queues. Reset qualification means the default lifecycle supplies no architectural-event witness.</p><p>IMEM is an asynchronous placeholder NOP; DMEM is zero/no-stall/no-error tie-off, without storage or effects. The scoreboard consumes without checking; the assertion shell and coverage hooks are empty. Queue shutdown and zero failures do not prove correctness.</p></article>
+      <article class="card"><h3>Hazard leaf</h3><p><a href="../../../Verification/hazard_tb/unit/README.md">Unit guide</a>: falling-edge drive → settled pre-rising-edge sample → immutable ID-tagged observation → user check → coverage callback. User sequence/checker/coverage remain unconfigured.</p><p>Source-defined guards reject unchecked/unrecorded samples and zero work. Plumbing uses two benign reset/release bundles and bypasses hooks. <code>SKELETON_READY</code> is infrastructure status; it was not observed in a retained runtime.</p></article>
+      <article class="card"><h3>Pipeline + LSU</h3><p><a href="../../../Verification/hazard_tb/pipeline/README.md">Pipeline guide</a>: actual core/MDU probes, <code>#1step</code> pre-edge and +1 ps post-NBA snapshots. Explicit-image synchronous 4096-word IMEM; 32 KiB DMEM with bounded waits, byte effects and no store effect on error.</p><p>No token/effect oracle or bins. A high request after modeled completion can become a new local request ID; duplication needs architectural association. <code>valid_W &amp; ~exc_valid_W</code> can stay high during a hold. LSU sizes/offsets/extension/alignment/error and real bus effects still need qualification.</p></article>
+    </div>
+    <p>Preserve <code>TODO(USER_REF_MODEL)</code>, <code>TODO(USER_STIMULUS)</code> and <code>TODO(USER_COVERAGE)</code>. CJ supplies the approved contract, independent state model, programs, pin/latency/error schedules and bins. The <a href="../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md">CSR corner plan</a> and both extension guides remain the detailed implementation route.</p>
+  </section>
+
+  <section id="irq">
+    <h2>4. IRQ boundary and current checker issues</h2>
+    <p>Current <a href="../../../riscv_core/rtl/irq_arbiter.v">arbiter</a>: class 2 fixed order <code>7,22,24,26,20,21,23,25</code>; class 1 cyclic <code>19,18,27</code>; class 0 cyclic <code>17,16</code>. Global MIE, per-source mie and <code>class+1 &gt; mintprio</code> gate eligibility; committed cause drives RR history. Timer/SPI event captures and GPIO rising-edge capture win simultaneous clear; I2C/UART levels pass through. No automatic hardware shadow stack. SoC SW/EXT inputs are tied low.</p>
+    <table>
+      <colgroup><col style="width:17%"><col style="width:49%"><col style="width:34%"></colgroup>
+      <thead><tr><th>Open record</th><th>Current inspected mechanism</th><th>Qualification needed</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/25">#25 IRQ predictor</a></td><td><a href="../../../Verification/infrastructure/checkers/irq_predictor.sv">Instantiated predictor</a> models absent shadow stacking, incomplete/wrong classes including cause 27 as class 2, and no actual expected-winner comparison.</td><td>Reconcile contract, model masks/priority/clear, detect intentionally wrong winner/map. Quiet error output is insufficient.</td></tr>
+        <tr><td><a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/27">#27 GPIO predictor</a></td><td><a href="../../../Verification/infrastructure/checkers/register_predictor.sv">Register predictor</a> assigns wrong semantics to INFO/CFG/rise/fall-enable offsets; most mode/IRQ reads get zero check mask.</td><td>Compare <a href="../../../gpio-master/gpio_reg_pkg.sv">actual register map</a>, check modes/status/clear and corrupted readback.</td></tr>
+        <tr><td><a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/26">#26 legacy DIV/IRQ TB</a></td><td><a href="../../../Verification/tb1_interrupts.sv">Test 5</a> has unbounded busy wait, no explicit failure after trap-wait expiry, checks 33333 while <a href="../../../Verification/asm/test5_hazard.S">assembly</a> computes 142857.</td><td>Recover loaded-image identity; reconcile busy-IRQ policy; require bounded trap/lifecycle evidence and missing-IRQ negative test.</td></tr>
+      </tbody>
+    </table>
+    <p class="meta">Current static-source findings, not new runtime reproductions. The scoped <a href="../../../Verification/artifacts/irq_restructure/irq_coverage_final_sim.log">IRQ unit simulation</a> and <a href="../../../Verification/artifacts/xcelium_irq_20261030_004317/functional_summary.txt">471/471 functional-bin report</a> do not repair these instantiated SoC predictors. Structural coverage remains incomplete in the retained <a href="../../../Verification/artifacts/xcelium_irq_20261030_004317/code_summary.txt">code report</a>.</p>
+  </section>
+
+  <section id="campaigns">
+    <h2>5. Development and architectural campaigns</h2>
+    <p><strong>Core-port evidence:</strong> <a href="../../../Verification/core_port_20261109/tb_core_port.sv">the harness</a> requires firmware store value 1 at <code>0x80001100</code>, with fatal on wrong value/timeout. Constants/labels check selected MDU, load/link preservation, trap metadata and mepc masking. Load waits are 0/1/4; stores are not delayed; data error and IRQs are zero. Small address-index aliases and no peripheral model limit its scope. The owner leaf checks hold/cancel/new-owner cases; retain the <a href="../../../Verification/core_port_20261109/evidence/owner_before_multiplier_abort.log">earlier negative result</a>. Legality enumeration is a selected field policy, not every CSR/state.</p>
+    <p><strong>Current corrections:</strong> PR15 integrated MDU valid/hold/owner/cancel, older-load and redirect/link preservation, RS2 qualification, legality guards, mepc write mask and fetch-region checks. Directed development results do not close saved workloads/seeds. <strong>#17 missing JALR mask was wrong and withdrawn</strong>: the ALU masks bit zero upstream; runtime low-bit cases remain coverage work. Retirement #16 and RS1 #18 remain open; fetch #19 is an investigation.</p>
+    <div class="split">
+      <article class="card"><h3>RISC-DV: saved GPR comparison</h3><p><a href="../../core/RISCV_DV_FAILURE_AUDIT.md">Historical audit</a>: 193 passed / 22 failed are saved comparator outcomes, not current rate or bug count. Illegal-family and younger DIV/REM-after-trap failures remain preserved; original seeds need current reruns.</p><p><a href="../../../../artifacts/riscv_dv_failure_audit_20261104/harness_snapshot/tb_riscv_dv.sv">Logger</a> reconstructs instruction/PC by address and suppresses equal consecutive PCPlus4W values. This can lose repeated-PC execution. <a href="../../../../artifacts/riscv_dv_failure_audit_20261104/harness_snapshot/rtl_no_trap_ref_compare.py">Alignment truncates RTL tail</a>; <a href="../../../../artifacts/riscv_dv_failure_audit_20261104/harness_snapshot/instr_trace_compare.py">comparator</a> skips no-GPR/unchanged rows. No full CSR/trap/store/MMIO/retirement proof.</p><p>Original seed build hashes/assembly are missing; Makefile and located TB paths differ, and the Cadence checkout is not bound to the merged port. Recover identities, qualify trace/checks, then rerun.</p></article>
+      <article class="card"><h3>RISCOF: architectural signatures</h3><p><a href="../../../../verification/riscof/config.ini">Saved config</a> selects Sail; <a href="../../../../verification/riscof/riscforge/riscof_riscforge.py">plugin</a> compiles a legacy core folder with Icarus. The <a href="../../../../verification/riscof/report.html">older report</a> has 46 passed/1 failed. A newer pass is engineer-reported; its current-candidate bundle is not established.</p><p>Signature tests support selected ISA/CSR/trap obligations; they do not establish arbitrary IRQ timing or precise effects. Recover actual source/plugin/reference/suite/ISA/tool and valid signatures, distinct from placeholder/timeout outputs. Ordinary CSR semantics remain engineer-assigned to RISCOF; dependency/collision/IRQ corners still need the corner benches.</p></article>
+    </div>
+  </section>
+
+  <section id="next">
+    <h2>6. Current milestones and CJ ownership</h2>
+    <ol>
+      <li><strong>K0–K4 / S0:</strong> proposed event-shell interfaces, source/tap identity, wiring, passive records, honest readiness/reporting, user hooks and explicit filelist. Freeze CSR, MDU IRQ, reset, direct trap/nesting and SW/EXT decisions.</li>
+      <li><strong>S1:</strong> CJ writes Timer0 <code>EV-TMR-01</code> + <code>CP-01</code>, with independent mask/event and then full lifecycle checks. S1 intentionally exceeds the exact 6.5 endpoint.</li>
+      <li><strong>S2 / S3:</strong> all real sources/subevents and legal simultaneous priority overlaps; then dynamic tokens, memory/MMIO effects, context canaries, load/store/branch/MDU/CSR collisions and declared nesting. Focused core evidence is supporting evidence only.</li>
+      <li><strong>S4 / S5:</strong> qualify selected drivers/BSP against actual registers and pins; retain current-candidate suite, coverage and defect dispositions with reproducible images/commands.</li>
+    </ol>
+    <p class="note"><strong>Negative checker cases remain planned.</strong> Wrong source/winner, ignored mask, early/duplicate clear, wrong PC/CSR, missing/extra retirement, stale MDU write, duplicate store, missing pin transfer and false firmware PASS must fail for the intended reason. Missing hooks, zero checks and timeouts cannot become PASS. Injected fixtures qualify checkers; they do not fill real peripheral bins.</p>
+    <p><strong>Learning checkpoint:</strong> trace a delayed older load → MUL → IRQ. Identify the unique instruction and MDU owner, completion/accept/commit edges, surviving older effect, forbidden younger effects and exact MRET resume point. Use the first missing observation/check to choose the next distinguishing experiment.</p>
+    <p>Open questions: approved busy-MDU IRQ rule/bound; older CSR versus IRQ eligibility; unsupported/read-only and M-only WARL policy; reset cancellation; context/nesting; newest RISCOF and actual saved RISC-DV build identities. Models, stimulus, schedules, bins and closure remain CJ-owned.</p>
+  </section>
+  <footer>Documentation only · Older files preserved as historical sources · <a href="02_verification_architecture.md">Full architecture and evidence</a> · <a href="../../../../artifacts/cj_documentation_unification_20261110/verification_handback.md">Implementation handback</a> · Parent owns final correctness review and packaging.</footer>
+</main>
+</body>
+</html>
