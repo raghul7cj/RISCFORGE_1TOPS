@@ -1,0 +1,59 @@
+
+/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/minstret_retirement/checklist/campaigns/20261111T083907Z/operations/program.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80000000 <_start>:
+80000000:	80001437          	lui	s0,0x80001
+80000004:	01500293          	li	t0,21
+80000008:	00300313          	li	t1,3
+8000000c:	006283b3          	add	t2,t0,t1
+80000010:	40628e33          	sub	t3,t0,t1
+80000014:	02628eb3          	mul	t4,t0,t1
+80000018:	0262cf33          	div	t5,t0,t1
+8000001c:	00000013          	nop
+80000020:	01e42023          	sw	t5,0(s0) # 80001000 <done+0xf78>
+80000024:	00042483          	lw	s1,0(s0)
+80000028:	00000013          	nop
+8000002c:	00700913          	li	s2,7
+80000030:	01248463          	beq	s1,s2,80000038 <equal>
+
+80000034 <poison0>:
+80000034:	ffffffff          	.word	0xffffffff
+
+80000038 <equal>:
+80000038:	fe628ee3          	beq	t0,t1,80000034 <poison0>
+8000003c:	00629463          	bne	t0,t1,80000044 <unequal>
+
+80000040 <poison1>:
+80000040:	ffffffff          	.word	0xffffffff
+
+80000044 <unequal>:
+80000044:	ff249ee3          	bne	s1,s2,80000040 <poison1>
+80000048:	008000ef          	jal	80000050 <jump_target>
+
+8000004c <poison2>:
+8000004c:	ffffffff          	.word	0xffffffff
+
+80000050 <jump_target>:
+80000050:	00000297          	auipc	t0,0x0
+80000054:	01028293          	addi	t0,t0,16 # 80000060 <indirect_target>
+80000058:	000280e7          	jalr	t0
+8000005c:	ffffffff          	.word	0xffffffff
+
+80000060 <indirect_target>:
+80000060:	00500293          	li	t0,5
+80000064:	34029373          	csrrw	t1,mscratch,t0
+80000068:	3402a3f3          	csrrs	t2,mscratch,t0
+8000006c:	3402be73          	csrrc	t3,mscratch,t0
+80000070:	3401def3          	csrrwi	t4,mscratch,3
+80000074:	34026f73          	csrrsi	t5,mscratch,4
+80000078:	3400fff3          	csrrci	t6,mscratch,1
+8000007c:	b02029f3          	csrr	s3,minstret
+80000080:	00942223          	sw	s1,4(s0)
+80000084:	00000013          	nop
+
+80000088 <done>:
+80000088:	00000013          	nop
+8000008c:	ffdff06f          	j	80000088 <done>

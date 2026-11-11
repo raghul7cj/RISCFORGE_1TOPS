@@ -299,6 +299,15 @@ module execute_cycle (
     wire div_abort_internal = wb_redirect_i | (irq_accept_E & stallMUL);
     assign div_abort_o = div_abort_internal;
 
+    // Declare transaction state and derived wires before procedural references
+    // for strict SystemVerilog compilers. Logic is unchanged.
+    reg        m_hold;
+    reg [31:0] m_hold_res;
+    reg [4:0]  m_hold_rd;
+    wire start_M = is_M_instruction_E && valid_E && !exc_valid_E &&
+                   !irq_accept_E && !m_started && !m_hold && !StallM && !wb_redirect_i;
+    wire m_complete = m_valid_out && m_started && !div_abort_internal;
+
     // M-extension transaction tracker and module instantiation
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -309,10 +318,6 @@ module execute_cycle (
             m_started <= 1'b1;
         end
     end
-    // Never issue from a bubble, killed instruction, or a frozen EX packet.
-    wire start_M = is_M_instruction_E && valid_E && !exc_valid_E &&
-                   !irq_accept_E && !m_started && !m_hold && !StallM && !wb_redirect_i;
-
     reg [31:0] pc_me;
     reg [31:0] pcplus4_me;
     always @(posedge clk or negedge rst_n) begin
@@ -324,9 +329,6 @@ module execute_cycle (
             pcplus4_me <= PCPlus4E;
         end
     end
-    reg        m_hold;
-    reg [31:0] m_hold_res;
-    reg [4:0]  m_hold_rd;
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             m_hold     <= 1'b0;
@@ -342,7 +344,6 @@ module execute_cycle (
             m_hold     <= 1'b0;
         end
     end
-    wire        m_complete = m_valid_out && m_started && !div_abort_internal;
     wire        m_out      = (m_complete | m_hold) && !div_abort_internal;
     wire [31:0] m_res      = m_hold ? m_hold_res : result_M;
     wire [4:0]  m_rd       = m_hold ? m_hold_rd  : rd_me;

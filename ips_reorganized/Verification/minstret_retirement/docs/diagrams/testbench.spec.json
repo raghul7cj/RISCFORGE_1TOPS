@@ -1,0 +1,320 @@
+{
+  "title": "Directed retirement verification chain",
+  "scope": "Real core with injected memory waits and timer input. An expected instruction path and final-state checks support the declared functional bins; not full-SoC peripheral verification.",
+  "baseline": {
+    "repo": "raghul7cj/RISCFORGE_1TOPS verification_infra + source-overlay 8647af8b6fe7",
+    "commit": "25d7b8ebf4ae8ab4da39f144df097676145e3dae",
+    "source_overlay_sha256": "8647af8b6fe70072995d0f06155605642ee559d96a0dd911b1161571a3c76f0d"
+  },
+  "layout": {
+    "width": 780,
+    "height": 420
+  },
+  "nodes": [
+    {
+      "id": "assembly",
+      "label": "Three assembly programs",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 185,
+        "symbol": "for case in ["
+      },
+      "box": [
+        15,
+        15,
+        220,
+        58
+      ]
+    },
+    {
+      "id": "build",
+      "label": "ELF + SRAM image build",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 189,
+        "symbol": "riscv64-unknown-elf-gcc"
+      },
+      "box": [
+        285,
+        15,
+        220,
+        58
+      ]
+    },
+    {
+      "id": "driver",
+      "label": "TB memory + timer drivers",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv",
+        "line": 4,
+        "symbol": "module tb_checklist;"
+      },
+      "box": [
+        15,
+        170,
+        220,
+        68
+      ]
+    },
+    {
+      "id": "oracle",
+      "label": "Software path reference",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 32,
+        "symbol": "def execute_reference("
+      },
+      "box": [
+        285,
+        110,
+        220,
+        58
+      ]
+    },
+    {
+      "id": "dut",
+      "label": "Real top core",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv",
+        "line": 23,
+        "symbol": "top #(.RESET_PC"
+      },
+      "box": [
+        15,
+        320,
+        220,
+        62
+      ]
+    },
+    {
+      "id": "checker",
+      "label": "PC + counter + memory / checks at clock edges",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv",
+        "line": 86,
+        "symbol": "before_count=dut.csr_file.minstret_r;"
+      },
+      "box": [
+        285,
+        310,
+        220,
+        74
+      ]
+    },
+    {
+      "id": "report",
+      "label": "Passing-bin collection / coverage.json",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 242,
+        "symbol": "summary[\"functional_checklist_closed\"]"
+      },
+      "box": [
+        565,
+        310,
+        200,
+        74
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "assembly",
+      "to": "build",
+      "label": "assemble",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 190,
+        "symbol": "HERE / f\"{case}.S\""
+      },
+      "route": [
+        [
+          235,
+          44
+        ],
+        [
+          285,
+          44
+        ]
+      ],
+      "label_at": [
+        238,
+        30
+      ]
+    },
+    {
+      "from": "build",
+      "to": "driver",
+      "label": "ELF / SRAM images",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 209,
+        "symbol": "f\"+HEX={image.with_suffix"
+      },
+      "route": [
+        [
+          285,
+          44
+        ],
+        [
+          258,
+          44
+        ],
+        [
+          258,
+          130
+        ],
+        [
+          125,
+          130
+        ],
+        [
+          125,
+          170
+        ]
+      ],
+      "label_at": [
+        18,
+        120
+      ]
+    },
+    {
+      "from": "build",
+      "to": "oracle",
+      "label": "assembled words",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 201,
+        "symbol": "reference = execute_reference(words, labels)"
+      },
+      "route": [
+        [
+          395,
+          73
+        ],
+        [
+          395,
+          110
+        ]
+      ],
+      "label_at": [
+        410,
+        96
+      ]
+    },
+    {
+      "from": "driver",
+      "to": "dut",
+      "label": "memory / waits / timer",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv",
+        "line": 29,
+        "symbol": ".timer_irq_i(timer_irq)"
+      },
+      "route": [
+        [
+          125,
+          238
+        ],
+        [
+          125,
+          320
+        ]
+      ],
+      "label_at": [
+        140,
+        280
+      ]
+    },
+    {
+      "from": "dut",
+      "to": "checker",
+      "label": "WB/CSR",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv",
+        "line": 86,
+        "symbol": "before_count=dut.csr_file.minstret_r;"
+      },
+      "route": [
+        [
+          235,
+          350
+        ],
+        [
+          285,
+          350
+        ]
+      ],
+      "label_at": [
+        237,
+        337
+      ]
+    },
+    {
+      "from": "oracle",
+      "to": "checker",
+      "label": "expected PCs",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv",
+        "line": 43,
+        "symbol": "$readmemh(reference,expected_pc"
+      },
+      "route": [
+        [
+          395,
+          168
+        ],
+        [
+          395,
+          310
+        ]
+      ],
+      "label_at": [
+        410,
+        234
+      ]
+    },
+    {
+      "from": "checker",
+      "to": "report",
+      "label": "verdict",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py",
+        "line": 218,
+        "symbol": "passed = result.returncode == 0"
+      },
+      "route": [
+        [
+          505,
+          348
+        ],
+        [
+          565,
+          348
+        ]
+      ],
+      "label_at": [
+        510,
+        331
+      ]
+    }
+  ],
+  "unknowns": [
+    "The interrupt acceptance cycle is aligned to the reported precise PC, not independently predicted.",
+    "The per-cycle consume predicate mirrors the contract; the reference path length, traps and final memory are independent checks."
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "parent": "25d7b8ebf4ae8ab4da39f144df097676145e3dae",
+  "matched_source_blobs": 109,
+  "generated_inputs_archived": [
+    "ips_reorganized/benchmarks/runs/minstret_fix/smoke_20261111T090645Z_bd4ac7b8/benchmark_config.svh",
+    "ips_reorganized/benchmarks/runs/minstret_fix/smoke_20261111T090645Z_bd4ac7b8/riscforge_bootrom.hex"
+  ],
+  "differences": [
+    {
+      "path": "ips_reorganized/benchmarks/filelists/soc_benchmark.f",
+      "local": "50f72ea49726123c89573ed2fd39e101cb567432",
+      "remote": null
+    },
+    {
+      "path": "ips_reorganized/benchmarks/filelists/uart_runtime_dependencies.f",
+      "local": "c0d027f35cb180496deefcdf17882e20e21c3b15",
+      "remote": null
+    },
+    {
+      "path": "ips_reorganized/apb_uart-main/include/obi/apb_to_obi.sv",
+      "local": "39db1dac42a7a1b9b5375aa8a06c5fa21ace163c",
+      "remote": "017d9b2fc4b2d5aafbedff6d2b06ec1c34a08f2a"
+    },
+    {
+      "path": "ips_reorganized/riscv_core/rtl/execute_cycle.v",
+      "local": "34dc1ef757dfdf910db084d53551a35956efff70",
+      "remote": "e9ffd4fadda2f9c00c4e260feb00273d3e28f04f"
+    },
+    {
+      "path": "ips_reorganized/riscv_core/rtl/top.v",
+      "local": "8ec439c05e54883ae8a6241a76d201fc2e822b9a",
+      "remote": "23525646aa6cd7e528b90e878fa880b4fc9d8140"
+    },
+    {
+      "path": "ips_reorganized/benchmarks/tb/soc_benchmark_tb.sv",
+      "local": "d711e1ce8bc79ff8b95c16a975609de6a48b8905",
+      "remote": null
+    }
+  ],
+  "disposition": {
+    "uart_difference": "Only a trailing blank line; executable source text is identical. Remote UART file is preserved.",
+    "retirement_and_execute": "The two intentional published core changes.",
+    "missing_benchmark_inputs": "Retained as immutable input snapshots under evidence/soc_20261111/inputs; no claim of publishing the entire benchmark build flow.",
+    "generated_inputs": "benchmark_config.svh and boot ROM are retained in each run directory."
+  }
+}

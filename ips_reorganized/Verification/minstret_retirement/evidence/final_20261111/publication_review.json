@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-11",
+  "reviewer": "retirement_publication_review (native read-only subagent)",
+  "scope": "RTL counter patch, compile-only declaration reorder, test/reference independence, final evidence, ground-truth diagrams, remote layout reproducibility, issue disposition",
+  "result": "No remaining substantive publication blockers",
+  "findings_resolved": [
+    "Checklist reproduction command now explicitly uses ips_reorganized and documents local ips alternative."
+  ],
+  "inspected_evidence": {
+    "directed_runs": 12,
+    "functional_bins": 29,
+    "source_identities": 36,
+    "artifact_identities": 53
+  },
+  "remaining_issue_disposition": {
+    "16": "open: counter writes/overflow/collisions and exact benchmark accounting remain",
+    "23": "open: CoreMark minimum duration and performance qualification remain"
+  },
+  "reviewer_actions": "No edits or new simulations"
+}

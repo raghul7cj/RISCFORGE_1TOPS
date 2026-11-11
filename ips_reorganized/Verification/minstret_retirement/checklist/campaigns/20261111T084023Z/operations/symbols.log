@@ -1,0 +1,16 @@
+80000000 T _start
+80000034 T poison0
+80000038 t equal
+80000040 T poison1
+80000044 t unequal
+8000004c T poison2
+80000050 t jump_target
+80000060 t indirect_target
+80000088 T done
+80001090 T __BSS_END__
+80001090 T __DATA_BEGIN__
+80001090 T __SDATA_BEGIN__
+80001090 T __bss_start
+80001090 T _edata
+80001090 T _end
+80001890 A __global_pointer$

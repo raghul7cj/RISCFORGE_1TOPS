@@ -1,0 +1,60 @@
+
+/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/Verification/minstret_retirement/checklist/campaigns/20261111T084023Z/interrupt/program.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+80000000 <_start>:
+80000000:	00000297          	auipc	t0,0x0
+80000004:	0ac28293          	addi	t0,t0,172 # 800000ac <handler>
+80000008:	30529073          	csrw	mtvec,t0
+8000000c:	08000293          	li	t0,128
+80000010:	30429073          	csrw	mie,t0
+80000014:	30046073          	csrsi	mstatus,8
+80000018:	00000013          	nop
+8000001c:	00000013          	nop
+
+80000020 <irq_trigger>:
+80000020:	00000013          	nop
+80000024:	00000013          	nop
+80000028:	00000013          	nop
+8000002c:	00000013          	nop
+80000030:	00000013          	nop
+80000034:	00000013          	nop
+80000038:	00000013          	nop
+8000003c:	00000013          	nop
+80000040:	00000013          	nop
+80000044:	00000013          	nop
+80000048:	00000013          	nop
+8000004c:	00000013          	nop
+80000050:	00000013          	nop
+80000054:	00000013          	nop
+80000058:	00000013          	nop
+8000005c:	00000013          	nop
+80000060:	00000013          	nop
+80000064:	00000013          	nop
+80000068:	00000013          	nop
+8000006c:	00000013          	nop
+80000070:	00000013          	nop
+80000074:	00000013          	nop
+80000078:	00000013          	nop
+8000007c:	00000013          	nop
+80000080:	00000013          	nop
+80000084:	00000013          	nop
+80000088:	00000013          	nop
+8000008c:	00000013          	nop
+80000090:	00000013          	nop
+80000094:	00000013          	nop
+80000098:	00000013          	nop
+8000009c:	00000013          	nop
+
+800000a0 <irq_end>:
+800000a0:	00d00413          	li	s0,13
+
+800000a4 <done>:
+800000a4:	00000013          	nop
+800000a8:	ffdff06f          	j	800000a4 <done>
+
+800000ac <handler>:
+800000ac:	30401073          	csrw	mie,zero
+800000b0:	30200073          	mret

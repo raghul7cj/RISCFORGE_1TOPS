@@ -1,0 +1,18 @@
+COMMAND: C:\Xilinx\Vivado\2022.2\bin\xsim.bat soc_benchmark_snapshot -R -f xsim_options.txt
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/soc_benchmark_snapshot/xsim_script.tcl
+# xsim {soc_benchmark_snapshot} -testplusarg IMEM_HEX=imem.hex -testplusarg DMEM_HEX=dmem.hex -testplusarg RESULT_JSON=result.json -testplusarg BENCHMARK_ID=2 -testplusarg TIMEOUT_CYCLES=2000000 -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+BENCH_PRELOAD imem=imem.hex dmem=dmem.hex
+BENCH_BOOT_READY timeout_cycles=2000000
+counter probe diagnostic complete; counts unqualified
+BENCH_TB_PASS id=2 cycles=1864 held_wb_cycles=69 raw_wb_valid_cycles=1254
+$finish called at time : 19160 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/tb/soc_benchmark_tb.sv" Line 265
+exit
+INFO: [Common 17-206] Exiting xsim at Wed Nov 11 14:37:38 2026...

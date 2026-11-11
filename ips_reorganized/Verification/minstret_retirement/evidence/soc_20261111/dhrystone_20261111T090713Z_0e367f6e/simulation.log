@@ -1,0 +1,75 @@
+COMMAND: C:\Xilinx\Vivado\2022.2\bin\xsim.bat soc_benchmark_snapshot -R -f xsim_options.txt
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/soc_benchmark_snapshot/xsim_script.tcl
+# xsim {soc_benchmark_snapshot} -testplusarg IMEM_HEX=imem.hex -testplusarg DMEM_HEX=dmem.hex -testplusarg RESULT_JSON=result.json -testplusarg BENCHMARK_ID=4 -testplusarg TIMEOUT_CYCLES=2000000 -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+BENCH_PRELOAD imem=imem.hex dmem=dmem.hex
+BENCH_BOOT_READY timeout_cycles=2000000
+
+Dhrystone Benchmark, Version C, Version 2.2
+Program compiled without 'register' attribute
+Using RISCFORGE 64-bit mcycle snapshot, HZ=100000000
+
+Trying 10 runs through Dhrystone:
+Final values of the variables used in the benchmark:
+
+Int_Glob:            5
+        should be:   5
+Bool_Glob:           1
+        should be:   1
+Ch_1_Glob:           A
+        should be:   A
+Ch_2_Glob:           B
+        should be:   B
+Arr_1_Glob[8]:       7
+        should be:   7
+Arr_2_Glob[8][7]:    20
+        should be:   Number_Of_Runs + 10
+Ptr_Glob->
+  Ptr_Comp:          163616
+        should be:   (implementation-dependent)
+  Discr:             0
+        should be:   0
+  Enum_Comp:         2
+        should be:   2
+  Int_Comp:          17
+        should be:   17
+  Str_Comp:          DHRYSTONE PROGRAM, SOME STRING
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+Next_Ptr_Glob->
+  Ptr_Comp:          163616
+        should be:   (implementation-dependent), same as above
+  Discr:             0
+        should be:   0
+  Enum_Comp:         1
+        should be:   1
+  Int_Comp:          18
+        should be:   18
+  Str_Comp:          DHRYSTONE PROGRAM, SOME STRING
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+Int_1_Loc:           5
+        should be:   5
+Int_2_Loc:           13
+        should be:   13
+Int_3_Loc:           7
+        should be:   7
+Enum_Loc:            1
+        should be:   1
+Str_1_Loc:           DHRYSTONE PROGRAM, 1'ST STRING
+        should be:   DHRYSTONE PROGRAM, 1'ST STRING
+Str_2_Loc:           DHRYSTONE PROGRAM, 2'ND STRING
+        should be:   DHRYSTONE PROGRAM, 2'ND STRING
+
+Dhrystone final-state checks complete
+BENCH_TB_PASS id=4 cycles=122731 held_wb_cycles=5577 raw_wb_valid_cycles=73951
+$finish called at time : 1227830 ns : File "C:/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/tb/soc_benchmark_tb.sv" Line 265
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:14 . Memory (MB): peak = 239.078 ; gain = 0.000
+exit
+INFO: xsimkernel Simulation Memory Usage: 17168 KB (Peak: 17168 KB), Simulation CPU Usage: 13609 ms
+INFO: [Common 17-206] Exiting xsim at Wed Nov 11 14:37:53 2026...

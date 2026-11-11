@@ -1,5 +1,9 @@
 # Selective malay core port into verification_infra
 
+> **11 November retirement update:** the held-WB counter input is corrected and the 29-bin/12-run directed checklist passes. Fresh full-SoC smoke/probe/Dhrystone pass; CoreMark CRCs match but its short-duration failure remains. [Current source-backed diagrams, evidence and limits](MINSTRET_RETIREMENT_20261111.md). Issue #16 remains open for counter-write/collision and benchmark-window qualification. Original port text below is historical.
+
+**10 November review correction:** the report's JALR missing-bit-zero-mask allegation is withdrawn. The existing ALU already computes (A+B) & ~32'd1 for JALR control 0110, selected by the decode chain. GitHub #17 was incorrectly filed and is now closed; JALR runtime coverage remains pending. Original port/provenance text below is preserved.
+
 Base: `58af373e031e64c78b867cdbcbc86518b3fc6ec9`. Donor: `18fb4baac942e2e87921002dd1ae5fb8d084ceb8`. The target source tree is **ips_reorganized/**. This is a selective implementation port, not a whole-branch merge.
 
 ## Changes and provenance

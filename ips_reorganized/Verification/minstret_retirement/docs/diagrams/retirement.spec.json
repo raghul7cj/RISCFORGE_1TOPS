@@ -1,0 +1,273 @@
+{
+  "title": "WB occupancy to exactly-once minstret event",
+  "scope": "Current retirement-counter input path only; not a claim about every architectural side effect. Baseline plus the saved hashed source overlay.",
+  "baseline": {
+    "repo": "raghul7cj/RISCFORGE_1TOPS verification_infra + source-overlay 8647af8b6fe7",
+    "commit": "25d7b8ebf4ae8ab4da39f144df097676145e3dae",
+    "source_overlay_sha256": "8647af8b6fe70072995d0f06155605642ee559d96a0dd911b1161571a3c76f0d"
+  },
+  "layout": {
+    "width": 780,
+    "height": 350
+  },
+  "nodes": [
+    {
+      "id": "wb",
+      "label": "MEM/WB packet / valid + exception",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/memory_cycle.v",
+        "line": 206,
+        "symbol": "reg valid_W_r;"
+      },
+      "box": [
+        10,
+        10,
+        210,
+        58
+      ]
+    },
+    {
+      "id": "wait",
+      "label": "Memory hold",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/memory_cycle.v",
+        "line": 193,
+        "symbol": "assign mem_stall_out = core_stall_gated;"
+      },
+      "box": [
+        10,
+        98,
+        210,
+        58
+      ]
+    },
+    {
+      "id": "flush",
+      "label": "WB flush",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 165,
+        "symbol": "wire FlushW;"
+      },
+      "box": [
+        10,
+        186,
+        210,
+        58
+      ]
+    },
+    {
+      "id": "mret",
+      "label": "MRET commit",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/wb_trap_mret_commit_controller.v",
+        "line": 65,
+        "symbol": "assign mret_commit ="
+      },
+      "box": [
+        10,
+        274,
+        210,
+        58
+      ]
+    },
+    {
+      "id": "pulse",
+      "label": "Retirement qualification / instr_retired_W",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 299,
+        "symbol": "assign instr_retired_W ="
+      },
+      "box": [
+        310,
+        130,
+        230,
+        78
+      ]
+    },
+    {
+      "id": "counter",
+      "label": "CSR minstret / increment on event",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/csr_regfile.v",
+        "line": 154,
+        "symbol": "if (instr_retired_i)"
+      },
+      "box": [
+        590,
+        140,
+        180,
+        62
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "wb",
+      "to": "pulse",
+      "label": "valid; no exception",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 299,
+        "symbol": "assign instr_retired_W ="
+      },
+      "route": [
+        [
+          220,
+          39
+        ],
+        [
+          270,
+          39
+        ],
+        [
+          270,
+          145
+        ],
+        [
+          310,
+          145
+        ]
+      ],
+      "label_at": [
+        275,
+        60
+      ]
+    },
+    {
+      "from": "wait",
+      "to": "pulse",
+      "label": "not held",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 300,
+        "symbol": "(mret_commit | (~mem_stall_out & ~FlushW));"
+      },
+      "route": [
+        [
+          220,
+          127
+        ],
+        [
+          285,
+          127
+        ],
+        [
+          285,
+          160
+        ],
+        [
+          310,
+          160
+        ]
+      ],
+      "label_at": [
+        228,
+        115
+      ]
+    },
+    {
+      "from": "flush",
+      "to": "pulse",
+      "label": "not flushed",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 300,
+        "symbol": "(mret_commit | (~mem_stall_out & ~FlushW));"
+      },
+      "route": [
+        [
+          220,
+          215
+        ],
+        [
+          285,
+          215
+        ],
+        [
+          285,
+          181
+        ],
+        [
+          310,
+          181
+        ]
+      ],
+      "label_at": [
+        228,
+        235
+      ]
+    },
+    {
+      "from": "mret",
+      "to": "pulse",
+      "label": "commit override",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 300,
+        "symbol": "(mret_commit | (~mem_stall_out & ~FlushW));"
+      },
+      "route": [
+        [
+          220,
+          303
+        ],
+        [
+          270,
+          303
+        ],
+        [
+          270,
+          196
+        ],
+        [
+          310,
+          196
+        ]
+      ],
+      "label_at": [
+        275,
+        290
+      ]
+    },
+    {
+      "from": "pulse",
+      "to": "counter",
+      "label": "pulse",
+      "status": "present",
+      "source": {
+        "path": "ips_reorganized/riscv_core/rtl/top.v",
+        "line": 590,
+        "symbol": ".instr_retired_i(instr_retired_W),"
+      },
+      "route": [
+        [
+          540,
+          171
+        ],
+        [
+          590,
+          171
+        ]
+      ],
+      "label_at": [
+        548,
+        155
+      ]
+    }
+  ],
+  "unknowns": [
+    "No statement/toggle/FSM coverage or counter-write/overflow qualification is represented."
+  ]
+}

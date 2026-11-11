@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-11",
+  "simulator": "Vivado XSim 2022.2",
+  "modeled_clock_hz": 100000000,
+  "run_class": "short engineering correctness runs; not published benchmark scores",
+  "source_baseline": "25d7b8ebf4ae8ab4da39f144df097676145e3dae plus hashed local overlay",
+  "runs": {
+    "smoke_20261111T090645Z_bd4ac7b8": {
+      "valid": true,
+      "status": "pass",
+      "iterations": 1,
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "trap_seen": 0,
+      "observed_cycles": 1830,
+      "cycle_delta": 244,
+      "raw_instret_delta_unqualified": 131,
+      "coremark_crc": {
+        "list": "0x0000",
+        "matrix": "0x0000",
+        "state": "0x0000",
+        "final": "0x0000"
+      },
+      "firmware_elf_sha256": "eb7d1e3f7e90d208b15fede8a153c40ce528e3f458ef5f0f66e609351084c88e",
+      "source_recheck_count": 117,
+      "source_recheck_differences": [],
+      "record": "smoke_20261111T090645Z_bd4ac7b8/analysis.json"
+    },
+    "counter_probe_20261111T090713Z_5d44cf56": {
+      "valid": true,
+      "status": "pass",
+      "iterations": 1,
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "trap_seen": 0,
+      "observed_cycles": 1864,
+      "cycle_delta": 38,
+      "raw_instret_delta_unqualified": 24,
+      "coremark_crc": {
+        "list": "0x0000",
+        "matrix": "0x0000",
+        "state": "0x0000",
+        "final": "0x0000"
+      },
+      "firmware_elf_sha256": "7a69ec7856e68df79db4e028c87afd976d907ac547a92b38a22623b5f4724c9e",
+      "source_recheck_count": 117,
+      "source_recheck_differences": [],
+      "record": "counter_probe_20261111T090713Z_5d44cf56/analysis.json"
+    },
+    "dhrystone_20261111T090713Z_0e367f6e": {
+      "valid": true,
+      "status": "pass",
+      "iterations": 10,
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "trap_seen": 0,
+      "observed_cycles": 122731,
+      "cycle_delta": 10163,
+      "raw_instret_delta_unqualified": 5575,
+      "coremark_crc": {
+        "list": "0x0000",
+        "matrix": "0x0000",
+        "state": "0x0000",
+        "final": "0x0000"
+      },
+      "firmware_elf_sha256": "81ed7fe927cd1c3a8da2e0f90ecfdceb87f4895a1af221b3c38d6229ab44c9fe",
+      "source_recheck_count": 117,
+      "source_recheck_differences": [],
+      "record": "dhrystone_20261111T090713Z_0e367f6e/analysis.json"
+    },
+    "coremark_20261111T090713Z_853ac45a": {
+      "valid": false,
+      "status": "fail",
+      "iterations": 1,
+      "validation_errors": 1,
+      "error_code": "0x00003002",
+      "trap_seen": 0,
+      "observed_cycles": 578171,
+      "cycle_delta": 534940,
+      "raw_instret_delta_unqualified": 313965,
+      "coremark_crc": {
+        "list": "0xe3c1",
+        "matrix": "0x0747",
+        "state": "0x8d84",
+        "final": "0xe3c1"
+      },
+      "firmware_elf_sha256": "cadbb0ef81a55b0651f5c3d0c5ec3aff16fc646d72b3d980b42ffd8d322c685e",
+      "source_recheck_count": 117,
+      "source_recheck_differences": [],
+      "record": "coremark_20261111T090713Z_853ac45a/analysis.json"
+    }
+  },
+  "coremark_disposition": "FAIL retained: exactly one minimum-duration error; list/matrix/state match upstream 2K validation CRCs; no trap; no valid score."
+}

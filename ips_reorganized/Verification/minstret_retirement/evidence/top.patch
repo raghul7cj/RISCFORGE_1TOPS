@@ -1,0 +1,34 @@
+--- top_before.v
++++ ips/riscv_core/rtl/top.v
+@@ -272,6 +272,7 @@
+ 
+     wire RegWriteW_gated;
+     wire csr_write_en_W_gated;
++    wire instr_retired_W;
+ 
+     wire LUISrcE;
+     wire isLUIE;
+@@ -289,6 +290,14 @@
+     // Gate architectural retirement side-effects
+     assign RegWriteW_gated = RegWriteW & valid_W & ~exc_valid_W & ~mret_commit;
+     assign csr_write_en_W_gated = csr_write_en_W & valid_W & ~exc_valid_W & ~mret_commit;
++
++    // Count an ordinary WB packet only when MEM/WB can advance. A memory
++    // wait holds valid_W high; it must not retire that packet every cycle.
++    // MRET commits through its redirect even when it flushes MEM/WB, so count
++    // that instruction once. Exceptions and flushed ordinary packets do not
++    // retire. Real NOP instructions count; invalid pipeline bubbles do not.
++    assign instr_retired_W = valid_W & ~exc_valid_W &
++                             (mret_commit | (~mem_stall_out & ~FlushW));
+ 
+     assign PCSrcE1 = PCSrcE;
+ 
+@@ -578,7 +587,7 @@
+         .trap_addr_valid_i(trap_commit_addr_valid),
+         .trap_is_interrupt_i(trap_commit_is_interrupt),
+         
+-        .instr_retired_i(valid_W & ~exc_valid_W),
++        .instr_retired_i(instr_retired_W),
+         
+         .timer_intr_i(timer_intr_core),
+         .ext_intr_i(ext_irq_i),
