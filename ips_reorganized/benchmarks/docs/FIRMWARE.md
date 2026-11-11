@@ -161,6 +161,12 @@ upstream errors produce FAIL. The official 10-second duration error remains in
 `total_errors`; a short functional run may therefore fail even when CRCs match,
 and is never reported as a compliant published score.
 
+The reporting hook also receives upstream's CRC-only `results[0].err` after
+`known_id` selects the correct seed/data-size table. It does not duplicate CRC
+constants. Unknown seed configurations fail closed. A duration-only error is
+`0x3001`; an upstream CRC error is `0x3002`; other/unknown or combined non-CRC
+errors are `0x3003`. This fixes the former 6K-table comparison in a 2K build.
+
 ### Dhrystone
 
 The pinned source is the RISC-V tests port of Dhrystone C Version 2.2. The

@@ -1,0 +1,33 @@
+{
+  "fix": "Reporting hook uses upstream CRC error result for its selected configuration; no duplicate CRC table",
+  "source_verification": "All 7 vendored files matched independent EEMBC pinned downloads before edits and remain unchanged",
+  "upstream_commit": "1f483d5b8316753a742cbf5590caf5bd0a4e4777",
+  "host_tests": {
+    "passed": 41,
+    "compiled_C_classification_cases": 12
+  },
+  "full_soc_run": "coremark_20261111T111230Z_dc575342",
+  "result": {
+    "status": "fail",
+    "validation_errors": 1,
+    "error_code": "0x00003001",
+    "crc": {
+      "list": "0xe3c1",
+      "matrix": "0x0747",
+      "state": "0x8d84",
+      "final": "0xe3c1"
+    },
+    "timed_cycles": 534940,
+    "no_trap": true
+  },
+  "before": {
+    "run": "coremark_20261111T090713Z_853ac45a",
+    "error_code": "0x00003002",
+    "meaning": "incorrect CRC classification in reporting hook, alongside genuine upstream duration error"
+  },
+  "after": "Correct 0x3001 duration-only classification; short-run FAIL deliberately retained",
+  "score_eligible": false,
+  "rtl_or_tb_changed": false,
+  "upstream_algorithms_and_duration_check_changed": false,
+  "limitations": "Compiled C complete-duration test cases use synthetic snapshots; no long qualifying CoreMark run was performed."
+}

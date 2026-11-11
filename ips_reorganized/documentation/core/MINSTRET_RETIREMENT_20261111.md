@@ -140,8 +140,17 @@ full-SoC harness and unchanged staged firmware images:
 CoreMark reports list `0xe3c1`, matrix `0x0747`, state `0x8d84`, matching the
 upstream 2K validation arrays. The timed work consumes 534,940 target cycles;
 at the modeled 100 MHz that is about 5.35 ms, below the required 10 seconds.
-The unchanged duration rule produces one error (`0x3002`). This is correctness
-evidence with a preserved qualification failure, **not a valid CoreMark score**.
+The unchanged upstream duration rule produces one validation error. The original
+mailbox `0x3002` was **misclassified by a separate reporting-hook bug**: it checked
+6K CRC constants against the 2K validation run. The upstream CRCs themselves
+were correct. The corrected hook consumes upstream's selected CRC-error result
+instead of duplicating constants. The new run
+`coremark_20261111T111230Z_dc575342` retains the same CRCs and 534,940 timed cycles,
+one duration error and no trap, now correctly classified as `0x3001`.
+[Clone verification and fix evidence](../../benchmarks/docs/evidence/coremark_report_fix/summary.json).
+This is correctness evidence with a preserved qualification failure, **not a
+valid CoreMark score**. The previous statement that `0x3002` directly represented
+the duration error is withdrawn; the old run and its binary remain unchanged.
 
 See [retained SoC run evidence](../../Verification/minstret_retirement/evidence/soc_20261111/summary.json).
 The [source binding audit](../../Verification/minstret_retirement/evidence/soc_20261111/source_binding.json)

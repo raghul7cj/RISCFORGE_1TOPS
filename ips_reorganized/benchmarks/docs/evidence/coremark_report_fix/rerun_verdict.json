@@ -1,0 +1,20 @@
+{
+  "run": "ips\\benchmarks\\runs\\coremark_report_fix\\coremark_20261111T111230Z_dc575342",
+  "expected": "short-run FAIL with 0x3001, one duration error, matching CRCs, no trap",
+  "observed": {
+    "valid": false,
+    "status": "fail",
+    "validation_errors": 1,
+    "error_code": "0x00003001",
+    "coremark_crc": {
+      "list": "0xe3c1",
+      "matrix": "0x0747",
+      "state": "0x8d84",
+      "final": "0xe3c1"
+    },
+    "cycle_delta": 534940
+  },
+  "trap_seen": 0,
+  "no_rtl_or_tb_edits": true,
+  "upstream_core_main_sha256_after_fix": "17884c93c5b94378eb0ff02b4df3725756cf2addb9b8cbcaa6200a4649ff5ca7"
+}
