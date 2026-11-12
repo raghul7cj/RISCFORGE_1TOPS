@@ -1,5 +1,19 @@
 # Dhrystone re-run on the closed retirement-counter source (12 November 2026)
 
+**Result: PASS with caveats.** The Dhrystone workload is correct on the
+integrated SoC (zero validation errors, zero counter-check failures, no trap)
+and the retired-instruction and CPI accounting is qualified against the
+pinned source hashes. Caveats below; they are tracked as a low-priority
+issue, [#37](https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/37), under
+the umbrella benchmark issue #23.
+
+| Caveat | Detail |
+| --- | --- |
+| Timebase | Score is a simulation figure at a modeled 100 MHz clock, not a measured one |
+| Duration | Upstream rule `Too_Small_Time = 2*HZ` not met: 10,000 iterations is about 0.101 s of modeled time |
+| Scoring | Score is analyzer-derived, not produced by upstream's scoring routine; the build flag set is the port's |
+| CoreMark | Still fails the upstream minimum-duration rule `0x3001` (534,940 cycles is about 5.35 ms against 10 s) |
+
 This bundle records a fresh full-SoC Dhrystone re-run performed after issue
 #16 ("minstret counts a held WB packet more than once") was closed in
 `raghul7cj/RISCFORGE_1TOPS` commit
@@ -73,7 +87,10 @@ Record used here: `qualification_record.json` (copy of
 
 * The Dhrystone figure is an RTL-simulation engineering estimate; cycles come
   from simulation and the 100 MHz clock is modeled, not measured on hardware.
-  `published_compliance` stays `false`.
+  `published_compliance` stays `false`. The work needed for a publishable
+  number is tracked in
+  [#37](https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/37)
+  (low-priority).
 * CoreMark is unaffected by this re-run and still fails the upstream
   minimum-duration rule (`0x3001`): 534,940 timed cycles are about 5.35 ms at
   the modeled clock against the required 10 seconds.

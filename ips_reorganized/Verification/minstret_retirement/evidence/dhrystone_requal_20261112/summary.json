@@ -10,6 +10,19 @@
     "closed_at": "2026-11-12T08:41:35Z",
     "fix_commit": "eaca32ef031b9a16e3751462afb5fc2565d86bfa"
   },
+  "result": "pass_with_caveats",
+  "caveats": [
+    "Score is a simulation figure at a modeled 100 MHz clock, not a measured or publishable number.",
+    "Upstream duration rule Too_Small_Time = 2*HZ is not met: 10,000 iterations is about 0.101 s of modeled time.",
+    "The score is derived by the analyzer, not produced by upstream's scoring routine, and the build flag set is the port's.",
+    "CoreMark still fails the upstream minimum-duration rule 0x3001 (534,940 cycles is about 5.35 ms against 10 s)."
+  ],
+  "caveat_tracking": {
+    "issue": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/37",
+    "title": "[CORE-BENCH-SCORE] Publishable Dhrystone figure: timebase, run rules and scoring",
+    "priority": "low-priority",
+    "umbrella": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/23"
+  },
   "source_binding": {
     "core_rtl_matches_remote_head": true,
     "verified_sources": {
@@ -105,5 +118,5 @@
       "firmware_elf_sha256": "2cfb81374614cb61907c0b26d7c74ef05dd4336f28deb97601f873fa42e43d02"
     }
   ],
-  "disposition": "Dhrystone re-run after the closed #16 retirement fix: PASS with qualified instruction and CPI accounting bound to the pinned source hashes. Published benchmark compliance remains open: the Dhrystone figure is an RTL-simulation engineering estimate and CoreMark still fails the upstream minimum-duration rule (0x3001)."
+  "disposition": "RESULT: PASS with caveats. Dhrystone re-run after the closed #16 retirement fix: workload correct (zero validation errors, no trap) and instruction/CPI accounting qualified against the pinned source hashes. Caveats: the score is a simulation figure at a modeled 100 MHz clock; the upstream duration rule (Too_Small_Time = 2*HZ) is not met at 10,000 iterations; the score is analyzer-derived rather than produced by upstream's scoring routine; CoreMark still fails the upstream minimum-duration rule 0x3001. Caveat tracking: issue #37 (low-priority); umbrella issue #23."
 }
