@@ -1,0 +1,89 @@
+{
+  "title": "Focused IRQ compliance review",
+  "scope": "Real block-level reproduction of pending/eligibility and CSR contract mismatches; not full pipeline or SoC execution.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main/rtl; SHA256(source_identity.json bytes + reproducer bytes)",
+    "commit": "worktree-sha256:e97db949e44b442def13f7fba5435f9b401b2177ffe376cd3efc97282d978515"
+  },
+  "nodes": [
+    {
+      "id": "S",
+      "label": "Directed CSR writes and IRQ inputs",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 41,
+        "symbol": "write_csr(12'h304,32'h888);"
+      }
+    },
+    {
+      "id": "D",
+      "label": "Real gateway + CSR + arbiter; top-equivalent wiring",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 27,
+        "symbol": "irq_arbiter arb("
+      }
+    },
+    {
+      "id": "C",
+      "label": "Independent standard-contract checks",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 34,
+        "symbol": "task check("
+      }
+    },
+    {
+      "id": "R",
+      "label": "Retained failing verdict",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 63,
+        "symbol": "if(failures) $fatal"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "S",
+      "to": "D",
+      "label": "CSR state qualifies pending requests",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 28,
+        "symbol": ".mstatus_mie_i(status[3])"
+      }
+    },
+    {
+      "from": "D",
+      "to": "C",
+      "label": "observe pending, offer and CSR fields",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 52,
+        "symbol": "check(mip[11]"
+      }
+    },
+    {
+      "from": "C",
+      "to": "R",
+      "label": "failed contracts accumulate",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv",
+        "line": 36,
+        "symbol": "failures=failures+1;"
+      }
+    }
+  ],
+  "unknowns": [
+    "Instruction-pipeline CSR ordering remains under GitHub #21.",
+    "APB timer mismatch #35 is static inspection, not exercised by this reproducer."
+  ]
+}

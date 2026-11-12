@@ -1,0 +1,16 @@
+[OBSERVE] software write mip: mip=00000008 mie=00000888 mstatus=00001808 irq=0 id=0
+[FAIL] MSIP must be read-only through mip CSR (write 1 must not assert it)
+[FAIL] Advertised enabled MSIP must reach arbitration
+[OBSERVE] software pin: mip=00000008 irq=0 id=0
+[FAIL] Enabled software interrupt pin must reach arbitration
+[OBSERVE] external pin: mip=00000800 irq=0 id=0
+[FAIL] Enabled MEIP must reach arbitration
+[PASS] Baseline timer offer with mintprio=0
+[OBSERVE] standard MTI at threshold 3: mip=00000080 mie=00000888 mstatus=00001808 irq=0
+[FAIL] Standard MTI remains eligible with MIE and MTIE set
+[OBSERVE] M-only mstatus write: mstatus=0000000a MPP=00 SIE=1
+[FAIL] M-only MPP must remain the only supported mode (M)
+[FAIL] No S-mode: SIE must be read-only zero
+[SUMMARY] standards_checks_failed=7 (intentional negative evidence)
+FATAL: ips/Verification/artifacts/irq_compliance_review_20261112/tb_irq_compliance.sv:63: Compliance review found contract mismatches; preserve log
+       Time: 151000  Scope: tb_irq_compliance
