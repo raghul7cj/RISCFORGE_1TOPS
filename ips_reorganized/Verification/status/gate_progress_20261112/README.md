@@ -42,3 +42,13 @@ SP briefly reaches 0x28004 during startup auipc/addi address construction, then 
 ## Next experiment
 
 Use a small multi-iteration pilot before a long run. At 100 MHz a qualifying duration needs at least one billion timed cycles, beyond the current 2M watchdog. The first-order 2,500-iteration estimate is 13.37 target seconds and about 1.72 host hours in Verilator; it has not been executed. Preserve upstream duration/CRC checks. More iterations reuse buffers; no SRAM enlargement is indicated for this configuration. Performance seeds and remaining counter/timing qualification are also required.
+
+## Dhrystone direct results
+
+The 11 November XSim run passes all port final-state checks for 10 iterations: zero validation errors, no trap, 10,163 timed cycles (1,016.3 cycles/iteration). Instruction count and CPI remain unqualified; no published compliant score is asserted.
+
+- [Analyzed Dhrystone PASS and qualification limits](https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/bae6e79e01f479afc624fd3afb0011f29d0b8306/ips_reorganized/Verification/minstret_retirement/evidence/soc_20261111/dhrystone_20261111T090713Z_0e367f6e/analysis.json).
+- [Raw Dhrystone mailbox and testbench result](https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/bae6e79e01f479afc624fd3afb0011f29d0b8306/ips_reorganized/Verification/minstret_retirement/evidence/soc_20261111/dhrystone_20261111T090713Z_0e367f6e/result.json).
+- [Dhrystone simulation log](https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/bae6e79e01f479afc624fd3afb0011f29d0b8306/ips_reorganized/Verification/minstret_retirement/evidence/soc_20261111/dhrystone_20261111T090713Z_0e367f6e/simulation.log).
+- [Run identity and metadata](https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/bae6e79e01f479afc624fd3afb0011f29d0b8306/ips_reorganized/Verification/minstret_retirement/evidence/soc_20261111/dhrystone_20261111T090713Z_0e367f6e/run_metadata.json).
+- [Build flags, source pins and image hashes](https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/bae6e79e01f479afc624fd3afb0011f29d0b8306/ips_reorganized/Verification/minstret_retirement/evidence/soc_20261111/dhrystone_20261111T090713Z_0e367f6e/build.json).
