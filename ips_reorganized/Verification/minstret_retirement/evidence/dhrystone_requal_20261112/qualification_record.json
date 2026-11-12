@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "scope": "instruction_retirement_counter",
+  "minstret": "qualified",
+  "cpi": "qualified",
+  "normalized_score": "engineering_estimate_only",
+  "published_compliance": false,
+  "issue": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/16",
+  "fix_commit": "eaca32ef031b9a16e3751462afb5fc2565d86bfa",
+  "basis": "Issue #16 (minstret counted a held WB packet more than once) was closed on 12 November 2026 by commit eaca32ef031b9a16e3751462afb5fc2565d86bfa, with the directed before/after reproducer, the final 29-bin/12-run retirement checklist and the focused regression retained in the repository. The retirement counter in the pinned sources below counts each consumed WB instruction exactly once, including MRET and real NOPs, so the retired-instruction delta read through mcycle/minstret pairs and the resulting CPI are qualified for this source snapshot. The claim is bound to the recorded source hashes; any source change invalidates it and the analyzer then fails closed.",
+  "evidence": [
+    "https://github.com/raghul7cj/RISCFORGE_1TOPS/commit/eaca32ef031b9a16e3751462afb5fc2565d86bfa",
+    "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/16",
+    "https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/verification_infra/ips_reorganized/Verification/minstret_retirement/docs/MINSTRET_RETIREMENT_20261111.md"
+  ],
+  "required_source_sha256": {
+    "ips/riscv_core/rtl/top.v": "f1959a689b45c8890d9e336d123b402b74746ed4ac138ed10f17823682aa0c25",
+    "ips/riscv_core/rtl/csr_regfile.v": "8da2799b54f3ae2ec686823c886d42191117e59c650c01fc0e789b771a2b666a"
+  },
+  "limits": [
+    "Instruction count and CPI are qualified for the pinned RTL snapshot only; a source change voids the record.",
+    "Scores remain engineering estimates: cycles come from RTL simulation and the 100 MHz clock is modeled, not measured on hardware.",
+    "Published benchmark compliance is separate and remains open, including the CoreMark minimum-duration rule and the remaining obligations tracked in issue #23.",
+    "The analyzer verifies the pinned source hashes before accepting this record and fails closed on any mismatch."
+  ]
+}

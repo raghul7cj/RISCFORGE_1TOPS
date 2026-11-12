@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-12",
+  "simulator": "AMD Vivado XSim 2022.2 (local) and Cadence Xcelium 24.09 (vlsi server)",
+  "modeled_clock_hz": 100000000,
+  "run_class": "re-run of the closed-issue source; engineering evidence, not a published score",
+  "issue_closed": {
+    "issue": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/16",
+    "title": "[CORE-RETIRE] minstret counts a held WB packet more than once",
+    "state": "closed",
+    "closed_at": "2026-11-12T08:41:35Z",
+    "fix_commit": "eaca32ef031b9a16e3751462afb5fc2565d86bfa"
+  },
+  "source_binding": {
+    "core_rtl_matches_remote_head": true,
+    "verified_sources": {
+      "ips/riscv_core/rtl/top.v": "f1959a689b45c8890d9e336d123b402b74746ed4ac138ed10f17823682aa0c25",
+      "ips/riscv_core/rtl/csr_regfile.v": "8da2799b54f3ae2ec686823c886d42191117e59c650c01fc0e789b771a2b666a"
+    },
+    "remote_run_source_verification": {
+      "remote_root": "/tmp/dhrystone_requal",
+      "listed": 117,
+      "checked": 115,
+      "matched": 115,
+      "mismatched": [],
+      "missing": [
+        "ips/benchmarks/runs/dhrystone_20261112T091215Z_1eb19b6d/benchmark_config.svh",
+        "ips/benchmarks/runs/dhrystone_20261112T091215Z_1eb19b6d/riscforge_bootrom.hex"
+      ]
+    },
+    "note": "The pinned core RTL is byte-identical to branch verification_infra at the published commit; the remote Xcelium run re-verified 115 of 117 listed sources byte-for-byte, the two exceptions being run-directory inputs (generated config and boot ROM copy)."
+  },
+  "retained_baseline_11_nov": {
+    "cycle_delta": 10163,
+    "raw_instret_delta_unqualified": 5575,
+    "cpi_raw_unqualified": 1.8229596412556053,
+    "note": "Retained unchanged; the 12 November re-run reproduces these counters exactly."
+  },
+  "runs": [
+    {
+      "label": "short_10_iterations_xsim",
+      "run_id": "dhrystone_20261112T091521Z_102701f4",
+      "simulator": "AMD Vivado XSim 2022.2 (local workstation)",
+      "valid": true,
+      "status": "pass",
+      "iterations": 10,
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "trap_seen": false,
+      "cycle_delta": 10163,
+      "instret_delta": 5575,
+      "cpi": 1.8229596412556053,
+      "cycles_per_iteration": 1016.3,
+      "observed_clock_cycles": 122731,
+      "held_wb_cycles": 5577,
+      "raw_wb_valid_cycles": 73951,
+      "qualification": {
+        "minstret": "qualified",
+        "cpi": "qualified",
+        "normalized_score": "engineering_estimate_only",
+        "published_compliance": false
+      },
+      "engineering_score_estimate": {
+        "label": "Dhrystones/second engineering estimate",
+        "value": 98396.14287119945,
+        "dmips_estimate": 56.002357923278005,
+        "published_compliant": false,
+        "limitations": [
+          "RTL simulation cycles and modeled clock are engineering evidence, not a published-system score"
+        ]
+      },
+      "firmware_elf_sha256": "81ed7fe927cd1c3a8da2e0f90ecfdceb87f4895a1af221b3c38d6229ab44c9fe"
+    },
+    {
+      "label": "long_10000_iterations_xcelium",
+      "run_id": "dhrystone_10000_iterations_xcelium",
+      "simulator": "Cadence Xcelium 24.09 (vlsi.iiita.ac.in)",
+      "valid": true,
+      "status": "pass",
+      "iterations": 10000,
+      "validation_errors": 0,
+      "error_code": "0x00000000",
+      "trap_seen": false,
+      "cycle_delta": 10120043,
+      "instret_delta": 5540035,
+      "cpi": 1.8267110225837924,
+      "cycles_per_iteration": 1012.0043,
+      "observed_clock_cycles": 10233189,
+      "held_wb_cycles": 585003,
+      "raw_wb_valid_cycles": 6187947,
+      "qualification": {
+        "minstret": "qualified",
+        "cpi": "qualified",
+        "normalized_score": "engineering_estimate_only",
+        "published_compliance": false
+      },
+      "engineering_score_estimate": {
+        "label": "Dhrystones/second engineering estimate",
+        "value": 98813.80938796407,
+        "dmips_estimate": 56.24007364141381,
+        "published_compliant": false,
+        "limitations": [
+          "RTL simulation cycles and modeled clock are engineering evidence, not a published-system score"
+        ]
+      },
+      "firmware_elf_sha256": "2cfb81374614cb61907c0b26d7c74ef05dd4336f28deb97601f873fa42e43d02"
+    }
+  ],
+  "disposition": "Dhrystone re-run after the closed #16 retirement fix: PASS with qualified instruction and CPI accounting bound to the pinned source hashes. Published benchmark compliance remains open: the Dhrystone figure is an RTL-simulation engineering estimate and CoreMark still fails the upstream minimum-duration rule (0x3001)."
+}

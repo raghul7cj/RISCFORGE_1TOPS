@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "valid": true,
+  "failure_reasons": [],
+  "warnings": [],
+  "qualification": {
+    "minstret": "qualified",
+    "cpi": "qualified",
+    "normalized_score": "engineering_estimate_only",
+    "published_compliance": false
+  },
+  "published_score": null,
+  "raw_reason": "none",
+  "magic": "0x42454e43",
+  "version": 1,
+  "status": "pass",
+  "benchmark_id": 4,
+  "benchmark": "dhrystone",
+  "iterations": 10,
+  "validation_errors": 0,
+  "error_code": "0x00000000",
+  "firmware_trap": {
+    "cause": 0,
+    "epc": 0,
+    "tval": 0
+  },
+  "counter_checks": 7,
+  "probe_expected": 0,
+  "probe_observed": 0,
+  "result_flags": 3,
+  "coremark_crc": {
+    "list": "0x0000",
+    "matrix": "0x0000",
+    "state": "0x0000",
+    "final": "0x0000"
+  },
+  "words": [
+    "0x42454e43",
+    "0x00000001",
+    "0x00000002",
+    "0x00000004",
+    "0x0000000a",
+    "0x00000000",
+    "0x0000601c",
+    "0x00000000",
+    "0x000087cf",
+    "0x00000000",
+    "0x0000368a",
+    "0x00000000",
+    "0x00004c51",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000007",
+    "0x00066b0a",
+    "0x00000000",
+    "0x00000000",
+    "0x00000002",
+    "0x00000003",
+    "0x05f5e100",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000",
+    "0x00000000"
+  ],
+  "testbench_marker": "BENCH_TB_PASS",
+  "cycle_start_raw": 24604,
+  "cycle_end_raw": 34767,
+  "cycle_delta": 10163,
+  "raw_instret_start": 13962,
+  "raw_instret_end": 19537,
+  "raw_instret_delta_unqualified": 5575,
+  "observed_clock_cycles": 122731,
+  "held_wb_cycles": 5577,
+  "raw_wb_valid_cycles": 73951,
+  "timing_phase_first_cycle": 24603,
+  "timing_phase_last_cycle": 34831,
+  "trap_seen": false,
+  "cycles_per_iteration": 1016.3,
+  "cpi_raw_unqualified": 1.8229596412556053,
+  "instret_delta": 5575,
+  "cpi": 1.8229596412556053,
+  "clock_hz_source": "testbench_10ns_clock",
+  "modeled_clock_hz": 100000000,
+  "firmware_clock_hz": 100000000,
+  "engineering_score_estimate": {
+    "label": "Dhrystones/second engineering estimate",
+    "value": 98396.14287119945,
+    "dmips_estimate": 56.002357923278005,
+    "published_compliant": false,
+    "limitations": [
+      "RTL simulation cycles and modeled clock are engineering evidence, not a published-system score"
+    ]
+  },
+  "build_metadata": {
+    "benchmark": "dhrystone",
+    "benchmark_id": 4,
+    "iterations": 10,
+    "clock_hz": 100000000,
+    "arch": "rv32im_zicsr",
+    "build_status": "complete",
+    "verification_status": "not_run",
+    "output_dir": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112",
+    "compiler": "riscv64-unknown-elf-gcc",
+    "compiler_version": "13.2.0",
+    "contract": {
+      "name": "RISCFORGE benchmark result block",
+      "version": 1,
+      "address": "0x00020000",
+      "reserved_bytes": 256,
+      "fields": [
+        "magic",
+        "version",
+        "status",
+        "benchmark_id",
+        "iterations",
+        "validation_errors",
+        "cycle_start_lo",
+        "cycle_start_hi",
+        "cycle_end_lo",
+        "cycle_end_hi",
+        "instret_start_lo",
+        "instret_start_hi",
+        "instret_end_lo",
+        "instret_end_hi",
+        "crc_list",
+        "crc_matrix",
+        "crc_state",
+        "crc_final",
+        "error_code",
+        "trap_cause",
+        "trap_epc",
+        "trap_tval",
+        "counter_checks",
+        "console_word",
+        "probe_expected",
+        "probe_observed",
+        "timing_phase",
+        "result_flags",
+        "clock_hz"
+      ],
+      "sha256": "25ca693410e1f93f545ea6cec35441fcba2b27f25f391ea7714666bccd87afa6"
+    },
+    "source_pins": {
+      "coremark": {
+        "repository": "eembc/coremark",
+        "revision": "1f483d5b8316753a742cbf5590caf5bd0a4e4777",
+        "version": "CoreMark 1.0 (EEMBC upstream)",
+        "license_file": "LICENSE.md",
+        "sha256": {
+          "LICENSE.md": "9577b9c846f61fd69a0d8ac965998c6450c7d8969f71f0bb4a931b91aebad28a",
+          "core_list_join.c": "ca00e4e010ece47d7f040cb92aa50a95345a00d3171b59d088f6b243be06ce7b",
+          "core_main.c": "17884c93c5b94378eb0ff02b4df3725756cf2addb9b8cbcaa6200a4649ff5ca7",
+          "core_matrix.c": "ecdff717b5a5c4907d221a606760e25499899cbf617582c05d40db71c91351e4",
+          "core_state.c": "f4b84bb0a3452c45a4daa664ab502bfdccbd31cb57d93e9ac490c60937717a4e",
+          "core_util.c": "a3fbfcb9bb943b638624b8ece01c5836dd56a96d7bcde2697b248d077447327f",
+          "coremark.h": "42642b9a06c7ed2b3bd9eda971b7c3868c4f5d27bf7ef6c4bba11291a0c2598a"
+        }
+      },
+      "dhrystone": {
+        "repository": "riscv-software-src/riscv-tests",
+        "revision": "3df703cd52d5f0d8224e3c50bf03c6cb70efff98",
+        "version": "Dhrystone C, Version 2.2 (RISC-V tests port)",
+        "license_file": "LICENSE",
+        "sha256": {
+          "LICENSE": "43b7309213293b4323d65301a90e05472579abcd51feb260a850354bcb49ff8f",
+          "benchmarks/dhrystone/dhrystone.c": "11eb8a10d14d4a0b2e087f7d5e9ab67f76b1e9b1fd682457b5ed3ac1e7534e97",
+          "benchmarks/dhrystone/dhrystone.h": "a66aa6e73b38afb85021b2ac751402c8b27d47e48beffed852afb36aa94a2af5",
+          "benchmarks/dhrystone/dhrystone_main.c": "45f1aeb092b50ccbd2f37782e5b054b446c93c49771a45a36c940386f72d338d"
+        }
+      }
+    },
+    "port_adaptations": [
+      "The upstream dhrystone.c computational routines are compiled unchanged and as a separate translation unit.",
+      "A build-local header copy binds Start_Timer/Stop_Timer to the 64-bit high-low-high mailbox snapshots and disables the legacy short-run retry so the requested iteration count stays exact.",
+      "A build-local main copy initializes the result block, checks all final arrays/scalars/strings/records, and omits the upstream target score calculation/output.",
+      "The upstream alloca.h and util.h dependencies are supplied by small freestanding port headers; the empty upstream debug_printf stub is renamed for the algorithm translation unit and a port implementation writes readable output outside the measured loop.",
+      "Struct assignment and strcpy/strcmp behavior remain enabled."
+    ],
+    "flags": {
+      "common": [
+        "-march=rv32im_zicsr",
+        "-mabi=ilp32",
+        "-O2",
+        "-ffreestanding",
+        "-fno-builtin",
+        "-fno-common",
+        "-fno-pic",
+        "-msmall-data-limit=0",
+        "-ffunction-sections",
+        "-fdata-sections",
+        "-nostdlib",
+        "-DBENCHMARK_ID=4u",
+        "-DBENCHMARK_ITERATIONS=10u",
+        "-DBENCHMARK_CLOCK_HZ=100000000u"
+      ],
+      "benchmark": [
+        "-std=gnu89",
+        "-fno-inline",
+        "-fno-ipa-icf",
+        "-fno-builtin-strcpy",
+        "-fno-builtin-strcmp",
+        "-DBUILD_DHRYSTONE=1",
+        "-include",
+        "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/ports/dhrystone/string.h"
+      ],
+      "link": [
+        "-nostdlib",
+        "-T /mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/firmware/linker.ld",
+        "-Wl,--gc-sections",
+        "-lgcc"
+      ],
+      "per_object": {
+        "dhrystone.c": [
+          "-Ddebug_printf=upstream_debug_printf"
+        ]
+      }
+    },
+    "memory_fit": {
+      "imem_origin": "0x00010000",
+      "imem_capacity_bytes": 32768,
+      "imem_text_bytes": 6220,
+      "imem_free_bytes": 26548,
+      "dmem_origin": "0x00020000",
+      "dmem_capacity_bytes": 32768,
+      "result_reserved_bytes": 256,
+      "dmem_static_end": "0x00023078",
+      "dmem_static_bytes_including_result_reservation": 12408,
+      "stack_top": "0x00028000",
+      "stack_margin_bytes_after_static_data": 20360,
+      "required_stack_margin_bytes": 4096,
+      "dynamic_stack_proven": false,
+      "static_sections": [
+        {
+          "name": ".text",
+          "region": "imem",
+          "address": "0x00010000",
+          "size_bytes": 6220,
+          "loadable": true
+        },
+        {
+          "name": ".benchmark_result",
+          "region": "dmem",
+          "address": "0x00020000",
+          "size_bytes": 256,
+          "loadable": false
+        },
+        {
+          "name": ".rodata",
+          "region": "dmem",
+          "address": "0x00020100",
+          "size_bytes": 1904,
+          "loadable": true
+        },
+        {
+          "name": ".data",
+          "region": "dmem",
+          "address": "0x00020870",
+          "size_bytes": 4,
+          "loadable": true
+        },
+        {
+          "name": ".bss",
+          "region": "dmem",
+          "address": "0x00020874",
+          "size_bytes": 10244,
+          "loadable": false
+        }
+      ],
+      "initialized_bytes_by_region": {
+        "imem": 6220,
+        "dmem": 1908
+      },
+      "static_allocated_bytes_by_region": {
+        "imem": 6220,
+        "dmem": 12408,
+        "noload": 10500
+      }
+    },
+    "images": {
+      "elf": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112/program.elf",
+      "map": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112/program.map",
+      "disassembly": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112/program.dis",
+      "imem_hex": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112/imem.hex",
+      "dmem_hex": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112/dmem.hex",
+      "log": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/build/firmware/dhrystone_requal_20261112/build.log"
+    },
+    "source_hashes": {
+      "firmware": {
+        "firmware/benchmark.h": "4e3cd1fc627a0378b54c3548c2c1344fad7d9f4b95da90b2f6a2488095b359b0",
+        "firmware/start.S": "cf2903ef7a68a5bae05ca18a060d89492451e1189b45acd3f309381d2b146097",
+        "firmware/runtime.c": "eaa9013ff96c909dee2976aba797952a024dceb67635a5fe71b168532dc00bc5"
+      },
+      "ports": {
+        "ports/dhrystone/dhrystone_port.c": "48d957b827041bd3bdb6896a569f17d3733b98db96cf41a52e30ac9bcb8958d4",
+        "ports/dhrystone/util.h": "3f8393144c607405ee439deb908c457762e1f832533267890882ec833d127e34",
+        "ports/dhrystone/alloca.h": "b9843cba8e9df006c03c96d23c25189a13de8cb852908c534a6305e8e3c5dd49",
+        "ports/dhrystone/stdio.h": "0fd2e4f0cb05ef520805e09b7ed050edf414b5532f07e70d058e6e9eabf981ea",
+        "ports/dhrystone/string.h": "bdb175b4a89187589490fe7e10aa2a6764b8c685f2306e471e2c8d07ed760810"
+      },
+      "upstream_files_compiled": {
+        "vendor/upstream/dhrystone/benchmarks/dhrystone/dhrystone.c": "11eb8a10d14d4a0b2e087f7d5e9ab67f76b1e9b1fd682457b5ed3ac1e7534e97"
+      },
+      "ported_build_copies": {
+        "dhrystone_main.c": "ffd7ec2a899811981984ead1c40868cf0be1f40f5ac3538e4554befdfb5c26ff",
+        "dhrystone_header_ported": "b76b838905217f6842afe114278f71ab129c8824336b67d0d1b8a15072618b78",
+        "dhrystone_main_ported": "ffd7ec2a899811981984ead1c40868cf0be1f40f5ac3538e4554befdfb5c26ff"
+      },
+      "linker_script": "acf4a2b51b0a2b817eae0ac896731cf9be9a2930c8a2fc741d76591730157fa8",
+      "source_lock": "cf088ce5c96e974acf347d4cd7aeb6ca2e279c96dfd60dcb105ff85f96fd9f07",
+      "build_tools": {
+        "tools/build_firmware.py": "36d9bcb4f7f1d0a2a94d30913d014cbbd7fe31fd7f16050e2e072a5a04b24cee",
+        "tools/fetch_sources.py": "6783010eefe2678f86ce4fa24d0593ea2859892b518f5a7fd800f8a8d1f209e1"
+      }
+    },
+    "output_hashes": {
+      "program.elf": "81ed7fe927cd1c3a8da2e0f90ecfdceb87f4895a1af221b3c38d6229ab44c9fe",
+      "program.map": "5f0d20c74f9e2eec03e6d253a766fc035386894d59864fa919761f9ffa4f1dc0",
+      "program.dis": "8a06ae8d4cae0e88afe2596ab177cb718a7e367281c7f7b3653b6d82acd1253d",
+      "imem.hex": "65a0e0f8d4514a924f6ab18a84ca62385508ea22cb538668b71a071980052355",
+      "dmem.hex": "ea36cef94c2d219a72101bbf7e48952d6047467b619a035c572eb4547dc04349",
+      "ported/dhrystone/dhrystone.h": "b76b838905217f6842afe114278f71ab129c8824336b67d0d1b8a15072618b78",
+      "ported/dhrystone/dhrystone_main.c": "ffd7ec2a899811981984ead1c40868cf0be1f40f5ac3538e4554befdfb5c26ff"
+    }
+  },
+  "qualification_basis": {
+    "issue": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/16",
+    "fix_commit": "eaca32ef031b9a16e3751462afb5fc2565d86bfa",
+    "basis": "Issue #16 (minstret counted a held WB packet more than once) was closed on 12 November 2026 by commit eaca32ef031b9a16e3751462afb5fc2565d86bfa, with the directed before/after reproducer, the final 29-bin/12-run retirement checklist and the focused regression retained in the repository. The retirement counter in the pinned sources below counts each consumed WB instruction exactly once, including MRET and real NOPs, so the retired-instruction delta read through mcycle/minstret pairs and the resulting CPI are qualified for this source snapshot. The claim is bound to the recorded source hashes; any source change invalidates it and the analyzer then fails closed.",
+    "evidence": [
+      "https://github.com/raghul7cj/RISCFORGE_1TOPS/commit/eaca32ef031b9a16e3751462afb5fc2565d86bfa",
+      "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/16",
+      "https://github.com/raghul7cj/RISCFORGE_1TOPS/blob/verification_infra/ips_reorganized/Verification/minstret_retirement/docs/MINSTRET_RETIREMENT_20261111.md"
+    ],
+    "limits": [
+      "Instruction count and CPI are qualified for the pinned RTL snapshot only; a source change voids the record.",
+      "Scores remain engineering estimates: cycles come from RTL simulation and the 100 MHz clock is modeled, not measured on hardware.",
+      "Published benchmark compliance is separate and remains open, including the CoreMark minimum-duration rule and the remaining obligations tracked in issue #23.",
+      "The analyzer verifies the pinned source hashes before accepting this record and fails closed on any mismatch."
+    ],
+    "verified_sources": {
+      "ips/riscv_core/rtl/top.v": "f1959a689b45c8890d9e336d123b402b74746ed4ac138ed10f17823682aa0c25",
+      "ips/riscv_core/rtl/csr_regfile.v": "8da2799b54f3ae2ec686823c886d42191117e59c650c01fc0e789b771a2b666a"
+    }
+  }
+}
