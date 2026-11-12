@@ -1,0 +1,39 @@
+source .venv/bin/activate.csh
+
+setenv RISCV_INSTALL "$HOME/riscv_tools"
+setenv PATH "$RISCV_INSTALL/bin:$PATH"
+setenv RISCV_TOOLCHAIN "$RISCV_INSTALL"
+setenv RISCV_GCC "$RISCV_INSTALL/bin/riscv64-unknown-elf-gcc"
+setenv RISCV_OBJCOPY "$RISCV_INSTALL/bin/riscv64-unknown-elf-objcopy"
+setenv SPIKE_PATH "$RISCV_INSTALL/bin"
+
+
+run --custom_target target/rv32i --isa rv32i_zicsr --mabi ilp32 --test riscv_arithmetic_basic_test --iss spike --simulator ius
+
+
+# 1. Convert the binary to the hex file your RTL expects
+riscv64-unknown-elf-objcopy -I binary -O verilog out_2026-07-23/asm_test/riscv_arithmetic_basic_test_0.bin out_2026-07-23/asm_test/test.hex
+
+# 2. Simulate your RTL in Xcelium to generate your core's trace log
+run --custom_target target/rv32i --test riscv_arithmetic_basic_test --simulator ius --custom_simulator_yaml yaml/custom_sim.yaml
+
+# 3. Compare your core's execution against Spike's Golden Reference
+python3 scripts/iss_cmp.py --iss spike \
+  --iss_log out_2026-07-23/spike_sim/riscv_arithmetic_basic_test_0.log \
+  --rtl_log out_2026-07-23/rtl_sim/rtl_trace.csv
+
+
+ # 1. Generate the test (without fences) and get the Spike Golden Trace
+run --custom_target target/rv32i --isa rv32i_zicsr --mabi ilp32 --test riscv_arithmetic_basic_test --iss spike --simulator ius --sim_opts "+no_fence=1"
+
+# 2. Convert to Hex
+riscv64-unknown-elf-objcopy -I binary -O verilog out_2026-07-23/asm_test/riscv_arithmetic_basic_test_0.bin out_2026-07-23/asm_test/test.hex
+
+# 3. Simulate in Xcelium (Remember the -clean flag to recompile the TB!)
+xrun -clean -64bit -sv -timescale 1ns/1ps -incdir RTL_5STAGE_TRAP_EXC_INTR RTL_5STAGE_TRAP_EXC_INTR/*.v RTL_5STAGE_TRAP_EXC_INTR/tb_riscv_dv.sv -top tb_riscv_dv +instr_file=out_2026-07-23/asm_test/test.hex +rtl_trace=out_2026-07-23/rtl_sim/rtl_trace.csv
+
+# 4. Compare
+python3 scripts/instr_trace_compare.py --csv_file_1 out_2026-07-23/spike_sim/spike_trace.csv --csv_file_2 out_2026-07-23/rtl_sim/rtl_trace.csv
+
+
+go through all these rtl code files thoroughly and fix all the bugs, i want to verify my custom rtl core using the RISCV DV setup to obtain functional coverage and other coverage metrics like code coverage, coverpoints and covergroups etc, for this task we have already made the setup but we are not able to progress because of some errors, fix all those errors, make sure the testbench is right and appropriate, FYI : the DUT is now RTL_5STAGE_TRAP_EXC_INTR (riscforge 5_stage_trap_exc_intr_no_mul): RV32I + Zicsr with trap/exception support (ecall/ebreak trap to mtvec), NO M extension, and fence is decoded as illegal. Use make generate / make simulate / make compare (TARGET=rv32i).

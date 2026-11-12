@@ -1,0 +1,486 @@
+`DEFINE_ZBA_INSTR(SH1ADD, R_FORMAT, ARITHMETIC, RV32ZBA);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zba_instr.sv,18|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBA_INSTR(SH2ADD, R_FORMAT, ARITHMETIC, RV32ZBA);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zba_instr.sv,19|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBA_INSTR(SH3ADD, R_FORMAT, ARITHMETIC, RV32ZBA);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zba_instr.sv,20|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ANDN,   R_FORMAT, LOGICAL,    RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,18|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(CLZ,    I_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,19|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(CPOP,   I_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,20|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(CTZ,    I_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,21|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(MAX,    R_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,22|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(MAXU,   R_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,23|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(MIN,    R_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,24|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(MINU,   R_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,25|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ORC_B,  I_FORMAT, LOGICAL,    RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,26|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ORN,    R_FORMAT, LOGICAL,    RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,27|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(REV8,   I_FORMAT, SHIFT,      RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,28|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ROL,    R_FORMAT, SHIFT,      RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,29|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ROR,    R_FORMAT, SHIFT,      RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,30|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(RORI,   I_FORMAT, SHIFT,      RV32ZBB, UIMM);
+                                                              |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,31|62): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(SEXT_B, I_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,32|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(SEXT_H, I_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,33|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(XNOR,   R_FORMAT, LOGICAL,    RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,34|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ZEXT_H, R_FORMAT, ARITHMETIC, RV32ZBB);
+                                                        |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv32zbb_instr.sv,35|56): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+endclass : riscv_zcb_instr;
+                          |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/riscv_zcb_instr.sv,225|26): Ignored unexpected semicolon following SystemVerilog description keyword (riscv_zcb_instr).
+`DEFINE_ZBA_INSTR(ADD_UW,    R_FORMAT, ARITHMETIC, RV64ZBA);
+                                                           |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zba_instr.sv,18|59): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBA_INSTR(SH1ADD_UW, R_FORMAT, ARITHMETIC, RV64ZBA);
+                                                           |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zba_instr.sv,19|59): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBA_INSTR(SH2ADD_UW, R_FORMAT, ARITHMETIC, RV64ZBA);
+                                                           |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zba_instr.sv,20|59): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBA_INSTR(SH3ADD_UW, R_FORMAT, ARITHMETIC, RV64ZBA);
+                                                           |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zba_instr.sv,21|59): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBA_INSTR(SLLI_UW,   I_FORMAT, SHIFT,      RV64ZBA, UIMM);
+                                                                 |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zba_instr.sv,22|65): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(CLZW,  I_FORMAT, ARITHMETIC, RV64ZBB);
+                                                       |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zbb_instr.sv,18|55): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(CPOPW, I_FORMAT, ARITHMETIC, RV64ZBB);
+                                                       |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zbb_instr.sv,19|55): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(CTZW,  I_FORMAT, ARITHMETIC, RV64ZBB);
+                                                       |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zbb_instr.sv,20|55): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(ROLW,  R_FORMAT, SHIFT,      RV64ZBB);
+                                                       |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zbb_instr.sv,21|55): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(RORW,  R_FORMAT, SHIFT,      RV64ZBB);
+                                                       |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zbb_instr.sv,22|55): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+`DEFINE_ZBB_INSTR(RORIW, I_FORMAT, SHIFT,      RV64ZBB, UIMM);
+                                                             |
+xmvlog: *W,UEXPSC (/home/iiita/riscv-dv/src/isa/rv64zbb_instr.sv,23|61): Ignored unexpected semicolon following SystemVerilog description keyword (endclass).
+	Top level design units:
+		uvm_pkg
+		cdns_uvmapi
+		cdns_assert2uvm_pkg
+		cdns_uvm_pkg
+		riscv_signature_pkg
+		riscv_instr_pkg
+		riscv_instr_test_pkg
+		riscv_instr_gen_tb_top
+  `FP_LOAD_INSTR_CG_BEGIN(flw)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,711|29): Bit-select or part-select index out of declared bounds.
+  `FP_LOAD_INSTR_CG_BEGIN(fld, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,714|32): Bit-select or part-select index out of declared bounds.
+  `FP_STORE_INSTR_CG_BEGIN(fsw)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,717|30): Bit-select or part-select index out of declared bounds.
+  `FP_STORE_INSTR_CG_BEGIN(fsd, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,720|33): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fadd_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,723|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fadd_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,723|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fadd_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,723|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fadd_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,727|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fadd_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,727|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fadd_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,727|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsub_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,731|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsub_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,731|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsub_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,731|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsub_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,735|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsub_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,735|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsub_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,735|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmul_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,739|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmul_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,739|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmul_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,739|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmul_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,743|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmul_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,743|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmul_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,743|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fdiv_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,747|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fdiv_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,747|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fdiv_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,747|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fdiv_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,751|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fdiv_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,751|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fdiv_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,751|32): Bit-select or part-select index out of declared bounds.
+  `FSQRT_INSTR_CG_BEGIN(fsqrt_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,755|31): Bit-select or part-select index out of declared bounds.
+  `FSQRT_INSTR_CG_BEGIN(fsqrt_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,755|31): Bit-select or part-select index out of declared bounds.
+  `FSQRT_INSTR_CG_BEGIN(fsqrt_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,758|34): Bit-select or part-select index out of declared bounds.
+  `FSQRT_INSTR_CG_BEGIN(fsqrt_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,758|34): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmin_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,761|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmin_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,761|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmin_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,761|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmin_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,765|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmin_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,765|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmin_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,765|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmax_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,769|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmax_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,769|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmax_s)
+                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,769|29): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmax_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,773|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmax_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,773|32): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fmax_d, D)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,773|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,777|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,777|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,777|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,777|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,780|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,780|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,780|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmadd_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,780|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,783|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,783|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,783|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,783|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,786|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,786|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,786|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmadd_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,786|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,789|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,789|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,789|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,789|31): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,792|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,792|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,792|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fmsub_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,792|34): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,795|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,795|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,795|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_s)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,795|32): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,798|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,798|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,798|35): Bit-select or part-select index out of declared bounds.
+  `FP_R4_INSTR_CG_BEGIN(fnmsub_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,798|35): Bit-select or part-select index out of declared bounds.
+    `FP_SPECIAL_VALUES_CP(instr.fs1_value, fs1_value, D)
+                                                       |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,807|55): Bit-select or part-select index out of declared bounds.
+    `FP_SPECIAL_VALUES_CP(instr.fd_value, fd_value, S)
+                                                     |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,808|53): Bit-select or part-select index out of declared bounds.
+    `FP_SPECIAL_VALUES_CP(instr.fs1_value, fs1_value, S)
+                                                       |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,817|55): Bit-select or part-select index out of declared bounds.
+    `FP_SPECIAL_VALUES_CP(instr.fd_value, fd_value, D)
+                                                     |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,818|53): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_w_s)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,822|33): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_wu_s, , UNSIGN)
+                                            |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,825|44): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_l_s)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,828|33): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_lu_s, UNSIGN)
+                                          |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,831|42): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_l_d, D)
+                                    |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,834|36): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_lu_d, D, UNSIGN)
+                                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,837|45): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_w_d, D)
+                                    |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,840|36): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fcvt_wu_d, D, UNSIGN)
+                                             |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,843|45): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnj_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,870|30): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnj_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,870|30): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnj_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,870|30): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnj_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,873|33): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnj_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,873|33): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnj_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,873|33): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjn_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,876|31): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjn_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,876|31): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjn_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,876|31): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjn_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,879|34): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjn_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,879|34): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjn_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,879|34): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjx_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,882|31): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjx_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,882|31): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjx_s)
+                               |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,882|31): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjx_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,885|34): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjx_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,885|34): Bit-select or part-select index out of declared bounds.
+  `FP_R_INSTR_CG_BEGIN(fsgnjx_d, D)
+                                  |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,885|34): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fmv_x_w)
+                                |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,888|32): Bit-select or part-select index out of declared bounds.
+  `FP_F2I_INSTR_CG_BEGIN(fmv_x_d, D)
+                                   |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,891|35): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(feq_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,900|30): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(feq_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,900|30): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(feq_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,903|33): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(feq_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,903|33): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(flt_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,906|30): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(flt_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,906|30): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(flt_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,909|33): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(flt_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,909|33): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(fle_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,912|30): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(fle_s)
+                              |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,912|30): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(fle_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,915|33): Bit-select or part-select index out of declared bounds.
+  `FP_CMP_INSTR_CG_BEGIN(fle_d, D)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,915|33): Bit-select or part-select index out of declared bounds.
+  `FCLASS_INSTR_CG_BEGIN(fclass_s)
+                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,918|33): Bit-select or part-select index out of declared bounds.
+  `FCLASS_INSTR_CG_BEGIN(fclass_d, D)
+                                    |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,921|36): Bit-select or part-select index out of declared bounds.
+    cp_len_64bit_sel01: coverpoint instr.rs2_value[60:56] iff (XLEN == 64 &&
+                                                 |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,1214|49): Bit-select or part-select index out of declared bounds.
+    cp_offset_64bit_sel01: coverpoint instr.rs2_value[53:48] iff (XLEN == 64 &&
+                                                    |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,1219|52): Bit-select or part-select index out of declared bounds.
+    cp_len_64bit_not_sel01: coverpoint instr.rs2_value[60:56] iff (XLEN == 64 &&
+                                                     |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,1224|53): Bit-select or part-select index out of declared bounds.
+    cp_offset_64bit_not_sel01: coverpoint instr.rs2_value[53:48] iff (XLEN == 64 &&
+                                                        |
+xmelab: *W,BNDWRN (./src/riscv_instr_cover_group.sv,1229|56): Bit-select or part-select index out of declared bounds.

@@ -1,0 +1,211 @@
+============================================================================
+ HOW TO GENERATE A RANDOM INSTRUCTION STREAM, COMPILE IT AND RUN IT
+ ON THE RTL CORE (riscforge riscv_core, RV32IM)
+============================================================================
+
+High-level flow
+---------------
+  1. GENERATE   : run.py drives the SystemVerilog generator (riscv-dv) to
+                  emit random RISC-V assembly programs (one per seed) and
+                  runs them on Spike (ISS) for reference logs/traces.
+  2. COMPILE    : riscv-gcc assembles/links each program to an ELF; objcopy
+                  produces <test>_0.bin and test.hex (Verilog memory image)
+                  plus disasm.txt (annotated disassembly).
+  3. RTL SIM    : irun (Xcelium) elaborates the riscv_core RTL + the
+                  tb_riscv_dv testbench; the TB loads test.hex into the
+                  imem/dmem models via +instr_file and runs the core.
+  4. COMPARE    : the RTL commit trace is converted to CSV and compared
+                  instruction-by-instruction against the Spike trace.
+
+The core under test
+-------------------
+  RTL_DIR   = RISCFORGE_1TOPS/ips/riscv_core/rtl   (pipeline + M unit +
+              CSR/trap hardware, external SRAM-style imem/lsu ports)
+  DV models = rtl_dv_companions/
+              - Instruction_Memory.v  (behavioural imem, loaded from test.hex)
+              - Data_Memory.v         (behavioural dmem)
+              - tb_riscv_dv.sv        (top-level testbench)
+  The TB takes two plusargs:
+              +instr_file=<test.hex>   program image (linked at 0x80000000)
+              +tohost_addr=<hex>       end-of-test store address (the TB
+                                       polls this address for the value 1
+                                       to know the test passed)
+  Target ISA: rv32im, mabi ilp32, with Zicsr (the core executes CSR setup
+              instructions for real via csr_regfile + trap/mret logic).
+
+----------------------------------------------------------------------------
+ 0. ONE-TIME ENVIRONMENT SETUP
+----------------------------------------------------------------------------
+You MUST source the environment setup script in your shell first:
+
+    csh/tcsh:  source env_setup.csh
+    bash:      source env_setup.bash
+
+This puts riscv-gcc (riscv64-unknown-elf-*), Spike and the Cadence tools
+on your PATH/LD_LIBRARY_PATH. All make targets below assume this.
+
+----------------------------------------------------------------------------
+ 1. GENERATE THE RANDOM INSTRUCTION STREAM
+----------------------------------------------------------------------------
+The Makefile wraps everything. From the repo root:
+
+    make generate TEST_NAME=riscv_arithmetic_basic_test NUM_TESTS=1 SEED=1
+
+What this runs (equivalent manual command):
+
+    python3 run.py --verbose \
+        --custom_target target/rv32im \
+        --isa rv32im --mabi ilp32 \
+        --test riscv_arithmetic_basic_test \
+        --iss spike --simulator ius \
+        --sim_opts "+no_fence=1" \
+        --gcc_opts="-march=rv32im_zicsr" \
+        -i 1 --start_seed 1
+
+Key points:
+  - target/rv32im is the target directory (riscv_core_setting.sv +
+    testlist) matching what the core implements. Other predefined targets
+    (rv32i, rv32imc, rv64imc, ...) exist under target/, but the core flow
+    uses rv32im.
+  - TEST_NAME selects the random program style from the testlist
+    (riscv_arithmetic_basic_test, riscv_non_compressed_instr_test,
+    riscv_rand_instr_test, riscv_base_test, riscv_illegal_instr_test,
+    riscv_misaligned_instr_test, ...). See target/rv32im/testlist.yaml.
+  - Each seed (-i NUM_TESTS starting from --start_seed) produces one
+    independently random program.
+  - run.py itself drives the whole ISS flow: gen -> gcc compile -> spike
+    run -> spike log -> trace CSV.
+
+Outputs (run.py creates out_<YYYY.MM.DD>/, the Makefile records the exact
+directory in .outdir and the test name in .testname):
+
+    out_*/asm_test/<test>_0.S      generated random assembly program
+    out_*/asm_test/<test>_0.o/.elf/.bin
+    out_*/asm_test/test.hex        Verilog memory image (4-byte words)
+    out_*/asm_test/disasm.txt      objdump disassembly (no-aliases mnemonics)
+    out_*/spike_sim/<test>_0.log   Spike reference log
+    out_*/spike_trace.csv          Spike retired-instruction trace
+
+The generate target also greps the Spike log for the end-of-test signature
+('mem <addr> 0x00000001') and records it in .tohost; that address is later
+passed to the RTL testbench as +tohost_addr.
+
+Tuning the randomness (extra generator plusargs):
+
+    make base_test GEN_OPTS="+instr_cnt=5000 +num_of_sub_program=2"
+    make generate TEST_NAME=riscv_base_test \
+         GEN_OPTS="+no_branch_jump=1 +no_load_store=1"
+
+Every knob in src/riscv_instr_gen_config.sv can be set this way
+(instr_cnt, num_of_sub_program, no_fence, disable_compressed_instr,
+no_branch_jump, no_load_store, no_data_page, ...).
+
+----------------------------------------------------------------------------
+ 2. COMPILE TO A MEMORY IMAGE (usually done automatically)
+----------------------------------------------------------------------------
+'make simulate' depends on hex/disasm, so this normally runs implicitly:
+
+    riscv64-unknown-elf-objcopy -I binary -O verilog \
+        --verilog-data-width=4 --reverse-bytes=4 \
+        out_*/asm_test/<test>_0.bin  out_*/asm_test/test.hex
+
+    riscv64-unknown-elf-objdump -D -b binary -m riscv:rv32 -M no-aliases \
+        --adjust-vma=0x80000000  out_*/asm_test/<test>_0.bin > disasm.txt
+
+Notes:
+  - The binary is placed at 0x80000000 (the core's reset vector).
+  - disasm.txt must use -M no-aliases: the RTL coverage script matches the
+    exact encodings' mnemonics against riscv_instr_pkg; aliases like CSRW
+    or JR would abort trace-to-CSV conversion.
+  - To build only the image:  make hex
+
+----------------------------------------------------------------------------
+ 3. RUN IT ON THE RTL CORE
+----------------------------------------------------------------------------
+    make simulate
+
+What this runs (equivalent manual command):
+
+    irun -clean -64bit -sv -access +rwc -timescale 1ns/1ps \
+         -coverage all -covoverwrite \
+         -covworkdir out_*/cov_work \
+         -incdir RISCFORGE_1TOPS/ips/riscv_core/rtl \
+         RISCFORGE_1TOPS/ips/riscv_core/rtl/*.v \
+         RISCFORGE_1TOPS/ips/riscv_core/rtl/*.sv \
+         rtl_dv_companions/Instruction_Memory.v \
+         rtl_dv_companions/Data_Memory.v \
+         rtl_dv_companions/tb_riscv_dv.sv \
+         -top tb_riscv_dv \
+         +instr_file=out_*/asm_test/test.hex \
+         +tohost_addr=0x........ \
+         -l out_*/rtl_sim/rtl.log
+
+Then the commit log is converted to a trace:
+
+    python3 scripts/rtl_log_to_trace_csv.py \
+        out_*/rtl_sim/rtl.log  out_*/rtl_sim/rtl_trace.csv \
+        --disasm out_*/asm_test/disasm.txt
+
+How it works:
+  - tb_riscv_dv loads test.hex into the imem/dmem models through
+    +instr_file, drives the core's reset, and lets it run.
+  - Every retired instruction is logged (PC, register writes, memory
+    writes) to rtl_sim/rtl.log; the CSV conversion annotates it with the
+    disassembly.
+  - The TB stops when the watched +tohost_addr receives the value 1
+    (the riscv-dv signature store written by the generated test's EOT
+    routine). If .tohost was not found during generate, the TB falls back
+    to its built-in address 0x8000c000, which only matches
+    riscv_arithmetic_basic_test - a different test would then never stop
+    on its own. You can override manually:  make simulate EOT_ADDR=0x80012000.
+
+Outputs:
+    out_*/rtl_sim/rtl.log         raw RTL commit log
+    out_*/rtl_sim/rtl_trace.csv   RTL retired-instruction trace
+
+----------------------------------------------------------------------------
+ 4. COMPARE AGAINST SPIKE (did the core execute correctly?)
+----------------------------------------------------------------------------
+    make compare
+
+This runs scripts/rtl_no_trap_ref_compare.py (aligns the traces: drops
+Spike's trailing ecall and truncates the RTL trace to the same length,
+since the final ecall never retires in the RTL) followed by
+scripts/instr_trace_compare.py, which diffs PC / register / memory values
+retire-by-retire. Any mismatch is reported; otherwise the compare passes.
+
+----------------------------------------------------------------------------
+ 5. ALL-IN-ONE AND BATCH RUNS
+----------------------------------------------------------------------------
+  Full flow for one program:
+      make base_test GEN_OPTS="+instr_cnt=5000"      # generate+sim+compare
+
+  Multi-seed regression (each seed: generate -> RTL sim -> compare):
+      make seed_sweep TEST_NAME=riscv_arithmetic_basic_test RTL_SEEDS=10 SEED=1
+      make seed_sweep_report                         # pass/fail per seed
+
+  Skip RTL during a sweep (ISS-only):
+      make seed_sweep SKIP_RTL=1
+
+----------------------------------------------------------------------------
+ 6. FUNCTIONAL COVERAGE (optional)
+----------------------------------------------------------------------------
+  From the RTL commit trace:
+      make coverage
+  From the Spike logs only (fast, no RTL needed, merges all seeds):
+      make cov_iss
+  Multi-seed multi-test RTL coverage:
+      make cov_rtl_batch RTL_TESTS="riscv_rand_instr_test riscv_illegal_instr_test" \
+           RTL_SEEDS=5 COV_NAME=cov_rtl_mixed
+      make cov_rtl_report COV_NAME=cov_rtl_mixed
+
+----------------------------------------------------------------------------
+ QUICK REFERENCE CARD
+----------------------------------------------------------------------------
+  source env_setup.csh                                   # 0. setup (required)
+  make generate TEST_NAME=riscv_arithmetic_basic_test    # 1. random program
+  make simulate                                          # 2-3. hex + RTL run
+  make compare                                           # 4. vs Spike
+  make seed_sweep RTL_SEEDS=10                           # batch regression
+  make coverage                                          # RTL func coverage
+============================================================================
