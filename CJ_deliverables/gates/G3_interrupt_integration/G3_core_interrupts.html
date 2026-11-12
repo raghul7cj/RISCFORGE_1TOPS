@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core interrupt path (consolidated)</title>
+<link rel="stylesheet" href="../../../documentation/html/assets/style.css">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff; --fg: #1d2433; --muted: #5b667a; --line: #d5dbe6; --soft: #f4f6fa;
+    --accent: #1f4e9c; --accent-soft: #e8effa;
+    --ok: #1d7a43; --warn: #a15c00; --bad: #b3261e;
+  }
+</style>
+</head>
+<body>
+<div class="topbar"><a class="brand" href="../../../documentation/html/index.html">RISCFORGE documentation</a><span class="crumb">/ Gates / G3 interrupt integration / Core interrupt path</span></div>
+<div class="wrap">
+
+<h1>Core interrupt path — consolidated</h1>
+<p class="lead">This page has been merged into the single G3 source of truth. The as-coded interrupt path, the 13-channel map, the gateway, the arbiter and the take/return sequence are now documented in <a href="G3_IRQ_ARCH_and_TB.html">G3_IRQ_ARCH_and_TB.html</a>.</p>
+
+<div class="note">
+  <b>Where to go.</b>
+  <ul>
+    <li>As-coded path, per-channel table and Figure 1: <a href="G3_IRQ_ARCH_and_TB.html#map">G3_IRQ_ARCH_and_TB.html section 1</a> and <a href="G3_IRQ_ARCH_and_TB.html#channels">section 2</a>.</li>
+    <li>Gateway, arbiter and gating: <a href="G3_IRQ_ARCH_and_TB.html#gateway">sections 3-5</a>.</li>
+    <li>Architecture decision (no PLIC, no CLIC) and block contracts: <a href="G3_IRQ_Architecture.html">G3_IRQ_Architecture.html</a>.</li>
+    <li>Verification plan and check register: <a href="G3_IRQ_ARCH_and_TB.html#tb">section 9</a>.</li>
+  </ul>
+  <p>The previous content of this page is preserved verbatim at <a href="superseded/G3_core_interrupts.html">superseded/G3_core_interrupts.html</a>. Its upstream original, <code>ips/documentation/html/core_interrupts.html</code>, is unchanged. No claim on this stub is new evidence.</p>
+</div>
+
+<p class="meta">Replaced 2026-11-12. This stub creates no verification result, no approval and no waiver.</p>
+
+</div>
+</body>
+</html>

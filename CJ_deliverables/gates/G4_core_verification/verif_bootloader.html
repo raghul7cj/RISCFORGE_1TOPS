@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bootloader Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification / Bootloader</span></div>
+<div class="wrap">
+
+<h1>Bootloader verification</h1>
+<p class="lead">What boot checking exists in the repository today, what it has shown, what Rev B section 12 requires on top of it, and where the gaps are. The retained evidence shows the cold and warm happy paths pass; no failure-path, integrity or reset-during-boot test exists.</p>
+<p class="meta">Scope: bootloader unit benches, the SoC boot bench, and Rev B section 12 obligations | Sources: testbenches in <code>bootloader/</code> and <code>RTL_SOC/</code>, retained logs and run records, Rev B 12 and 11.2 | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Testbench inventory</a></li>
+<li><a href="#s2">Results retained</a></li>
+<li><a href="#s3">Check architecture</a></li>
+<li><a href="#s4">Rev B 12 obligations</a></li>
+<li><a href="#s5">Boot scenarios</a></li>
+<li><a href="#s6">Boot cycle budget and fast-boot backdoor</a></li>
+<li><a href="#s7">Gaps</a></li>
+</ol></div>
+
+<p>Design description: <a href="soc_bootloader.html">bootloader design</a>. Plan-level view: <a href="vf_boot_verification.html">boot verification plan</a>. Memory side: <a href="soc_memory_boot_path.html">memory and boot path</a>. Reset side: <a href="vf_reset_clock.html">reset and clock</a>. Architecture: <a href="soc_architecture.html">SoC architecture</a>. Index: <a href="index.html">all pages</a>.</p>
+
+<h2 id="s1">1. Testbench inventory</h2>
+<p>Five benches under <code>bootloader/</code> and one SoC-level bench under <code>RTL_SOC/</code>. The unit benches that include the SPI master load an image (<code>ebreak_combined.mem</code>: 375 instruction words and 1,164 data words, 6,156 bytes) into the vendor S25FS512S flash model by backdoor writes, then check SRAM contents against the same golden words. All benches use a 10 ns clock.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>File (module)</th><th>What it does</th><th>Checks</th><th>Does not cover</th></tr></thead>
+<tbody>
+<tr><td><code>bootloader/bootloader_tb_barebone.sv</code> (<code>bootloader_tb</code>)</td><td>DUT alone. Releases both resets after 10 cycles and runs 500 cycles with the SPI side tied to always-ready stubs.</td><td>X/Z on the reset outputs and <code>boot_done_o</code> each cycle; 1 ms timeout.</td><td>Smoke only: no image, no flash, <code>b_valid</code> never asserted, so the FSM cannot progress past S_CLEAR_SRAM. No pass/fail on function.</td></tr>
+<tr><td><code>bootloader/bootloader_tb.sv</code> (<code>bootloader_coldboot_tb</code>)</td><td>Debug harness. Cold boot only, with a live FSM-transition monitor and an APB beat printer. 512 ISRAM and 2,048 DSRAM words; timeout 600,000 cycles.</td><td>SRAM contents against golden after <code>boot_done</code>.</td><td>No warm boot, no reset checks, no SPI protocol check. Header says it is a debug aid.</td></tr>
+<tr><td><code>bootloader/bootloader_tb_basic.sv</code> (<code>bootloader_coldboot_tb</code>)</td><td>Cold boot only, full image, heartbeat prints. 2,000,000 cycle timeout.</td><td>All 1,539 words against golden (<code>TC1</code>).</td><td>As above. Same module name as the debug bench, so the two cannot share a snapshot.</td></tr>
+<tr><td><code>bootloader/bootloader_tb_all_testcases.sv</code> (<code>bootloader_spi_tb</code>)</td><td>Self-checking bench with the DUT, <code>apb_spi_master</code>, flash model and an AXI-Lite memory. 512 ISRAM and 2,048 DSRAM words. Filelist <code>bootloader/bootloader.f</code>.</td><td>TC1 cold boot data and phase cycle report; TC2 warm boot SRAM retention; TC3 repeat cold boot gives the same cycle count; TC4 core and peripheral resets low one cycle after release of each reset; TC6 post-boot passthrough read of SPI STATUS; TC8 SPI monitor (opcode 0x03, address, word data, word count). TC5 and TC7 are not present.</td><td>TC6 only prints the value read, with no compare. TC2 does not check that SPI is idle. No clear-pass check, no failure injection.</td></tr>
+<tr><td><code>bootloader/bootloader_tb_all_testcases_32KB_sram.sv</code> (<code>bootloader_spi_32KB_sram_tb</code>)</td><td>Same plan at the deployed SRAM size (8,192 words each) with the chunked burst. Chunk-aware SPI monitor, per-state cycle accounting and SPI/AXI overlap analysis. Filelist <code>bootloader/bootloader_32KB_sram.f</code>.</td><td>TC1, TC2, TC3, TC6 as above; expects 2 bursts for 1,539 words at 1,024 words per burst; burst start address continues from the previous burst.</td><td>Same gaps. No retained result for this bench was found.</td></tr>
+<tr><td><code>RTL_SOC/soc_imem_boot_tb.sv</code> (<code>soc_imem_boot_tb</code>)</td><td>Full SoC. 8-word image in a SPI flash behavioural model, <code>FLASH_POWERUP_CYCLES</code> = 10, 100,000-cycle timeout. Cold boot, then a warm reset with the flash poisoned to 0xDEADBEEF.</td><td>36 checks: reset levels during hard reset; 8 ISRAM words match; 4 spot-checked cleared words; SPI reset released before core reset; core and peripheral resets released together; CS0 activity in cold boot and none in warm; <code>warm_boot_q</code> set; FSM parked in S_DONE; ISRAM retained across warm boot.</td><td>Image has no data words (<code>NUM_DATA_WORDS</code> = 0); 8 words not the deployed 64; no DSRAM check; no failure path.</td></tr>
+</tbody></table></div>
+<p>An additional run record, 20261019_run02 (<code>soc_timer0_boot_run_tb</code>, 52 of 52 checks), exercises boot as a precondition of a Timer0 test and is described on <a href="soc_memory_boot_path.html">the memory and boot path page</a>. It used a staged bench and filelist and is kept separate from the checked-in sources (<code>Verification/components/memory/boot_path.md</code>).</p>
+
+<h2 id="s2">2. Results retained</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Evidence</th><th>Bench</th><th>Result</th><th>Caveat</th></tr></thead>
+<tbody>
+<tr><td><code>Verification/artifacts/component_first/20261018_run01/boot/sim.log</code>, README</td><td><code>soc_imem_boot_tb</code>, Vivado XSim 2022.2</td><td>PASS, 36 of 36 checks. Cold boot completes at cycle 84,844; warm boot 9 cycles after soft-reset release.</td><td>8-word image, ISRAM only, flash wait shortened to 10 cycles. The README records that the bench's flash model needed a fix to increment the byte address per word.</td></tr>
+<tr><td><code>Verification/artifacts/runs/tb_bootloader_20261031_155629_afa724da</code> and <code>..._183859_f178e58b</code> (<code>verdict.json</code>)</td><td><code>bootloader_spi_tb</code> (tier 1 filelist, evidence id BOOT-01), XSim</td><td>Verdict PASSED, no forbidden pattern, no vacuity flag. The later run's log shows TC1, TC3, TC2 and TC6 and the cold boot at 528,269 cycles (35,135 configuration, 493,134 feeding), repeated identically in TC3.</td><td>The pass signature matched is only the string "PASS: all 1539 words". <code>git_commit</code> is recorded as unknown. A third run directory (155337) has a log but no verdict.</td></tr>
+<tr><td><code>Verification/artifacts/historical_logs/bootloader/xrun_bootloader_tb_all_testcases.log</code></td><td><code>bootloader_spi_tb</code>, Xcelium 22.09</td><td>TC1, TC3, TC2 PASS; cold boot 1,024,718 cycles, repeated identically; TC6 read 0x00000001.</td><td>Older run (file dated 2026-09-02). The cycle count is about twice the later XSim figure; the difference is consistent with the per-word fetch that the chunked burst replaced, but the RTL version of the older run was not recorded.</td></tr>
+<tr><td><code>.../historical_logs/bootloader/xrun_bootloader_basic_tb.log</code></td><td><code>bootloader_tb_basic.sv</code></td><td>TC1 PASS (1,539 words), finish at 10,247,165 ns.</td><td>Cold boot only.</td></tr>
+<tr><td><code>.../historical_logs/bootloader/xrun_bootloader_tb_barebone.log</code></td><td><code>bootloader_tb_barebone.sv</code></td><td>Compiles, runs to $finish at 5,095 ns, no errors.</td><td>Smoke only.</td></tr>
+</tbody></table></div>
+<p>This is "PASS for a stated boundary": the cold and warm happy paths at unit level, and an 8-word cold plus warm boot at SoC level. It is not evidence for the deployed 64-word image on the SoC, for the 32 KB chunked bench, for any failure path or for any reset during the load. P0 itself is in progress (13 of 20 checklist items met on 2026-10-31, per <code>Verification/status/PHASE_STATUS.md</code>); the defects register contains no boot-specific entry.</p>
+
+<h2 id="s3">3. Check architecture</h2>
+<p>Figure 1 is the structure of the strongest existing bench (the 32 KB unit bench plus the SoC bench), with the Rev B CT-5 criterion shown as the consumer of the result. CT-5 requires one cold and one warm boot each to reach S_DONE with <code>attestation_words_written</code> &gt; 0 and <code>axi_beats</code> &gt; 0 in the verdict record (Rev B CT-5). Neither counter is produced by the unit benches; the SoC-level verdict path is a P0 matter and was not re-traced here. <span class="tag open">OPEN</span></p>
+
+<figure>
+<svg viewBox="0 0 1040 424" role="img" aria-label="Boot check architecture: flash model, SPI master, bootloader DUT and SRAM model with an SPI monitor, boot monitor and SRAM checker feeding a verdict record, plus the golden image">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<text class="th" x="24" y="32">Design under test and models</text>
+<rect class="bx-ext" x="24" y="64" width="176" height="64" rx="6"/>
+<text class="tb mid" x="112" y="92">Flash model</text>
+<text class="ts mid" x="112" y="110">S25FS512S / behavioural</text>
+<rect class="bx-per" x="248" y="64" width="176" height="64" rx="6"/>
+<text class="tb mid" x="336" y="92">apb_spi_master</text>
+<text class="ts mid" x="336" y="110">RX FIFO, SPI shifter</text>
+<rect class="bx-ctrl" x="472" y="64" width="176" height="64" rx="6"/>
+<text class="tb mid" x="560" y="92">Bootloader DUT</text>
+<text class="ts mid" x="560" y="110">16-state FSM</text>
+<rect class="bx-mem" x="696" y="64" width="176" height="64" rx="6"/>
+<text class="tb mid" x="784" y="92">SRAM model</text>
+<text class="ts mid" x="784" y="110">AXI-Lite memory / SoC</text>
+<path class="ar" d="M248 96 H200"/>
+<text class="ts mid" x="224" y="88">SPI</text>
+<path class="ar" d="M472 96 H424"/>
+<text class="ts mid" x="448" y="88">APB</text>
+<path class="ar" d="M648 96 H696"/>
+<text class="ts mid" x="672" y="88">AXI</text>
+
+<text class="th" x="24" y="176">Checkers</text>
+<rect class="bx-ver" x="24" y="208" width="192" height="64" rx="6"/>
+<text class="tb mid" x="120" y="236">SPI monitor (TC8)</text>
+<text class="ts mid" x="120" y="254">opcode, address, data</text>
+<rect class="bx-ver" x="448" y="208" width="224" height="64" rx="6"/>
+<text class="tb mid" x="560" y="236">Boot monitor</text>
+<text class="ts mid" x="560" y="254">FSM log, reset release cycles</text>
+<rect class="bx-ver" x="704" y="208" width="176" height="64" rx="6"/>
+<text class="tb mid" x="792" y="236">SRAM checker</text>
+<text class="ts mid" x="792" y="254">backdoor read vs golden</text>
+<path class="ar-ver" d="M112 128 V208"/>
+<path class="ar-ver" d="M560 128 V208"/>
+<path class="ar-ver" d="M784 128 V208"/>
+
+<rect class="bx-ver" x="24" y="336" width="192" height="64" rx="6"/>
+<text class="tb mid" x="120" y="364">Golden image</text>
+<text class="ts mid" x="120" y="382">ebreak_combined.mem</text>
+<path class="ar-ver" d="M72 336 V272"/>
+<rect class="bx-ver" x="264" y="336" width="616" height="64" rx="6"/>
+<text class="tb mid" x="572" y="364">Verdict record (CT-5 criterion)</text>
+<text class="ts mid" x="572" y="382">cold + warm reach S_DONE; attestation_words_written &gt; 0; axi_beats &gt; 0</text>
+<path class="ar-ver" d="M216 252 H240 V368 H264"/>
+<path class="ar-ver" d="M560 272 V336"/>
+<path class="ar-ver" d="M792 272 V336"/>
+</svg>
+<figcaption><b>Figure 1.</b> Check architecture. The golden image preloads the flash and is the reference for both the SPI monitor and the SRAM checker (reference arrow to the SRAM checker omitted for clarity). The boot monitor exists as the FSM transition log in the SoC bench and as reset-level checks in the unit bench; Rev B CT-5 does not name these components.</figcaption>
+</figure>
+
+<h2 id="s4">4. Rev B 12 obligations</h2>
+<p>Rev B names check IDs BOOT-01 to BOOT-20, BOOT-S1 to BOOT-S6 and BOOT-N1 to BOOT-N9. In the text read for this page the IDs are defined only through the "Check" column of Table 12.2, Table 12.3 and the integrity table; BOOT-16 to BOOT-20 are given only by reference and no definition table was located. The wording below is therefore a paraphrase by state, and status means: <span class="tag exists">EXISTS</span> a stimulus and a check in the repository cover it; <span class="tag specified">SPECIFIED</span> Rev B requires it and nothing in the repository checks it; <span class="tag open">OPEN</span> unclear or not yet determinable.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Obligation (from Rev B Table 12.2 or 12.3)</th><th>Status</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>BOOT-01, 02</td><td>S_RESET branches cold versus warm correctly.</td><td><span class="tag exists">EXISTS</span></td><td>SoC bench cold and warm checks; unit TC1 and TC2.</td></tr>
+<tr><td>BOOT-03</td><td>S_CLEAR_SRAM zeroes every word of both SRAMs.</td><td><span class="tag exists">EXISTS</span> partial</td><td>SoC bench spot-checks 4 words after the image. The unit benches never compare the clear pass. Full 16,384-word check absent.</td></tr>
+<tr><td>BOOT-04</td><td>Flash wait lasts exactly <code>FLASH_POWERUP_CYCLES</code>.</td><td><span class="tag specified">SPECIFIED</span></td><td>Cycle visible in the log (10 cycles) but never asserted.</td></tr>
+<tr><td>BOOT-05</td><td>One-time SPI configuration writes (divider, command, dummy).</td><td><span class="tag exists">EXISTS</span> indirect</td><td>The SPI monitor sees the correct opcode, so the command register is right; divider and dummy are not checked directly.</td></tr>
+<tr><td>BOOT-06, 07</td><td>Per-chunk length, address and trigger; chunk boundaries.</td><td><span class="tag exists">EXISTS</span></td><td>TC8 in the 32 KB bench checks burst count and continuation address. No retained run of that bench. The deployed 64-word case is one chunk and so never crosses a chunk boundary.</td></tr>
+<tr><td>BOOT-08, 09</td><td>RX FIFO read and AXI write deliver each word to the right address.</td><td><span class="tag exists">EXISTS</span></td><td>Golden compare of every word in ISRAM and DSRAM (unit); ISRAM only (SoC).</td></tr>
+<tr><td>BOOT-10</td><td>S_CHECK_DONE counters and ISRAM-to-DSRAM crossover.</td><td><span class="tag exists">EXISTS</span></td><td>Boundary words compared in the unit benches. SoC image has no data words, so the crossover is not exercised at SoC level.</td></tr>
+<tr><td>BOOT-11, 12</td><td>Clean-slate assert and hold of exactly 4 cycles.</td><td><span class="tag specified">SPECIFIED</span></td><td>Sequence visible in the log; no cycle-count assertion.</td></tr>
+<tr><td>BOOT-13</td><td>Core, peripheral, SPI release in S_CLEAN_RELEASE; core handoff state.</td><td><span class="tag exists">EXISTS</span> partial</td><td>Release together and SPI before core are checked. Handoff state (<code>mstatus</code>, <code>mtvec</code>, first fetch) is not checked in any boot bench.</td></tr>
+<tr><td>BOOT-14</td><td>Exactly one cycle with core out of reset and <code>boot_done_o</code> low.</td><td><span class="tag specified">SPECIFIED</span></td><td>Scored by Rev B scenario RS-13; no assertion exists.</td></tr>
+<tr><td>BOOT-15, 16</td><td>S_DONE absorbing; APB passthrough after boot.</td><td><span class="tag exists">EXISTS</span> weak</td><td>"FSM parked in S_DONE" check (SoC). Passthrough read is only printed.</td></tr>
+<tr><td>BOOT-17</td><td>SPI reset high in every load state, low only before S_RESET exits and in the clean-slate window.</td><td><span class="tag exists">EXISTS</span> partial</td><td>SoC bench checks release at cycle 14 and before core release; no continuous assertion.</td></tr>
+<tr><td>BOOT-18</td><td>Unbounded S_CLEAR_SRAM and S_WRITE_SRAM stated as a known hole.</td><td><span class="tag specified">SPECIFIED</span></td><td>Documented in <a href="soc_bootloader.html">the design page</a>; no test.</td></tr>
+<tr><td>BOOT-19</td><td>Error responses are ignored today; must be checked.</td><td><span class="tag specified">SPECIFIED</span></td><td>No stimulus injects <code>pslverr</code> or a bad <code>bresp</code>.</td></tr>
+<tr><td>BOOT-20</td><td>Not defined in the text read.</td><td><span class="tag open">OPEN</span></td><td>Referenced only as the end of the range BOOT-01..20.</td></tr>
+<tr><td>BOOT-S1 to S6</td><td>Magic and length, checksum, failure state, failure signature, load timeout, error checking.</td><td><span class="tag specified">SPECIFIED</span></td><td>All need RTL changes not present (Rev B 12.5, decision D-029).</td></tr>
+<tr><td>BOOT-N1 to N9</td><td>Nine failure rows (bad magic, short or long image, bad checksum, PREADY stuck, absent image, load never completes, wedged AXI, early trap).</td><td><span class="tag specified">SPECIFIED</span></td><td>Table 12.3 gives today's behaviour and the required one. No directed negative test exists.</td></tr>
+</tbody></table></div>
+
+<h2 id="s5">5. Boot scenarios</h2>
+<p>Figure 2 groups the scenarios by whether a test exists. Reset-related scenario IDs come from Rev B Table 11.7.</p>
+<figure>
+<svg viewBox="0 0 1040 360" role="img" aria-label="Nine boot scenarios in three columns, drawn solid when a test exists and dashed when specified or open">
+<text class="th" x="24" y="32">Happy paths</text>
+<text class="th" x="372" y="32">Failure and integrity</text>
+<text class="th" x="720" y="32">Reset and equivalence</text>
+
+<rect class="bx-ver" x="24" y="48" width="296" height="72" rx="6"/>
+<text class="tb mid" x="172" y="76">Cold boot</text>
+<text class="ts mid" x="172" y="94">unit 1,539 words; SoC 8 words</text>
+<text class="ts mid" x="172" y="108">EXISTS, passing</text>
+<rect class="bx-ver" x="24" y="144" width="296" height="72" rx="6"/>
+<text class="tb mid" x="172" y="172">Warm boot</text>
+<text class="ts mid" x="172" y="190">SRAM retained, SPI idle (SoC)</text>
+<text class="ts mid" x="172" y="204">EXISTS, passing</text>
+<rect class="bx-ver" x="24" y="240" width="296" height="72" rx="6"/>
+<text class="tb mid" x="172" y="268">Repeat cold boot, passthrough</text>
+<text class="ts mid" x="172" y="286">same cycle count; STATUS read</text>
+<text class="ts mid" x="172" y="300">EXISTS, passthrough compare weak</text>
+
+<rect class="bx-ext" x="372" y="48" width="296" height="72" rx="6"/>
+<text class="tb mid" x="520" y="76">Corrupt or absent image</text>
+<text class="ts mid" x="520" y="94">BOOT-N1, N2, N4, N6</text>
+<text class="ts mid" x="520" y="108">SPECIFIED, needs RTL change</text>
+<rect class="bx-ext" x="372" y="144" width="296" height="72" rx="6"/>
+<text class="tb mid" x="520" y="172">Transport error or stall</text>
+<text class="ts mid" x="520" y="190">BOOT-N3, N5, N7, N8</text>
+<text class="ts mid" x="520" y="204">SPECIFIED, today completes</text>
+<rect class="bx-ext" x="372" y="240" width="296" height="72" rx="6"/>
+<text class="tb mid" x="520" y="268">Early trap after release</text>
+<text class="ts mid" x="520" y="286">BOOT-N9: unset mtvec, silent hang</text>
+<text class="ts mid" x="520" y="300">SPECIFIED, needs core boot bench</text>
+
+<rect class="bx-ext" x="720" y="48" width="296" height="72" rx="6"/>
+<text class="tb mid" x="868" y="76">Hard reset during the load</text>
+<text class="ts mid" x="868" y="94">RS-12, at each of 16 states</text>
+<text class="ts mid" x="868" y="108">SPECIFIED, executable today</text>
+<rect class="bx-ext" x="720" y="144" width="296" height="72" rx="6"/>
+<text class="tb mid" x="868" y="172">Reset in clean-slate hold</text>
+<text class="ts mid" x="868" y="190">RS-13, four offsets</text>
+<text class="ts mid" x="868" y="204">SPECIFIED, executable today</text>
+<rect class="bx-ext" x="720" y="240" width="296" height="72" rx="6"/>
+<text class="tb mid" x="868" y="268">Soft reset during the load</text>
+<text class="ts mid" x="868" y="286">skips load, releases core</text>
+<text class="ts mid" x="868" y="300">OPEN: not in Rev B scenarios</text>
+<text class="ts" x="24" y="344">Solid = test exists. Dashed = no test in the repository.</text>
+</svg>
+<figcaption><b>Figure 2.</b> Boot scenario coverage. All solid boxes are in the retained results of section 2; all dashed boxes are gaps.</figcaption>
+</figure>
+<ul>
+<li><b>Cold and warm.</b> Covered; see section 2. Rev B CT-5 asks for one of each reaching S_DONE.</li>
+<li><b>Failure.</b> Rev B requires each row of Table 12.3 as a directed test whose expected result is today's behaviour until the RTL changes land, then re-baselined. None is built.</li>
+<li><b>Reset during boot.</b> RS-12 (hard reset at any load state: load restarts, no partially loaded word survives, S_CLEAN_RELEASE not reached on the interrupted attempt) and RS-13 (hard reset in the 4-cycle hold) are new in Rev B and listed as executable today. Soft reset during a cold load (section 7 of the design page) is not in the scenario list. RS-11 (soft reset taking effect before the system reset releases) is expected to fail today.</li>
+<li><b>SPI release ordering.</b> BOOT-17 is the keeper of the rule that the SPI reset releases before the first APB access.</li>
+</ul>
+
+<h2 id="s6">6. Boot cycle budget and fast-boot backdoor</h2>
+<h3>Cycle budget</h3>
+<p>Rev B Table 12.4 estimates a cold boot of the deployed configuration at about 133,000 cycles: <code>30000 + 16384 x 5 + 64 x (320 + 8) + 7 = 132,919</code>. The 5 and the 8 are planning defaults (decision D-027), not measurements, and the plan requires a directed measurement test to replace them. <span class="tag specified">SPECIFIED</span></p>
+<p>What the retained logs already show:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>Rev B estimate</th><th>Retained observation</th><th>Run</th></tr></thead>
+<tbody>
+<tr><td>SRAM clear (16,384 words)</td><td>5 cycles per write</td><td>81,920 cycles, exactly 5 per write</td><td>SoC, 20261018_run01</td></tr>
+<tr><td>Per-word fetch</td><td>320 serial + 8 overhead = 328</td><td>320 cycles per word including the AXI write (6 cycles), so the write is hidden under the SPI shift</td><td>SoC, 20261018_run01</td></tr>
+<tr><td>First word</td><td>not separate</td><td>636 cycles in S_READ_FIFO, which includes the 8-bit command and 24-bit address shift</td><td>SoC, 20261018_run01</td></tr>
+<tr><td>Whole boot, 8 words, 10-cycle flash wait</td><td>10 + 81,920 + 8 x 328 + 7 = 84,561 (my arithmetic with the Rev B formula)</td><td>84,844</td><td>SoC, 20261018_run01</td></tr>
+<tr><td>Configuration phase / feed phase, 1,539 words</td><td>not given</td><td>35,135 / 493,134 cycles (total 528,269)</td><td>unit, 20261031_183859</td></tr>
+</tbody></table></div>
+<p>The 283-cycle gap between the formula and the SoC observation is plausibly the 320 cycles of command and address that the formula does not count, partly offset by the 8-cycle overhead guess; this reading has not been verified. The deterministic repeat (TC3) shows the cycle count is stable under identical stimulus. The first-instruction measurement Rev B asks for (from hard reset release to the first retired instruction at address 0) does not exist. <span class="tag open">OPEN</span></p>
+
+<h3>Fast-boot backdoor</h3>
+<p>Rev B 12.9 allows a backdoor that deposits the image into the SRAMs and releases the core directly, as the only affordable way to run large campaigns, and defines "equivalent" as a comparison of: SRAM content at release (all 16,384 words), the reset record at release, SPI master state, and the first retired instructions from address 0. Every check in BOOT-01..20, every row of Table 12.3 and every item of Table 12.2 is backdoor-ineligible; a green backdoor-only run counts as untested for them, and the manifest must carry a per-test boot mode. In simulation the default is a testbench-only deposit (D-028); a hardware load port would need one RTL change. <span class="tag specified">SPECIFIED</span></p>
+<p>Today: no backdoor loader exists, no boot-mode field is known to be in the run manifest (not checked), and no equivalence comparator exists. The benches use a backdoor read of the AXI memory model for checking only.</p>
+
+<h2 id="s7">7. Gaps</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Gap</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>No failure-path test: error responses, stuck <code>PREADY</code>, wedged AXI, bad or absent image.</td><td>Five of six failure classes have no detection in the RTL and the sixth completes the boot with 0xDEAD_BEEF; none is exercised.</td></tr>
+<tr><td>2</td><td>No integrity feature to verify (BOOT-S1 to S6 unbuilt).</td><td>A bad image and a good image are indistinguishable from outside.</td></tr>
+<tr><td>3</td><td>No reset-during-boot test (RS-12, RS-13); soft reset mid-load not scenario-listed.</td><td>Restart behaviour and the soft-reset skip are untested.</td></tr>
+<tr><td>4</td><td>Chunked 32 KB bench has no retained result; the deployed 64-word image is not run at SoC level; the SoC bench has no data words.</td><td>Chunk boundary and ISRAM-to-DSRAM crossover are verified only in unit benches at other parameters.</td></tr>
+<tr><td>5</td><td>Clear pass checked by 4 words in one bench.</td><td>Firmware that assumes zeroed DSRAM relies on an unchecked clear.</td></tr>
+<tr><td>6</td><td>Cycle-exact assertions absent: flash wait, 4-cycle hold, one-cycle release window.</td><td>BOOT-04, 11, 12, 14 unchecked.</td></tr>
+<tr><td>7</td><td>Pass criteria are weak in places: verdict keyed to a log string; TC6 only prints; <code>git_commit</code> unknown on run records.</td><td>Evidence is reproducible only as far as the filelist, not the commit.</td></tr>
+<tr><td>8</td><td>No cycle-budget measurement to first retired instruction; no fast-boot backdoor or equivalence comparator.</td><td>Rev B 12.9 obligations unmet.</td></tr>
+<tr><td>9</td><td>Attestation counters of CT-5 not traced to a source.</td><td>CT-5 cannot be shown met by the boot benches alone.</td></tr>
+</tbody></table></div>
+
+<div class="sources"><b>Sources read:</b> <code>bootloader/bootloader.sv</code>, <code>bootloader/bootloader_tb_barebone.sv</code>, <code>bootloader_tb.sv</code>, <code>bootloader_tb_basic.sv</code> (headers), <code>bootloader_tb_all_testcases.sv</code>, <code>bootloader_tb_all_testcases_32KB_sram.sv</code>, <code>bootloader.f</code>, <code>bootloader_32KB_sram.f</code>, <code>RTL_SOC/soc_imem_boot_tb.sv</code> (check list), <code>Verification/artifacts/component_first/20261018_run01/README.md</code> and <code>boot/sim.log</code>, <code>Verification/artifacts/runs/tb_bootloader_*</code>, <code>Verification/artifacts/historical_logs/bootloader/*.log</code>, <code>Verification/components/memory/boot_path.md</code>, <code>Verification/status/PHASE_STATUS.md</code>, Rev B sections 11.2, 12 and CT-5.</div>
+</div>
+</body>
+</html>

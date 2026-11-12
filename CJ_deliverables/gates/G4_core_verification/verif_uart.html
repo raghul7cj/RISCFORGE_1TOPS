@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UART Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification / UART</span></div>
+<div class="wrap">
+
+<h1>UART verification</h1>
+<p class="lead">The UART (APB slot 2) simulation stall, how it was isolated, the fix and the evidence behind it, the 30 test cases of the component bench, and the Rev B scenarios and SoC-level work that remain. For engineers who need to know exactly what the 69/69 result does and does not establish.</p>
+<p class="meta">Scope: <code>apb_uart</code> component bench and its adapter; SoC-level UART work only as an open item | Sources: <code>Verification/components/apb/uart.md</code>, <code>20261024_uart_delta_isolation</code>, <code>apb_uart-main/rtl/tb_apb_uart_thorough.sv</code>, matrix, defect register, Rev B 15.7 | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Where the UART stands</a></li>
+<li><a href="#s2">The stall investigation</a></li>
+<li><a href="#s3">The fix and the zero-timing-change argument</a></li>
+<li><a href="#s4">Housekeeping conflicts</a></li>
+<li><a href="#s5">The 30 test cases</a></li>
+<li><a href="#s6">Rev B 15.7 scenarios and mapping status</a></li>
+<li><a href="#s7">Remaining SoC-level work</a></li>
+<li><a href="#s8">What this page does not claim</a></li>
+</ol></div>
+
+<h2 id="s1">1. Where the UART stands</h2>
+<div class="note"><b>Correction to older records.</b> <code>components/apb/uart.md</code> (status dated 2026-10-28) and the isolation README ("To Apply Later") say the fix is staged only. That is no longer true. Both canonical copies, <code>SOC_FILES/include/obi/apb_to_obi.sv</code> and <code>apb_uart-main/include/obi/apb_to_obi.sv</code>, now contain the decoupled <code>assign obi_req_o.req</code> at line 111, and both hash to SHA-256 prefix <code>91ED8D6E</code>, the same prefix as the staged <code>apb_to_obi_fix.sv</code>. The defect register records DEF-002 as FIXED-VERIFIED (fix applied to both copies 2026-10-31). <span class="tag exists">EXISTS</span> The tracker's Peripheral_Closure note for the UART ("golden simulation run next") is also behind the defect register.</div>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Component bench result</td><td>69 PASSED / 0 FAILED across 30 test cases, ends at 127946 ns, XSim 2022.2, run <code>tb_apb_uart_20261031_183831_c6c78663</code>, verdict PASSED, vacuity not detected</td><td>matrix APB-02; <code>Verification/artifacts/runs/tb_apb_uart_20261031_183831_c6c78663/verdict.json</code></td></tr>
+<tr><td>Compile list of that run</td><td>Analyses <code>SOC_FILES/include/obi/apb_to_obi.sv</code> (the canonical file)</td><td>that run's <code>run.log</code></td></tr>
+<tr><td>Canonical RTL patched</td><td>Yes, both copies, byte-identical</td><td>line 111 of each file (read 2026-11-03)</td></tr>
+<tr><td>SoC-level UART firmware run</td><td>None retained; Stage 6 (tracker ACT-013)</td><td>matrix APB-02 scope limit</td></tr>
+<tr><td>Rev B 15.7 mapping</td><td>NOT MAPPED; <code>soc_boundary_closed = NO</code></td><td>matrix APB-02</td></tr>
+<tr><td>Phase</td><td>P0 bring-up IN PROGRESS (13 MET, 5 PARTIAL, 2 NOT MET of 20)</td><td><code>Verification/status/PHASE_STATUS.md</code></td></tr>
+</tbody></table></div>
+
+<h2 id="s2">2. The stall investigation</h2>
+<h3>2.1 Symptom</h3>
+<p>In component-first run 02 (2026-10-19, XSim 2022.2) the UART bench compiled and elaborated, passed the reset checks of TC1, then stopped advancing at 60 ns, at the first register read, when <code>PSEL</code> rises. The retained notes record memory climbing to 8.5 GB before a kernel fatal. The matrix classified the row INCOMPLETE. One caveat: the roadmap notes that the retained <code>uart/debug/sim_adapter.log</code> ends at <code>ADAPTER before PSEL 60000</code>, so the fatal and memory figures are not corroborated by that file. <span class="tag open">OPEN</span></p>
+
+<h3>2.2 Evidence trail</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Date</th><th>Step</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>2026-10-19</td><td>Run 02: full bench, then minimal UART read bench, then adapter-only <code>apb_to_obi</code> with a synthetic <code>gnt = req</code> responder</td><td>All reproduce the stall at 60 ns. A no-DUT control advances; forcing <code>gnt</code> low advances; disabling OBI assertions does not help; <code>-maxdeltaid</code> 10 and 1000 also stall. Run 02 concluded "tool failure pending comparison", not a DUT defect.</td></tr>
+<tr><td>2026-10-24</td><td>Isolation: side-by-side bench <code>test_adapter.sv</code>, original vs decoupled adapter, same stimulus</td><td>Original hangs at <code>ADAPTER before PSEL 60000</code>. Fixed version finishes at 81 ns in under a second. A 164 MB delta trace named the two looping processes: <code>Always111_2</code> in <code>apb_to_obi.sv</code> and the responder's always block.</td></tr>
+<tr><td>2026-10-24</td><td>Full bench with the staged fix</td><td>69 PASSED / 0 FAILED at 127946 ns (<code>tb_uart_thorough_xsim_pass.log</code>).</td></tr>
+<tr><td>2026-10-28</td><td>Investigation closed (DEF-002 tracked)</td><td>Fix still staged.</td></tr>
+<tr><td>2026-10-31</td><td>Fix applied to both canonical copies; bench re-run against them</td><td>69/69, run <code>tb_apb_uart_20261031_183831_c6c78663</code>.</td></tr>
+</tbody></table></div>
+
+<h3>2.3 Mechanism</h3>
+<p>The adapter converts APB to OBI. In its original form one <code>always_comb</code> block both drives <code>obi_req_o.req</code> and reads <code>obi_rsp_i.gnt</code> (<code>apb_to_obi.sv:111-134</code> before the fix):</p>
+<pre><code>always_comb begin : obi_fsm
+  obi_req_o.req    = 1'b0;            // line 112, default
+  ...
+  ADDR: begin
+    obi_req_o.req = apb_req_i.psel;   // line 119
+    if (obi_req_o.req &amp;&amp; obi_rsp_i.gnt) obi_phase_d = RESP;   // line 121 reads gnt
+  end</code></pre>
+<p>The UART register file answers with <code>obi_rsp_o.gnt = obi_req_i.req</code> (<code>obi_uart_register.sv:51</code>), a combinational feed-through. Reading <code>gnt</code> makes the block sensitive to it. Per the isolation README, when the block re-runs, the default assignment on line 112 produces a 1 to 0 event on <code>req</code> in XSim even though line 119 sets it back to 1; the responder sees the glitch, updates <code>gnt</code>, and the block is triggered again, without end and without simulation time advancing. A slave raising <code>gnt</code> combinationally from <code>req</code> is allowed by OBI; <code>req</code> must not depend on <code>gnt</code>, and here it does through the sensitivity. Figures 1 and 2 show the loop.</p>
+
+<figure>
+<svg viewBox="0 0 960 300" role="img" aria-label="Request and grant loop between obi_fsm and obi_uart_register">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ctrl" x="64" y="88" width="280" height="120" rx="6"/>
+<text class="tb mid" x="204" y="116">obi_fsm (always_comb)</text>
+<text class="ts mid" x="204" y="136">apb_to_obi.sv:111-134</text>
+<text class="ts mid" x="204" y="160">line 112: req = 0</text>
+<text class="ts mid" x="204" y="176">line 119: req = psel</text>
+<text class="ts mid" x="204" y="192">line 121: reads gnt</text>
+<rect class="bx-per" x="616" y="88" width="280" height="120" rx="6"/>
+<text class="tb mid" x="756" y="116">obi_uart_register</text>
+<text class="ts mid" x="756" y="136">obi_uart_register.sv:46-53</text>
+<text class="ts mid" x="756" y="168">gnt = req</text>
+<text class="ts mid" x="756" y="184">(combinational, line 51)</text>
+<path class="ar-bad" d="M344 124 H616"/>
+<text class="ts mid" x="480" y="116">req  1, 0, 1, 0 ...</text>
+<path class="ar-bad" d="M616 172 H344"/>
+<text class="ts mid" x="480" y="196">gnt follows req; wakes obi_fsm</text>
+<rect class="bx" x="64" y="232" width="832" height="40" rx="6"/>
+<text class="t mid" x="480" y="257">Result: delta cycles repeat at 60 ns; no clock edge is ever reached</text>
+</svg>
+<figcaption><b>Figure 1.</b> The feedback loop. The red arrows are the two combinational paths; neither crosses a flip-flop, so nothing breaks the loop in zero time.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 960 336" role="img" aria-label="Delta-cycle timeline at 60 ns showing psel, req, gnt and obi_fsm re-triggering every other delta">
+<rect class="lane" x="24" y="56" width="896" height="48"/>
+<rect class="lane" x="24" y="120" width="896" height="48"/>
+<rect class="lane" x="24" y="184" width="896" height="48"/>
+<rect class="lane" x="24" y="248" width="896" height="48"/>
+<text class="tm end" x="184" y="84">psel</text>
+<text class="tm end" x="184" y="148">obi_req_o.req</text>
+<text class="tm end" x="184" y="212">obi_rsp_i.gnt</text>
+<text class="tm end" x="184" y="276">obi_fsm runs</text>
+<text class="ts mid" x="244" y="40">D0</text><text class="ts mid" x="332" y="40">D1</text><text class="ts mid" x="420" y="40">D2</text><text class="ts mid" x="508" y="40">D3</text><text class="ts mid" x="596" y="40">D4</text><text class="ts mid" x="684" y="40">D5</text><text class="ts mid" x="772" y="40">D6</text><text class="ts mid" x="860" y="40">D7</text>
+<path class="ln" d="M200 94 H200 V66 H904"/>
+<path class="ln" d="M200 158 H288 V130 H464 V158 H640 V130 H816 V158 H904"/>
+<path class="ln" d="M200 222 H376 V194 H552 V222 H728 V194 H904"/>
+<rect class="pill" x="208" y="258" width="72" height="28" rx="14"/><text class="ts mid" x="244" y="276">run</text>
+<rect class="pill" x="384" y="258" width="72" height="28" rx="14"/><text class="ts mid" x="420" y="276">run</text>
+<rect class="pill" x="560" y="258" width="72" height="28" rx="14"/><text class="ts mid" x="596" y="276">run</text>
+<rect class="pill" x="736" y="258" width="72" height="28" rx="14"/><text class="ts mid" x="772" y="276">run</text>
+<path class="ar-bad" d="M420 232 V258"/>
+<path class="ar-bad" d="M596 232 V258"/>
+<path class="ar-bad" d="M772 232 V258"/>
+<text class="ts" x="24" y="326">Illustrative. Time stays at 60 ns; only the delta index advances. A gnt change re-runs obi_fsm, which re-drives req.</text>
+</svg>
+<figcaption><b>Figure 2.</b> Delta cycles D0 to D7 at one simulation instant. <code>psel</code> rises in D0; <code>req</code> then toggles (the glitch from the default assignment), <code>gnt</code> follows one delta later, and each <code>gnt</code> change re-triggers <code>obi_fsm</code> (red arrows). The exact event order inside XSim is not retained; this drawing shows the cause-and-effect pattern only.</figcaption>
+</figure>
+
+<h3>2.4 Why Xcelium did not stall</h3>
+<p>The isolation README says Cadence Xcelium finishes the same design because it collapses the intermediate procedural write in <code>always_comb</code> and only schedules downstream processes at steady state. I did not find a retained second-simulator experiment that tests this explanation, so treat it as the investigators' account. <span class="tag open">OPEN</span> Related evidence is mixed: the README cites <code>apb_uart-main/xrun_thorough_1.log</code> as a complete Xcelium run, but that file (dated 2026-09-28) ends <code>59 PASSED / 10 FAILED</code>, with all ten failures being read-data mismatches (RBR, loopback, FIFO burst bytes reading 0). The current bench comments describe a BFM bug in which an extra clock before the ready check triggered a second OBI read that cleared RHR; the failures look like that, but I did not verify it. The run 02 README separately declines to accept an earlier "Xcelium 69/69" claim because no source identity was captured.</p>
+
+<h2 id="s3">3. The fix and the zero-timing-change argument</h2>
+<p>The fix moves the request out of the procedural block into a continuous assignment, and the block no longer drives <code>req</code>:</p>
+<pre><code>assign obi_req_o.req = (obi_phase_q == ADDR) ? apb_req_i.psel : 1'b0;   // line 111
+...
+ADDR: if (apb_req_i.psel &amp;&amp; obi_rsp_i.gnt) obi_phase_d = RESP;</code></pre>
+<p><b>Why timing is unchanged.</b> In the original, <code>req</code> is <code>psel</code> in state ADDR and 0 in every other state (RESP and the default arm both leave the line 112 default). The new assignment gives exactly the same function of <code>phase_q</code> and <code>psel</code>. The next-state condition <code>req &amp;&amp; gnt</code> in ADDR becomes <code>psel &amp;&amp; gnt</code>, which is equal because <code>req = psel</code> there. So every cycle-level output (<code>req</code>, <code>pready</code>, next phase) is the same Boolean function, and the cone is the same two-input logic. This is my reading of the code and the README's argument. <span class="tag exists">EXISTS</span> No formal equivalence run or gate-level comparison is retained, and the 69/69 run is the dynamic evidence. <span class="tag open">OPEN</span></p>
+
+<figure>
+<svg viewBox="0 0 960 320" role="img" aria-label="Original: one process drives req and reads gnt. Fixed: req comes from a continuous assignment and gnt only feeds the process.">
+<rect class="grp" x="24" y="40" width="440" height="248" rx="8"/>
+<text class="th" x="40" y="64">Original</text>
+<rect class="bx-ctrl" x="64" y="96" width="200" height="72" rx="6"/>
+<text class="tb mid" x="164" y="124">obi_fsm</text><text class="ts mid" x="164" y="142">drives req, reads gnt</text>
+<path class="ar-bad" d="M264 116 H424"/><text class="ts mid" x="344" y="108">req</text>
+<path class="ar-bad" d="M424 150 H264"/><text class="ts mid" x="344" y="170">gnt</text>
+<text class="ts" x="64" y="232">req is rewritten inside the process that reads gnt</text>
+<rect class="grp" x="496" y="40" width="440" height="248" rx="8"/>
+<text class="th" x="512" y="64">Fixed</text>
+<rect class="bx-bus" x="536" y="80" width="200" height="56" rx="6"/>
+<text class="tb mid" x="636" y="102">assign req</text><text class="ts mid" x="636" y="120">phase_q == ADDR ? psel : 0</text>
+<path class="ar" d="M736 108 H896"/><text class="ts mid" x="816" y="100">req</text>
+<rect class="bx-ctrl" x="536" y="176" width="200" height="56" rx="6"/>
+<text class="tb mid" x="636" y="198">obi_fsm</text><text class="ts mid" x="636" y="216">phase_d, pready only</text>
+<path class="ar" d="M896 204 H736"/><text class="ts mid" x="816" y="196">gnt</text>
+<text class="ts" x="536" y="264">req no longer depends on gnt</text>
+</svg>
+<figcaption><b>Figure 3.</b> The change breaks the dependency of <code>req</code> on <code>gnt</code>. Logic and cycle behaviour are the same; only the simulator's event structure differs.</figcaption>
+</figure>
+
+<h2 id="s4">4. Housekeeping conflicts</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Issue</th><th>What the files show</th><th>Register state</th></tr></thead>
+<tbody>
+<tr><td>Scratch path in the reproducer</td><td>In the run folder, <code>uart_test.f</code> line 22 now points at the canonical <code>SOC_FILES/include/obi/apb_to_obi.sv</code>. <code>xvlog_test.f</code> line 14 still points at <code>../../scratch/uart_xsim_test/apb_to_obi_fix.sv</code>, outside the retained tree, and that file is the one named in <code>reproducibility.json</code> (<code>xvlog -sv -f xvlog_test.f</code>). So the recorded reproducer is still not self-contained.</td><td>DEF-007 FIXED-VERIFIED (covers <code>uart_test.f</code> only)</td></tr>
+<tr><td>UART chain comment in the design filelist</td><td><code>RTL_SOC/soc_subsystem.f</code> lines 37-43 and 156-161 say the OBI chain (<code>apb_uart_wrap</code>, <code>apb_to_obi</code>, <code>obi_uart*</code>) was removed and that <code>apb_uart.sv</code> is self-contained. But <code>apb_uart-main/rtl/apb_uart.sv:52</code> instantiates <code>apb_uart_wrap</code>, and the <code>obi_uart*</code> sources exist under <code>SOC_FILES/include/obi/</code> and are compiled by the UART bench. Rev B DEV-0428 counts 11 files missing from that list.</td><td>DEF-006 FIXED-VERIFIED through <code>Verification/filelists/tier3_soc/soc_subsystem.f</code>; the comment text in <code>RTL_SOC/soc_subsystem.f</code> was unchanged when I read it. <span class="tag open">OPEN</span> which list is the SoC list of record.</td></tr>
+<tr><td>Stale narrative</td><td><code>uart.md</code> and the isolation README still call the golden patch "not closed"; the matrix header notes mention INCOMPLETE history.</td><td>Superseded by DEF-002 FIXED-VERIFIED</td></tr>
+</tbody></table></div>
+
+<h2 id="s5">5. The 30 test cases</h2>
+<p>The bench <code>apb_uart-main/rtl/tb_apb_uart_thorough.sv</code> is directed, self-checking and non-UVM. It drives <code>apb_uart</code> through an APB BFM, uses masked <code>===</code> comparisons, sticky flags for single-cycle events, concurrent APB protocol assertions, and a 20 ms global watchdog. Check counts per test case below are counted from the retained <code>xsim.log</code> of the 2026-10-31 run (they sum to 69).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Group</th><th>Test cases</th><th>Checks</th><th>What is checked</th></tr></thead>
+<tbody>
+<tr><td>Reset and protocol</td><td>TC1 reset values; TC2 PSLVERR/PREADY sane; TC3 SCR round trip</td><td>10, 1, 0</td><td>TC3 is informational only: SCR is not implemented, so every pattern reads 0x00 and no check is counted</td></tr>
+<tr><td>Register fields</td><td>TC4 LCR bits; TC5 DLAB isolation; TC6 IER; TC7 MCR; TC8 FCR and IIR[7:6]; TC9 divisor read-back</td><td>5, 3, 4, 5, 1, 2</td><td>Round trip per bit; DLL/DLM visible only with DLAB=1</td></tr>
+<tr><td>Data path</td><td>TC10 TX captured on SOUT; TC11 RX from SIN; TC12 loopback byte; TC13 4-byte loopback burst; TC14 THRE; TC15 TEMT</td><td>1, 2, 1, 4, 1, 1</td><td>Serial pins and internal loopback (<code>MCR.LOOP</code>); FIFO ordering</td></tr>
+<tr><td>Interrupts and modem</td><td>TC16 RDA; TC17 THRE; TC18 modem status; TC19 MCR to MSR mirror; TC20 physical modem inputs</td><td>4, 2, 3, 2, 3</td><td>One source at a time: INT, IIR code, clear by access</td></tr>
+<tr><td>Line errors</td><td>TC21 parity ok; TC22 wrong parity; TC23 framing error; TC24 break</td><td>2, 1, 1, 1</td><td>LSR PE, FE, BI flags</td></tr>
+<tr><td>Configuration variants</td><td>TC25 7N1 loopback; TC26 divisor 8</td><td>1, 1</td><td>One word length and one baud other than default</td></tr>
+<tr><td>Flow and reset</td><td>TC27 back-to-back reads; TC28 warm reset; TC29 SOUT idle; TC30 CTS auto-flow</td><td>1, 4, 1, 1</td><td>TC30 is informational: the log reports MCR.AFE is not honoured by this variant, and the check counted is that TX still went out</td></tr>
+</tbody></table></div>
+
+<figure>
+<svg viewBox="0 0 960 272" role="img" aria-label="Bar chart of the number of checks in each of the 30 UART test cases, grouped by theme">
+<path class="ln" d="M48 208 H928"/>
+<rect class="bx-ver" x="56" y="48" width="22" height="160" rx="2"/>
+<text class="ts mid" x="67" y="44">10</text>
+<text class="ts mid" x="67" y="224">1</text>
+<rect class="bx-ver" x="85" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="96" y="188">1</text>
+<text class="ts mid" x="96" y="224">2</text>
+<text class="ts mid" x="125" y="204">0</text>
+<text class="ts mid" x="125" y="224">3</text>
+<rect class="bx-bus" x="143" y="128" width="22" height="80" rx="2"/>
+<text class="ts mid" x="154" y="124">5</text>
+<text class="ts mid" x="154" y="224">4</text>
+<rect class="bx-bus" x="172" y="160" width="22" height="48" rx="2"/>
+<text class="ts mid" x="183" y="156">3</text>
+<text class="ts mid" x="183" y="224">5</text>
+<rect class="bx-bus" x="201" y="144" width="22" height="64" rx="2"/>
+<text class="ts mid" x="212" y="140">4</text>
+<text class="ts mid" x="212" y="224">6</text>
+<rect class="bx-bus" x="230" y="128" width="22" height="80" rx="2"/>
+<text class="ts mid" x="241" y="124">5</text>
+<text class="ts mid" x="241" y="224">7</text>
+<rect class="bx-bus" x="259" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="270" y="188">1</text>
+<text class="ts mid" x="270" y="224">8</text>
+<rect class="bx-bus" x="288" y="176" width="22" height="32" rx="2"/>
+<text class="ts mid" x="299" y="172">2</text>
+<text class="ts mid" x="299" y="224">9</text>
+<rect class="bx-ver" x="317" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="328" y="188">1</text>
+<text class="ts mid" x="328" y="224">10</text>
+<rect class="bx-ver" x="346" y="176" width="22" height="32" rx="2"/>
+<text class="ts mid" x="357" y="172">2</text>
+<text class="ts mid" x="357" y="224">11</text>
+<rect class="bx-ver" x="375" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="386" y="188">1</text>
+<text class="ts mid" x="386" y="224">12</text>
+<rect class="bx-ver" x="404" y="144" width="22" height="64" rx="2"/>
+<text class="ts mid" x="415" y="140">4</text>
+<text class="ts mid" x="415" y="224">13</text>
+<rect class="bx-ver" x="433" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="444" y="188">1</text>
+<text class="ts mid" x="444" y="224">14</text>
+<rect class="bx-ver" x="462" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="473" y="188">1</text>
+<text class="ts mid" x="473" y="224">15</text>
+<rect class="bx-bus" x="491" y="144" width="22" height="64" rx="2"/>
+<text class="ts mid" x="502" y="140">4</text>
+<text class="ts mid" x="502" y="224">16</text>
+<rect class="bx-bus" x="520" y="176" width="22" height="32" rx="2"/>
+<text class="ts mid" x="531" y="172">2</text>
+<text class="ts mid" x="531" y="224">17</text>
+<rect class="bx-bus" x="549" y="160" width="22" height="48" rx="2"/>
+<text class="ts mid" x="560" y="156">3</text>
+<text class="ts mid" x="560" y="224">18</text>
+<rect class="bx-bus" x="578" y="176" width="22" height="32" rx="2"/>
+<text class="ts mid" x="589" y="172">2</text>
+<text class="ts mid" x="589" y="224">19</text>
+<rect class="bx-bus" x="607" y="160" width="22" height="48" rx="2"/>
+<text class="ts mid" x="618" y="156">3</text>
+<text class="ts mid" x="618" y="224">20</text>
+<rect class="bx-ver" x="636" y="176" width="22" height="32" rx="2"/>
+<text class="ts mid" x="647" y="172">2</text>
+<text class="ts mid" x="647" y="224">21</text>
+<rect class="bx-ver" x="665" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="676" y="188">1</text>
+<text class="ts mid" x="676" y="224">22</text>
+<rect class="bx-ver" x="694" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="705" y="188">1</text>
+<text class="ts mid" x="705" y="224">23</text>
+<rect class="bx-ver" x="723" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="734" y="188">1</text>
+<text class="ts mid" x="734" y="224">24</text>
+<rect class="bx-bus" x="752" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="763" y="188">1</text>
+<text class="ts mid" x="763" y="224">25</text>
+<rect class="bx-bus" x="781" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="792" y="188">1</text>
+<text class="ts mid" x="792" y="224">26</text>
+<rect class="bx-ver" x="810" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="821" y="188">1</text>
+<text class="ts mid" x="821" y="224">27</text>
+<rect class="bx-ver" x="839" y="144" width="22" height="64" rx="2"/>
+<text class="ts mid" x="850" y="140">4</text>
+<text class="ts mid" x="850" y="224">28</text>
+<rect class="bx-ver" x="868" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="879" y="188">1</text>
+<text class="ts mid" x="879" y="224">29</text>
+<rect class="bx-ver" x="897" y="192" width="22" height="16" rx="2"/>
+<text class="ts mid" x="908" y="188">1</text>
+<text class="ts mid" x="908" y="224">30</text>
+<path class="ln" d="M56 242 H136"/>
+<text class="ts mid" x="96" y="258">Reset, APB</text>
+<path class="ln" d="M143 242 H310"/>
+<text class="ts mid" x="226.5" y="258">Register fields</text>
+<path class="ln" d="M317 242 H484"/>
+<text class="ts mid" x="400.5" y="258">Data path</text>
+<path class="ln" d="M491 242 H629"/>
+<text class="ts mid" x="560" y="258">Interrupts, modem</text>
+<path class="ln" d="M636 242 H745"/>
+<text class="ts mid" x="690.5" y="258">Line errors</text>
+<path class="ln" d="M752 242 H803"/>
+<text class="ts mid" x="777.5" y="258">Config</text>
+<path class="ln" d="M810 242 H919"/>
+<text class="ts mid" x="864.5" y="258">Flow, reset</text>
+
+
+<text class="ts" x="24" y="24">checks per test case (sum 69)</text>
+</svg>
+<figcaption><b>Figure 4.</b> Check counts per test case. TC1 (reset values) is the largest single case with 10 checks; TC3 contributes none. Twenty of the 30 cases have one or two checks, so the 69 is a count of assertions, not of independent scenarios.</figcaption>
+</figure>
+
+<p>Two observations on what the bench measures, both drawn from the bench and Rev B: TC27 logs 0 wait-state cycles because the BFM samples <code>PREADY</code> in the first access-phase cycle (bench comments, lines 169-210), whereas Rev B 15.7.1 states that the UART access occupies at least two <code>clk_i</code> cycles with <code>PREADY</code> low in the address phase; the two statements count from different points and have not been reconciled. <span class="tag open">OPEN</span> The bench header also says an interrupt is "cleared by IIR read" (TC17 line), which Rev B 15.7.3 (DEV-0416) states is not what the RTL does: reading IIR clears nothing.</p>
+
+<h2 id="s6">6. Rev B 15.7 scenarios and mapping status</h2>
+<p>Rev B 15.7.3 defines 29 SoC-level checks, <code>DEV-0401</code> to <code>DEV-0429</code>. All are CFG-S only (full SoC), invalid in the core-only and fabric-only configurations, and none needs a UART VIP because <code>MCR[4]</code> closes the loop internally (the plan's own prose is inconsistent about "nine" pad-level checks; the roadmap flags it). <span class="tag specified">SPECIFIED</span> None is mapped to a retained check: the matrix column is NOT MAPPED. The last column is my reading of topic overlap with the component bench, not a retained mapping.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Group</th><th>Rev B IDs</th><th>Subject</th><th>Topic overlap with bench (my reading)</th></tr></thead>
+<tbody>
+<tr><td>Register map and decode</td><td>0401 to 0404, 0426</td><td>Read-back of seven stored registers; 128 SCR offsets read 0; all 1024 word offsets alias onto 8 indices; ten dead bits have no effect; write all ones then zeros</td><td>TC1, TC4 to TC7 touch single registers on a 3-bit port; the bench has no window of 1024 offsets, so alias and SCR sweeps are not covered</td></tr>
+<tr><td>Baud and live status</td><td>0405, 0406</td><td>Divisor edge cases and 16 x divisor timing at 0 cycles; LSR, MSR, IIR checked every clock</td><td>TC9, TC26 partial; status is sampled by polling, not per edge</td></tr>
+<tr><td>Receiver FIFO behaviour</td><td>0407 to 0411</td><td>Overrun overwrites in non-FIFO mode; 16-deep FIFO; 17th character wraps usage; trigger levels 1, 4, 8, 14</td><td>TC13 (4 bytes) only. Rev B asserts today's RTL departs from the data sheet here (defects D-128, D-129)</td></tr>
+<tr><td>Timeout and interrupt identification</td><td>0412 to 0420</td><td>Character timeout (3 baud periods short of 4 character times), IIR encodings, priority of 10 pairs, IIR read clears nothing, FIFO-mode clear rule, IIR[7:6] constant 11, modem-status reachable by loopback</td><td>TC16 to TC18 and TC8 cover single sources; priority pairs and timeout are not covered</td></tr>
+<tr><td>End-to-end</td><td>0421 to 0423</td><td>8-byte loopback by polling; pad-level frame for four word lengths and parity modes; the four error flags</td><td>TC10 to TC12, TC21 to TC25 partial</td></tr>
+<tr><td>Error response and strobes</td><td>0424, 0425, 0429</td><td>PSLVERR on LSR/MSR writes (DLAB=0) and reads (DLAB=1); sub-word strobes silently dropped</td><td>None: TC2 only checks PSLVERR stays low after a read</td></tr>
+<tr><td>Reset and tooling</td><td>0427, 0428</td><td>Reset values including LSR=0x60; filelist identity assertion</td><td>TC1 and TC28 partial; 0428 not covered</td></tr>
+</tbody></table></div>
+<p>The plan states several RTL departures as today's truth: the receiver overwrites on overrun, usage wraps at the 17th character, the timeout is short by 3 baud periods, <code>IIR[7:6]</code> is constant, PSTRB is ignored (hardwired at <code>apb_uart.sv:45</code>), and the UART is the only one of six instances that conforms to error-policy row X4. These are Rev B claims read from RTL; no retained run executes them. <span class="tag specified">SPECIFIED</span> An honest summary is that the component bench is a smoke-level functional bench on the register and datapath basics. It covers a minority of the Rev B topics and none at SoC level.</p>
+
+<h2 id="s7">7. Remaining SoC-level work</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th><th>Reference</th></tr></thead>
+<tbody>
+<tr><td>Stage 6 firmware UART test through the real fabric</td><td><code>Verification/tests/suites/stage6_polled_periph/main.c</code> exists and checks a loopback byte THR to RBR with LSR bits; no retained result found. <span class="tag open">OPEN</span></td><td>tracker ACT-013</td></tr>
+<tr><td>Earlier stage proofs</td><td>Stage 2 and 3 proofs touched slots 0, 1 and 5 only, so they never exercised the UART</td><td>matrix STG-02, STG-03</td></tr>
+<tr><td>Register reset sweep (stage 5)</td><td><code>stage5_reg_sweep/main.c</code> only checks UART LSR for read stability; its header says the UART register RTL is absent, which is stale</td><td>file header</td></tr>
+<tr><td>UART interrupt to <code>mip[19]</code></td><td>Not exercised; the IRQ column of the closure map is OPEN</td><td>Rev B 15.7.1; tracker</td></tr>
+<tr><td>Rev B DEV-0401 to 0429</td><td>Unmapped; the register, error and FIFO groups are the largest gap</td><td>section 6</td></tr>
+<tr><td>Datapath smoke</td><td><code>datapath_verification/UART0</code> prints a character through firmware at subsystem boundary (matrix DP-UART, PASS), with an isolated <code>crt0</code>, not the reference SoC firmware flow</td><td>matrix DP-UART</td></tr>
+<tr><td>Equivalence of fix</td><td>Argued by inspection; no formal or gate-level check retained</td><td>section 3</td></tr>
+</tbody></table></div>
+<p>Related pages: <a href="verif_peripherals.html">peripheral verification</a> for the other five devices and the closure map; <a href="soc_peripherals.html">SoC peripherals</a> and <a href="soc_fabric.html">SoC fabric</a> for the design; <a href="verif_fabric.html">fabric verification</a> and <a href="vf_fabric_peripheral.html">fabric-to-peripheral checking</a> for the bridge that the UART sits behind; <a href="index.html">index</a>.</p>
+
+<h2 id="s8">8. What this page does not claim</h2>
+<ul>
+<li>It does not claim the UART is verified at SoC level, or that any Rev B 15.7 check is closed.</li>
+<li>It does not claim XSim is wrong or Xcelium is right; the code pattern is the cause of the loop in XSim, and the Xcelium explanation is unverified.</li>
+<li>The overlap column in section 6 is my reading, not a traceability record.</li>
+<li>The delta diagram is illustrative; no retained trace gives the exact event order.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> <code>Verification/components/apb/uart.md</code>, <code>Verification/artifacts/component_first/20261024_uart_delta_isolation/{README.md,reproducibility.json,uart_test.f,xvlog_test.f,apb_to_obi_fix.sv}</code>, <code>20261019_run02/README.md</code>, <code>Verification/artifacts/runs/tb_apb_uart_20261031_183831_c6c78663/{verdict.json,run.log,xsim.log}</code>, <code>SOC_FILES/include/obi/apb_to_obi.sv</code>, <code>apb_uart-main/include/obi/apb_to_obi.sv</code>, <code>apb_uart-main/rtl/{apb_uart.sv,tb_apb_uart_thorough.sv}</code>, <code>apb_uart-main/xrun_thorough_1.log</code>, <code>RTL_SOC/soc_subsystem.f</code>, <code>Verification/status/{PHASE_STATUS.md,defects.csv,build_tracker.py}</code>, <code>verification_matrix.csv</code>, <code>verification_roadmap.md</code>, <code>stage5_reg_sweep/main.c</code>, <code>stage6_polled_periph/main.c</code>, Rev B 15.7.</div>
+</div>
+</body>
+</html>

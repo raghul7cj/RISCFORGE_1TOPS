@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IRQ Unit Functional Coverage · CJ G4.12 | RISCFORGE</title>
+<style>
+:root{--ink:#18202c;--sub:#526174;--line:#dbe2ea;--tint:#f8fafc;--blue:#125a91;--green:#15803d;--green-bg:#eaf7ee;--amber:#a85b00;--amber-bg:#fff5df}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:980px;padding:28px 30px 40px;color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,Segoe UI,Arial,sans-serif}
+header{border-bottom:1px solid var(--line);padding-bottom:16px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+h1{font-family:Archivo,"IBM Plex Sans",system-ui,sans-serif;font-size:30px;margin:8px 0 10px;letter-spacing:-.02em}
+h2{font-family:Archivo,"IBM Plex Sans",system-ui,sans-serif;font-size:20px;margin:0 0 10px}
+h3{font-size:15px;margin:0 0 6px}
+.lede{color:var(--sub);font-size:16px;margin:0 0 12px}
+.scope{border-left:4px solid var(--amber);background:var(--amber-bg);padding:10px 14px;font-size:13px;margin:14px 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:var(--sub)}
+.meta strong{color:var(--ink);margin-right:5px}
+nav{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin-top:16px}
+nav a{color:var(--blue);text-decoration:none}
+nav a[aria-current]{font-weight:700;color:var(--ink);border-bottom:2px solid var(--blue)}
+section{margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.card{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--tint)}
+.card strong{display:block;font-size:22px;line-height:1.2}
+.card span{font-size:12px;color:var(--sub)}
+.note{border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:13px;margin:14px 0;background:var(--tint)}
+.note.success{border-color:#bfe3c8;background:var(--green-bg)}
+.note.warn{border-color:#f0d7a8;background:var(--amber-bg)}
+.diagram{margin:16px 0 0}
+.diagram svg{display:block;width:100%;height:auto}
+figcaption{font-size:11px;color:var(--sub);margin-top:8px}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--tint);font-weight:600}
+code,.mono{font-family:"IBM Plex Mono",Consolas,monospace;font-size:12px;overflow-wrap:anywhere}
+ul{font-size:13px}
+a{color:var(--blue)}
+.source-list{list-style:none;padding:0;font-size:13px}
+.source-list li{margin:6px 0}
+footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--sub)}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">RISCFORGE / Core / Interrupt interface · CJ G4.12 unit evidence</div>
+<h1>Functional coverage</h1>
+<p class="lede">The declared unit-level covergroups, their bins and the limits of the recorded 100% score.</p>
+<div class="meta">
+<span><strong>Groups</strong> 14</span>
+<span><strong>Result</strong> All declared bins hit</span>
+<span><strong>Latest report</strong> Xcelium / IMC, 11 November 2026</span>
+<span><strong>Official workbook status, 4.12</strong> In Progress</span>
+</div>
+<p class="scope"><strong>Scope:</strong> declared-bin and reported-code metrics for the unit bench only. The four blocks are separately instantiated, so this is supporting evidence for 4.12 and not pipeline entry closure, SoC integration or a sign-off claim.</p>
+<nav aria-label="Related documentation">
+<a href="G4_report.html">G4 gate report</a>
+<a href="G4_IRQ_UNIT_VERIFICATION.html">IRQ unit verification</a>
+<a href="G4_IRQ_UNIT_COVERAGE.html" aria-current="page">IRQ unit coverage</a>
+<a href="../G3_interrupt_integration/interrupt_interface_index.html">G3 interrupt interface (architecture)</a>
+</nav>
+</header><p class="note"><strong>12-Nov source/evidence recheck:</strong> the retained run below is valid for its saved inputs: all 28 output hashes and four current RTL source hashes match. The current <code>tb_irq_restructure.sv</code> has changed (constants/helper/checker refactoring), so its latest revision is not covered by this result. A refresh through <code>ssh vlsi</code> was blocked before simulation by a connection-level Permission denied error. <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/evidence_recheck_20261112.json">Hash recheck</a> · <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261112T043538Z_c91939b7/ATTEMPT_STATUS.md">Refresh attempt</a> · <a href="IRQ_COVERAGE_HANDOFF_20261112.md">Coverage handoff</a>.</p>
+
+<p class="meta"><strong>IRQ UNIT FILES:</strong> <a href="../../../Verification/irq_unit/README.md">folder / TB inventory</a> &middot; <a href="../../../Verification/irq_unit/STIMULUS.md">STIMULUS + CHECKS</a> &middot; <a href="../../../Verification/irq_unit/irq_unit.f">FILELIST</a> &middot; <a href="../../../Verification/irq_unit/run.ps1">RUN: XCELIUM / IMC</a></p><section>
+<div class="kicker">01 / How to read coverage</div>
+<h2>From observation to a bin</h2>
+<figure class="diagram"><svg viewBox="0 0 860 130" role="img" aria-labelledby="ctitle cdesc"><title id="ctitle">Coverage sampling flow</title><desc id="cdesc">Stimulus drives a scenario, expected and observed results are compared, and the matching bin is sampled after the check.</desc><defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#6e8196"/></marker></defs><g fill="#fff" stroke="#b9c8d8" stroke-width="1.5"><rect x="10" y="25" width="205" height="65" rx="5"/><rect x="270" y="25" width="270" height="65" rx="5"/><rect x="595" y="25" width="255" height="65" rx="5"/></g><g text-anchor="middle"><text x="112" y="49" font-size="14" font-weight="700">Drive a case</text><text x="112" y="70" font-size="11">source · gates · priority</text><text x="405" y="49" font-size="14" font-weight="700">Check the result</text><text x="405" y="70" font-size="11">observed output versus expected</text><text x="722" y="49" font-size="14" font-weight="700">Sample coverage</text><text x="722" y="70" font-size="11">record the exercised bin</text></g><g stroke="#6e8196" fill="none" stroke-width="1.5" marker-end="url(#ar)"><path d="M215 57H268"/><path d="M540 57H593"/></g></svg><figcaption>A coverpoint groups values into bins; a cross records combinations of coverpoint bins. Bins indicate exercised cases, while checks determine whether behavior matched the expectation. The diagram does not show code-coverage closure or connected-pipeline behavior.</figcaption></figure>
+<div class="grid">
+<div class="card"><strong>100%</strong><span>Of declared functional bins</span></div>
+<div class="card"><strong>1 run</strong><span>Latest Xcelium execution</span></div>
+<div class="card"><strong>Open</strong><span>Code-coverage closure</span></div>
+</div>
+<div class="note warn"><strong>Interpretation:</strong> the aggregate score is not 100% of all possible unit behaviors or proof of RTL correctness. Some groups include both individual coverpoints and cross bins; the counts below identify the scenario or cross bins, not a sum of the report's entire denominator.</div>
+</section>
+
+<section>
+<div class="kicker">02 / Arbitration</div>
+<h2>Decision and RR bins</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th style="width:26%">Group</th><th style="width:16%">Scenario bins</th><th>What is sampled</th></tr></thead>
+<tbody>
+<tr><td>Eligibility</td><td>208</td><td>13 individual sources x 4 thresholds x 2 source-enable states x 2 global-MIE states.</td></tr>
+<tr><td>Stream choice</td><td>24</td><td>3 RR pointers x all 8 request masks for causes 19, 18 and 27.</td></tr>
+<tr><td>Background choice</td><td>8</td><td>2 RR pointers x all 4 request masks for causes 17 and 16.</td></tr>
+<tr><td>Fixed pair</td><td>28</td><td>Every unordered pair of the eight timer causes; the configured higher-priority source wins.</td></tr>
+<tr><td>RR feedback</td><td>15</td><td>5 RR winners x matching commit, no commit and another-class commit.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note"><strong>Example:</strong> UART pending, source enable on, MIE on and threshold 1 is one eligibility combination. UART belongs to class 1, so its rank is 2 and it passes threshold 1. The same source is blocked at threshold 2.</div>
+<p>In addition to these bins, the test compares 196,608 arbitration snapshots: all pending vectors across four thresholds and six combined RR states, with all source enables and MIE asserted.</p>
+</section>
+
+<section>
+<div class="kicker">03 / Gateway</div>
+<h2>Input capture bins</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th style="width:26%">Group</th><th style="width:16%">Scenario bins</th><th>Configured contract</th></tr></thead>
+<tbody>
+<tr><td>Event gateway</td><td>40</td><td>10 timer and SPI event inputs x single, separated, adjacent and held-with-ack scenarios.</td></tr>
+<tr><td>GPIO gateway</td><td>4</td><td>Rising edge, held-high acknowledgement, coincident new edge and rearm.</td></tr>
+<tr><td>Level gateway</td><td>6</td><td>2 level sources x asserted, acknowledged while held and deasserted.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Events can coalesce into one pending bit. For an event or a new GPIO edge, capture wins over a coincident acknowledgement. UART and I²C level outputs remain pending only while asserted.</p>
+</section>
+
+<section>
+<div class="kicker">04 / CSR and commit</div>
+<h2>Register and retirement bins</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th style="width:26%">Group</th><th style="width:16%">Scenario bins</th><th>What is sampled</th></tr></thead>
+<tbody>
+<tr><td>CSR threshold</td><td>16 + 3</td><td>16 old-to-new mintprio transitions; three separately covered upper-bit patterns. The patterns are not crossed with every transition.</td></tr>
+<tr><td>CSR control</td><td>3</td><td>Reset, trap-priority and MRET-priority behavior for mintprio.</td></tr>
+<tr><td>CSR interrupt control</td><td>7</td><td>Trap and MRET MIE/MPIE states, software/input MSIP and MEIP visibility.</td></tr>
+<tr><td>Enable bits</td><td>19</td><td>One-hot write/readback of the supported standard and fast mie bits.</td></tr>
+<tr><td>Commit source</td><td>13</td><td>Acknowledgement decoding for each supported committed cause.</td></tr>
+<tr><td>Commit control</td><td>4</td><td>Invalid WB packet, invalid exception packet, synchronous exception and unsupported IRQ.</td></tr>
+</tbody>
+</table>
+</div>
+<p>MSIP and MEIP visibility is covered at the CSR interface. Their delivery is outside the implemented arbiter contract.</p>
+</section>
+
+<section>
+<div class="kicker">05 / Code metrics</div>
+<h2>Xcelium unit code coverage</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th style="width:28%">Instance</th><th style="width:24%">Block</th><th style="width:24%">Expression</th><th style="width:24%">Toggle</th></tr></thead>
+<tbody>
+<tr><td>Gateway</td><td>100% (3/3)</td><td>Not scored</td><td>70.75% (75/106)</td></tr>
+<tr><td>Arbiter</td><td>98.21% (55/56)</td><td>100% (3/3)</td><td>95.74% (90/94)</td></tr>
+<tr><td>Commit controller</td><td>100% (7/7)</td><td>83.33% (5/6)</td><td>10.21% (49/480)</td></tr>
+<tr><td>CSR register file</td><td>51.02% (25/49)</td><td>75% (9/12)</td><td>18.02% (151/838)</td></tr>
+</tbody>
+</table>
+</div>
+<p>These are instance-local IMC metrics for one IRQ-focused unit run. Aggregate reported totals for the run are block 85.42% (293/343), expression 55.68% (49/88) and toggle 57.38% (237/413). Xcelium's default expression scoring covers logical operators in conditions only; no FSM was extracted. The CSR and commit units include ports and functions outside this test's scope. No exclusions or coverage refinements were applied.</p>
+</section>
+<section>
+<div class="kicker">06 / Gaps</div>
+<h2>Coverage still to develop</h2>
+<ul>
+<li>Exercise multiple pending sources with selective enable masks at different thresholds and RR states.</li>
+<li>Cross mintprio upper-bit patterns with all transitions if that coverage is required; current readback checks compare the full CSR value.</li>
+<li>Use a separately reviewed source-to-cause table to reduce shared mapping assumptions between the testbench and RTL.</li>
+<li>Review uncovered code items, including the arbiter's committed-cause default branch. No code-coverage closure is claimed.</li>
+</ul>
+<p>Connected pipeline behavior, peripheral source timing and firmware are outside this unit-level report. The full RTL-facing CSR contains functionality beyond the interrupt-focused checks listed here.</p>
+<p class="source-list">
+<a href="../../../Verification/irq_unit/IRQ_UNIT_COVERAGE_PLAN.md">Coverage plan</a> · <a href="../../../Verification/irq_unit/tb_irq_restructure.sv">Covergroups and stimulus</a> · <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/functional_summary.txt">Functional summary</a> · <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/metrics_summary.txt">Metric summary</a> · <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/code_html/index.html">IMC code report</a> · <a href="diagrams/irq_unit_coverage_flow.spec.json">Validated coverage-flow spec</a>
+</p>
+</section>
+<footer>RISCFORGE · CJ G4.12 interrupt unit coverage · Declared-bin evidence, not sign-off · Official status is owned by the workbook.</footer>
+</body>
+</html>

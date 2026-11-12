@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Current Status</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>svg .bx-bad { fill: color-mix(in srgb, var(--bad) 20%, var(--bg)); stroke: var(--bad); stroke-width: 1.4; }</style>
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../signoff/cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. Generated historical tracker snapshot. Its phase/gate naming and baseline differ from the official 18-item CJ review; it is not refreshed automatically. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Status</span></div>
+<div class="wrap">
+<h1>Current verification status</h1>
+<p class="lead">Where the Rev B schedule stands, generated from the tracker: P0 in progress or done; 15 of 16 phase rows not started.</p>
+<p class="meta">Generated 2026-11-03 from <code>Verification/status/build_tracker.py</code> (tracker review date 2026-10-31). Nothing was re-simulated for this status. Master tracker: <code>Verification/status/RISCFORGE_Verification_Tracker.xlsx</code>.</p>
+<div class="toc"><b>Contents</b><ol>
+<li><a href="#phases">Phase position</a></li><li><a href="#p0">P0 exit checklist</a></li><li><a href="#gates">Gates</a></li><li><a href="#defects">Open defects</a></li><li><a href="#actions">Next actions</a></li></ol></div>
+
+<h2 id="phases">1. Phase position</h2>
+<figure>
+<svg viewBox="0 0 1040 280" role="img" aria-label="Phase spine P0 to P6 with track F above; P0 in progress, all others not started">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-ctrl" x="24" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="76" y="176">P0</text>
+<text class="ts mid" x="76" y="194">Bring-up</text>
+<text class="ts mid" x="76" y="232">in progress</text>
+<path class="ar" d="M128 182 H144"/>
+<rect class="bx-ext" x="144" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="196" y="176">P1a</text>
+<text class="ts mid" x="196" y="194">Core trust</text>
+<text class="ts mid" x="196" y="232">not started</text>
+<path class="ar" d="M248 182 H264"/>
+<rect class="bx-ext" x="264" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="316" y="176">P1b</text>
+<text class="ts mid" x="316" y="194">SoC structural</text>
+<text class="ts mid" x="316" y="232">not started</text>
+<path class="ar" d="M368 182 H384"/>
+<rect class="bx-ext" x="384" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="436" y="176">P2</text>
+<text class="ts mid" x="436" y="194">Models</text>
+<text class="ts mid" x="436" y="232">not started</text>
+<path class="ar" d="M488 182 H504"/>
+<rect class="bx-ext" x="504" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="556" y="176">P3</text>
+<text class="ts mid" x="556" y="194">Architectural</text>
+<text class="ts mid" x="556" y="232">not started</text>
+<path class="ar" d="M608 182 H624"/>
+<rect class="bx-ext" x="624" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="676" y="176">P4</text>
+<text class="ts mid" x="676" y="194">Closure</text>
+<text class="ts mid" x="676" y="232">not started</text>
+<path class="ar" d="M728 182 H744"/>
+<rect class="bx-ext" x="744" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="796" y="176">P5</text>
+<text class="ts mid" x="796" y="194">Soak</text>
+<text class="ts mid" x="796" y="232">not started</text>
+<path class="ar" d="M848 182 H864"/>
+<rect class="bx-ext" x="864" y="150" width="104" height="64" rx="6"/>
+<text class="tb mid" x="916" y="176">P6</text>
+<text class="ts mid" x="916" y="194">Release</text>
+<text class="ts mid" x="916" y="232">not started</text>
+<rect class="bx-ver" x="144" y="24" width="584" height="48" rx="6"/>
+<text class="tb mid" x="436" y="46">Track F: formal (parallel, stamps no gate)</text>
+<text class="ts mid" x="436" y="62">enters at P1a exit; must close before P5; status: not started</text>
+<path class="ar-ver" d="M196 72 V150"/>
+<path class="ar-ver" d="M796 72 V150"/>
+<text class="ts" x="24" y="268">Fill: amber = in progress, dashed grey = not started. Source: Verification/status tracker.</text>
+</svg>
+<figcaption><b>Figure 1.</b> The Rev B spine P0 to P6 with track F. P3 and P4 are parents of four and five sub-phases. Effort ranges are planning estimates (ASSUMED, total 186 to 358 engineer-days; effort, not elapsed time).</figcaption>
+</figure>
+
+<h2 id="p0">2. P0 exit checklist</h2>
+<p>13 of 20 criteria are met, 5 partial and 2 not met. Not yet met: P0-G1.1 unresolved_modules == 0 against golden module set; P0-G1.2 extra_modules == 0 against golden module set; P0-G1.5 Build/elab logs and filelist diff report retained; P0-G3.6 Exact run command recorded; P0-X1 DC-1 scope decision recorded (CLIC, AON watchdog); P0-X2 Table 21.3 effort reissued with measured tau_scen; P0-X3 One run package passes G0 and G1 together</p>
+<figure>
+<svg viewBox="0 0 1040 290" role="img" aria-label="P0 exit checklist: each criterion coloured by status">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<text class="tb" x="16" y="28">Harness integrity (G0)</text>
+<rect class="bx-ctrl" x="220" y="16" width="96" height="40" rx="4"/>
+<text class="tb mid" x="268" y="33">G1.1</text>
+<text class="ts mid" x="268" y="48">partial</text>
+<rect class="bx-ctrl" x="326" y="16" width="96" height="40" rx="4"/>
+<text class="tb mid" x="374" y="33">G1.2</text>
+<text class="ts mid" x="374" y="48">partial</text>
+<rect class="bx-mem" x="432" y="16" width="96" height="40" rx="4"/>
+<text class="tb mid" x="480" y="33">G1.3</text>
+<text class="ts mid" x="480" y="48">met</text>
+<rect class="bx-mem" x="538" y="16" width="96" height="40" rx="4"/>
+<text class="tb mid" x="586" y="33">G1.4</text>
+<text class="ts mid" x="586" y="48">met</text>
+<rect class="bx-ctrl" x="644" y="16" width="96" height="40" rx="4"/>
+<text class="tb mid" x="692" y="33">G1.5</text>
+<text class="ts mid" x="692" y="48">partial</text>
+<text class="tb" x="16" y="88">DUT activity (G1)</text>
+<rect class="bx-mem" x="220" y="76" width="96" height="40" rx="4"/>
+<text class="tb mid" x="268" y="93">G2.1</text>
+<text class="ts mid" x="268" y="108">met</text>
+<rect class="bx-mem" x="326" y="76" width="96" height="40" rx="4"/>
+<text class="tb mid" x="374" y="93">G2.2</text>
+<text class="ts mid" x="374" y="108">met</text>
+<rect class="bx-mem" x="432" y="76" width="96" height="40" rx="4"/>
+<text class="tb mid" x="480" y="93">G2.3</text>
+<text class="ts mid" x="480" y="108">met</text>
+<rect class="bx-mem" x="538" y="76" width="96" height="40" rx="4"/>
+<text class="tb mid" x="586" y="93">G2.4</text>
+<text class="ts mid" x="586" y="108">met</text>
+<rect class="bx-mem" x="644" y="76" width="96" height="40" rx="4"/>
+<text class="tb mid" x="692" y="93">G2.5</text>
+<text class="ts mid" x="692" y="108">met</text>
+<text class="tb" x="16" y="148">Run identity</text>
+<rect class="bx-mem" x="220" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="268" y="153">G3.1</text>
+<text class="ts mid" x="268" y="168">met</text>
+<rect class="bx-mem" x="326" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="374" y="153">G3.2</text>
+<text class="ts mid" x="374" y="168">met</text>
+<rect class="bx-mem" x="432" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="480" y="153">G3.3</text>
+<text class="ts mid" x="480" y="168">met</text>
+<rect class="bx-mem" x="538" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="586" y="153">G3.4</text>
+<text class="ts mid" x="586" y="168">met</text>
+<rect class="bx-mem" x="644" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="692" y="153">G3.5</text>
+<text class="ts mid" x="692" y="168">met</text>
+<rect class="bx-ctrl" x="750" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="798" y="153">G3.6</text>
+<text class="ts mid" x="798" y="168">partial</text>
+<rect class="bx-mem" x="856" y="136" width="96" height="40" rx="4"/>
+<text class="tb mid" x="904" y="153">G3.7</text>
+<text class="ts mid" x="904" y="168">met</text>
+<text class="tb" x="16" y="208">Close-out</text>
+<rect class="bx-bad" x="220" y="196" width="96" height="40" rx="4"/>
+<text class="tb mid" x="268" y="213">X1</text>
+<text class="ts mid" x="268" y="228">not met</text>
+<rect class="bx-bad" x="326" y="196" width="96" height="40" rx="4"/>
+<text class="tb mid" x="374" y="213">X2</text>
+<text class="ts mid" x="374" y="228">not met</text>
+<rect class="bx-ctrl" x="432" y="196" width="96" height="40" rx="4"/>
+<text class="tb mid" x="480" y="213">X3</text>
+<text class="ts mid" x="480" y="228">partial</text>
+<rect class="bx-mem" x="220" y="260" width="18" height="18" rx="3"/>
+<text class="t" x="246" y="273">met</text>
+<rect class="bx-ctrl" x="330" y="260" width="18" height="18" rx="3"/>
+<text class="t" x="356" y="273">partial</text>
+<rect class="bx-bad" x="440" y="260" width="18" height="18" rx="3"/>
+<text class="t" x="466" y="273">not met</text>
+</svg>
+<figcaption><b>Figure 2.</b> P0 criteria by group. IDs follow <code>goals/P0_bringup.md</code>; P0-G labels are local, not Rev B gate identifiers.</figcaption>
+</figure>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Status</th><th>Gap</th></tr></thead>
+<tbody>
+<tr><td>P0-G1.1</td><td>unresolved_modules == 0 against golden module set</td><td>PARTIAL</td><td>Full elaboration module comparison against gold set pending packaging run.</td></tr>
+<tr><td>P0-G1.2</td><td>extra_modules == 0 against golden module set</td><td>PARTIAL</td><td>Same as P0-G1.1.</td></tr>
+<tr><td>P0-G1.3</td><td>Simulator and toolchain version pinned and recorded</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G1.4</td><td>Artifact write test passes</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G1.5</td><td>Build/elab logs and filelist diff report retained</td><td>PARTIAL</td><td>Repackaging Stage 3 will bundle build and elab logs.</td></tr>
+<tr><td>P0-G2.1</td><td>instructions_retired &gt; 0</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G2.2</td><td>axi_transfers &gt; 0</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G2.3</td><td>apb_transfers &gt; 0</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G2.4</td><td>attestation_words_written &gt; 0</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G2.5</td><td>Counter block retained with the verdict record</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G3.1</td><td>RTL SHA-256 (H_rtl) per Table 21.10</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G3.2</td><td>Filelist SHA-256 (H_filelist)</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G3.3</td><td>ID-1, ID-2, ID-3 stamped with the run</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G3.4</td><td>Random seed recorded (or &#x27;none&#x27; stated)</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G3.5</td><td>Plusargs recorded</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-G3.6</td><td>Exact run command recorded</td><td>PARTIAL</td><td>Capture live compile/elaborate logs during final attributable run.</td></tr>
+<tr><td>P0-G3.7</td><td>Logs and verdict retained together in one package</td><td>MET</td><td>-</td></tr>
+<tr><td>P0-X1</td><td>DC-1 scope decision recorded (CLIC, AON watchdog)</td><td>NOT MET</td><td>Write the record; default is out of scope.</td></tr>
+<tr><td>P0-X2</td><td>Table 21.3 effort reissued with measured tau_scen</td><td>NOT MET</td><td>Needs P0 timing data.</td></tr>
+<tr><td>P0-X3</td><td>One run package passes G0 and G1 together</td><td>PARTIAL</td><td>Re-run Stage 3 through the automated package script at the final identity.</td></tr>
+</tbody></table></div>
+
+<h2 id="gates">3. Gates</h2>
+<p>Gate verdicts: 7 UNTESTED. Rev B treats untested as not a pass.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Gate</th><th>Name</th><th>Tier</th><th>Verdict</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>G0</td><td>Harness integrity</td><td>per-run</td><td>UNTESTED</td><td>Golden module set established; formal diff execution pending.</td></tr>
+<tr><td>G1</td><td>Stimulus reached the DUT</td><td>per-run</td><td>UNTESTED</td><td>Stage 3 counters satisfy all four activity predicates; verdict record stamped in P0_MANIFEST.json.</td></tr>
+<tr><td>G2</td><td>Checker viability</td><td>per-candidate</td><td>UNTESTED</td><td>Step4 11/11 injection used a bridge model, not RTL.</td></tr>
+<tr><td>G3</td><td>Checkers all pass</td><td>per-run</td><td>UNTESTED</td><td>Not evaluated on the real SoC path.</td></tr>
+<tr><td>G4</td><td>Coverage closed</td><td>per-candidate</td><td>UNTESTED</td><td>IRQ unit achieved 100% functional cov; SoC database open.</td></tr>
+<tr><td>G5</td><td>Compliance and formal closed</td><td>release</td><td>UNTESTED</td><td>No current compliance report at a recorded identity; no proof log.</td></tr>
+<tr><td>G6</td><td>Traceability complete</td><td>per-candidate</td><td>UNTESTED</td><td>verification_matrix.csv expanded to 26 rows.</td></tr>
+</tbody></table></div>
+
+<h2 id="defects">4. Open defects</h2>
+<p>Severities are proposed; Rev B assigns them at triage by someone other than the fixer.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Title</th><th>Class</th><th>Severity</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>DEF-001</td><td>Load-use flush inserted during MMIO memory stall drops loads</td><td>C-DUT</td><td>S2</td><td>FIXED-UNVERIFIED</td></tr>
+<tr><td>DEF-004</td><td>Divergent duplicate timer.sv copies (ID-1 reachable)</td><td>C-HARNESS</td><td>S1</td><td>FIXED-CONVERGED</td></tr>
+<tr><td>DEF-005</td><td>Unresolvable and absolute-path entries in filelists (ID-2, ID-3)</td><td>C-HARNESS</td><td>S1</td><td>OPEN</td></tr>
+<tr><td>DEF-008</td><td>Stage proof manifests lack Rev B identity fields</td><td>C-HARNESS</td><td>S2</td><td>IN_PROGRESS</td></tr>
+<tr><td>DEF-010</td><td>Stage numbers in test suites differ from stage briefs and Rev B phases</td><td>C-SPEC</td><td>S4</td><td>OPEN</td></tr>
+<tr><td>DEF-011</td><td>Rev B errata: section 21 numbering; duplicated 15.2-15.8; Table 20.1 does not split P1; F entry points disagree; no P4.5 entry row</td><td>C-SPEC</td><td>S4</td><td>OPEN</td></tr>
+<tr><td>DEF-012</td><td>Legacy bug register not migrated (INFRA_TRACKING B1-B21, V1-V14)</td><td>C-HARNESS</td><td>S4</td><td>OPEN</td></tr>
+</tbody></table></div>
+
+<h2 id="actions">5. Next actions (priority 1)</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Action</th><th>Done when</th></tr></thead>
+<tbody>
+<tr><td>ACT-002</td><td>Write the P0 run-package script: H_rtl, H_filelist, ID-1/2/3, tool, seed, plusargs, command, build logs, counters, G0 and G1 verdict</td><td>One folder passes P0-G1.4, G1.5, G2.4, G2.5, G3.*</td></tr>
+<tr><td>ACT-003</td><td>Define the golden module set from the agreed filelist and implement the unresolved/extra module comparison</td><td>P0-G1.1 and G1.2 computed</td></tr>
+<tr><td>ACT-006</td><td>Decide the simulator of record and coverage tool</td><td>DEC-A decided and recorded in Table 5.1</td></tr>
+<tr><td>ACT-007</td><td>Hash hazard_unit.v and compare against the Stage 3 proof timestamp; confirm the proof ran the current file</td><td>Note in run register</td></tr>
+<tr><td>ACT-008</td><td>Record DC-1 (scope for CLIC and AON watchdog)</td><td>Decision record or defaulted entry</td></tr>
+<tr><td>ACT-009</td><td>Re-run Stage 3 through the package script; declare P0 exit; reissue Table 21.3 with measured tau_scen</td><td>P0-X1..X3 MET</td></tr>
+<tr><td>ACT-010</td><td>Add a directed regression for DEF-001 (MMIO access followed by a DSRAM load-use) that fails without the fix; second-person review</td><td>Test fails on old RTL, passes on fixed</td></tr>
+<tr><td>ACT-011</td><td>Re-run RISCOF compliance and plan the lock-step model at the final identity</td><td>CT-1 report; CT-2 plan</td></tr>
+</tbody></table></div>
+
+
+<div class="sources"><b>Sources:</b> <code>Verification/status/build_tracker.py</code>, <code>goals/P0_bringup.md</code>, <code>Verification/verification_matrix.csv</code>.</div>
+</div>
+</body>
+</html>

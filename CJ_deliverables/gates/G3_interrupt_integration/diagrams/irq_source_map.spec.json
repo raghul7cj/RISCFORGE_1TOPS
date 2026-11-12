@@ -1,0 +1,35 @@
+{
+  "title": "IRQ source-to-interface map",
+  "scope": "How the 13 serviced channels travel from SoC peripheral IRQ outputs through the subsystem ports, the core gateway and arbiter, to trap commit. Static wiring only: it does not show peripheral register clearing, firmware, nesting, or any executed interrupt.",
+  "baseline": { "repo": "RISCFORGE_1TOPS-main/rtl worktree; subsystem, core IRQ RTL and the five peripheral IRQ sources combined", "commit": "worktree-sha256:1f0f44a12a3c2c4d48d2cbb734f73ecce3ac770036423694df3f8e0bde456a90" },
+  "nodes": [
+    { "id": "PERIPH", "label": "Peripheral IRQ outputs: Timer 0, Timer 1, UART, SPI, I2C, GPIO", "status": "present", "source": { "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv", "line": 1068, "symbol": ".interrupt_o( i2c_interrupt_o" }, "note": "Also timer0 at line 1097, UART at 1119, GPIO at 1153, SPI events at 1180, timer1 at 1220." },
+    { "id": "SOC", "label": "subsystem fast_irq_i[15:0] / timer_irq_i", "status": "present", "source": { "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv", "line": 1280, "symbol": ".fast_irq_i     ( { 4'b0," }, "note": "timer_irq_i takes timer0_irq_o[1] at line 1293; only fast_irq_i[11:0] are serviced." },
+    { "id": "RAW", "label": "core irq_raw[12:0] = {fast_irq_i[11:0], timer_irq_i}", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 212, "symbol": "wire [12:0] irq_raw = {fast_irq_i[11:0], timer_irq_i};" } },
+    { "id": "GW", "label": "irq_gateway: edge latch for GPIO, event latch for timers/SPI, level pass-through for I2C/UART", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 220, "symbol": "irq_gateway u_irq_gateway (" }, "note": "Modes are constants: edge_mode 13'h0002 and event_mode 13'h1fe9 at top.v:213-214." },
+    { "id": "ARB", "label": "irq_arbiter: class 2 fixed order, class 1 and 0 round robin, mintprio gate", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 236, "symbol": "irq_arbiter u_irq_arbiter (" } },
+    { "id": "EX", "label": "execute_cycle accepts the interrupt on a valid EX item", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 419, "symbol": ".irq_pending_i(irq_pending)," } },
+    { "id": "WB", "label": "WB commit: trap entry, one-hot gateway clear, round-robin advance", "status": "present", "source": { "path": "ips/riscv_core/rtl/wb_trap_mret_commit_controller.v", "line": 78, "symbol": "assign wb_commit_irq_o     = trap_commit & trap_is_interrupt_o;" } },
+    { "id": "MIP", "label": "mip[11] MEIP and mip[3] MSIP bits (ext_irq_i, sw_irq_i tied to 0)", "status": "present", "source": { "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv", "line": 1294, "symbol": ".ext_irq_i      ( 1'b0                )" }, "note": "sw_irq_i tied to 1'b0 at line 1295. Both reach mip through csr_regfile.v:217 only." },
+    { "id": "PLIC", "label": "PLIC", "status": "absent", "note": "Searched riscforge_soc_subsystem.sv: no PLIC instance and no plic port; MEIP is driven by the constant 1'b0 at line 1294, and irq_arbiter.v:20 masks only mie[27:16] and mie[7]." },
+    { "id": "CLIC", "label": "CLIC", "status": "absent", "note": "ips/clic-master/ exists as standalone RTL. Searched riscforge_soc_subsystem.sv for a clic instance and csr_regfile.v for mintstatus/mtvt/mnxti; none found." }
+  ],
+  "edges": [
+    { "from": "PERIPH", "to": "SOC", "label": "peripheral IRQ pins", "status": "present", "source": { "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv", "line": 1289, "symbol": "uart_int_o," } },
+    { "from": "SOC", "to": "RAW", "label": "fast_irq_i / timer_irq_i ports", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 212, "symbol": "irq_raw = {fast_irq_i[11:0], timer_irq_i}" } },
+    { "from": "RAW", "to": "GW", "label": "irq_raw_i", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 223, "symbol": ".irq_raw_i   (irq_raw)," } },
+    { "from": "GW", "to": "ARB", "label": "pend_gateway", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 239, "symbol": ".pend_i          (pend_gateway)," } },
+    { "from": "ARB", "to": "EX", "label": "irq_pending, irq_id, irq_class", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 419, "symbol": ".irq_pending_i(irq_pending)," } },
+    { "from": "EX", "to": "WB", "label": "tagged trap packet through EX/MEM and MEM/WB", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 551, "symbol": ".trap_cause_o(trap_commit_cause)," } },
+    { "from": "WB", "to": "GW", "label": "clear_gateway_o, one-hot per committed cause", "status": "present", "source": { "path": "ips/riscv_core/rtl/wb_trap_mret_commit_controller.v", "line": 92, "symbol": "assign clear_gateway_o = clear_gateway_r;" } },
+    { "from": "WB", "to": "ARB", "label": "wb_commit_irq advances the matching round-robin pointer", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 243, "symbol": ".wb_commit_i     (wb_commit_irq)," } },
+    { "from": "MIP", "to": "ARB", "label": "no delivery path: arbiter masks only mie[27:16], mie[7]", "status": "absent", "source": { "path": "ips/riscv_core/rtl/irq_arbiter.v", "line": 20, "symbol": "wire [12:0] active = pend_i & {mie_i[27:16], mie_i[7]} &" } },
+    { "from": "PLIC", "to": "ARB", "label": "not instantiated", "status": "absent" },
+    { "from": "CLIC", "to": "RAW", "label": "not instantiated", "status": "absent" }
+  ],
+  "unknowns": [
+    "Peripheral internal clear and re-arm timing is documented from the peripheral RTL but is not drawn here.",
+    "Firmware handlers, nesting protocol and interrupt latency are outside this map.",
+    "G3.6 timer-to-handler integration and G6 end-to-end behavior are not established by this wiring."
+  ]
+}

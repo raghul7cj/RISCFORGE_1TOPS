@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RISCFORGE benchmark testbench architecture</title>
+<style>
+:root{--ink:var(--foreground,#18202c);--sub:color-mix(in srgb,var(--ink) 76%,var(--background,#ffffff));--line:color-mix(in srgb,var(--ink) 24%,var(--background,#ffffff));--surface:var(--card,#f8fafc);--blue:#2d56c8;--teal:#087e70;--violet:#7445bd;--amber:#a8660c;--display:"Archivo","IBM Plex Sans",system-ui,sans-serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;background:transparent;color:var(--ink);font:15px/1.6 var(--sans)}main{width:100%;max-width:1000px;margin:auto}h1,h2,h3{font-family:var(--display);line-height:1.2;letter-spacing:-.015em}h1{font-size:25px;margin:8px 0 12px}h2{font-size:20px;margin:28px 0 12px}h3{font-size:16px;margin:0 0 8px}p{margin:8px 0 14px}.eyebrow{font:600 11px/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}.lead{color:var(--sub);max-width:80ch}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 12px}button{font:600 13px var(--sans);border:1px solid var(--line);border-radius:6px;padding:9px 12px;background:transparent;color:var(--ink);cursor:pointer}button[aria-selected=true]{background:var(--blue);color:white;border-color:var(--blue)}button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}.panel[hidden]{display:none}.diagram{width:100%;height:auto;display:block}.mobile{display:none}svg text{font-family:var(--sans);fill:var(--ink)}svg .small{font-size:12px;fill:var(--sub)}svg .label{font-size:14px;font-weight:600}svg .wire{stroke:var(--sub);stroke-width:1.7;fill:none;marker-end:url(#arrow)}svg .observe{stroke:var(--violet);stroke-dasharray:5 4;stroke-width:1.7;fill:none;marker-end:url(#arrow)}svg .box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}svg .core{fill:#2d56c810;stroke:var(--blue)}svg .memory{fill:#087e7010;stroke:var(--teal)}svg .host{fill:#7445bd0c;stroke:var(--violet)}.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--sub)}.legend span:before{content:"";display:inline-block;width:22px;border-top:2px solid var(--sub);margin-right:6px;vertical-align:middle}.legend .probe:before{border-color:var(--violet);border-top-style:dashed}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card,.note{border:1px solid var(--line);border-radius:8px;padding:16px;background:var(--surface)}.note{border-left:4px solid var(--amber);margin:16px 0}.card p:last-child,.note p:last-child{margin-bottom:0}.card small{display:block;color:var(--sub)}code,pre{font-family:var(--mono);font-size:12px}code{overflow-wrap:anywhere}pre{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;white-space:pre-wrap;overflow-wrap:anywhere}.step{display:flex;gap:12px;align-items:flex-start;margin:12px 0}.num{border:1px solid var(--line);border-radius:50%;height:28px;min-width:28px;text-align:center;font:600 13px/26px var(--mono);color:var(--blue)}.step p{margin:0}.timeline{display:grid;grid-template-columns:1fr 1.6fr 1fr;margin:16px 0}.timeline div{padding:14px;border-top:4px solid var(--line);font-size:13px}.timeline .measured{border-color:var(--teal);background:#087e700b}.timeline strong{display:block}.foot{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-top:14px;margin-top:22px}table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:9px 7px;overflow-wrap:anywhere}th{color:var(--sub);font-size:11px;text-transform:uppercase;letter-spacing:.04em}details{margin:12px 0}summary{cursor:pointer;font-weight:600}a{color:var(--blue)}
+@media(max-width:520px){h1{font-size:22px}.grid{grid-template-columns:1fr}.desktop{display:none}.mobile{display:block}.timeline{grid-template-columns:1fr}.timeline div{border-top:0;border-left:4px solid var(--line)}.timeline .measured{border-left-color:var(--teal)}button{padding:8px 10px}.card{padding:16px}}
+@page{size:A4 portrait;margin:14mm 12mm 16mm}
+@media print{html,body{color:#18202c!important;background:white!important;font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.tabs{display:none}.panel[hidden]{display:block}main{max-width:100%}section{break-inside:auto!important}h1,h2,h3{break-after:avoid}.card,.note,figure,pre,tr,.timeline{break-inside:avoid}.diagram{width:100%;height:auto}.mobile{display:none}.desktop{display:block}pre{white-space:pre-wrap;background:#f8fafc;color:#18202c}.foot{color:#526071}}
+</style>
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../../documentation/signoff/cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. Historical benchmark infrastructure/results: old failures and the diagnostic PASS are not current integrated-source workload verdicts. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside><main>
+<p class="eyebrow">RISCFORGE · dedicated benchmark environment · ABI version 1</p>
+<h1>From benchmark code to a checked SoC result</h1>
+<p class="lead">CoreMark and Dhrystone run as bare-metal firmware through the existing SoC. A separate testbench controls startup, observes failures, and collects the firmware's result block. Host tools preserve the evidence and interpret the measurements.</p>
+<details id="retirement-update-20261111"><summary>11 November: current retirement path and workload rerun</summary><p>Smoke, counter probe and Dhrystone pass on the corrected core. CoreMark completes with matching CRCs; terminal FAIL is retained for insufficient duration. No published score.</p><div style="background:white;padding:16px;border-radius:8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 350" role="img" aria-labelledby="title desc">
+<title id="title">WB occupancy to exactly-once minstret event</title>
+<desc id="desc">Current retirement-counter input path only; not a claim about every architectural side effect. Baseline plus the saved hashed source overlay.</desc>
+<style>text{font:13px system-ui,sans-serif;fill:#18202c}.box{fill:#eef4fc;stroke:#345e98;stroke-width:1.3}.arrow{stroke:#526879;stroke-width:1.5;fill:none;marker-end:url(#head)}.label{font-size:11px;fill:#475063}</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#526879"/></marker></defs>
+<path class="arrow" d="M220,39 L270,39 L270,145 L310,145"><title>ips_reorganized/riscv_core/rtl/top.v :: assign instr_retired_W =</title></path>
+<text class="label" x="275" y="60">valid; no exception</text>
+<path class="arrow" d="M220,127 L285,127 L285,160 L310,160"><title>ips_reorganized/riscv_core/rtl/top.v :: (mret_commit | (~mem_stall_out &amp; ~FlushW));</title></path>
+<text class="label" x="228" y="115">not held</text>
+<path class="arrow" d="M220,215 L285,215 L285,181 L310,181"><title>ips_reorganized/riscv_core/rtl/top.v :: (mret_commit | (~mem_stall_out &amp; ~FlushW));</title></path>
+<text class="label" x="228" y="235">not flushed</text>
+<path class="arrow" d="M220,303 L270,303 L270,196 L310,196"><title>ips_reorganized/riscv_core/rtl/top.v :: (mret_commit | (~mem_stall_out &amp; ~FlushW));</title></path>
+<text class="label" x="275" y="290">commit override</text>
+<path class="arrow" d="M540,171 L590,171"><title>ips_reorganized/riscv_core/rtl/top.v :: .instr_retired_i(instr_retired_W),</title></path>
+<text class="label" x="548" y="155">pulse</text>
+<g><title>ips_reorganized/riscv_core/rtl/memory_cycle.v :: reg valid_W_r;</title><rect class="box" x="10" y="10" width="210" height="58" rx="8"/>
+<text x="22" y="33">MEM/WB packet</text>
+<text x="22" y="52">valid + exception</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/memory_cycle.v :: assign mem_stall_out = core_stall_gated;</title><rect class="box" x="10" y="98" width="210" height="58" rx="8"/>
+<text x="22" y="121">Memory hold</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/top.v :: wire FlushW;</title><rect class="box" x="10" y="186" width="210" height="58" rx="8"/>
+<text x="22" y="209">WB flush</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/wb_trap_mret_commit_controller.v :: assign mret_commit =</title><rect class="box" x="10" y="274" width="210" height="58" rx="8"/>
+<text x="22" y="297">MRET commit</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/top.v :: assign instr_retired_W =</title><rect class="box" x="310" y="130" width="230" height="78" rx="8"/>
+<text x="322" y="153">Retirement qualification</text>
+<text x="322" y="172">instr_retired_W</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/csr_regfile.v :: if (instr_retired_i)</title><rect class="box" x="590" y="140" width="180" height="62" rx="8"/>
+<text x="602" y="163">CSR minstret</text>
+<text x="602" y="182">increment on event</text>
+</g>
+</svg>
+</div><p><a href="../../Verification/minstret_retirement/docs/diagrams/retirement.spec.json">Validated ground-truth spec</a> · <a href="../../documentation/core/MINSTRET_RETIREMENT_20261111.md">Current evidence and limits</a>. The original full-SoC diagram and November 4 results below remain historical.</p></details>
+<div class="tabs" role="tablist" aria-label="Architecture views">
+<button role="tab" id="tab-architecture" aria-controls="architecture" aria-selected="true" data-panel="architecture">Testbench diagram</button>
+<button role="tab" id="tab-timing" aria-controls="timing" aria-selected="false" data-panel="timing">Measurement boundary</button>
+<button role="tab" id="tab-evidence" aria-controls="evidence" aria-selected="false" data-panel="evidence">Evidence and limits</button>
+<button role="tab" id="tab-results" aria-controls="results" aria-selected="false" data-panel="results">Recorded results</button>
+</div>
+<section id="architecture" class="panel" role="tabpanel" aria-labelledby="tab-architecture">
+<svg class="diagram desktop" viewBox="0 0 760 525" role="img" aria-labelledby="diagram-title diagram-desc">
+<title id="diagram-title">Full SoC benchmark testbench architecture</title><desc id="diagram-desc">Pinned benchmark sources and platform code compile into SRAM images. The testbench synchronizes reset and preloads the actual SoC SRAMs. Firmware executes in the core, with counters inside the core and a result block in data SRAM. Read-only testbench probes detect traps, bus timeouts and WB hold overlap. The host validates the result and retains logs.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker></defs>
+<rect class="box host" x="8" y="8" width="225" height="61" rx="7"/><text class="label" x="23" y="33">Pinned sources + platform port</text><text class="small" x="23" y="53">CoreMark / Dhrystone / diagnostics</text>
+<path class="wire" d="M234 38H261"/>
+<rect class="box host" x="264" y="8" width="221" height="61" rx="7"/><text class="label" x="279" y="33">GCC + startup + linker</text><text class="small" x="279" y="53">RV32IM_Zicsr · ILP32 · memory checks</text>
+<path class="wire" d="M486 38H512"/>
+<rect class="box host" x="515" y="8" width="237" height="61" rx="7"/><text class="label" x="530" y="33">ELF, SRAM hex, build identity</text><text class="small" x="530" y="53">Disassembly · map · source hashes</text>
+<rect x="8" y="107" width="744" height="310" rx="9" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+<text class="label" x="23" y="132">Dedicated benchmark testbench</text><text class="small" x="23" y="151">Clock, synchronized warm startup, watchdog, result collection</text>
+<rect class="box" x="24" y="182" width="153" height="105" rx="7"/><text class="label" x="39" y="208">Reset + preload</text><text class="small" x="39" y="230">Wait for synchronizers</text><text class="small" x="39" y="249">Load actual SRAMs</text><text class="small" x="39" y="268">Release core reset</text>
+<path class="wire" d="M632 70V161H99V180"/><text class="small" x="316" y="86">Setup only: IMEM / DMEM images</text>
+<path class="wire" d="M178 233H205"/>
+<rect x="209" y="171" width="349" height="225" rx="8" fill="none" stroke="var(--blue)" stroke-width="1.4"/>
+<text class="label" x="224" y="194">Existing riscforge_soc_subsystem</text>
+<rect class="box core" x="225" y="209" width="155" height="67" rx="6"/><text class="label" x="238" y="234">RV32IM core</text><text class="small" x="238" y="255">mcycle + minstret CSRs</text>
+<rect class="box memory" x="397" y="209" width="145" height="67" rx="6"/><text class="label" x="410" y="234">BootROM / ISRAM</text><text class="small" x="410" y="255">Original fetch timing</text>
+<path class="wire" d="M381 241H395"/>
+<rect class="box memory" x="225" y="302" width="155" height="72" rx="6"/><text class="label" x="238" y="326">DSRAM · 32 KiB</text><text class="small" x="238" y="346">Result ABI: first 256 B</text><text class="small" x="238" y="363">Data, BSS, stack follow</text>
+<path class="wire" d="M302 277V299"/>
+<rect class="box" x="397" y="302" width="145" height="72" rx="6"/><text class="label" x="410" y="326">Fabric / peripherals</text><text class="small" x="410" y="346">Original design blocks</text><text class="small" x="410" y="363">Unused pins held idle</text>
+<path class="wire" d="M302 288H469V299"/>
+<rect class="box" x="579" y="182" width="157" height="192" rx="7"/><text class="label" x="592" y="208">Read-only probes</text><text class="small" x="592" y="234">Result header / status</text><text class="small" x="592" y="255">Console sequence</text><text class="small" x="592" y="276">Trap / bus timeouts</text><text class="small" x="592" y="297">WB hold overlap</text><text class="small" x="592" y="330">No RTL replacement</text><text class="small" x="592" y="351">No fake retirement oracle</text>
+<path class="observe" d="M543 240H575"/><path class="observe" d="M543 337H575"/>
+<path class="wire" d="M657 375V449"/>
+<rect class="box host" x="209" y="452" width="527" height="62" rx="7"/><text class="label" x="224" y="477">Host result validation → engineering metrics → retained evidence</text><text class="small" x="224" y="497">Raw snapshots, failure reason, logs, source identity, tool version and commands</text>
+<text class="small" x="24" y="468">Design file list</text><text class="small" x="24" y="487">references original RTL</text><text class="small" x="24" y="506">outside this folder</text>
+</svg>
+<svg class="diagram mobile" viewBox="0 0 360 640" role="img" aria-label="Mobile view: source build flows into reset and preload, the actual SoC, read-only probes, then host validation and evidence">
+<defs><marker id="arrow-mobile" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#526071"/></marker></defs>
+<rect class="box host" x="8" y="8" width="344" height="70" rx="7"/><text class="label" x="24" y="35">Pinned benchmark + platform code</text><text class="small" x="24" y="58">GCC → ELF, SRAM hex, map, source hashes</text>
+<path d="M180 79V105" stroke="#526071" fill="none" marker-end="url(#arrow-mobile)"/>
+<rect x="8" y="109" width="344" height="422" rx="8" fill="none" stroke="var(--line)"/><text class="label" x="24" y="137">Dedicated benchmark testbench</text>
+<rect class="box" x="24" y="154" width="312" height="61" rx="6"/><text class="label" x="40" y="179">Clock + reset + warm SRAM preload</text><text class="small" x="40" y="199">Synchronized startup; bounded watchdog</text>
+<path d="M180 216V240" stroke="#526071" fill="none" marker-end="url(#arrow-mobile)"/>
+<rect class="box core" x="24" y="244" width="312" height="172" rx="6"/><text class="label" x="40" y="270">Existing full SoC design</text><text class="small" x="40" y="295">RV32IM core: mcycle / minstret</text><text class="small" x="40" y="320">BootROM + 32 KiB instruction SRAM</text><text class="small" x="40" y="345">32 KiB DSRAM: result block + data + stack</text><text class="small" x="40" y="370">Original memory router, fabric, peripherals</text><text class="small" x="40" y="395">File list references original RTL sources</text>
+<path d="M180 417V441" stroke="#7445bd" stroke-dasharray="5 4" fill="none" marker-end="url(#arrow-mobile)"/>
+<rect class="box" x="24" y="445" width="312" height="68" rx="6"/><text class="label" x="40" y="470">Read-only observation</text><text class="small" x="40" y="491">Result ABI, traps, timeouts, WB holds</text>
+<path d="M180 532V559" stroke="#526071" fill="none" marker-end="url(#arrow-mobile)"/>
+<rect class="box host" x="8" y="563" width="344" height="69" rx="7"/><text class="label" x="24" y="590">Host validates and retains evidence</text><text class="small" x="24" y="613">Raw counters, logs, metadata, failure reasons</text>
+</svg>
+<div class="legend"><span>Execution / data flow</span><span class="probe">Observation only</span></div>
+<div class="note"><strong>Two different results must stay visible.</strong><p>Firmware validation can pass while retirement accounting remains unqualified. The current core can retain a valid WB entry during a memory stall; raw <code>minstret</code> values therefore cannot establish unique retired-instruction counts or trusted CPI.</p></div>
+<div class="grid"><div class="card"><h3>Fixed interface</h3><p><code>contract.json</code> defines a versioned result block at <code>0x00020000</code>. Firmware writes snapshots and validation fields, then terminal status last.</p><small>The benchmark linker reserves all 256 bytes.</small></div><div class="card"><h3>Separate verification boundary</h3><p>This TB has a benchmark completion contract. Existing SoC regression requirements and checkers retain their own acceptance criteria.</p><small>Full peripheral and ISA verification remain separate evidence.</small></div></div>
+</section>
+<section id="timing" class="panel" role="tabpanel" aria-labelledby="tab-timing" hidden>
+<h2>Measure the workload, then validate the answer</h2>
+<div class="timeline"><div><strong>Before timing</strong>Warm boot, BSS initialization, benchmark data initialization, and output setup.</div><div class="measured"><strong>Measured workload</strong>Explicit machine CSR snapshots bracket the selected benchmark iterations. No console output is added inside the workload.</div><div><strong>After timing</strong>CRC / final-state checks, result publication, host interpretation and log collection.</div></div>
+<div class="grid"><div class="card"><h3>RV32 counter reads</h3><p>Read high, low, high; retry if the high half changed. Use <code>mcycle / mcycleh</code> and <code>minstret / minstreth</code>.</p><small>The user aliases used by rdcycle / rdinstret are absent in this core.</small></div><div class="card"><h3>Boundary accounting</h3><p>Counter snapshots occur at different instructions. The phase marker is a diagnostic window, not an exact timestamp for either CSR sample.</p><small>Inspect generated assembly and retain measurement overhead.</small></div></div>
+<h2>What the numbers mean</h2>
+<pre>cycles per iteration = elapsed core cycles / iterations
+raw instructions per iteration = raw minstret delta / iterations
+raw CPI = elapsed core cycles / raw minstret delta
+CoreMark/MHz engineering estimate = iterations × 1,000,000 / cycles</pre>
+<p>Raw instruction-derived values require a clear qualification label. A modeled 100 MHz clock sets simulated target time; host simulator wall time does not measure the processor's performance. The simulated clock is also not an achieved silicon frequency.</p>
+<div class="note"><strong>A short run is an engineering run.</strong><p>Published CoreMark requires its prescribed validation and at least 10 seconds of target execution. At modeled 100 MHz that requires one billion measured cycles. A short CRC-valid run is useful evidence, but it cannot be relabeled as a compliant score.</p></div>
+</section>
+<section id="evidence" class="panel" role="tabpanel" aria-labelledby="tab-evidence" hidden>
+<h2>Evidence progresses through distinct stages</h2>
+<div class="step"><span class="num">1</span><p><strong>Compile firmware.</strong> Record toolchain, flags, source revisions/hashes, map, disassembly and static memory use.</p></div>
+<div class="step"><span class="num">2</span><p><strong>Compile and elaborate the SoC TB.</strong> Verify that the new top and original design sources agree, without substituting design blocks.</p></div>
+<div class="step"><span class="num">3</span><p><strong>Run firmware on the SoC.</strong> Preserve the watchdog outcome, trap details, bus failures, console, raw result block and command history.</p></div>
+<div class="step"><span class="num">4</span><p><strong>Validate the workload.</strong> Require benchmark CRC / final-state checks and a consistent result header. A simulator exit alone cannot establish success.</p></div>
+<div class="step"><span class="num">5</span><p><strong>Interpret performance.</strong> Retain source/tool/configuration identity and counter limitations. Signoff and published-score requirements need their own evidence.</p></div>
+<table><colgroup><col style="width:30%"><col style="width:70%"></colgroup><thead><tr><th>Deliverable</th><th>Purpose</th></tr></thead><tbody><tr><td>Firmware and ports</td><td>Startup, traps, freestanding support, counter readers, actual benchmark computations and validation.</td></tr><tr><td>TB and design file list</td><td>Full SoC instance, warm preload, observation, timeouts, collection, and explicit references to original RTL.</td></tr><tr><td>Build and run tools</td><td>Repeatable commands with isolated outputs, metadata, fail-closed result handling and host-side metrics.</td></tr><tr><td>Tests and review record</td><td>Check corrupt/missing/failed evidence paths and record independent findings and their resolution.</td></tr><tr><td>Documentation</td><td>Setup commands, result ABI, measurement boundaries, retained results and known limitations.</td></tr></tbody></table>
+</section>
+<section id="results" class="panel" role="tabpanel" aria-labelledby="tab-results" hidden>
+<h2>What was actually exercised</h2>
+<p>Recorded on 4 November 2026 with WSL GCC 13.2.0 and Vivado XSim 2022.2. The full SoC uses its modeled 100 MHz clock and original RTL sources. These outcomes keep compilation, execution, validation and performance qualification distinct.</p>
+<table><colgroup><col style="width:27%"><col style="width:20%"><col style="width:53%"></colgroup><thead><tr><th>Check</th><th>Outcome</th><th>Evidence boundary</th></tr></thead><tbody>
+<tr><td>Four firmware builds</td><td>PASS</td><td>Actual ELF/map/disassembly/images; all fit 32 KiB ISRAM + 32 KiB DSRAM with a static stack margin.</td></tr>
+<tr><td>Full SoC compile / elaborate</td><td>PASS</td><td>Original DUT, benchmark TB and source references agree. Existing RTL warnings remain recorded.</td></tr>
+<tr><td>Host tests</td><td>39 PASS</td><td>File lists, complete source inventories, sparse addresses, ELF/image consistency, stale-result rejection, console verdicts and analysis failure paths.</td></tr>
+<tr><td>TB negative fixtures</td><td>3 PASS</td><td>Actual simulation rejected a watchdog hang, an illegal instruction and a preloaded terminal result. This is guard verification.</td></tr>
+<tr><td>Counter probe</td><td>PASS</td><td>Real firmware published its counter samples and completed the entire build/run/analyze path. Counter accuracy remains unqualified.</td></tr>
+<tr><td>Arithmetic smoke</td><td>FAIL</td><td>Three validation checks failed. First error 0x1001: accumulation was 1016; expected 2980.</td></tr>
+<tr><td>CoreMark, 1 iteration</td><td>TRAP</td><td>Cause 6, PC 0x00010fa4, address 0x0002092d in core_list_init. Timed work and CRC validation were not reached.</td></tr>
+<tr><td>Dhrystone, 10 iterations</td><td>TRAP</td><td>Cause 5, PC 0x00010088, address 0x00040231 in emit_unsigned. Timed work and final-state validation were not reached.</td></tr>
+</tbody></table>
+<div class="note"><strong>The infrastructure is useful because it preserves these failures.</strong><p>The current design/runtime findings still need engineering diagnosis. No RTL correction, changed expected answer, benchmark success, trusted CPI or published score is claimed.</p></div>
+<div class="grid"><div class="card"><h3>Counter probe detail</h3><p>The snapshot window measured 38 core cycles and a raw minstret delta of 24. The body contains eight explicit instructions; reads and wrappers add overhead. This is a liveness diagnostic.</p></div><div class="card"><h3>Retained handoff</h3><p>The adjacent DELIVERABLES.md indexes the build products, run records, known failures and review responses. REVIEW_R1.md preserves the initial findings; the final integrated review is recorded separately.</p></div></div>
+</section>
+<p class="foot">Architecture guide · RISCFORGE benchmark environment. See the adjacent README and deliverable record for executable commands and the actual validation status. Upstream benchmark rules and existing signoff criteria remain authoritative.</p>
+</main><script>
+const tabs=Array.from(document.querySelectorAll('[role=tab]'));
+function activate(tab){tabs.forEach(button=>{const selected=button===tab;button.setAttribute('aria-selected',String(selected));document.getElementById(button.dataset.panel).hidden=!selected;});}
+tabs.forEach((tab,index)=>{tab.addEventListener('click',()=>activate(tab));tab.addEventListener('keydown',event=>{if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();const next=tabs[(index+(event.key==='ArrowRight'?1:tabs.length-1))%tabs.length];activate(next);next.focus();}});});
+window.addEventListener('load',()=>console.log(JSON.stringify({panels:document.querySelectorAll('[role=tabpanel]').length,diagramLabels:document.querySelectorAll('svg title').length,horizontalOverflow:document.documentElement.scrollWidth>window.innerWidth})));
+</script></body></html>

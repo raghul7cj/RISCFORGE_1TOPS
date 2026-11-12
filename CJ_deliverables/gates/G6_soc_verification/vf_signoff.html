@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign-off and RTL Identity</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification / Sign-off, identity and re-run policy</span></div>
+<div class="wrap">
+
+<h1>Sign-off, RTL Identity and Re-run Policy</h1>
+<p class="lead">What has to be true before Rev B allows a release statement, how an RTL version is given an identity when no version control exists, and how much must be re-run when RTL changes after the freeze point.</p>
+<p class="meta">Scope: Rev B section 20 and 21.7 (Tables 20.1, 20.2, 21.10 to 21.13; decisions D-GR07, D-GR08) | Sources: Rev B plan text, <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Sign-off is a conjunction</a></li>
+<li><a href="#s2">Phase exits and the gates stamped there</a></li>
+<li><a href="#s3">The sign-off statement</a></li>
+<li><a href="#s4">The RTL identity recipe</a></li>
+<li><a href="#s5">The three identity checks</a></li>
+<li><a href="#s6">Freeze point F and the re-run matrix</a></li>
+<li><a href="#s7">Where the repository stands</a></li>
+</ol></div>
+
+<h2 id="s1">1. Sign-off is a conjunction</h2>
+<p>Rev B 20 defines sign-off as the conjunction of the release-level gate set, evaluated once per release on the frozen candidate manifest. G5 requires the per-candidate gates (G2, G4, G6) and each of those requires every run in the manifest to have satisfied the per-run gates (G0, G1, G3). There is no partial sign-off: a design satisfying six of seven gates has six satisfied and one unknown, and an untested gate is reported untested. <span class="tag specified">SPECIFIED</span></p>
+<p>Section 20 restates no gate condition. Predicates, tiers and evidence live only in Table 6.1 (see <a href="vf_regression_gates.html">the gates page</a>). Rev B singles out G1 as carrying the most weight: without it, an unresponsive design yields a run with zero findings and every downstream check trivially satisfied.</p>
+
+<figure>
+<svg viewBox="0 0 960 340" role="img" aria-label="Sign-off gate stack: per-run gates G0, G1, G3 at the base, per-candidate gates G2, G4, G6 in the middle, release gate G5 with compliance report and proof log on top">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<text class="tb" x="24" y="72">Release</text>
+<text class="tb" x="24" y="176">Per-candidate</text>
+<text class="tb" x="24" y="280">Per-run</text>
+<rect class="grp" x="120" y="32" width="816" height="72" rx="8"/>
+<rect class="grp" x="120" y="136" width="816" height="72" rx="8"/>
+<rect class="grp" x="120" y="240" width="816" height="72" rx="8"/>
+
+<rect class="bx-ext" x="188" y="48" width="200" height="40" rx="6"/>
+<text class="tb mid" x="288" y="73">Compliance report (P4)</text>
+<rect class="bx-ver" x="428" y="48" width="200" height="40" rx="6"/>
+<text class="tb mid" x="528" y="65">G5</text>
+<text class="ts mid" x="528" y="80">Compliance and formal</text>
+<rect class="bx-ext" x="668" y="48" width="200" height="40" rx="6"/>
+<text class="tb mid" x="768" y="73">Proof log (P5)</text>
+<path class="ar-ver" d="M388 68 H428"/>
+<path class="ar-ver" d="M668 68 H628"/>
+
+<rect class="bx-ver" x="188" y="152" width="200" height="40" rx="6"/>
+<text class="tb mid" x="288" y="169">G2</text>
+<text class="ts mid" x="288" y="184">Checker viability</text>
+<rect class="bx-ver" x="428" y="152" width="200" height="40" rx="6"/>
+<text class="tb mid" x="528" y="169">G4</text>
+<text class="ts mid" x="528" y="184">Coverage closed</text>
+<rect class="bx-ver" x="668" y="152" width="200" height="40" rx="6"/>
+<text class="tb mid" x="768" y="169">G6</text>
+<text class="ts mid" x="768" y="184">Traceability complete</text>
+
+<rect class="bx-ver" x="188" y="256" width="200" height="40" rx="6"/>
+<text class="tb mid" x="288" y="273">G0</text>
+<text class="ts mid" x="288" y="288">Harness integrity</text>
+<rect class="bx-ver" x="428" y="256" width="200" height="40" rx="6"/>
+<text class="tb mid" x="528" y="273">G1</text>
+<text class="ts mid" x="528" y="288">Stimulus reached the DUT</text>
+<rect class="bx-ver" x="668" y="256" width="200" height="40" rx="6"/>
+<text class="tb mid" x="768" y="273">G3</text>
+<text class="ts mid" x="768" y="288">Checkers all pass</text>
+
+<path class="ar" d="M288 240 V208"/>
+<path class="ar" d="M528 240 V208"/>
+<path class="ar" d="M768 240 V208"/>
+<path class="ar" d="M528 136 V104"/>
+<text class="ts mid" x="480" y="330">No partial sign-off: six of seven satisfied means one unknown.</text>
+</svg>
+<figcaption><b>Figure 1.</b> Sign-off gate stack. Each layer is evaluated only on the layer below it: G5 sits on G4 and G6 of the frozen manifest, which sit on G0, G1 and G3 of every run in it. The compliance report and proof log are inputs produced upstream.</figcaption>
+</figure>
+
+<h2 id="s2">2. Phase exits and the gates stamped there</h2>
+<p>Table 20.1 fixes which gate verdicts are stamped at which phase exit. A gate consumed as an input is not stamped there; this column removes the Rev A cycle where P4 demanded G5 while formal closed in P5. <span class="tag specified">SPECIFIED</span></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Phase</th><th>Tier stamped</th><th>Exit criteria (summary)</th></tr></thead>
+<tbody>
+<tr><td>P0 Bring-up</td><td>per-run</td><td>G0 satisfied; one boot scenario completes with non-zero retired instructions, AXI beats and APB transfers, so G1 is decidable</td></tr>
+<tr><td>P1 Structural</td><td>per-run</td><td>G0, G1, G3 on the MMIO-path partition; path scoreboard drain passes; compliance reports produced as input, no gate stamped</td></tr>
+<tr><td>P2 Model</td><td>per-run</td><td>All three peripheral oracles green for all 6 APB instances; PC-1 to PC-6 met</td></tr>
+<tr><td>P3 Architectural</td><td>per-run</td><td>RS, IC and FP check families satisfied on their configurations</td></tr>
+<tr><td>P4 Closure</td><td>per-candidate</td><td>G2, G4, G6 on the merged campaign; CR-1 to CR-5 met; 69 of 69 applicable compliance tests; G5 not stamped</td></tr>
+<tr><td>P5 Soak</td><td>per-candidate</td><td>G2, G4, G6 re-evaluated on the soaked manifest; campaign converged per Table 6.5; G5 not stamped</td></tr>
+<tr><td>Track F Formal</td><td>none</td><td>FE-1 to FE-4 met and property register closed; an input to G5</td></tr>
+<tr><td>P6 Release</td><td>release</td><td>G5 stamped on the frozen manifest; release partition green; soak converged; no open defect at or above the release-blocking severity (S1)</td></tr>
+</tbody>
+</table></div>
+<p>Track F stamps nothing, because no gate is formal-only: formal feeds G5 and QG-9, which is measured at P6. Rev B notes errata on this table (DEF-011: Table 20.1 does not split P1; F entry points disagree). <span class="tag open">OPEN</span> See <a href="vf_phases_overview.html">the phases page</a>.</p>
+
+<h2 id="s3">3. The sign-off statement</h2>
+<p>Table 20.2 is the template. Each item names the artefact that supplies it.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Value required</th></tr></thead>
+<tbody>
+<tr><td>Design state</td><td>RTL identity: SHA-256 over the canonical filelist manifest plus the four anchor files <code>soc_subsystem.f</code>, <code>riscforge_soc_subsystem.sv</code>, <code>bootloader.sv</code>, <code>csr_regfile.v</code> (D-022). No commit id, because none exists</td></tr>
+<tr><td>Regression state</td><td>Verdict record identifiers for every partition, with per-run gate verdicts</td></tr>
+<tr><td>Candidate gate state</td><td>G2, G4, G6 verdicts on the frozen manifest, with the merged coverage database and viability ledger</td></tr>
+<tr><td>Coverage state</td><td>Bin closure against declared bins; open waivers with owners and review dates</td></tr>
+<tr><td>Compliance state</td><td>Report identifier; suite snapshot version and date (every curated entry carries <code>commit_id: '-'</code>); RTL identity compiled at; denominator 69 applicable with 93 out of scope recorded with reason</td></tr>
+<tr><td>Formal state</td><td>Proved, waived and open counts by module</td></tr>
+<tr><td>Open defects</td><td>Count by severity, none open at S1 (release-blocking, Table 21.2.7a)</td></tr>
+<tr><td>Open waivers</td><td>Count by owner, each with reason and review date</td></tr>
+<tr><td>Approver</td><td>Design, verification and project sign-off per the role definitions in 21.2</td></tr>
+</tbody>
+</table></div>
+<p>Two items replace Rev A wording that could not be satisfied: the RTL hash instead of a commit id, and the suite snapshot version and date instead of a suite commit. Both still bind evidence to an unambiguous, re-derivable identity. The approver row relies on the separation rule SD-8, which needs three distinct people for the P6 signatures.</p>
+
+<h2 id="s4">4. The RTL identity recipe</h2>
+<p>There is no <code>.git</code> in the repository or any parent (D-22), so the identity is a hash recipe (Table 21.10, decision D-GR07). Evidence is valid only for the identity that produced it. Figure 2 shows the eight steps; the failure branch matters as much as the flow, because a hash over a partly resolved file set looks authoritative and is not.</p>
+
+<figure>
+<svg viewBox="0 0 960 296" role="img" aria-label="Eight-step RTL identity recipe from fixing the file set to recording the identity in every artefact header, with an untested branch when entries do not resolve">
+<rect class="bx-ext" x="268" y="8" width="192" height="40" rx="6"/>
+<text class="tb mid" x="364" y="33">untested: no hash computed</text>
+<path class="ar-bad" d="M364 72 V48"/>
+<text class="ts" x="376" y="64">unresolved_entries &gt; 0</text>
+
+<rect class="bx-core" x="36" y="72" width="192" height="64" rx="6"/>
+<text class="tb mid" x="132" y="94">1 Fix file set</text>
+<text class="ts mid" x="132" y="112">non-comment entries of</text>
+<text class="ts mid" x="132" y="126">RTL_SOC/soc_subsystem.f</text>
+<rect class="bx-core" x="268" y="72" width="192" height="64" rx="6"/>
+<text class="tb mid" x="364" y="94">2 Resolve entries</text>
+<text class="ts mid" x="364" y="112">relative to rtl/ips</text>
+<text class="ts mid" x="364" y="126">unresolved == 0 first</text>
+<rect class="bx-core" x="500" y="72" width="192" height="64" rx="6"/>
+<text class="tb mid" x="596" y="94">3 Relativise</text>
+<text class="ts mid" x="596" y="112">repo-relative POSIX paths</text>
+<text class="ts mid" x="596" y="126">absolute path = error</text>
+<rect class="bx-core" x="732" y="72" width="192" height="64" rx="6"/>
+<text class="tb mid" x="828" y="94">4 Hash the files</text>
+<text class="ts mid" x="828" y="112">SHA-256 of raw bytes</text>
+<text class="ts mid" x="828" y="126">no normalisation</text>
+
+<rect class="bx-ver" x="36" y="208" width="192" height="64" rx="6"/>
+<text class="tb mid" x="132" y="230">5 Build manifest</text>
+<text class="ts mid" x="132" y="248">sha256, two spaces, path</text>
+<text class="ts mid" x="132" y="262">byte-sorted, LF endings</text>
+<rect class="bx-ver" x="268" y="208" width="192" height="64" rx="6"/>
+<text class="tb mid" x="364" y="230">6 Hash manifest</text>
+<text class="ts mid" x="364" y="248">H_rtl = SHA-256(manifest)</text>
+<text class="ts mid" x="364" y="262">H_filelist: relativised list</text>
+<rect class="bx-ver" x="500" y="208" width="192" height="64" rx="6"/>
+<text class="tb mid" x="596" y="230">7 Stamp ID checks</text>
+<text class="ts mid" x="596" y="248">ID-1, ID-2, ID-3</text>
+<text class="ts mid" x="596" y="262">recorded with H_rtl</text>
+<rect class="bx-ver" x="732" y="208" width="192" height="64" rx="6"/>
+<text class="tb mid" x="828" y="230">8 Record identity</text>
+<text class="ts mid" x="828" y="248">eight fields in header</text>
+<text class="ts mid" x="828" y="262">missing field = no evidence</text>
+
+<path class="ar" d="M228 104 H268"/>
+<path class="ar" d="M460 104 H500"/>
+<path class="ar" d="M692 104 H732"/>
+<path class="ar" d="M828 136 V172 H132 V208"/>
+<path class="ar" d="M228 240 H268"/>
+<path class="ar" d="M460 240 H500"/>
+<path class="ar" d="M692 240 H732"/>
+</svg>
+<figcaption><b>Figure 2.</b> The identity hash recipe. Steps 1 to 4 fix, resolve, normalise paths and hash the files; steps 5 to 8 build and hash the manifest, compute the identity checks and stamp every artefact. H_rtl is recomputed on every change and is never quoted as a constant.</figcaption>
+</figure>
+
+<p>Measured values Rev B reports for this repository (<span class="tag specified">SPECIFIED</span> as plan text; to be re-measured, not trusted): the file set is 105 entries and <code>RTL_SOC/soc_subsystem.f</code> has none unresolved, while across all 40 filelists in <code>rtl/ips</code>, 15 carry an unresolvable source entry and 9 contain absolute paths. The anchor hashes are published in <code>facts.yaml:meta.file_sha256</code>. Step 8 combines the existing run-identity tuple (tool version, seed, plusargs) with five new fields: H_rtl, H_filelist, ID-1, ID-2, ID-3.</p>
+
+<h2 id="s5">5. The three identity checks</h2>
+<p>Table 21.11 defines the checks computed in the same step as the hash. A run carrying a non-zero <code>duplicate_divergent_reachable</code> or <code>unresolved_entries</code> is untested, never pass (D-GR08).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Check</th><th>Predicate</th><th>What it catches</th></tr></thead>
+<tbody>
+<tr><td>ID-1 module-name uniqueness</td><td><code>duplicate_divergent_reachable == 0</code>. Group every module declaration in the tree by name; a group whose members differ in content is DIVERGENT, and REACHABLE if some filelist names a member together with a testbench</td><td>Two bodies for one module name where a live flow can compile either</td></tr>
+<tr><td>ID-2 resolution</td><td><code>unresolved_entries == 0</code> over every in-scope filelist, evaluated per flow</td><td>A filelist that cannot elaborate, or elaborates a subset of what it names</td></tr>
+<tr><td>ID-3 portability</td><td><code>absolute_path_entries == 0</code> in every in-scope filelist</td><td>A flow that only works on the machine that generated its filelist</td></tr>
+</tbody>
+</table></div>
+<p>The motivating case is the duplicate <code>timer.sv</code>: a green result is attributable to neither copy until one body is deleted or the two are byte-identical, and selecting the "right" copy does not escape the check. Rev B treats this as a defect class, not an incident (ID-1 is a precondition of core trust CT-1, and it is an S1 by predicate; see <a href="vf_traceability_defects.html">defects</a>).</p>
+
+<h2 id="s6">6. Freeze point F and the re-run matrix</h2>
+<p>The freeze point F is declared at the exit of P1b. After F, RTL keeps changing; the rules are that no edit is forbidden, <b>no edit is unrecorded</b> (each change note names files, classes from Table 21.12 and phases touched), and <b>no gate verdict transfers across an identity change</b>. Because the last rule needs no judgement of "significance", it is enforceable; the matrix only bounds how much must be re-run, because the bare rule would be unaffordable.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Class</th><th>Files</th><th>Must be re-run (summary)</th><th>Not needed</th></tr></thead>
+<tbody>
+<tr><td>A core</td><td>anything under <code>riscv_core/rtl/</code> and the core DUT filelist</td><td>CT-1, CT-2, CT-3 in full (69 compliance tests, lock-step, core assertions); critical-path formal goals; G0, G1, G3 on smoke at once; G2, G4, G6 re-derived on a fresh merged campaign</td><td>Peripheral suites whose devices did not change, unless their expected values derive from core-visible behaviour</td></tr>
+<tr><td>B fabric, reset, boot</td><td><code>axi_lite_xbar/</code>, <code>axi_lite_to_apb/</code>, <code>bus_monitors/</code>, SRAM mux and boot files, <code>bootloader.sv</code></td><td>P3.1 and P3.3 in full; the 39 path-scoreboard rules; the 7 timeout monitors; CT-5; candidate campaign restarts</td><td>CT-1 to CT-3, unless <code>core_rst_n</code> release timing changed (then Class A). No verdict transfers regardless</td></tr>
+<tr><td>C peripheral</td><td>I2C, timer, UART, GPIO, SPI, AON timer directories</td><td>That device's suite and bins; ID-1 for its module namespace</td><td>CT-1 to CT-3 and critical formal goals, provided the interrupt path into mip is unchanged</td></tr>
+<tr><td>D harness, TB, spec</td><td>Testbenches, VIPs, monitors, models, check-ID registry, filelists, generators, BSP, the plan</td><td>G0 only; authored checks re-reviewed for authorship conflicts</td><td>Every other gate, since H_rtl is unchanged. This row is why the policy is affordable</td></tr>
+<tr><td>X filelist, tree hygiene</td><td>Any filelist; any file added, moved, renamed or deleted</td><td>ID-1, ID-2, ID-3 in full</td><td>Everything else, unless a design file changed (then its class applies)</td></tr>
+</tbody>
+</table></div>
+<p>Three precedence rules resolve overlap: a broader trigger beats the narrower class (a change to <code>core_rst_n</code> release timing, to the <code>fast_irq_i</code> or <code>fast_intr_core</code> widths, or to <code>mip_w</code> is Class A wherever it sits); Class X is additive and never removes an obligation; and the class map is generated from the design-element column of the traceability matrix, maintained as a reviewed list until that matrix exists.</p>
+<p>Table 21.13 turns the matrix into a cost per gate. Every cell follows from the tiers: a per-run gate is re-run when the run is re-run, a per-candidate gate is re-derived when the manifest changes, and G5 is stamped once on the frozen manifest and so is re-stamped only in P6. Figure 3 shows the grid.</p>
+
+<figure>
+<svg viewBox="0 0 1040 400" role="img" aria-label="Grid of change class A, B, C, D, X against gates G0 to G6 showing re-run, re-derive, re-stamp, no change or conditional">
+<text class="tb mid" x="236" y="36">G0</text><text class="ts mid" x="236" y="50">per-run</text>
+<text class="tb mid" x="356" y="36">G1</text><text class="ts mid" x="356" y="50">per-run</text>
+<text class="tb mid" x="476" y="36">G2</text><text class="ts mid" x="476" y="50">per-candidate</text>
+<text class="tb mid" x="596" y="36">G3</text><text class="ts mid" x="596" y="50">per-run</text>
+<text class="tb mid" x="716" y="36">G4</text><text class="ts mid" x="716" y="50">per-candidate</text>
+<text class="tb mid" x="836" y="36">G5</text><text class="ts mid" x="836" y="50">release</text>
+<text class="tb mid" x="956" y="36">G6</text><text class="ts mid" x="956" y="50">per-candidate</text>
+
+<rect class="bx" x="16" y="68" width="144" height="48" rx="6"/>
+<text class="tb" x="28" y="88">Class A</text><text class="ts" x="28" y="104">core</text>
+<rect class="bx" x="16" y="124" width="144" height="48" rx="6"/>
+<text class="tb" x="28" y="144">Class B</text><text class="ts" x="28" y="160">fabric, reset, boot</text>
+<rect class="bx" x="16" y="180" width="144" height="48" rx="6"/>
+<text class="tb" x="28" y="200">Class C</text><text class="ts" x="28" y="216">peripheral</text>
+<rect class="bx" x="16" y="236" width="144" height="48" rx="6"/>
+<text class="tb" x="28" y="256">Class D</text><text class="ts" x="28" y="272">harness, TB, spec</text>
+<rect class="bx" x="16" y="292" width="144" height="48" rx="6"/>
+<text class="tb" x="28" y="312">Class X</text><text class="ts" x="28" y="328">filelist, hygiene</text>
+
+<!-- Class A row y=68 -->
+<rect class="bx-ctrl" x="176" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="234" y="96">Re-run</text>
+<rect class="bx-ctrl" x="296" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="354" y="96">Re-run</text>
+<rect class="bx-bus" x="416" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="474" y="88">Re-derive</text><text class="ts mid" x="474" y="104">new identity</text>
+<rect class="bx-ctrl" x="536" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="594" y="96">Re-run</text>
+<rect class="bx-bus" x="656" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="714" y="96">Re-derive</text>
+<rect class="bx-core" x="776" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="834" y="88">Re-stamp</text><text class="ts mid" x="834" y="104">in P6</text>
+<rect class="bx-bus" x="896" y="68" width="116" height="48" rx="6"/><text class="tb mid" x="954" y="96">Re-derive</text>
+
+<!-- Class B row y=124 -->
+<rect class="bx-ctrl" x="176" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="234" y="152">Re-run</text>
+<rect class="bx-ctrl" x="296" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="354" y="152">Re-run</text>
+<rect class="bx-bus" x="416" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="474" y="152">Re-derive</text>
+<rect class="bx-ctrl" x="536" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="594" y="152">Re-run</text>
+<rect class="bx-bus" x="656" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="714" y="152">Re-derive</text>
+<rect class="bx-core" x="776" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="834" y="144">Re-stamp</text><text class="ts mid" x="834" y="160">in P6</text>
+<rect class="bx-bus" x="896" y="124" width="116" height="48" rx="6"/><text class="tb mid" x="954" y="152">Re-derive</text>
+
+<!-- Class C row y=180 -->
+<rect class="bx-ctrl" x="176" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="234" y="208">Re-run</text>
+<rect class="bx-ctrl" x="296" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="354" y="208">Re-run</text>
+<rect class="bx-bus" x="416" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="474" y="208">Re-derive</text>
+<rect class="bx-ctrl" x="536" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="594" y="208">Re-run</text>
+<rect class="bx-ctrl" x="656" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="714" y="200">Re-run</text><text class="ts mid" x="714" y="216">that device's bins</text>
+<rect class="bx-core" x="776" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="834" y="200">Re-stamp</text><text class="ts mid" x="834" y="216">in P6</text>
+<rect class="bx-bus" x="896" y="180" width="116" height="48" rx="6"/><text class="tb mid" x="954" y="208">Re-derive</text>
+
+<!-- Class D row y=236 -->
+<rect class="bx-ctrl" x="176" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="234" y="264">Re-run</text>
+<rect class="bx" x="296" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="354" y="264">No change</text>
+<rect class="bx-ext" x="416" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="474" y="256">No change</text><text class="ts mid" x="474" y="272">if no re-author</text>
+<rect class="bx" x="536" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="594" y="264">No change</text>
+<rect class="bx" x="656" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="714" y="264">No change</text>
+<rect class="bx" x="776" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="834" y="264">No change</text>
+<rect class="bx-ext" x="896" y="236" width="116" height="48" rx="6"/><text class="tb mid" x="954" y="256">Re-generate</text><text class="ts mid" x="954" y="272">on registry change</text>
+
+<!-- Class X row y=292 -->
+<rect class="bx-ctrl" x="176" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="234" y="320">Re-run</text>
+<rect class="bx" x="296" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="354" y="320">No change</text>
+<rect class="bx" x="416" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="474" y="320">No change</text>
+<rect class="bx" x="536" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="594" y="320">No change</text>
+<rect class="bx" x="656" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="714" y="320">No change</text>
+<rect class="bx" x="776" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="834" y="320">No change</text>
+<rect class="bx" x="896" y="292" width="116" height="48" rx="6"/><text class="tb mid" x="954" y="320">No change</text>
+
+<rect class="bx-ctrl" x="176" y="368" width="24" height="16" rx="3"/><text class="ts" x="208" y="380">Re-run</text>
+<rect class="bx-bus" x="288" y="368" width="24" height="16" rx="3"/><text class="ts" x="320" y="380">Re-derive</text>
+<rect class="bx-core" x="424" y="368" width="24" height="16" rx="3"/><text class="ts" x="456" y="380">Re-stamp (P6)</text>
+<rect class="bx" x="584" y="368" width="24" height="16" rx="3"/><text class="ts" x="616" y="380">No change</text>
+<rect class="bx-ext" x="720" y="368" width="24" height="16" rx="3"/><text class="ts" x="752" y="380">Conditional</text>
+</svg>
+<figcaption><b>Figure 3.</b> Re-run matrix as a grid (Table 21.13). Classes A and B cost the most; a harness-only change (D) re-runs G0 and leaves RTL evidence attributable because H_rtl is unchanged; a hygiene change (X) costs only the identity checks plus G0.</figcaption>
+</figure>
+
+<h2 id="s7">7. Where the repository stands</h2>
+<p>This page reports no sign-off, and none is possible yet. <span class="tag exists">EXISTS</span> Per <code>Verification/status/PHASE_STATUS.md</code> (2026-10-31): P0 is IN PROGRESS with 13 of 20 checklist items MET, 5 PARTIAL, 2 NOT MET; every later phase, including track F and P6, is NOT STARTED, so no G2 to G6 verdict has been stamped.</p>
+<ul>
+<li>Identity items P0-G3.1 to P0-G3.3 (H_rtl, H_filelist, ID-1/2/3 stamped) are MET; the exact run command capture is PARTIAL.</li>
+<li>DEF-004 (duplicate <code>timer.sv</code>) is FIXED-CONVERGED. DEF-005 (ID-2 and ID-3: unresolved and absolute-path filelist entries) is OPEN at proposed severity S1, which by the S1 predicate would block sign-off; its checkers are not yet written. Rev B's own figures (15 of 40 and 9 of 40) are plan values, not re-measured here.</li>
+<li>DEF-001 (core hazard fix) is present in the current file but FIXED-UNVERIFIED. It is a Class A change, so the Class A rows above apply: CT-1, CT-2, CT-3 must be re-run at the final identity (ACT-011).</li>
+<li>No statement in this page's tables has been executed as a sign-off. The sign-off statement is a template.</li>
+</ul>
+<p>Related pages: <a href="vf_overview.html">verification overview</a>, <a href="vf_checking_scoreboards.html">checking and scoreboards</a>, <a href="tracker_status.html">tracker status</a>, <a href="index.html">index</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B plan text sections 20 (lines 10840 to 10909) and 21.7 (lines 11293 to 11442), with Table 6.1 and 21.2.7a for cross-references; <code>Verification/status/PHASE_STATUS.md</code>.</div>
+</div>
+</body>
+</html>

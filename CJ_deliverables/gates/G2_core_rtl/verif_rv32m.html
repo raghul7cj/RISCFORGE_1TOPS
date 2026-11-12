@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RV32M Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ VERIFICATION</span></div>
+<div class="wrap">
+
+<h1>Verification of the RV32M multiplier and divider</h1>
+<p class="lead">What must be proven about <code>rv32m_unit</code> (MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU), the test plan, the proposed checker, and the evidence that exists today. For core verification engineers.</p>
+<p class="meta">Scope: RV32M unit and its pipeline stall behaviour | Sources: riscv_core/rtl/rv32m_*.v, execute_cycle.v, hazard_unit.v, verification/riscof | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Scope and status</a></li>
+<li><a href="#s2">Requirements</a></li>
+<li><a href="#s3">Corner-case operand matrix</a></li>
+<li><a href="#s4">Test plan</a></li>
+<li><a href="#s5">Check architecture</a></li>
+<li><a href="#s6">Stalls and latency</a></li>
+<li><a href="#s7">Existing evidence</a></li>
+<li><a href="#s8">Not claimed</a></li>
+</ol></div>
+
+
+<h2 id="s1">1. Scope and status</h2>
+<p>This page plans and records verification of the RV32M multiplier and divider: <code>rv32m_unit</code> with its <code>rv32m_mul</code> (Booth radix-4, Dadda tree, three registered stages) and <code>rv32m_div</code> (non-restoring, iterative) sub-blocks, and how the unit stalls the pipeline. Status in one sentence: <span class="tag exists">EXISTS</span> there is <b>no dedicated unit testbench</b> for these modules anywhere in the repository (a search outside <code>riscv_core/rtl</code> and the artefact folders finds no file that instantiates <code>rv32m_*</code>); the only retained evidence is an older RISCOF compliance report that lists the eight M-extension tests as passed, and one historical interrupt test that executes a single DIV.</p>
+<div class="warn"><b>Evidence boundary.</b> The RISCOF report is dated 2026-06-03. <code>rv32m_div.v</code> and <code>rv32m_unit.v</code> were last modified on 2026-09-30, after the report. The tracker plans a RISCOF re-run at the final identity (ACT-011 in <code>Verification/status/PHASE_STATUS.md</code>); phase P1a (core trust) is NOT STARTED. Treat the M-extension compliance result as PASS for an earlier RTL state, not for the current files.</div>
+
+<h2 id="s2">2. Requirements</h2>
+<p>Requirement IDs below are local to this page. Spec behaviour is the RISC-V unprivileged M-extension definition. The RTL column states what the source does today (<span class="tag exists">EXISTS</span>, read from the file); it is not a verification result.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Requirement</th><th>RTL behaviour as read</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>RQ-M1</td><td>MUL returns the low 32 bits of rs1 x rs2 (sign does not matter for the low word)</td><td>Operands are widened to 33 bits, <code>upper</code> = 0 for funct3 000, result = product[31:0]</td><td><code>rv32m_mul.v:45-52,257</code></td></tr>
+<tr><td>RQ-M2</td><td>MULH: high 32 bits, signed x signed</td><td>funct3 001: both operands sign-extended, product[63:32]</td><td><code>rv32m_mul.v:45-49,257</code></td></tr>
+<tr><td>RQ-M3</td><td>MULHSU: high 32 bits, rs1 signed, rs2 unsigned</td><td>funct3 010: rs1 sign-extended, rs2 zero-extended</td><td><code>rv32m_mul.v:45-49</code></td></tr>
+<tr><td>RQ-M4</td><td>MULHU: high 32 bits, unsigned x unsigned</td><td>funct3 011: both zero-extended</td><td><code>rv32m_mul.v:45-49</code></td></tr>
+<tr><td>RQ-M5</td><td>DIV and REM: signed, quotient rounds toward zero, remainder takes the sign of the dividend, rs1 = quotient x rs2 + remainder</td><td>Operands taken as magnitudes, quotient negated when the signs differ, remainder negated when the dividend is negative</td><td><code>rv32m_div.v:73-74,138-146</code></td></tr>
+<tr><td>RQ-M6</td><td>DIVU and REMU: unsigned</td><td>signed_op = 0, magnitudes not negated</td><td><code>rv32m_div.v:47,138-140</code></td></tr>
+<tr><td>RQ-M7</td><td>Divide by zero: DIV and DIVU return all ones; REM and REMU return the dividend; no trap</td><td>Detected in IDLE; edge_result = rs1 for REM/REMU else 0xFFFFFFFF</td><td><code>rv32m_div.v:49,127-130</code></td></tr>
+<tr><td>RQ-M8</td><td>Signed overflow INT_MIN / -1: DIV returns INT_MIN, REM returns 0; the unsigned forms are not special</td><td>signed_ovf gated by signed_op, so DIVU/REMU with the same operands take the normal path</td><td><code>rv32m_div.v:50-52,132-135</code></td></tr>
+<tr><td>RQ-M9</td><td>The destination register tag follows the result, and exactly one result is produced per M instruction</td><td>rd_in is captured at accept and returned as rd_out with valid_out</td><td><code>rv32m_unit.v:85-88</code></td></tr>
+<tr><td>RQ-M10</td><td>The pipeline is held while an M operation is in flight and resumes with the correct result written once</td><td>stall = mul_stall | div_stall | valid_in; EX stage tracks <code>m_started</code></td><td><code>rv32m_unit.v:85</code>, <code>execute_cycle.v:300-327</code></td></tr>
+<tr><td>RQ-M11</td><td>An accepted interrupt may abort an in-flight divide without writing the destination register</td><td>abort_i returns the divider to IDLE and clears stalls; the multiplier has no abort input</td><td><code>rv32m_div.v:106-109</code>, <code>rv32m_mul.v:23-38</code></td></tr>
+</tbody></table></div>
+
+
+<h2 id="s3">3. Corner-case operand matrix</h2>
+<p>Figure 1 lists the eight operand pairs that every operation must pass, with the expected result worked out by hand from the specification. It is the seed of the directed list; constrained-random vectors are added on top (RM-13). The two highlighted regions are where the result is defined by the specification and not by arithmetic, so a reference model written by copying the RTL would hide a bug there; the oracle must be written from the spec.</p>
+<figure>
+<svg viewBox="0 0 1040 396" role="img" aria-label="Operand matrix: eight RV32M operations by eight operand pairs with the expected 32-bit result">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<text class="tb" x="24" y="44">operation</text>
+<text class="ts mid" x="196" y="36">rs1 0</text>
+<text class="ts mid" x="196" y="52">rs2 5</text>
+<text class="ts mid" x="304" y="36">rs1 1</text>
+<text class="ts mid" x="304" y="52">rs2 -1</text>
+<text class="ts mid" x="412" y="36">rs1 INT_MIN</text>
+<text class="ts mid" x="412" y="52">rs2 -1</text>
+<text class="ts mid" x="520" y="36">rs1 INT_MIN</text>
+<text class="ts mid" x="520" y="52">rs2 1</text>
+<text class="ts mid" x="628" y="36">rs1 INT_MAX</text>
+<text class="ts mid" x="628" y="52">rs2 INT_MAX</text>
+<text class="ts mid" x="736" y="36">rs1 -7</text>
+<text class="ts mid" x="736" y="52">rs2 2</text>
+<text class="ts mid" x="844" y="36">rs1 7</text>
+<text class="ts mid" x="844" y="52">rs2 0</text>
+<text class="ts mid" x="952" y="36">rs1 -1</text>
+<text class="ts mid" x="952" y="52">rs2 -1</text>
+<text class="tb" x="24" y="84">MUL</text>
+<rect class="bx-core" x="144" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="83">00000000</text>
+<rect class="bx-core" x="252" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="83">FFFFFFFF</text>
+<rect class="bx-core" x="360" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="83">80000000</text>
+<rect class="bx-core" x="468" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="83">80000000</text>
+<rect class="bx-core" x="576" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="83">00000001</text>
+<rect class="bx-core" x="684" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="83">FFFFFFF2</text>
+<rect class="bx-core" x="792" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="83">00000000</text>
+<rect class="bx-core" x="900" y="64" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="83">00000001</text>
+<text class="tb" x="24" y="120">MULH</text>
+<rect class="bx-core" x="144" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="119">00000000</text>
+<rect class="bx-core" x="252" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="119">FFFFFFFF</text>
+<rect class="bx-core" x="360" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="119">00000000</text>
+<rect class="bx-core" x="468" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="119">FFFFFFFF</text>
+<rect class="bx-core" x="576" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="119">3FFFFFFF</text>
+<rect class="bx-core" x="684" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="119">FFFFFFFF</text>
+<rect class="bx-core" x="792" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="119">00000000</text>
+<rect class="bx-core" x="900" y="100" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="119">00000000</text>
+<text class="tb" x="24" y="156">MULHSU</text>
+<rect class="bx-core" x="144" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="155">00000000</text>
+<rect class="bx-core" x="252" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="155">FFFFFFFF</text>
+<rect class="bx-core" x="360" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="155">80000000</text>
+<rect class="bx-core" x="468" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="155">FFFFFFFF</text>
+<rect class="bx-core" x="576" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="155">3FFFFFFF</text>
+<rect class="bx-core" x="684" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="155">FFFFFFFF</text>
+<rect class="bx-core" x="792" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="155">00000000</text>
+<rect class="bx-core" x="900" y="136" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="155">FFFFFFFF</text>
+<text class="tb" x="24" y="192">MULHU</text>
+<rect class="bx-core" x="144" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="191">00000000</text>
+<rect class="bx-core" x="252" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="191">00000000</text>
+<rect class="bx-core" x="360" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="191">7FFFFFFF</text>
+<rect class="bx-core" x="468" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="191">00000000</text>
+<rect class="bx-core" x="576" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="191">3FFFFFFF</text>
+<rect class="bx-core" x="684" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="191">00000001</text>
+<rect class="bx-core" x="792" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="191">00000000</text>
+<rect class="bx-core" x="900" y="172" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="191">FFFFFFFE</text>
+<text class="tb" x="24" y="228">DIV</text>
+<rect class="bx-core" x="144" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="227">00000000</text>
+<rect class="bx-core" x="252" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="227">FFFFFFFF</text>
+<rect class="bx-ctrl" x="360" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="227">80000000</text>
+<rect class="bx-core" x="468" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="227">80000000</text>
+<rect class="bx-core" x="576" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="227">00000001</text>
+<rect class="bx-core" x="684" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="227">FFFFFFFD</text>
+<rect class="bx-ctrl" x="792" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="227">FFFFFFFF</text>
+<rect class="bx-core" x="900" y="208" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="227">00000001</text>
+<text class="tb" x="24" y="264">DIVU</text>
+<rect class="bx-core" x="144" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="263">00000000</text>
+<rect class="bx-core" x="252" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="263">00000000</text>
+<rect class="bx-core" x="360" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="263">00000000</text>
+<rect class="bx-core" x="468" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="263">80000000</text>
+<rect class="bx-core" x="576" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="263">00000001</text>
+<rect class="bx-core" x="684" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="263">7FFFFFFC</text>
+<rect class="bx-ctrl" x="792" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="263">FFFFFFFF</text>
+<rect class="bx-core" x="900" y="244" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="263">00000001</text>
+<text class="tb" x="24" y="300">REM</text>
+<rect class="bx-core" x="144" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="299">00000000</text>
+<rect class="bx-core" x="252" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="299">00000000</text>
+<rect class="bx-ctrl" x="360" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="299">00000000</text>
+<rect class="bx-core" x="468" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="299">00000000</text>
+<rect class="bx-core" x="576" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="299">00000000</text>
+<rect class="bx-core" x="684" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="299">FFFFFFFF</text>
+<rect class="bx-ctrl" x="792" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="299">00000007</text>
+<rect class="bx-core" x="900" y="280" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="299">00000000</text>
+<text class="tb" x="24" y="336">REMU</text>
+<rect class="bx-core" x="144" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="196" y="335">00000000</text>
+<rect class="bx-core" x="252" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="304" y="335">00000001</text>
+<rect class="bx-core" x="360" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="412" y="335">80000000</text>
+<rect class="bx-core" x="468" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="520" y="335">00000000</text>
+<rect class="bx-core" x="576" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="628" y="335">00000000</text>
+<rect class="bx-core" x="684" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="736" y="335">00000001</text>
+<rect class="bx-ctrl" x="792" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="844" y="335">00000007</text>
+<rect class="bx-core" x="900" y="316" width="104" height="30" rx="6"/>
+<text class="tb mid" x="952" y="335">00000000</text>
+<rect class="bx-ctrl" x="144" y="364" width="24" height="16" rx="3"/><text class="ts" x="176" y="377">RISC-V defined special case (divide by zero, signed overflow)</text>
+<rect class="bx-core" x="600" y="364" width="24" height="16" rx="3"/><text class="ts" x="632" y="377">ordinary arithmetic; value computed per the specification</text>
+</svg>
+<figcaption><b>Figure 1.</b> Corner-case operand matrix. Each cell is the expected result in hex, calculated by hand from the RISC-V definition (INT_MIN = 0x80000000, INT_MAX = 0x7FFFFFFF, -1 = 0xFFFFFFFF). Highlighted cells are the cases where the specification overrides the arithmetic result. Column rs1 = INT_MIN, rs2 = -1 is signed overflow for DIV and REM only; the unsigned forms run the normal path.</figcaption>
+</figure>
+
+<div class="note">Two cases the matrix does not show but the plan includes (RM-14): a signed divisor of INT_MIN (its magnitude is 2^31, which the divider holds in a 32-bit register after negation), and a dividend of INT_MIN with any divisor other than -1. The RTL header comments record five divider defects that were found and fixed during development (<code>rv32m_div.v:65-70,142,178-198</code>); the same classes (sign handling, partial-remainder correction, op-flag snapshot) are what the random and directed sets must hit.</div>
+
+<h2 id="s4">4. Test plan</h2>
+<p>Status values: <b>NOT BUILT</b> means no test exists in the repository; <b>INDIRECT</b> means a retained artefact touches the behaviour but does not check it at unit level; <b>STALE</b> means a result exists for an earlier RTL state. The oracle for arithmetic cases is an independent reference model (Figure 2); for pipeline cases it is the retire stream and register file compared with a software model.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Scenario</th><th>Operand class</th><th>Expected result (per spec)</th><th>Oracle</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>RM-01</td><td>MUL low word</td><td>Figure 1 columns plus random</td><td>Low 32 bits of the product</td><td>Reference model</td><td>INDIRECT, STALE (RISCOF mul-01)</td></tr>
+<tr><td>RM-02</td><td>MULH, MULHSU, MULHU</td><td>Figure 1 columns plus INT_MIN x INT_MIN, 0xFFFFFFFF x 0xFFFFFFFF</td><td>High 32 bits for the stated signedness</td><td>Reference model, 64-bit product</td><td>INDIRECT, STALE (RISCOF mulh, mulhsu, mulhu)</td></tr>
+<tr><td>RM-03</td><td>DIV and REM, all four sign combinations</td><td>Positive/negative dividend x positive/negative divisor</td><td>Quotient toward zero, remainder sign of dividend</td><td>Reference model</td><td>INDIRECT, STALE (RISCOF div, rem)</td></tr>
+<tr><td>RM-04</td><td>DIVU and REMU</td><td>Large unsigned values, high bit set</td><td>Unsigned quotient and remainder</td><td>Reference model</td><td>INDIRECT, STALE (RISCOF divu, remu)</td></tr>
+<tr><td>RM-05</td><td>Divide by zero, four operations</td><td>rs2 = 0 with rs1 = 0, 7, -7, INT_MIN, 0xFFFFFFFF</td><td>DIV/DIVU = 0xFFFFFFFF; REM/REMU = rs1; no trap</td><td>Spec table, not the RTL</td><td>NOT BUILT (whether the RISCOF cases reach it is not established here)</td></tr>
+<tr><td>RM-06</td><td>Signed overflow</td><td>INT_MIN / -1 on DIV and REM</td><td>DIV = INT_MIN, REM = 0</td><td>Spec table</td><td>NOT BUILT</td></tr>
+<tr><td>RM-07</td><td>Same operands on the unsigned forms</td><td>0x80000000 / 0xFFFFFFFF on DIVU and REMU</td><td>0 and 0x80000000 (not an overflow)</td><td>Reference model</td><td>NOT BUILT</td></tr>
+<tr><td>RM-08</td><td>Divisor INT_MIN, signed</td><td>rs2 = 0x80000000 with several dividends</td><td>Normal quotient, no special case</td><td>Reference model</td><td>NOT BUILT</td></tr>
+<tr><td>RM-09</td><td>Exhaustive-style small range</td><td>rs1, rs2 in [-8, 8] for every operation</td><td>Reference model match</td><td>Reference model</td><td>NOT BUILT</td></tr>
+<tr><td>RM-10</td><td>Constrained random, each operation</td><td>Weighted toward 0, 1, -1, INT_MIN, INT_MAX, powers of two</td><td>Reference model match</td><td>Reference model, seed logged</td><td>NOT BUILT</td></tr>
+<tr><td>RM-11</td><td>Destination tag</td><td>rd varied including x0, rd of the previous op</td><td>rd_out equals rd_in; x0 stays zero</td><td>Register-file model</td><td>NOT BUILT</td></tr>
+<tr><td>RM-12</td><td>Back-to-back M operations</td><td>MUL then MUL, MUL then DIV, DIV then MUL, DIV then DIV</td><td>Each result correct; no result lost or duplicated</td><td>Retire stream</td><td>NOT BUILT</td></tr>
+<tr><td>RM-13</td><td>Stall holds the pipeline</td><td>Younger instructions behind an M operation</td><td>No younger instruction commits until valid_out; stall drops with the result</td><td>Retire stream and latency monitor</td><td>NOT BUILT</td></tr>
+<tr><td>RM-14</td><td>Result use by the next instruction</td><td>Dependent ADD, store, branch immediately after DIV and MUL</td><td>Dependent instruction sees the M result</td><td>Software model of the program</td><td>NOT BUILT</td></tr>
+<tr><td>RM-15</td><td>Issue once</td><td>Count of valid_in pulses per M instruction</td><td>Exactly one start per instruction, including when stall drops</td><td>Monitor on <code>start_M</code></td><td>NOT BUILT</td></tr>
+<tr><td>RM-16</td><td>Interrupt during DIV</td><td>Interrupt accepted in each divider state</td><td>Divider returns to IDLE, rd not written, instruction re-executes after MRET with the correct result</td><td>Retire stream, DMEM check</td><td>STALE and in doubt (tb1 test 5, see Section 7)</td></tr>
+<tr><td>RM-17</td><td>Interrupt during MUL</td><td>Interrupt accepted at t0, t1, t2</td><td>No stray write to rd after the abort</td><td>Retire stream</td><td>NOT BUILT; OPEN (the multiplier has no abort input)</td></tr>
+<tr><td>RM-18</td><td>Reset during an operation</td><td>Reset asserted in COMPUTE</td><td>Unit idle, no valid_out after reset</td><td>Monitor</td><td>NOT BUILT</td></tr>
+<tr><td>RM-19</td><td>Latency</td><td>One operation of each type in isolation</td><td>Matches Figure 3</td><td>Latency monitor</td><td>NOT BUILT</td></tr>
+</tbody></table></div>
+
+
+<h2 id="s5">5. Check architecture</h2>
+<p>The unit is small enough to verify standalone with a clock and the ports of <code>rv32m_unit</code> (<code>rv32m_unit.v:2-21</code>), then re-checked inside the core by the lock-step flow. Figure 2 shows the unit-level harness. The reference model is deliberately written in a different style from the RTL: a plain SystemVerilog function using 64-bit signed and unsigned arithmetic for the multiplies and the specification rules for the divides, or a Python script that emits an expected-results file. The comparator checks the 32-bit result, <code>rd_out</code> and that <code>valid_out</code> is a single pulse. The latency monitor checks Figure 3.</p>
+<figure>
+<svg viewBox="0 0 1040 304" role="img" aria-label="Check architecture for the RV32M unit: generator, DUT, reference model, comparator, latency monitor">
+<rect class="bx-ver" x="290" y="24" width="200" height="48" rx="6"/>
+<text class="tb mid" x="390" y="44">Stall / latency monitor</text>
+<text class="ts mid" x="390" y="62">valid_in to valid_out</text>
+<rect class="bx-ver" x="40" y="112" width="170" height="56" rx="6"/>
+<text class="tb mid" x="125" y="136">Operand generator</text>
+<text class="ts mid" x="125" y="154">directed + random</text>
+<rect class="bx-core" x="290" y="112" width="200" height="56" rx="6"/>
+<text class="tb mid" x="390" y="136">DUT: rv32m_unit</text>
+<text class="ts mid" x="390" y="154">clk, funct3, rs1, rs2</text>
+<rect class="bx-ver" x="600" y="112" width="180" height="56" rx="6"/>
+<text class="tb mid" x="690" y="136">Comparator</text>
+<text class="ts mid" x="690" y="154">result and rd_out</text>
+<rect class="bx-ver" x="860" y="112" width="150" height="56" rx="6"/>
+<text class="tb mid" x="935" y="136">Verdict log</text>
+<text class="ts mid" x="935" y="154">pass, fail, seed</text>
+<rect class="bx-ver" x="290" y="224" width="200" height="56" rx="6"/>
+<text class="tb mid" x="390" y="248">Reference model</text>
+<text class="ts mid" x="390" y="266">SV functions or Python</text>
+<path class="ar" d="M210 140 H290"/>
+<path class="ar" d="M490 140 H600"/>
+<path class="ar-ver" d="M780 140 H860"/>
+<path class="ar-ver" d="M390 112 V72"/>
+<path class="ar-ver" d="M490 48 H690 V112"/>
+<path class="ar-ver" d="M125 168 V252 H290"/>
+<path class="ar-ver" d="M490 252 H640 V168"/>
+<text class="ts" x="222" y="132">stimulus</text>
+<text class="ts" x="500" y="132">result</text>
+<text class="ts" x="500" y="270">expected</text>
+</svg>
+<figcaption><b>Figure 2.</b> Proposed unit-level check architecture. The same operand reaches the DUT and an independent reference model; the comparator checks the 32-bit result and the destination register tag, and a separate monitor checks when valid_out and the stall output change. Nothing in this figure is built yet.</figcaption>
+</figure>
+
+
+<h2 id="s6">6. How stalls and latency interact with the pipeline</h2>
+<p>The unit raises <code>stall</code> from three terms: the multiplier counter, the divider, and the accept cycle itself (<code>rv32m_unit.v:85</code>). In the core, <code>stallMUL</code> feeds <code>StallF</code>, <code>StallD</code> and <code>FlushE</code> in <code>hazard_unit.v:170-171,192</code> but not <code>StallE</code> (<code>hazard_unit.v:173</code>, which follows only <code>mem_stall_i</code>). The EX stage substitutes the M result into <code>ResultE</code> and the destination tag into the write-back when <code>m_valid_out</code> is high (<code>execute_cycle.v:293,329-331</code>). A divide interrupted by an accepted interrupt is aborted through <code>div_abort_o = irq_accept_E &amp; stallMUL</code> (<code>execute_cycle.v:297</code>).</p>
+<figure>
+<svg viewBox="0 0 1040 280" role="img" aria-label="Latency of MUL, DIV and the divide edge cases measured from the cycle the unit accepts the operation">
+<text class="ts mid" x="148" y="30">0</text>
+<text class="ts mid" x="172" y="30">1</text>
+<text class="ts mid" x="196" y="30">2</text>
+<text class="ts mid" x="220" y="30">3</text>
+<text class="ts mid" x="916" y="30">32</text>
+<text class="ts mid" x="940" y="30">33</text>
+<text class="ts mid" x="964" y="30">34</text>
+<text class="ts mid" x="988" y="30">35</text>
+<text class="ts" x="24" y="30">cycle (t0 = start_M)</text>
+<rect class="lane" x="136" y="40" width="864" height="1"/>
+<text class="tb" x="24" y="68">MUL family</text>
+<rect class="bx-ctrl" x="136" y="50" width="72" height="28" rx="3"/><text class="ts mid" x="172" y="69">stall</text>
+<rect class="bx-ver" x="208" y="50" width="24" height="28" rx="3"/><text class="tb mid" x="220" y="69">R</text>
+<text class="ts" x="244" y="69">stall high t0..t2, valid_out and result at t3 (derived from reading)</text>
+<text class="tb" x="24" y="128">DIV family</text>
+<rect class="bx-core" x="136" y="110" width="24" height="28" rx="3"/><text class="tb mid" x="148" y="129">I</text>
+<rect class="bx-core" x="160" y="110" width="768" height="28" rx="3"/><text class="tb mid" x="544" y="129">COMPUTE, 32 iterations (t1..t32)</text>
+<rect class="bx-core" x="928" y="110" width="24" height="28" rx="3"/><text class="tb mid" x="940" y="129">C</text>
+<rect class="bx-core" x="952" y="110" width="24" height="28" rx="3"/><text class="tb mid" x="964" y="129">D</text>
+<rect class="bx-ver" x="976" y="110" width="24" height="28" rx="3"/><text class="tb mid" x="988" y="129">R</text>
+<rect class="bx-ctrl" x="136" y="146" width="840" height="24" rx="3"/><text class="ts mid" x="556" y="162">stall high t0..t34; valid_out and result at t35</text>
+<text class="tb" x="24" y="220">DIV by 0, INT_MIN / -1</text>
+<rect class="bx-core" x="136" y="200" width="24" height="28" rx="3"/><text class="tb mid" x="148" y="219">I</text>
+<rect class="bx-core" x="160" y="200" width="24" height="28" rx="3"/><text class="tb mid" x="172" y="219">D</text>
+<rect class="bx-ver" x="184" y="200" width="24" height="28" rx="3"/><text class="tb mid" x="196" y="219">R</text>
+<text class="ts" x="220" y="219">stall high t0..t1, valid_out and result at t2 (IDLE goes straight to DONE)</text>
+<text class="ts" x="24" y="262">I = IDLE accept, C = CORRECT, D = DONE, R = result valid. Horizontal scale 24 px per cycle; the COMPUTE bar is the full 32-cycle run.</text>
+</svg>
+<figcaption><b>Figure 3.</b> Latency map of the unit, derived by reading rv32m_unit.v, rv32m_mul.v and rv32m_div.v. Cycle t0 is the cycle in which valid_in (start_M) is high. The cycle counts are a prediction that the latency monitor must confirm in simulation; no run has measured them.</figcaption>
+</figure>
+
+<p>Pipeline-level checks, each needing the full core and not the standalone harness:</p>
+<ul>
+<li><b>No early commit.</b> While <code>stallMUL</code> is high no younger instruction may retire (RM-13).</li>
+<li><b>Exactly one start.</b> <code>start_M</code> is derived from <code>m_started</code>, which clears when <code>m_valid_out</code> is high. The cycle the result arrives, the EX stage must advance and not re-issue the same instruction (RM-15). I did not find a test that observes this.</li>
+<li><b>Flush interaction.</b> <code>FlushE</code> includes <code>stallMUL</code>, so bubbles are inserted behind the M operation; the checks must confirm no bubble overwrites a pending write-back.</li>
+<li><b>Interrupt abort.</b> The interrupt path and the M unit share <code>abort_i</code>; <code>rv32m_mul</code> has no abort port, so a multiply already in its three-stage pipeline may still produce <code>valid_out</code> after the abort. <span class="tag open">OPEN</span> Whether that can corrupt a register is not shown by any evidence I found; RM-17 exists to decide it. The interrupt plan <code>Verification/MINTPRIO_INTEGRATION_AND_PREEMPTION_PLAN.md</code> also lists MUL/DIV interruption as an unverified pipeline risk.</li>
+</ul>
+
+<h2 id="s7">7. Existing evidence</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Evidence</th><th>What it shows</th><th>Boundary</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>RISCOF compliance report, 8 M-extension tests: div, divu, mul, mulh, mulhsu, mulhu, rem, remu</td><td>All eight listed as Passed against the Sail reference signature</td><td>Report dated 2026-06-03; <code>rv32m_div.v</code> and <code>rv32m_unit.v</code> changed 2026-09-30. The report lists one failure in the privilege suite (misalign1-jalr-01), unrelated to M. The test operand sets are those of the riscv-arch-test suite; I did not enumerate them, so I cannot say they reach every cell of Figure 1.</td><td><code>../verification/riscof/report.html</code>, <code>../verification/riscof/test_list_mul.yaml</code> (lists mul-01 only)</td></tr>
+<tr><td>tb1_interrupts test 5: DIV 100000 / 3 with a timer interrupt pending</td><td>The test program expects quotient 33333 in DMEM and checks that <code>irq_accept_E</code> stays low while <code>stallMUL</code> is high</td><td>Written for the pre-restructure interrupt design (see the interrupt page). On the current RTL, <code>irq_accept_E</code> has no <code>stallMUL</code> term (<code>execute_cycle.v:459</code>) and <code>div_abort</code> is defined to need it high at the same time, so the test's assertion and the abort wiring disagree. No retained run log was found. OPEN.</td><td><code>Verification/tb1_interrupts.sv:590-654</code>, <code>Verification/gen_tb1_hex.py:347-388</code></td></tr>
+<tr><td>Directed, unit-level RV32M testbench</td><td>None exists</td><td>-</td><td>search of the repository</td></tr>
+</tbody></table></div>
+
+<p>The verification matrix and tracker do not list an M-extension unit row; the relevant planned work is phase P1a (CT-1 to CT-5) and ACT-011 (RISCOF re-run at the final identity), both NOT STARTED in <code>Verification/status/PHASE_STATUS.md</code>.</p>
+
+<h2 id="s8">8. What this page does not claim</h2>
+<ul>
+<li>It does not claim the unit is correct. The latency numbers and the expected values in Figure 1 are derived from the source and the specification, not from a simulation.</li>
+<li>It does not claim the RISCOF passes still hold on the present RTL.</li>
+<li>It does not cover the Zba/Zbb or compressed extensions, which are not in this core.</li>
+</ul>
+<p>Related pages: <a href="core_execute_mem_wb.html">Execute, memory and write-back stages</a>, <a href="core_interrupts.html">Core interrupts</a>, <a href="verif_core_overview.html">Core verification overview</a>, <a href="vf_core_lockstep_compliance.html">Lock-step and compliance</a>, <a href="vf_interrupt_verification.html">Interrupt verification</a>, <a href="verif_lsu_memif.html">Load/store and memory interface verification</a>, <a href="index.html">Index</a>.</p>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/rv32m_unit.v</code>, <code>rv32m_mul.v</code>, <code>rv32m_div.v</code>, <code>execute_cycle.v</code> (lines 285-335, 459), <code>hazard_unit.v</code> (170-201), <code>Verification/tb1_interrupts.sv</code>, <code>gen_tb1_hex.py</code>, <code>MINTPRIO_INTEGRATION_AND_PREEMPTION_PLAN.md</code>, <code>Verification/status/PHASE_STATUS.md</code>, <code>../verification/riscof/report.html</code> and <code>test_list_mul.yaml</code>.</div>
+</div>
+</body>
+</html>

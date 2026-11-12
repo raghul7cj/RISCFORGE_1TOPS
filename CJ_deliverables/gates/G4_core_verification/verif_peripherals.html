@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peripheral Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification / Peripherals</span></div>
+<div class="wrap">
+
+<h1>Peripheral verification</h1>
+<p class="lead">How the six integrated APB devices are verified, what evidence is retained for each, and why a component PASS does not close a SoC-level obligation. For verification engineers and reviewers reading the Rev B peripheral plan against the evidence tree.</p>
+<p class="meta">Scope: I2C, Timer 0, UART, GPIO, SPI master, Timer 1 (APB slots 0 to 5); the AON watchdog is covered only to say it is not integrated | Sources: <code>Verification/README.md</code>, <code>verification_matrix.csv</code>, <code>components/apb/*.md</code>, tracker <code>Peripheral_Closure</code>, Rev B section 15 | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Layered approach</a></li>
+<li><a href="#s2">Verification environment</a></li>
+<li><a href="#s3">Per-device summary and retained evidence</a></li>
+<li><a href="#s4">Full-window offset sweep and error policy</a></li>
+<li><a href="#s5">Timing oracle for timed devices</a></li>
+<li><a href="#s6">Sign-off criteria</a></li>
+<li><a href="#s7">Evidence versus requirement</a></li>
+<li><a href="#s8">Closure heat-map</a></li>
+<li><a href="#s9">What this page does not claim</a></li>
+</ol></div>
+
+<div class="note"><b>Current status (from <code>Verification/status/PHASE_STATUS.md</code>, 2026-10-31).</b> P0 bring-up is IN PROGRESS: 13 of 20 exit items MET, 5 PARTIAL, 2 NOT MET. The UART <code>apb_to_obi.sv</code> fix is now in the canonical RTL (see <a href="verif_uart.html">UART verification</a>). The duplicate <code>timer.sv</code> copies are converged (DEF-004, FIXED-CONVERGED). Every row in the verification matrix has <code>soc_boundary_closed = NO</code> and <code>revb_check_ids_mapped = NOT MAPPED</code>.</div>
+
+<h2 id="s1">1. Layered approach</h2>
+<p>Rev B draws one scope line for all peripherals (Rev B 15.1). At SoC level the plan verifies two things only: <em>connectivity</em> (decode to the right instance, protocol conformance from the load/store unit to the register file, well-formed response, interrupt line reaching the intended <code>mip</code> bit, reset release) and <em>end-to-end flows</em> (a transaction started through the fabric produces the architectural side effect). Device internals, such as framing, command decoding and bit timing, are <em>inherited</em> from each IP's own bench, and an inherited claim is only valid when a named artefact and IP source hash back it (Rev B 15.1, mechanisms M-A, M-B, M-C; falsifiers FALS-1 to FALS-4). <span class="tag specified">SPECIFIED</span></p>
+<p>Closure is tracked in five layers, which is also how the tracker sheet <code>Peripheral_Closure</code> is organised. Figure 1 lists them; the first is the "component bench" column and the other four are SoC-level.</p>
+
+<figure>
+<svg viewBox="0 0 960 384" role="img" aria-label="Five verification layers: register model, device oracle, SoC firmware path, interrupt path, error and timeout path">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ver" x="24" y="24" width="216" height="48" rx="6"/>
+<text class="tb mid" x="132" y="53">1 Register model</text>
+<rect class="bx" x="272" y="24" width="664" height="48" rx="6"/>
+<text class="t" x="288" y="53">Read-back of every reachable register identity; reserved bits checked, not masked</text>
+<path class="ar-ver" d="M240 48 H272"/>
+
+<rect class="bx-ver" x="24" y="96" width="216" height="48" rx="6"/>
+<text class="tb mid" x="132" y="125">2 Device VIP or oracle</text>
+<rect class="bx" x="272" y="96" width="664" height="48" rx="6"/>
+<text class="t" x="288" y="125">Pin-level slave or serial peer; cycle model (timing oracle) for the two timers</text>
+<path class="ar-ver" d="M240 120 H272"/>
+
+<rect class="bx-core" x="24" y="168" width="216" height="48" rx="6"/>
+<text class="tb mid" x="132" y="197">3 SoC firmware path</text>
+<rect class="bx" x="272" y="168" width="664" height="48" rx="6"/>
+<text class="t" x="288" y="197">Firmware on the real core reaches the device through LSU, AXI-Lite and APB</text>
+<path class="ar" d="M240 192 H272"/>
+
+<rect class="bx-ctrl" x="24" y="240" width="216" height="48" rx="6"/>
+<text class="tb mid" x="132" y="269">4 IRQ path</text>
+<rect class="bx" x="272" y="240" width="664" height="48" rx="6"/>
+<text class="t" x="288" y="269">Device line to gateway, arbiter and mip bit; clear and re-assert</text>
+<path class="ar" d="M240 264 H272"/>
+
+<rect class="bx-bus" x="24" y="312" width="216" height="48" rx="6"/>
+<text class="tb mid" x="132" y="341">5 Error and timeout</text>
+<rect class="bx" x="272" y="312" width="664" height="48" rx="6"/>
+<text class="t" x="288" y="341">PSLVERR, DECERR and timeout-monitor responses against error-policy rows</text>
+<path class="ar" d="M240 336 H272"/>
+</svg>
+<figcaption><b>Figure 1.</b> Layers 1 and 2 are device-side (inherited from IP benches, re-observed at the bus); layers 3 to 5 need the whole SoC. Layer 5 is checked against rows X1 to X13 of the Rev B error policy (section 4).</figcaption>
+</figure>
+
+<h2 id="s2">2. Verification environment</h2>
+<p>Figure 2 shows the target environment that Rev B 15 describes for a SoC-level peripheral check: firmware on the real core, the fabric, one APB slot, the device, and the verification components around them. The device VIP is a pin-level model of whatever sits on the pads (I2C EEPROM, SPI flash, serial peer); for UART the internal loopback (<code>MCR[4]</code>) removes the need for one (Rev B 15.7.3). The environment as a whole is <span class="tag specified">SPECIFIED</span>. Pieces that <span class="tag exists">EXIST</span> in the repository are the passive monitors and checker self-proof (matrix rows MON-01, CHK-01), the I2C EEPROM and SPI flash models (MEM-SLV), and stage proofs that ran firmware through the real fabric (STG-02, STG-03); a per-device register model and scoreboard is not retained as a run.</p>
+
+<figure>
+<svg viewBox="0 0 1040 432" role="img" aria-label="Verification environment: firmware, core, fabric, APB slot and device on top; APB monitor, register model, scoreboard and device VIP below">
+<rect class="bx-ctrl" x="24" y="64" width="160" height="56" rx="6"/>
+<text class="tb mid" x="104" y="88">Firmware</text><text class="ts mid" x="104" y="106">polled or ISR driven</text>
+<rect class="bx-core" x="232" y="64" width="160" height="56" rx="6"/>
+<text class="tb mid" x="312" y="88">Core</text><text class="ts mid" x="312" y="106">RV32IM, LSU</text>
+<rect class="bx-bus" x="440" y="64" width="160" height="56" rx="6"/>
+<text class="tb mid" x="520" y="88">Fabric</text><text class="ts mid" x="520" y="106">AXI-Lite to APB</text>
+<rect class="bx-bus" x="648" y="64" width="160" height="56" rx="6"/>
+<text class="tb mid" x="728" y="88">APB slot</text><text class="ts mid" x="728" y="106">one of six windows</text>
+<rect class="bx-per" x="856" y="64" width="160" height="56" rx="6"/>
+<text class="tb mid" x="936" y="88">Device RTL</text><text class="ts mid" x="936" y="106">I2C, UART, ...</text>
+<path class="ar" d="M184 92 H232"/>
+<path class="ar" d="M392 92 H440"/>
+<path class="ar" d="M600 92 H648"/>
+<path class="ar" d="M808 92 H856"/>
+<path class="ar-d" d="M936 64 V36 H312 V64"/>
+<text class="ts mid" x="624" y="28">device interrupt line to mip</text>
+
+<rect class="bx-ver" x="232" y="248" width="160" height="56" rx="6"/>
+<text class="tb mid" x="312" y="272">Scoreboard</text><text class="ts mid" x="312" y="290">expected vs observed</text>
+<rect class="bx-ver" x="440" y="248" width="160" height="56" rx="6"/>
+<text class="tb mid" x="520" y="272">Register model</text><text class="ts mid" x="520" y="290">three masks per register</text>
+<rect class="bx-ver" x="648" y="248" width="160" height="56" rx="6"/>
+<text class="tb mid" x="728" y="272">APB monitor</text><text class="ts mid" x="728" y="290">passive, per transfer</text>
+<rect class="bx-ver" x="856" y="344" width="160" height="56" rx="6"/>
+<text class="tb mid" x="936" y="368">Device VIP</text><text class="ts mid" x="936" y="386">pin model or loopback</text>
+
+<path class="ar-ver" d="M352 120 V248"/>
+<text class="ts" x="360" y="190">retired MMIO, ISR cause</text>
+<path class="ar-ver" d="M728 120 V248"/>
+<text class="ts" x="736" y="190">PSEL ... PRDATA</text>
+<path class="ar-ver" d="M648 276 H600"/>
+<path class="ar-ver" d="M440 276 H392"/>
+<path class="ar-ver" d="M936 120 V344"/>
+<text class="ts" x="944" y="230">pins</text>
+<path class="ar-ver" d="M856 372 H272 V304"/>
+<text class="ts mid" x="560" y="364">observed pin events</text>
+</svg>
+<figcaption><b>Figure 2.</b> The verification-component boxes (lower rows) only observe. The scoreboard joins three views of the same access: what firmware retired, what the APB monitor saw through the register model, and what the pins did.</figcaption>
+</figure>
+
+<h2 id="s3">3. Per-device summary and retained evidence</h2>
+<p>Rev B publishes a scenario table per device (15.2 to 15.8 as device sub-parts). The counts below are the number of <code>DEV-nnnn</code> rows I found in those tables; where the plan states a total in prose it is marked "stated". Register identities per device are 6, 6, 7, 19, 10, 6 in slot order, 54 in all (Rev B PC-1). Counts of retained checks come from <code>Verification/verification_matrix.csv</code>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Device (slot)</th><th>Rev B scenarios</th><th>Retained result (matrix row)</th><th>Boundary and limit</th></tr></thead>
+<tbody>
+<tr><td>GPIO (3)</td><td>22 rows (<code>DEV-0603</code> to <code>DEV-0628</code>, counted)</td><td><b>312/312</b>, <code>tb_gpio_apb_directed</code>, run <code>tb_gpio_20261031_155313_6110d203</code> (APB-03)</td><td>Direct wrapper bench bypasses the SoC APB decoder. Aperture routing is shown separately by FAB-02 (43/43) with synthetic responders, so it does not test GPIO RTL.</td></tr>
+<tr><td>I2C master (0)</td><td>20 (stated)</td><td><b>90/90</b>, <code>thorough_tb</code>, run <code>tb_apb_i2c_20261031_183848_8596553a</code> (APB-00)</td><td>Direct APB bench with a pin model. The component record <code>components/apb/i2c.md</code> still cites the earlier <code>20261018_run01</code>; the 90 checks are not enumerated against Rev B IDs.</td></tr>
+<tr><td>SPI master (4)</td><td>35 (stated)</td><td><b>26/26</b> plus 9 EOT events, <code>tb_apb_spi_master_bfm</code> (APB-04)</td><td>Behavioural BFM only. The top-level <code>20261019_run02/reproducibility.json</code> carries an older TC6 caveat that the follow-up manifest supersedes.</td></tr>
+<tr><td>Timer 0 (1)</td><td>25 rows (<code>DEV-0201</code> to <code>DEV-0225</code>, counted)</td><td><b>9/9</b> shared two-instance bench; <b>52/52</b> staged boot-to-runtime (APB-01)</td><td>The 52/52 run used a staged XSim-compatible bench and filelist, not the checked-in integration bench. Timing oracle PATH-0301 to 0307 is not among the retained checks.</td></tr>
+<tr><td>Timer 1 (5)</td><td>26 (stated, <code>DEV-0301</code> to <code>DEV-0326</code>)</td><td>Inside the same <b>9/9</b> (APB-05)</td><td>No Timer 1 specific count and no Timer 1 firmware flow. Its four interrupt lines are not routed to the core (Rev B 15.5), so that part of the coverage oracle is blocked.</td></tr>
+<tr><td>UART (2)</td><td>29 (stated, <code>DEV-0401</code> to <code>DEV-0429</code>)</td><td><b>69/69</b> across 30 test cases, with the decoupling fix, run <code>tb_apb_uart_20261031_183831_c6c78663</code> (APB-02)</td><td>Component boundary only; no SoC firmware UART run (Stage 6). Details on <a href="verif_uart.html">UART verification</a>.</td></tr>
+<tr><td>AON watchdog</td><td>30 rows, specified</td><td>None (matrix <code>NOT_INTEGRATED</code>)</td><td>Not one of the six APB devices; no SoC instance (Rev B 15).</td></tr>
+</tbody></table></div>
+<p>Other retained evidence that touches peripherals: firmware-driven smoke tests under <code>datapath_verification/</code> for I2C0, SPI0, UART0 (matrix rows DP-I2C, DP-SPI, DP-UART, all PASS at subsystem boundary with an isolated <code>crt0</code>, not the reference SoC firmware flow); the suites <code>Verification/tests/suites/stage5_reg_sweep/main.c</code> (reset-value sweep over the six apertures) and <code>stage6_polled_periph/main.c</code> (UART loopback, Timer 0 counting, GPIO loopback, SPI transfer, I2C bus recovery). I found <span class="tag open">OPEN</span> no retained pass record for the stage 5 or stage 6 suites in the files read. The stage 5 header also says the OBI UART register RTL is absent from the tree; that is stale, because <code>SOC_FILES/include/obi/obi_uart_register.sv</code> is compiled by the UART bench filelists.</p>
+
+<h2 id="s4">4. Full-window offset sweep and error policy</h2>
+<p>Rev B 15.3 requires one word read and one word write at every word offset of the APB decode space (<code>0x4000_0000</code> to <code>0x4000_5FFF</code>), 6144 offsets, each recorded for response code, read data and register-model state change. The outcome must reconcile: 3603 offsets resolve to a register, 2029 are unimplemented inside decoded windows and 512 fall in the GPIO hole (3603 + 2029 + 512 = 6144). <span class="tag specified">SPECIFIED</span> The key point is that four of six instances receive only part of PADDR, so offsets above their decode range alias onto real registers rather than reading zero.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Window</th><th>Word offsets reaching a register</th><th>Unimplemented</th><th>Alias period</th><th>Behaviour of an unimplemented offset</th></tr></thead>
+<tbody>
+<tr><td>I2C</td><td>384 (6 identities)</td><td>640</td><td>64 bytes</td><td>Read 0, write ignored, no PSLVERR (constant 0)</td></tr>
+<tr><td>Timer 0</td><td>768 (6 identities)</td><td>256</td><td>32 bytes</td><td>As I2C; index 3 is a negative-proof bin (PATH-0112)</td></tr>
+<tr><td>UART</td><td>1024 decode an arm; 896 reach a stored register, 128 reach the unimplemented SCR</td><td>0</td><td>32 bytes</td><td>No read-as-zero space at all; PSLVERR is driven by the register file</td></tr>
+<tr><td>GPIO</td><td>19 (sparse)</td><td>493</td><td>none</td><td>Read 0, write ignored, PSLVERR asserted</td></tr>
+<tr><td>SPI master</td><td>640 (10 identities)</td><td>384</td><td>64 bytes</td><td>As I2C; index 7 (<code>0x1C</code>) sits between implemented offsets</td></tr>
+<tr><td>Timer 1</td><td>768 (6 identities)</td><td>256</td><td>32 bytes</td><td>As Timer 0</td></tr>
+<tr><td>Hole <code>0x4000_3800</code> to <code>0x4000_3FFF</code></td><td>0</td><td>512</td><td>n/a</td><td>DECERR, read data <code>0xDEA110C8</code>, no APB transfer</td></tr>
+</tbody></table></div>
+<p>Reserved and unimplemented bits are checked, never masked (decision D-90); each register descriptor carries three masks and the read-back comparison uses all three. The error policy (Rev B 15.4, Table 15.5) replaces a rule set that contradicted the RTL. Rows that matter for planning:</p>
+<ul>
+<li><b>X3</b> byte-lane write: non-conforming on all six instances, by four distinct mechanisms. None has a working PSTRB path.</li>
+<li><b>X4</b> write to a read-only register must give PSLVERR: conforming on the UART only.</li>
+<li><b>X5</b> write to an unimplemented offset must give PSLVERR: conforming on GPIO only; vacuous on UART (no unimplemented offset).</li>
+<li><b>X8</b> zero-lane write to a decode hole returns OKAY in the bridge instead of DECERR (one edit, <code>axi_lite_to_apb.sv:319</code> per Rev B).</li>
+<li><b>X13</b> concerns the AON watchdog only, so the executable minimum on the integrated instances is 11 of 13 rows (PC-3).</li>
+</ul>
+<p>Rev B predicts today's response for these and records it as a defect, so a green X3, X4, X5 or X8 is a recorded defect, not a pass. These are plan statements; no retained run executes the sweep or the policy rows (matrix mapping is NOT MAPPED throughout). <span class="tag open">OPEN</span></p>
+
+<h2 id="s5">5. Timing oracle for timed devices</h2>
+<p>A pin oracle is not applicable to a timer: the timer has no status latch, only combinational levels qualified by <code>TIMER_CTRL.EN</code>. Rev B 15.5 therefore replaces it with a cycle-accurate counter-and-compare reference model built from only the predicted register values and the count of <code>clk_i</code> rising edges, never reading a DUT net. <span class="tag specified">SPECIFIED</span></p>
+<ul>
+<li>Tick period is 1 cycle when <code>TIMER_CTRL[5:3]</code> is 0 and that value plus 1 otherwise, so periods 1 to 8 cycles; all eight are exercised.</li>
+<li>Tolerance is 0 cycles. A one-cycle disagreement is a finding (PATH-0301 to PATH-0305).</li>
+<li>Overflow is reached by a directed write of <code>0xFFFF_FFFF</code> to <code>TIMER_VAL</code> followed by one tick, because counting to it takes 2^32 ticks.</li>
+<li>A write to <code>TIMER_CMP</code> clears <code>TIMER_VAL</code> on the next cycle; compare or overflow clears it on the following cycle.</li>
+<li>PATH-0307 mutates the model's tick period by one cycle and requires PATH-0301 to report; the model is mutated, never the DUT.</li>
+</ul>
+<p>All obligations are in <code>clk_i</code> cycles; the clock frequency in hertz is TBD (D-92). The retained Timer 0 and Timer 1 results (9/9, 52/52) are functional checks, not this oracle. <span class="tag open">OPEN</span></p>
+
+<h2 id="s6">6. Sign-off criteria</h2>
+<p>Peripheral sign-off is the conjunction of PC-1 to PC-9 and PC-9a for all six instances, with TBD entries reported as untested (Rev B 15.8). "Untested" is a different verdict from "passed".</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Criterion (summary)</th><th>Measurement</th></tr></thead>
+<tbody>
+<tr><td>PC-1</td><td>Three oracles populated and green</td><td>54 register identities read back; timing oracle for timers, pin oracle otherwise; coverage bins hit</td></tr>
+<tr><td>PC-2</td><td>Every documented device mode exercised</td><td>Bin count against the published mode list; blocked while the mode list count is TBD(D-93)</td></tr>
+<tr><td>PC-3</td><td>Every error-policy row provoked</td><td>11 of 13 rows executable on integrated instances</td></tr>
+<tr><td>PC-4</td><td>Every interrupt line provoked end to end</td><td>Causes taken and <code>mip</code> bit observed; Timer 1's four lines and Timer 0's three non-MTIP lines are programmable but unrouted</td></tr>
+<tr><td>PC-5</td><td>Driver register map matches generated header</td><td>Build check; header does not exist yet, so not evaluable</td></tr>
+<tr><td>PC-6</td><td>One named end-to-end flow per instance</td><td>Side effect counted at the pins or at <code>TIMER_VAL</code></td></tr>
+<tr><td>PC-7</td><td>Offset sweep reconciles, reserved bits checked</td><td>3603 + 2029 + 512 = 6144</td></tr>
+<tr><td>PC-8</td><td>Every inherited claim backed by a named artefact</td><td>Mechanism, artefact id and IP hash per instance</td></tr>
+<tr><td>PC-9</td><td>Unreachable-by-construction offsets proved</td><td>Timer index 3 (256 offsets), SPI <code>0x1C</code>, UART SCR bin</td></tr>
+<tr><td>PC-9a</td><td>Scope line enforced for GPIO</td><td>The AXI-Lite GPIO wrapper appears in no filelist and is not instantiated</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Evidence versus requirement</h2>
+<p>The verification README states the rule: a PASS in a component record does not automatically close a Rev B check ID; the check-to-test mapping and the SoC-level scope must also be established. Figure 3 applies that rule. Each retained result on the left supports only part of the obligations on the right; the dashed boxes have no retained evidence at all.</p>
+
+<figure>
+<svg viewBox="0 0 960 540" role="img" aria-label="Retained evidence on the left partially supports some SoC obligations on the right; several obligations have no retained evidence">
+<text class="th" x="24" y="16">Retained evidence</text>
+<text class="th" x="592" y="16">Rev B SoC obligation</text>
+<rect class="bx-ver" x="24" y="24" width="296" height="56" rx="6"/>
+<text class="tb mid" x="172" y="48">Component benches</text><text class="ts mid" x="172" y="66">GPIO 312, I2C 90, SPI 26, T0/T1 9, UART 69</text>
+<rect class="bx-ver" x="24" y="96" width="296" height="56" rx="6"/>
+<text class="tb mid" x="172" y="120">Aperture routing 43/43</text><text class="ts mid" x="172" y="138">real bridge, synthetic APB responders</text>
+<rect class="bx-ver" x="24" y="168" width="296" height="56" rx="6"/>
+<text class="tb mid" x="172" y="192">Timer 0 boot-to-runtime 52/52</text><text class="ts mid" x="172" y="210">staged XSim-compatible sources</text>
+
+<rect class="bx-bus" x="592" y="24" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="48">Register map and device behaviour</text><text class="ts mid" x="764" y="66">inherited (M-B); needs hash-tied artefact</text>
+<rect class="bx-bus" x="592" y="96" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="120">Decode to the intended instance</text><text class="ts mid" x="764" y="138">routing only; peripheral RTL not in loop</text>
+<rect class="bx-bus" x="592" y="168" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="192">End-to-end flow through fabric (PC-6)</text><text class="ts mid" x="764" y="210">Timer 0 only, staged</text>
+<rect class="bx-ext" x="592" y="240" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="264">Interrupt to mip, clear, re-assert (PC-4)</text><text class="ts mid" x="764" y="282">no retained evidence</text>
+<rect class="bx-ext" x="592" y="312" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="336">Error policy rows X1 to X13 (PC-3)</text><text class="ts mid" x="764" y="354">no retained evidence</text>
+<rect class="bx-ext" x="592" y="384" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="408">Timing oracle, 0-cycle tolerance</text><text class="ts mid" x="764" y="426">no retained evidence</text>
+<rect class="bx-ext" x="592" y="456" width="344" height="56" rx="6"/>
+<text class="tb mid" x="764" y="480">Inherited-claim artefacts (PC-8)</text><text class="ts mid" x="764" y="498">Rev B assumes present for GPIO only</text>
+
+<path class="ar-ver" d="M320 52 H592"/>
+<text class="ts mid" x="456" y="44">register behaviour</text>
+<path class="ar-ver" d="M320 124 H592"/>
+<text class="ts mid" x="456" y="116">address selection</text>
+<path class="ar-ver" d="M320 196 H592"/>
+<text class="ts mid" x="456" y="188">one device only</text>
+</svg>
+<figcaption><b>Figure 3.</b> Solid arrows mark partial support, not closure. The four dashed boxes are untested in the sense of Rev B: there is no run to cite. Even the supported rows carry boundary qualifications from the evidence records.</figcaption>
+</figure>
+
+<h2 id="s8">8. Closure heat-map</h2>
+<p>Figure 4 reproduces the layer statuses from the <code>PERIPHERALS</code> list in <code>Verification/status/build_tracker.py</code>, which generates the <code>Peripheral_Closure</code> sheet (I read the same values from the workbook with openpyxl). The sheet's "Overall" column is a formula and is empty in the cached file, so no overall verdict is drawn. PASS means a passing run for the stated component boundary; PARTIAL means some SoC access is exercised; OPEN means nothing retained.</p>
+
+<figure>
+<svg viewBox="0 0 960 520" role="img" aria-label="Heat-map of closure status by device and layer: component bench PASS for all six; SoC firmware path PARTIAL for I2C, Timer 0, Timer 1, SPI and OPEN for GPIO and UART; IRQ and error paths OPEN for all">
+<text class="th mid" x="292" y="24">Component bench</text>
+<text class="th mid" x="476" y="24">SoC firmware path</text>
+<text class="th mid" x="660" y="24">IRQ path</text>
+<text class="th mid" x="844" y="24">Error / timeout path</text>
+
+<text class="tb" x="24" y="68">GPIO</text><text class="ts" x="24" y="84">slot 3</text>
+<rect class="bx-ver" x="200" y="40" width="184" height="52" rx="6"/><text class="tb mid" x="292" y="70">PASS</text>
+<rect class="bx-ext" x="384" y="40" width="184" height="52" rx="6"/><text class="tb mid" x="476" y="70">OPEN</text>
+<rect class="bx-ext" x="568" y="40" width="184" height="52" rx="6"/><text class="tb mid" x="660" y="70">OPEN</text>
+<rect class="bx-ext" x="752" y="40" width="184" height="52" rx="6"/><text class="tb mid" x="844" y="70">OPEN</text>
+
+<text class="tb" x="24" y="132">I2C master</text><text class="ts" x="24" y="148">slot 0</text>
+<rect class="bx-ver" x="200" y="104" width="184" height="52" rx="6"/><text class="tb mid" x="292" y="134">PASS</text>
+<rect class="bx-bus" x="384" y="104" width="184" height="52" rx="6"/><text class="tb mid" x="476" y="134">PARTIAL</text>
+<rect class="bx-ext" x="568" y="104" width="184" height="52" rx="6"/><text class="tb mid" x="660" y="134">OPEN</text>
+<rect class="bx-ext" x="752" y="104" width="184" height="52" rx="6"/><text class="tb mid" x="844" y="134">OPEN</text>
+
+<text class="tb" x="24" y="196">Timer 0</text><text class="ts" x="24" y="212">slot 1</text>
+<rect class="bx-ver" x="200" y="168" width="184" height="52" rx="6"/><text class="tb mid" x="292" y="198">PASS</text>
+<rect class="bx-bus" x="384" y="168" width="184" height="52" rx="6"/><text class="tb mid" x="476" y="198">PARTIAL</text>
+<rect class="bx-ext" x="568" y="168" width="184" height="52" rx="6"/><text class="tb mid" x="660" y="198">OPEN</text>
+<rect class="bx-ext" x="752" y="168" width="184" height="52" rx="6"/><text class="tb mid" x="844" y="198">OPEN</text>
+
+<text class="tb" x="24" y="260">Timer 1</text><text class="ts" x="24" y="276">slot 5</text>
+<rect class="bx-ver" x="200" y="232" width="184" height="52" rx="6"/><text class="tb mid" x="292" y="262">PASS</text>
+<rect class="bx-bus" x="384" y="232" width="184" height="52" rx="6"/><text class="tb mid" x="476" y="262">PARTIAL</text>
+<rect class="bx-ext" x="568" y="232" width="184" height="52" rx="6"/><text class="tb mid" x="660" y="262">OPEN</text>
+<rect class="bx-ext" x="752" y="232" width="184" height="52" rx="6"/><text class="tb mid" x="844" y="262">OPEN</text>
+
+<text class="tb" x="24" y="324">UART</text><text class="ts" x="24" y="340">slot 2</text>
+<rect class="bx-ver" x="200" y="296" width="184" height="52" rx="6"/><text class="tb mid" x="292" y="326">PASS</text>
+<rect class="bx-ext" x="384" y="296" width="184" height="52" rx="6"/><text class="tb mid" x="476" y="326">OPEN</text>
+<rect class="bx-ext" x="568" y="296" width="184" height="52" rx="6"/><text class="tb mid" x="660" y="326">OPEN</text>
+<rect class="bx-ext" x="752" y="296" width="184" height="52" rx="6"/><text class="tb mid" x="844" y="326">OPEN</text>
+
+<text class="tb" x="24" y="388">SPI master</text><text class="ts" x="24" y="404">slot 4</text>
+<rect class="bx-ver" x="200" y="360" width="184" height="52" rx="6"/><text class="tb mid" x="292" y="390">PASS</text>
+<rect class="bx-bus" x="384" y="360" width="184" height="52" rx="6"/><text class="tb mid" x="476" y="390">PARTIAL</text>
+<rect class="bx-ext" x="568" y="360" width="184" height="52" rx="6"/><text class="tb mid" x="660" y="390">OPEN</text>
+<rect class="bx-ext" x="752" y="360" width="184" height="52" rx="6"/><text class="tb mid" x="844" y="390">OPEN</text>
+
+<text class="tb" x="24" y="452">AON watchdog</text><text class="ts" x="24" y="468">not integrated</text>
+<rect class="bx" x="200" y="424" width="736" height="52" rx="6"/><text class="tb mid" x="568" y="454">N/A (not integrated)</text>
+
+<rect class="bx-ver" x="200" y="492" width="24" height="16" rx="3"/><text class="ts" x="232" y="504">PASS</text>
+<rect class="bx-bus" x="296" y="492" width="24" height="16" rx="3"/><text class="ts" x="328" y="504">PARTIAL</text>
+<rect class="bx-ext" x="408" y="492" width="24" height="16" rx="3"/><text class="ts" x="440" y="504">OPEN</text>
+</svg>
+<figcaption><b>Figure 4.</b> Every device is green only in the first column. The UART SoC path is OPEN even though its component bench passes 69/69; the GPIO SoC path is OPEN because the aperture test used synthetic responders. PARTIAL for I2C is a PRER write and read at stage 3; for the timers it is stage 3 access plus, for Timer 0, the staged 52/52 run; for SPI it is the boot-flash read via bootloader interposition.</figcaption>
+</figure>
+
+<h2 id="s9">9. What this page does not claim</h2>
+<ul>
+<li>No percentage of requirements is closed. Evidence is "PASS for a stated boundary".</li>
+<li>Rev B scenario counts are plan content (<span class="tag specified">SPECIFIED</span>); none is mapped to a retained check, and the plan itself leaves some counts TBD (D-87, D-93).</li>
+<li>Counts of GPIO and Timer 0 rows are my row counts, not totals stated by the plan.</li>
+<li>Fabric-side verification (bridge, crossbar, timeout monitor) is on <a href="verif_fabric.html">fabric verification</a> and <a href="vf_fabric_peripheral.html">the fabric-to-peripheral view</a>; device design is on <a href="soc_peripherals.html">SoC peripherals</a> and <a href="soc_fabric.html">SoC fabric</a>. Start from the <a href="index.html">index</a>.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> <code>Verification/README.md</code>, <code>Verification/verification_matrix.csv</code>, <code>Verification/verification_roadmap.md</code>, <code>Verification/components/apb/{gpio,i2c,spi,timer0,timer1,uart}.md</code>, <code>Verification/artifacts/component_first/20261019_run02/README.md</code>, <code>Verification/status/build_tracker.py</code> (PERIPHERALS), tracker sheet <code>Peripheral_Closure</code>, <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/tests/suites/stage5_reg_sweep/main.c</code>, <code>stage6_polled_periph/main.c</code>, Rev B text sections 15.1 to 15.10 and the per-device scenario tables.</div>
+</div>
+</body>
+</html>

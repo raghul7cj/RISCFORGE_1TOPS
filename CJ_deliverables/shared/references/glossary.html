@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary and Naming</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Reference</span></div>
+<div class="wrap">
+
+<h1>Glossary and naming</h1>
+<p class="lead">The vocabulary used across this set, with the Rev B meaning of each term. Several repository documents use overlapping names; the last section maps them.</p>
+<p class="meta">Sources: Verification Plan Rev B (sections 1.3, 6, 21), Verification/status tracker | Reviewed 2026-11-03</p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#status">Evidence status labels</a></li>
+<li><a href="#taxonomy">Band, layer, class, severity</a></li>
+<li><a href="#gates">Gates and phase conditions</a></li>
+<li><a href="#identity">Run identity and change classes</a></li>
+<li><a href="#naming">Stage and phase naming crosswalk</a></li>
+<li><a href="#ids">Identifiers used in this set</a></li>
+</ol></div>
+
+<h2 id="status">1. Evidence status labels</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Label</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><span class="tag exists">EXISTS</span></td><td>Present in the repository and read by the author of the page; usually cited to a file and line.</td></tr>
+<tr><td><span class="tag specified">SPECIFIED</span></td><td>Stated by the Rev B plan as the intended state. Nothing is built or executed. Rev B itself says no phase has been executed.</td></tr>
+<tr><td><span class="tag open">OPEN</span></td><td>Unknown, disputed or not yet decided.</td></tr>
+<tr><td>ASSUMED / TBD</td><td>Rev B planning values. ASSUMED(D-xx) is an estimate with a stated basis; TBD(D-xx) is a value nobody has supplied yet (for example team size, D-GR03).</td></tr>
+<tr><td>PASS (matrix)</td><td>A retained run passed for the stated boundary only. It is not a percentage of requirements covered and does not by itself close a Rev B check ID.</td></tr>
+<tr><td>untested</td><td>A gate or check that could not be evaluated. Rev B treats it as not a pass.</td></tr>
+</tbody></table></div>
+
+<h2 id="taxonomy">2. Band, layer, class, severity</h2>
+<p>Rev B Table 1.2 separates words that Rev A used interchangeably. Use them exactly.</p>
+<figure>
+<svg viewBox="0 0 960 300" role="img" aria-label="Three independent axes: layers L1 to L7 (where), bands BAND-1 to BAND-4 (kind of work), classes (where a fault lies)">
+<text class="th" x="24" y="28">LAYER: where in the design (one mechanism and one owner role per layer)</text>
+<rect class="bx-core" x="24" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="84" y="69">L1 Protocol</text>
+<rect class="bx-core" x="156" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="216" y="69">L2 Path</text>
+<rect class="bx-core" x="288" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="348" y="69">L3 Register</text>
+<rect class="bx-core" x="420" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="480" y="69">L4 Device</text>
+<rect class="bx-core" x="552" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="612" y="69">L5 Interrupt</text>
+<rect class="bx-core" x="684" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="744" y="69">L6 Privilege</text>
+<rect class="bx-core" x="816" y="40" width="120" height="48" rx="6"/><text class="tb mid" x="876" y="69">L7 Firmware</text>
+<text class="th" x="24" y="130">BAND: what kind of work</text>
+<rect class="bx-ver" x="24" y="142" width="210" height="48" rx="6"/><text class="tb mid" x="129" y="170">BAND-1 stimulus</text>
+<rect class="bx-ver" x="258" y="142" width="210" height="48" rx="6"/><text class="tb mid" x="363" y="170">BAND-2 observe</text>
+<rect class="bx-ver" x="492" y="142" width="210" height="48" rx="6"/><text class="tb mid" x="597" y="170">BAND-3 check</text>
+<rect class="bx-ver" x="726" y="142" width="210" height="48" rx="6"/><text class="tb mid" x="831" y="170">BAND-4 close</text>
+<path class="ar-ver" d="M234 166 H258"/><path class="ar-ver" d="M468 166 H492"/><path class="ar-ver" d="M702 166 H726"/>
+<text class="th" x="24" y="232">CLASS: where the fault lies</text>
+<rect class="bx-per" x="24" y="244" width="140" height="40" rx="6"/><text class="tb mid" x="94" y="268">C-DUT</text>
+<rect class="bx-per" x="176" y="244" width="140" height="40" rx="6"/><text class="tb mid" x="246" y="268">C-TB</text>
+<rect class="bx-per" x="328" y="244" width="140" height="40" rx="6"/><text class="tb mid" x="398" y="268">C-HARNESS</text>
+<rect class="bx-per" x="480" y="244" width="140" height="40" rx="6"/><text class="tb mid" x="550" y="268">C-SPEC</text>
+<rect class="bx-per" x="632" y="244" width="140" height="40" rx="6"/><text class="tb mid" x="702" y="268">C-ENV</text>
+<rect class="bx-per" x="784" y="244" width="152" height="40" rx="6"/><text class="tb mid" x="860" y="268">C-EXPECT</text>
+<defs>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+</defs>
+</svg>
+<figcaption><b>Figure 1.</b> Three separate axes. A finding has one value on each; the words are never interchangeable (Rev B Table 1.2).</figcaption>
+</figure>
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>Question it answers</th><th>Values</th></tr></thead>
+<tbody>
+<tr><td>BAND</td><td>What kind of work is this?</td><td>BAND-1 stimulus, BAND-2 observe, BAND-3 check, BAND-4 close</td></tr>
+<tr><td>LAYER</td><td>Where in the design does it apply?</td><td>L1 Protocol, L2 Path, L3 Register, L4 Device, L5 Interrupt, L6 Privilege, L7 Firmware</td></tr>
+<tr><td>CLASS</td><td>Where does the fault lie?</td><td>C-DUT, C-TB, C-HARNESS, C-SPEC, C-ENV, C-EXPECT</td></tr>
+<tr><td>SEVERITY</td><td>How bad is the defect?</td><td>S1 release-blocking, S2 major, S3 minor, S4 observability, S5 observation (Table 21.2.7a). Not comparable with the plan-findings scale H, M, L, B.</td></tr>
+<tr><td>Primary owner role</td><td>Who is accountable?</td><td>One of the thirteen roles in Table 21.2.1</td></tr>
+</tbody></table></div>
+
+<h2 id="gates">3. Gates and phase conditions</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>G0</td><td>Harness integrity (per run): canonical module set matches, tool version pinned, artefact write test passes.</td></tr>
+<tr><td>G1</td><td>Stimulus reached the DUT (per run): instructions retired, AXI transfers, APB transfers and attestation words all greater than zero.</td></tr>
+<tr><td>G2</td><td>Checker viability (per candidate): every bound check ID can be shown capable of reporting.</td></tr>
+<tr><td>G3</td><td>Checkers all pass (per run): no open findings, no unexplained ring drops, scoreboards drained.</td></tr>
+<tr><td>G4</td><td>Coverage closed (per candidate): every declared bin hit, waived or excluded with a record.</td></tr>
+<tr><td>G5</td><td>Compliance and formal closed (release): stamped once, in P6.</td></tr>
+<tr><td>G6</td><td>Traceability complete (per candidate): no orphan requirement, check, test or defect.</td></tr>
+<tr><td>Phase-entry condition</td><td>A predicate over evidence that must hold before a phase may start. Not a gate and never stamped (Rev B Table 21.1).</td></tr>
+<tr><td>CT-1 to CT-5</td><td>Core-trust conditions: compliance, lock-step, core assertion viability, core formal goals, boot entry. Entry condition for P2 onward.</td></tr>
+<tr><td>DC-1, DC-2</td><td>Decision cutoffs: scope at the exit of P0, behaviour at the exit of P2. An undecided item defaults and is logged as defaulted.</td></tr>
+<tr><td>Track F</td><td>The formal track. Runs in parallel with phases and stamps no gate.</td></tr>
+<tr><td>CFG-C, CFG-S</td><td>Compliance configurations: core-only wrapper (exists) and SoC context (specified).</td></tr>
+</tbody></table></div>
+
+<h2 id="identity">4. Run identity and change classes</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>H_rtl, H_filelist</td><td>SHA-256 of the 105-line manifest built from the non-comment entries of <code>RTL_SOC/soc_subsystem.f</code>, and of the relativised filelist (Table 21.10).</td></tr>
+<tr><td>ID-1</td><td>Module-name uniqueness: no divergent duplicate module reachable from a filelist that also names a testbench.</td></tr>
+<tr><td>ID-2</td><td>Every filelist entry in scope resolves.</td></tr>
+<tr><td>ID-3</td><td>No absolute paths in filelists in scope.</td></tr>
+<tr><td>Freeze point F</td><td>Declared at the exit of P1b. RTL may still change, but every edit carries a change note and no gate verdict transfers across an identity change.</td></tr>
+<tr><td>Class A / B / C / D / X</td><td>Change classes for the re-run matrix: core, fabric/reset/boot, peripheral, harness only, tree hygiene (Table 21.12).</td></tr>
+<tr><td>SD-1 to SD-10</td><td>Separation-of-duty predicates, for example closer is not the fixer, release signatories are distinct.</td></tr>
+</tbody></table></div>
+
+<h2 id="naming">5. Stage and phase naming crosswalk</h2>
+<p>Rev B phase names are authoritative. The repository also carries stage numbers from earlier documents. The tracker sheet <code>Stage_Crosswalk</code> holds the full mapping.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Rev B phase</th><th>Stage brief</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>P0 Bring-up</td><td>Stage 1</td><td>Test suite <code>stage1_hello</code></td></tr>
+<tr><td>P1a Core trust</td><td>Stage 2</td><td>The suite named <code>stage2_watchdog</code> is a different test (blame-engine proof)</td></tr>
+<tr><td>P1b SoC structural</td><td>Stage 3</td><td>Suite <code>stage3_monitor_count</code></td></tr>
+<tr><td>P2 Model completion</td><td>Stage 4</td><td></td></tr>
+<tr><td>P3 Architectural</td><td>Stage 5</td><td>P3.1 reset/clock, P3.2 interrupts, P3.3 fabric, P3.4 firmware oracle</td></tr>
+<tr><td>P4 Closure</td><td>Stage 6</td><td>P4.1 to P4.5</td></tr>
+<tr><td>P5 Soak</td><td>Stage 7</td><td></td></tr>
+<tr><td>P6 Release</td><td>Stage 8</td><td>Engineering baseline, not tapeout authorisation</td></tr>
+<tr><td>Track F</td><td>Formal track brief</td><td>Not a phase</td></tr>
+</tbody></table></div>
+<p>Other schemes in the tree: S0 to S8 in <code>INFRA_TRACKING.md</code>; R0 to R7 in the verification roadmap; S0 to S4 in the FPGA handoff; local goal labels P0-G1, P0-G2, P0-G3 (not Rev B gate identifiers).</p>
+
+<h2 id="ids">6. Identifiers used in this set</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>DEF-nnn</td><td>Defect register entry (<code>Verification/status/defects.csv</code>). DEF-001 is the hazard-unit flush defect; DEF-002 is the UART adapter delta loop.</td></tr>
+<tr><td>DEC-x, ACT-nnn</td><td>Tracker decisions and actions.</td></tr>
+<tr><td>APB-00 to APB-05, MEM, FAB, STG, MON, CHK, AON, SYS</td><td>Evidence rows in <code>Verification/verification_matrix.csv</code>.</td></tr>
+</tbody></table></div>
+
+<div class="sources"><b>Sources read:</b> Rev B sections 1.3, 6, 20, 21; <code>Verification/status/build_tracker.py</code>.</div>
+</div>
+</body>
+</html>

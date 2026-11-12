@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification Framework Overview</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification framework / Overview</span></div>
+<div class="wrap">
+
+<h1>Verification Framework Overview</h1>
+<p class="lead">What the SoC Verification Plan Rev B is for, how it is organised, what it verifies and what it only specifies. Start here: the master map in section 2 is the picture the rest of the verification pages hang from.</p>
+<p class="meta">Scope: Rev B sections 1, 2 and 3 | Sources: Rev B plan text, <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Purpose and how to read the plan</a></li>
+<li><a href="#s2">The whole framework on one page</a></li>
+<li><a href="#s3">BAND, LAYER and CLASS: three meanings</a></li>
+<li><a href="#s4">Objectives and quality goals</a></li>
+<li><a href="#s5">Scope: what the design is, what is verified, what is out</a></li>
+<li><a href="#s6">Status vocabulary</a></li>
+<li><a href="#s7">Where to go next</a></li>
+</ol></div>
+
+<h2 id="s1">1. Purpose and how to read the plan</h2>
+<p>The objective of the plan is not "find bugs". It is to be able to make a defensible statement that the SoC meets its specification and to show the evidence for that statement (Rev B 2). Three consequences shape everything else:</p>
+<ul>
+<li>Every requirement needs a check and every check needs a test. The chain is generated into a traceability matrix, not maintained by hand.</li>
+<li>An absence of findings means something only if the mechanism could have produced one. This is the organising principle (Rev B 1.6): <b>a check that cannot fail is not a check</b>. Each checker therefore carries a proof of viability: a fault-injection case, an assertion self-test or a directed negative test.</li>
+<li>A run that exercised nothing is a failure, not a pass. This is why gates exist in tiers.</li>
+</ul>
+<div class="note"><b>Evidence rule used across these pages.</b> A verification result is "PASS for a stated boundary" (a named RTL identity, configuration and check set). It is never expressed as a percentage of requirements. At the time of review P0 (bring-up) is <b>in progress</b>, not exited: 13 of 20 exit items met, 5 partial, 2 not met (<code>Verification/status/PHASE_STATUS.md</code>).</div>
+
+<p>Rev B answers four different questions, kept in separate sections so a reader needs only one group (Rev B 1.1).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Question</th><th>Rev B sections</th><th>Page in this set</th></tr></thead>
+<tbody>
+<tr><td>What are we verifying, in what environment, to what standard?</td><td>2, 3, 4, 5</td><td>This page and <a href="vf_strategy_env.html">vf_strategy_env.html</a></td></tr>
+<tr><td>How is stimulus generated and how are errors detected?</td><td>7, 8, 9, 10</td><td><a href="vf_strategy_env.html">vf_strategy_env.html</a> (stimulus), <a href="vf_checking_scoreboards.html">vf_checking_scoreboards.html</a>, <a href="vf_coverage.html">vf_coverage.html</a></td></tr>
+<tr><td>What must be proven about this design specifically?</td><td>11, 13, 14, 15, 17, 18</td><td>Block-specific pages, listed in <a href="index.html">the index</a></td></tr>
+<tr><td>How is completion shown, in what order, and who decides?</td><td>19, 20, 21, 22</td><td><a href="vf_regression_gates.html">vf_regression_gates.html</a>, <a href="vf_phases_overview.html">vf_phases_overview.html</a></td></tr>
+</tbody></table></div>
+
+<p>Boot (section 12) and core/ISS lock-step (section 16) have their own sections. Four annexes hold the registries (check IDs, records, decisions, defects). Rev B conventions that matter when reading it:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Convention</th><th>Meaning (Rev B Table 1.1)</th></tr></thead>
+<tbody>
+<tr><td>MUST / SHALL</td><td>A requirement; non-compliance blocks sign-off. Carries a REQ-NNN identifier.</td></tr>
+<tr><td>SHOULD</td><td>Strong expectation; deviation needs a recorded waiver naming one check ID, owner, reason and review date.</td></tr>
+<tr><td>MAY</td><td>Optional; the choice is recorded in the requirement register.</td></tr>
+<tr><td>Gate Gn</td><td>A pass or fail condition evaluated by the harness, defined once in Table 6.1. No other section restates a gate condition.</td></tr>
+<tr><td>Check ID</td><td>A stable identifier registered centrally in Table A.2 and never reused.</td></tr>
+</tbody></table></div>
+<p>Cross-references inside Rev B are tokens, not literal section numbers, because a hand-written number once pointed at the wrong section and survived into Rev A as a finding (Rev B 1.1).</p>
+
+<h2 id="s2">2. The whole framework on one page</h2>
+<p>Figure 1 is the master picture. The design under test sits in the centre. <b>Stimulus</b> (five sources, top) drives it. The seven <b>layers</b> (left) say where in the design a check applies. <b>Observers, checkers and models</b> (right) judge what the design did. <b>Coverage</b> and the <b>reporter</b> (below) turn that into evidence, <b>gates</b> decide pass, fail or untested, and <b>phases</b> order the build-up. The environment box under the DUT is the generated, hashed run identity that makes any result citable. Everything in this picture is what Rev B <i>specifies</i>; the figure is not a claim that it is built. <span class="tag specified">SPECIFIED</span></p>
+
+<figure>
+<svg viewBox="0 0 1040 748" role="img" aria-label="Master map of the verification framework: five stimulus sources drive the SoC design under test; seven layers on the left and checkers and models on the right surround it; coverage and a reporter feed gates G0 to G6, ordered by phases P0 to P6.">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+
+<text class="tb" x="24" y="28">BAND-1 stimulus: five sources (Rev B 7)</text>
+<rect class="bx-ver" x="24" y="40" width="176" height="48" rx="6"/>
+<text class="tb mid" x="112" y="62">Directed</text><text class="ts mid" x="112" y="78">boot, reset, modes, nesting</text>
+<rect class="bx-ver" x="224" y="40" width="176" height="48" rx="6"/>
+<text class="tb mid" x="312" y="62">Constrained random</text><text class="ts mid" x="312" y="78">BFMs, legal space only</text>
+<rect class="bx-ver" x="424" y="40" width="176" height="48" rx="6"/>
+<text class="tb mid" x="512" y="62">Fault injection</text><text class="ts mid" x="512" y="78">proves checkers are alive</text>
+<rect class="bx-ver" x="624" y="40" width="176" height="48" rx="6"/>
+<text class="tb mid" x="712" y="62">Software suites</text><text class="ts mid" x="712" y="78">6 C suites + interrupt tests</text>
+<rect class="bx-ver" x="824" y="40" width="176" height="48" rx="6"/>
+<text class="tb mid" x="912" y="62">ISA compliance</text><text class="ts mid" x="912" y="78">69 applicable tests</text>
+<path class="ln" d="M112 88 V104"/><path class="ln" d="M312 88 V104"/><path class="ln" d="M512 88 V104"/><path class="ln" d="M712 88 V104"/><path class="ln" d="M912 88 V104"/>
+<path class="ln" d="M112 104 H912"/>
+<path class="ar-ver" d="M512 104 V190"/>
+<text class="ts" x="524" y="150">drives</text>
+
+<rect class="grp" x="16" y="124" width="256" height="348" rx="8"/>
+<text class="tb" x="28" y="144">LAYERS: where in the design</text>
+<rect class="bx-core" x="28" y="156" width="232" height="36" rx="6"/><text class="t" x="40" y="179">L1 Protocol: assertions</text>
+<rect class="bx-core" x="28" y="200" width="232" height="36" rx="6"/><text class="t" x="40" y="223">L2 Path: path scoreboard</text>
+<rect class="bx-core" x="28" y="244" width="232" height="36" rx="6"/><text class="t" x="40" y="267">L3 Register: register model</text>
+<rect class="bx-core" x="28" y="288" width="232" height="36" rx="6"/><text class="t" x="40" y="311">L4 Device: VIP + pin monitor</text>
+<rect class="bx-core" x="28" y="332" width="232" height="36" rx="6"/><text class="t" x="40" y="355">L5 Interrupt: arbiter model</text>
+<rect class="bx-core" x="28" y="376" width="232" height="36" rx="6"/><text class="t" x="40" y="399">L6 Privilege: CSR/trap model</text>
+<rect class="bx-core" x="28" y="420" width="232" height="36" rx="6"/><text class="t" x="40" y="443">L7 Firmware: mailbox oracle</text>
+<path class="ar-d" d="M272 260 H392"/>
+<text class="ts mid" x="332" y="252">applied to</text>
+
+<rect class="bx-core" x="392" y="190" width="240" height="140" rx="8"/>
+<text class="tb mid" x="512" y="214">DESIGN UNDER TEST</text>
+<text class="tb mid" x="512" y="234">RISCFORGE SoC (RTL)</text>
+<text class="ts mid" x="512" y="260">5-stage RV32IM_Zicsr core</text>
+<text class="ts mid" x="512" y="276">BootROM, bootloader, 2 SRAMs</text>
+<text class="ts mid" x="512" y="292">AXI-Lite xbar, AXI-to-APB bridge</text>
+<text class="ts mid" x="512" y="308">6 APB peripherals</text>
+
+<rect class="bx-ver" x="392" y="372" width="240" height="64" rx="6"/>
+<text class="tb mid" x="512" y="396">Environment and run record</text>
+<text class="ts mid" x="512" y="414">one RTL tree, 8-field run identity</text>
+<path class="ar-d" d="M512 372 V330"/>
+
+<rect class="grp" x="756" y="124" width="268" height="348" rx="8"/>
+<text class="tb" x="772" y="144">Observe and check (BAND-2, 3)</text>
+<path class="ar-ver" d="M632 260 H756"/>
+<text class="ts mid" x="694" y="252">observed</text>
+<rect class="bx-ver" x="772" y="156" width="240" height="48" rx="6"/><text class="tb mid" x="892" y="176">Monitors (BAND-2)</text><text class="ts mid" x="892" y="193">observe without judging</text>
+<rect class="bx-ver" x="772" y="216" width="240" height="48" rx="6"/><text class="tb mid" x="892" y="236">Assertions (BAND-3)</text><text class="ts mid" x="892" y="253">immediate and concurrent</text>
+<rect class="bx-ver" x="772" y="276" width="240" height="48" rx="6"/><text class="tb mid" x="892" y="296">Path scoreboards</text><text class="ts mid" x="892" y="313">MMIO path, SRAM path</text>
+<rect class="bx-ver" x="772" y="336" width="240" height="48" rx="6"/><text class="tb mid" x="892" y="356">Reference models</text><text class="ts mid" x="892" y="373">register, arbiter, ISS</text>
+<rect class="bx-ver" x="772" y="396" width="240" height="48" rx="6"/><text class="tb mid" x="892" y="416">Fault catalogue</text><text class="ts mid" x="892" y="433">injection proves viability</text>
+
+<rect class="bx-mem" x="24" y="504" width="272" height="48" rx="6"/>
+<text class="tb mid" x="160" y="525">Coverage (BAND-4 close)</text><text class="ts mid" x="160" y="541">code + functional, per layer</text>
+<path class="ar-ver" d="M144 472 V504"/>
+<rect class="bx-mem" x="744" y="504" width="272" height="48" rx="6"/>
+<text class="tb mid" x="880" y="525">Verdicts and findings</text><text class="ts mid" x="880" y="541">one reporter, per-run record</text>
+<path class="ar-ver" d="M892 472 V504"/>
+<path class="ar-ver" d="M24 528 H8 V64 H24"/>
+<text class="ts mid" x="520" y="532">left-edge arrow: coverage holes become new stimulus</text>
+
+<rect class="grp" x="16" y="580" width="1008" height="84" rx="8"/>
+<path class="ar" d="M144 552 V580"/><path class="ar" d="M892 552 V580"/>
+<rect class="bx-ctrl" x="24" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="88" y="612">G0</text><text class="ts mid" x="88" y="628">harness integrity</text>
+<rect class="bx-ctrl" x="168" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="232" y="612">G1</text><text class="ts mid" x="232" y="628">stimulus reached</text>
+<rect class="bx-ctrl" x="312" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="376" y="612">G2</text><text class="ts mid" x="376" y="628">checker viability</text>
+<rect class="bx-ctrl" x="456" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="520" y="612">G3</text><text class="ts mid" x="520" y="628">checkers all pass</text>
+<rect class="bx-ctrl" x="600" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="664" y="612">G4</text><text class="ts mid" x="664" y="628">coverage closed</text>
+<rect class="bx-ctrl" x="744" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="808" y="612">G5</text><text class="ts mid" x="808" y="628">compliance + formal</text>
+<rect class="bx-ctrl" x="888" y="592" width="128" height="48" rx="6"/><text class="tb mid" x="952" y="612">G6</text><text class="ts mid" x="952" y="628">traceability</text>
+<text class="ts" x="28" y="656">GATES (Rev B 6): per-run G0, G1, G3; per-candidate G2, G4, G6; release G5</text>
+
+<text class="tb" x="24" y="692">PHASES (Rev B 21): order the build-up; gates are stamped at each exit. F is the parallel formal track.</text>
+<rect class="pill" x="24" y="704" width="100" height="28" rx="14"/><text class="t mid" x="74" y="723">P0</text>
+<rect class="pill" x="136" y="704" width="100" height="28" rx="14"/><text class="t mid" x="186" y="723">P1a</text>
+<rect class="pill" x="248" y="704" width="100" height="28" rx="14"/><text class="t mid" x="298" y="723">P1b</text>
+<rect class="pill" x="360" y="704" width="100" height="28" rx="14"/><text class="t mid" x="410" y="723">P2</text>
+<rect class="pill" x="472" y="704" width="100" height="28" rx="14"/><text class="t mid" x="522" y="723">P3</text>
+<rect class="pill" x="584" y="704" width="100" height="28" rx="14"/><text class="t mid" x="634" y="723">P4</text>
+<rect class="pill" x="696" y="704" width="100" height="28" rx="14"/><text class="t mid" x="746" y="723">F</text>
+<rect class="pill" x="808" y="704" width="100" height="28" rx="14"/><text class="t mid" x="858" y="723">P5</text>
+<rect class="pill" x="920" y="704" width="96" height="28" rx="14"/><text class="t mid" x="968" y="723">P6</text>
+</svg>
+<figcaption><b>Figure 1.</b> The verification framework. Teal boxes are verification components, the blue box is the design, green boxes are evidence stores, amber boxes are gates. Solid arrows lead to a decision; dashed teal arrows are verification flows. Read top to bottom: stimulus, DUT with layers and checkers, coverage and verdicts, gates, phases. The arrow along the left edge is the closure loop of Rev B 10.4.</figcaption>
+</figure>
+
+<p>Two properties of the picture are worth stating in words, because they are the point of the design of the plan (Rev B 2):</p>
+<ul>
+<li><b>Each band can fail a run alone; no band can detect everything alone.</b> One band reporting one finding fails the run and cannot be outvoted. For every defect class at least one band cannot see it, so the sign-off claim is the conjunction of all four bands, and each band must separately be able to report a finding.</li>
+<li><b>Gates are tiered by what evidence they need.</b> Rev A demanded all seven gates of every run, which is impossible because G2, G4 and G6 are decidable only from artefacts that accumulate across commits. A gate that cannot be evaluated is reported as <code>untested</code>, never as passed, and never as a waiver.</li>
+</ul>
+<p>Details: gates in <a href="vf_regression_gates.html">vf_regression_gates.html</a>, checkers in <a href="vf_checking_scoreboards.html">vf_checking_scoreboards.html</a>, coverage in <a href="vf_coverage.html">vf_coverage.html</a>, phases in <a href="vf_phases_overview.html">vf_phases_overview.html</a>, layers and environment in <a href="vf_strategy_env.html">vf_strategy_env.html</a>.</p>
+
+<h2 id="s3">3. BAND, LAYER and CLASS: three meanings</h2>
+<p>Rev A used "layer" for three unrelated things. Rev B fixes the terms for the whole document (Rev B 1.3, Table 1.2). The table below is the disambiguation to keep open while reading any other section.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>Question it answers</th><th>Permitted values</th><th>Never used for</th></tr></thead>
+<tbody>
+<tr><td><b>BAND</b></td><td>What kind of work is this?</td><td>BAND-1 stimulus, BAND-2 observe, BAND-3 check, BAND-4 close (decide, record, grade)</td><td>An architectural position. In the original Figure 2 of Rev B the four bands are still captioned "layers"; a correction is requested (R-211), and "layer" in that figure means BAND</td></tr>
+<tr><td><b>LAYER</b></td><td>Where in the design does it apply?</td><td>L1 Protocol, L2 Path, L3 Register, L4 Device, L5 Interrupt, L6 Privilege, L7 Firmware</td><td>A mechanism class. Each layer has exactly one named mechanism and one owner role</td></tr>
+<tr><td><b>CLASS</b></td><td>Where does the fault lie?</td><td>C-DUT, C-TB, C-HARNESS, C-SPEC, C-ENV, C-EXPECT</td><td>A band or a layer. Discriminated by who fixes the fault</td></tr>
+<tr><td>Primary owner role</td><td>Who is accountable for this finding?</td><td>One of thirteen roles (Table 21.2.1)</td><td>A band, a layer or a person's name. A finding has exactly one</td></tr>
+<tr><td>Contributor role</td><td>Who else contributed?</td><td>Zero or more of the thirteen roles</td><td>A second primary owner</td></tr>
+<tr><td>SEVERITY</td><td>How bad is the defect?</td><td>S1 to S5 (Table 21.2.7)</td><td>Translated to or from the ledger's H, M, L, B scale</td></tr>
+</tbody></table></div>
+<p>Practical rule: if a sentence says "layer", ask whether it means a place in the design (LAYER), a role in the flow (BAND) or a kind of fault (CLASS). Rev B also retires several phrasings (Table 1.3): "owning layer" for the triage field becomes primary owner role; "fired" for an assertion becomes <i>reported</i> (a property that fires has failed in SVA) or <i>evaluated</i> (sampled with its antecedent satisfied); and the unsourced counts "25+ registers", "8 monitors", "7 APB windows" are replaced by 19, 7 and 6.</p>
+
+<h2 id="s4">4. Objectives and quality goals</h2>
+<p>Quality goals are stated as measured quantities, each at the tier where it is decidable (Rev B Table 2.1). None is a claim about the current repository; each states what the plan requires of the environment it specifies.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>QG</th><th>Goal</th><th>Measured as</th><th>Tier</th><th>Target</th></tr></thead>
+<tbody>
+<tr><td>QG-1</td><td>Design meets its specification</td><td>Register requirements with at least one check in the generated traceability matrix and that check passing at the release RTL identity</td><td>per-candidate</td><td>100%</td></tr>
+<tr><td>QG-2a</td><td>No viable checker left without a current record</td><td>Bound check IDs holding a current viability record, over bound check IDs</td><td>per-candidate</td><td>100%</td></tr>
+<tr><td>QG-3</td><td>Every checker can provably report</td><td>Same viability measure (negative_case_pass or vacuity_proved)</td><td>per-candidate</td><td>100%</td></tr>
+<tr><td>QG-4</td><td>No run is evidence unless graded</td><td>Runs with G0, G1 and G3 all pass, over runs graded</td><td>per-run</td><td>100%</td></tr>
+<tr><td>QG-5</td><td>Structural coverage closed</td><td>Structural bins hit or waived with reason, over declared; includes every FSM state of bridge, gateway, arbiter and the 6 APB peripherals</td><td>per-candidate</td><td>100%</td></tr>
+<tr><td>QG-6</td><td>Functional coverage closed</td><td>Functional bins hit or waived with reason, over declared</td><td>per-candidate</td><td>100%</td></tr>
+<tr><td>QG-7</td><td>Every bound check is evaluated</td><td>Bound check IDs with antecedent_satisfied_count &gt;= 1, over bound check IDs</td><td>per-candidate</td><td>100%</td></tr>
+<tr><td>QG-8</td><td>ISA compliance complete for the implemented ISA</td><td>Applicable tests passed over applicable: 69 of the 162 in the vendored tree; 93 recorded out-of-scope</td><td>release</td><td>69 of 69</td></tr>
+<tr><td>QG-9</td><td>Formal claims closed</td><td>Goals proved, waived with owner and date, or converted to a directed test, over declared</td><td>release</td><td>100%</td></tr>
+<tr><td>QG-10</td><td>Failures reproducible</td><td>Failures re-produced from RTL SHA-256, filelist SHA-256, seed and plusargs alone</td><td>per-run</td><td>100%</td></tr>
+<tr><td>QG-11</td><td>Results attributable</td><td>Findings with one primary owner, a contributor list and a severity, over findings</td><td>per-run</td><td>100%</td></tr>
+<tr><td>QG-12</td><td>No silent information loss</td><td>Records dropped from any bounded ring or queue; each ring publishes its overflow count</td><td>per-run</td><td>0 drops</td></tr>
+<tr><td>QG-13</td><td>Candidate gate set satisfied</td><td>G2, G4 and G6 pass on the frozen candidate manifest</td><td>per-candidate</td><td>3 of 3</td></tr>
+<tr><td>QG-14</td><td>Release gate set satisfied</td><td>G5 passes at the release RTL identity</td><td>release</td><td>1 of 1</td></tr>
+</tbody></table></div>
+<div class="note"><b>Why QG-7 and QG-3 are two goals.</b> Being evaluated by the DUT (QG-7) is a coverage-database fact. Being capable of reporting (QG-3) is a viability-ledger fact. One never discharges the other (Rev B 2, 6). QG-8 is stated against 69, not 162: the 162 is the inventory of the vendored riscv-arch-test snapshot (v2.4.4, 2021-07-19) and includes 27 compressed, 1 Zifencei and 65 unratified scalar-cryptography tests that the DUT does not implement (Rev B Table 6.4). The post-silicon half of the old QG-2 is QG-2b; it is never a gate or goal (REQ-2009).</div>
+<div class="open"><span class="tag open">OPEN</span> <b>QG-1 and G6 are already failing on paper.</b> Rev B 2 states that six of the ten seed requirements carry no check ID and are therefore orphans under G6 (orphans == 0), so QG-1 at 100% is not yet achievable. The gap is recorded as an OPEN defect and the target is unchanged.</div>
+
+<h2 id="s5">5. Scope: what the design is, what is verified, what is out</h2>
+<h3>5.1 The design under test</h3>
+<p>The DUT is the integrated SoC, described as the RTL builds it, not as a diagram or an earlier draft (Rev B 3.1). Block-level verification of each peripheral IP is in scope only as far as it yields a model the SoC plan consumes. Figure 2 shows the integrated design (solid) against the items that are specified or unintegrated (dashed) and the out-of-scope list.</p>
+
+<figure>
+<svg viewBox="0 0 1040 552" role="img" aria-label="DUT scope: integrated SoC blocks inside a boundary, with the AON watchdog and CLIC outside as specified-only items and an out-of-scope box.">
+<rect class="grp" x="16" y="40" width="1008" height="400" rx="8"/>
+<text class="tb" x="28" y="60">Design under test: the integrated SoC as built (EXISTS)</text>
+
+<rect class="bx-core" x="40" y="100" width="192" height="64" rx="6"/>
+<text class="tb mid" x="136" y="122">Core</text><text class="ts mid" x="136" y="138">5-stage RV32IM_Zicsr</text><text class="ts mid" x="136" y="154">+ gateway, arbiter, shadow stack</text>
+<rect class="bx-mem" x="40" y="196" width="192" height="48" rx="6"/>
+<text class="tb mid" x="136" y="217">BootROM, 64 B</text><text class="ts mid" x="136" y="233">fetch demux only</text>
+<rect class="bx-ctrl" x="40" y="264" width="192" height="56" rx="6"/>
+<text class="tb mid" x="136" y="286">Bootloader</text><text class="ts mid" x="136" y="302">SPI image fetch, 3 resets</text>
+<path class="ar" d="M136 164 V196"/>
+<text class="ts" x="146" y="184">fetch</text>
+
+<rect class="bx-mem" x="296" y="100" width="200" height="64" rx="6"/>
+<text class="tb mid" x="396" y="122">Hybrid mem + SRAM mux</text><text class="ts mid" x="396" y="138">two 32 KB SRAMs</text><text class="ts mid" x="396" y="154">ISRAM write protected</text>
+<path class="ar" d="M232 132 H296"/>
+<rect class="bx-bus" x="296" y="244" width="200" height="72" rx="6"/>
+<text class="tb mid" x="396" y="270">axi_lite_xbar</text><text class="ts mid" x="396" y="286">2 masters, 3 targets</text><text class="ts mid" x="396" y="302">internal error slave</text>
+<path class="ar" d="M396 164 V244"/>
+<text class="ts" x="408" y="208">MMIO via AXI-Lite</text>
+<path class="ar" d="M232 292 H296"/>
+
+<rect class="bx-bus" x="560" y="244" width="200" height="72" rx="6"/>
+<text class="tb mid" x="660" y="270">AXI-Lite to APB4 bridge</text><text class="ts mid" x="660" y="286">6 windows</text><text class="ts mid" x="660" y="302">0x4000_0000 to 0x4000_5FFF</text>
+<path class="ar" d="M496 280 H560"/>
+<rect class="bx-per" x="824" y="224" width="176" height="112" rx="6"/>
+<text class="tb mid" x="912" y="262">6 APB peripherals</text><text class="ts mid" x="912" y="282">I2C, Timer 0, UART,</text><text class="ts mid" x="912" y="298">GPIO, SPI, Timer 1</text>
+<path class="ar" d="M760 280 H824"/>
+<path class="ar" d="M912 224 V80 H136 V100"/>
+<text class="ts mid" x="520" y="74">6 interrupt lines to the core gateway</text>
+
+<rect class="bx-ctrl" x="560" y="360" width="200" height="56" rx="6"/>
+<text class="tb mid" x="660" y="382">7 bus timeout monitors</text><text class="ts mid" x="660" y="398">6 APB + 1 AXI-Lite</text>
+<path class="ar-d" d="M660 360 V316"/>
+
+<text class="ts" x="28" y="458">Outside the integrated RTL</text>
+<rect class="bx-ext" x="40" y="472" width="360" height="64" rx="6"/>
+<text class="tb mid" x="220" y="492">AON watchdog (aon_timer)</text><text class="ts mid" x="220" y="508">SPECIFIED, not integrated; TL-UL, own clock/reset</text><text class="ts mid" x="220" y="524">14 registers; no wire to soft_rst_ni today</text>
+<rect class="bx-ext" x="440" y="472" width="280" height="64" rx="6"/>
+<text class="tb mid" x="580" y="498">CLIC</text><text class="ts mid" x="580" y="514">unintegrated RTL; its APB slot</text><text class="ts mid" x="580" y="528">was taken by Timer 1</text>
+<rect class="bx" x="760" y="472" width="256" height="64" rx="6"/>
+<text class="tb mid" x="888" y="492">OUT OF SCOPE</text><text class="ts mid" x="888" y="508">gate-level sim, physical sign-off,</text><text class="ts mid" x="888" y="524">software above BSP, C/F ISA</text>
+</svg>
+<figcaption><b>Figure 2.</b> DUT scope. Solid boxes are in the RTL and fully in scope. Dashed boxes are specified or unintegrated: the plan can only run a negative test on them until the RTL edits of section 5.3 land. Five active-low reset domains cover the solid blocks (table below).</figcaption>
+</figure>
+
+<p>Facts that the rest of the plan depends on, each located in the RTL by Rev B 3.1 and not re-read for this page: <span class="tag exists">EXISTS</span></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>What the RTL builds (per Rev B 3.1)</th><th>Locator given by Rev B</th></tr></thead>
+<tbody>
+<tr><td>Core</td><td>Five-stage RV32IM_Zicsr; <code>misa</code> reset 0x4000_1100 (I and M only)</td><td><code>riscv_core/rtl/csr_regfile.v:97-109</code></td></tr>
+<tr><td>Trap shadow stack</td><td>Two deep: mepc, mcause, mpie, class; pushed on interrupt entry only, popped on MRET</td><td><code>csr_regfile.v:84-88,170-177,189-204</code></td></tr>
+<tr><td>Boot</td><td>64 B BootROM reached only by the fetch demux; bootloader fetches the image from SPI NOR over APB and releases three reset domains</td><td><code>RTL_SOC/boot_rom.sv:31-45</code>, <code>bootloader/bootloader.sv:309-326,722-740</code></td></tr>
+<tr><td>Memory</td><td>Hybrid I/D interface over two 32 KB SRAMs behind a fixed-priority 2:1 mux</td><td><code>hybrid_mem_interface.sv:61-75</code>, <code>RTL_SOC/sram_mux.sv:6,12-17,74-79</code></td></tr>
+<tr><td>Fabric</td><td><code>axi_lite_xbar</code>, 2 masters and 3 targets with internal error slave; AXI-to-APB bridge decodes 6 windows over 0x4000_0000 to 0x4000_5FFF</td><td><code>riscforge_soc_subsystem.sv:419-421,678-690</code></td></tr>
+<tr><td>Monitors</td><td>7 timeout monitors: 6 APB plus 1 AXI-Lite on the core's master port</td><td><code>riscforge_soc_subsystem.sv:995-1010,1310-1330</code></td></tr>
+<tr><td>Interrupts</td><td>In-core gateway and two-level class arbiter, 6 sources wide</td><td><code>riscv_core/rtl/top.v:207,548</code>, <code>irq_gateway.v</code>, <code>irq_arbiter.v</code></td></tr>
+<tr><td>Registers</td><td>I2C 6, Timer 0 6, Timer 1 6, UART 8, GPIO 19, SPI master 10</td><td>Rev B 3.2; authoritative map is Rev B Table 14.1</td></tr>
+</tbody></table></div>
+
+<p>Rev B's five reset domains (all active-low, Table 3.1) set the release-order obligations of the reset section:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Domain</th><th>Source</th><th>Covers</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>sys_rst_n</code></td><td><code>hard_rst_ni &amp; soft_rst_ni</code>, 4-flop chain</td><td>Crossbar, bridge, SRAM muxes and wrappers, all 7 timeout monitors</td></tr>
+<tr><td>2</td><td><code>hard_rst_sync_n</code></td><td><code>hard_rst_ni</code> only</td><td>Bootloader; leaves reset on the same edge as <code>sys_rst_n</code></td></tr>
+<tr><td>3</td><td><code>core_rst_n</code></td><td>Bootloader output</td><td>Core, hybrid memory interface, BootROM; held for the whole image load</td></tr>
+<tr><td>4</td><td><code>periph_rst_n</code></td><td>Bootloader output</td><td>I2C, Timer 0, UART, Timer 1, GPIO (not SPI)</td></tr>
+<tr><td>5</td><td><code>spi_rst_n</code></td><td>Bootloader output, independent timing</td><td>SPI master only; released early so the boot fetch can use it</td></tr>
+</tbody></table></div>
+
+<h3>5.2 Three facts Rev A got wrong</h3>
+<ul>
+<li><b>There is no always-on watchdog in this SoC.</b> <code>aon_timer</code> is real RTL but instantiated nowhere and absent from <code>soc_subsystem.f</code>. Its host port is TL-UL, not APB, it has its own clock and reset, and 14 registers. <span class="tag exists">EXISTS</span> as a file, not as an integrated block.</li>
+<li><b><code>soft_rst_ni</code> is an external input.</b> Nothing inside the SoC drives it; warm boot is an externally requested event, not a watchdog consequence.</li>
+<li><b><code>mip[20]</code> is Timer 0 channel 0 overflow, not a watchdog.</b> The SoC wires it but the core discards it, so <code>mip[20]</code> to <code>mip[26]</code> are provably zero in the RTL as it stands. Existing firmware must not depend on those bits.</li>
+</ul>
+
+<h3>5.3 Verified versus specified</h3>
+<p>The plan verifies the SoC as an integrated system (Rev B Table 3.2). Items marked specified are in scope because the plan must be able to test them, but nothing in the repository builds them. Each has an itemised RTL-change count that is a precondition for its check family, not a deliverable of the plan.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Area</th><th>Content</th><th>Verified by</th><th>Build state</th></tr></thead>
+<tbody>
+<tr><td>Boot</td><td>BootROM fetch, fetch demux, bootloader handoff, warm and cold boot, boot failure</td><td>Directed boot scenarios plus firmware suites (section 12)</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Reset</td><td>Five domains, release order, reset during bus activity, reset-cause register</td><td>Directed scenarios (section 11)</td><td>Domains <span class="tag exists">EXISTS</span>; reset-cause register <span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>Core</td><td>RV32I, M, Zicsr, traps, privilege, interrupt entry and return</td><td>RISCOF plus privilege and interrupt suites (sections 17, 13)</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Memory</td><td>Hybrid decode, fetch demux, SRAM mux arbitration, byte-masked access, ISRAM write protection</td><td>SRAM-path scoreboard, PATH-NNNN family (sections 8, 14)</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Fabric</td><td>Crossbar decode, timeout monitors, bridge, APB decode and holes, bus-error response</td><td>SVA plus path scoreboard (sections 8, 14)</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Peripherals</td><td>I2C, Timer 0, Timer 1, UART, GPIO, SPI at 6, 6, 6, 8, 19, 10 registers</td><td>Three-oracle harness (section 15)</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Interrupts</td><td>Gateway, arbiter, classes, round-robin, nesting, shadow stack, seven dropped timer lines once wired</td><td>Arbiter model plus directed scenarios (section 13)</td><td>6 sources <span class="tag exists">EXISTS</span>; 7 lines <span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>Compliance</td><td>ISA conformance of the shipping RTL</td><td>RISCOF sweep (section 17)</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Always-on watchdog</td><td>Bite detection, escalation, reset-cause reporting, bite-to-warm-boot</td><td>Reset, interrupt checks and a directed scenario (sections 11, 13)</td><td><span class="tag specified">SPECIFIED</span>, not integrated</td></tr>
+<tr><td>CLIC</td><td>Nothing while unintegrated</td><td>Not applicable</td><td><span class="tag specified">SPECIFIED</span>, not integrated</td></tr>
+</tbody></table></div>
+
+<p>The specified-only changes, with Rev B's own counts (Table 3.3). Until they land, a watchdog test is a negative test: no watchdog exists, so no bite can occur.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>What it adds</th><th>RTL edits (Rev B)</th></tr></thead>
+<tbody>
+<tr><td>AON watchdog, bus and decode</td><td>TL-UL-to-APB shim as bridge slave 6 at 0x4000_6000 to 0x4000_6FFF</td><td>5 edits in <code>riscforge_soc_subsystem.sv</code>, plus 1 new shim file and 3 filelist entries</td></tr>
+<tr><td>AON watchdog, clock and reset</td><td><code>clk_aon_i</code> and <code>rst_aon_ni</code> ports; the only domain that survives domains 3 to 5</td><td>2 edits</td></tr>
+<tr><td>AON watchdog, interrupt</td><td><code>fast_irq_i[12]</code> to <code>mip[28]</code>, level source</td><td>5 edits in 4 files</td></tr>
+<tr><td>Reset-cause register</td><td>32-bit read-only RSTCAUSE at APB[6] offset 0x40 (ASSUMED(D-180))</td><td>6 edits in 3 files</td></tr>
+<tr><td>Watchdog bite to warm boot</td><td>OR the reset request into the soft reset path</td><td>2 edits</td></tr>
+<tr><td>Subtotal and plan total</td><td>Five watchdog rows = 20 edits across 5 files; with 9 block-internal edits (Table 15.8.6) the plan total is 29</td><td>20 + 9 = 29</td></tr>
+<tr><td>Seven dropped timer interrupt lines</td><td><code>mip[20]</code> to <code>mip[26]</code>; gateway and arbiter widen to 13 sources; counted separately</td><td>10 edits across 3 files</td></tr>
+</tbody></table></div>
+<p>Rev B notes that its 29 is 3 more than the 26 in decision D-173, whose 16 was unreconciled, and that reconciliation is raised as a cross-file row. Until it lands, 29 is the count the plan states.</p>
+
+<h3>5.4 Out of scope</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Reason</th><th>Substitute evidence</th></tr></thead>
+<tbody>
+<tr><td>Gate-level simulation</td><td>Not required for a tape-out claim at this stage</td><td>Assertion coverage and formal closure</td></tr>
+<tr><td>Physical effects, timing closure, power; analogue sign-off</td><td>Out of this document</td><td>None in this plan</td></tr>
+<tr><td>Software above the BSP</td><td>Applications are not part of the tape-out</td><td>BSP drivers are exercised</td></tr>
+<tr><td>Peripheral-internal microarchitecture</td><td>Verified at IP level</td><td>Inherited as a model, cited to the IP sign-off report</td></tr>
+<tr><td>Compressed and floating-point instructions</td><td>Not implemented; <code>misa</code> advertises I and M</td><td>Absence is a design fact; 93 vendored tests recorded out of scope</td></tr>
+<tr><td>CLIC</td><td>Real RTL, never instantiated</td><td>The in-core gateway and arbiter</td></tr>
+<tr><td>Watchdog behaviour as built</td><td>No watchdog is integrated</td><td>Negative test only, until the 29 edits land</td></tr>
+<tr><td>Boot-image integrity as built</td><td>The bootloader has no CRC, checksum, magic, signature or length header, and no abort state</td><td>Stated in section 12 as a gap to close, not described as present</td></tr>
+<tr><td>SRAM contents at reset</td><td>A boot-path property, not a memory-model property</td><td>Section 12</td></tr>
+</tbody></table></div>
+
+<h2 id="s6">6. Status vocabulary</h2>
+<p>Every statement in Rev B carries one of four build states, and this documentation set follows the same discipline with a fifth, <span class="tag open">OPEN</span>, for facts that are unknown or disputed (Rev B 1.2).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Tag</th><th>Meaning in Rev B</th><th>What a reader may conclude</th></tr></thead>
+<tbody>
+<tr><td><span class="tag exists">EXISTS</span></td><td>Present in the repository today, with a locator; falsifiable by reading the file</td><td>The statement can be checked against the file now</td></tr>
+<tr><td><span class="tag specified">SPECIFIED</span></td><td>Required by the plan, absent today, with an itemised RTL-change count</td><td>It is a requirement, not a result. Nothing here proves it works</td></tr>
+<tr><td>ASSUMED(D-nnn)</td><td>A directed default adopted because the RTL is silent, with reasoning recorded</td><td>A decision, not a measurement. A REFUTED decision may not be relied on</td></tr>
+<tr><td>TBD(D-nnn)</td><td>Required and not established; the tag names the decision that will supply a default</td><td>Do not substitute an untagged number</td></tr>
+<tr><td><span class="tag open">OPEN</span></td><td>Unknown or disputed (this documentation set's label)</td><td>Treat as unresolved</td></tr>
+</tbody></table></div>
+<div class="warn">Two cautions. First, Rev B was written before most verification was built, so many "specified" statements are plans, not outcomes: its quality goals are targets, not current state. Second, the privileged ISA version is TBD (no version string exists in the repository), which Rev B calls the plan's largest specification gap (Rev B 1.4).</div>
+
+<h2 id="s7">7. Where to go next</h2>
+<ul>
+<li><a href="vf_strategy_env.html">Strategy, environment and stimulus</a>: the seven layers, independence sources, run record and stimulus sources.</li>
+<li><a href="vf_regression_gates.html">Regression and gates</a>: the seven-gate register and tiers.</li>
+<li><a href="vf_checking_scoreboards.html">Checking and scoreboards</a>: how errors are detected.</li>
+<li><a href="vf_coverage.html">Coverage</a>: closure rules and the closure loop.</li>
+<li><a href="vf_phases_overview.html">Phases</a>: P0 to P6 and the formal track.</li>
+<li><a href="glossary.html">Glossary</a> and <a href="index.html">index</a>.</li>
+</ul>
+<p>This page does not claim any verification result. It describes the plan and the design as Rev B states them; the current status of each phase is in the phase pages and tracker.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B sections 1, 2 and 3 (extracted text), <code>Verification/status/PHASE_STATUS.md</code>. RTL locators in section 5 are quoted from Rev B 3.1 and were not re-read for this page.</div>
+</div>
+</body>
+</html>

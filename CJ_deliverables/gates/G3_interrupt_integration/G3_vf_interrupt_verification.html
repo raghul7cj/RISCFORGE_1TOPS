@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interrupt verification guide (consolidated)</title>
+<link rel="stylesheet" href="../../../documentation/html/assets/style.css">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff; --fg: #1d2433; --muted: #5b667a; --line: #d5dbe6; --soft: #f4f6fa;
+    --accent: #1f4e9c; --accent-soft: #e8effa;
+    --ok: #1d7a43; --warn: #a15c00; --bad: #b3261e;
+  }
+</style>
+</head>
+<body>
+<div class="topbar"><a class="brand" href="../../../documentation/html/index.html">RISCFORGE documentation</a><span class="crumb">/ Gates / G3 interrupt integration / Interrupt verification</span></div>
+<div class="wrap">
+
+<h1>Interrupt verification guide — consolidated</h1>
+<p class="lead">This page has been merged into the single G3 source of truth. The Rev B test plan, the IC-n check register, the gate and nesting cases, and the spurious/clear-ordering cases are now documented in <a href="G3_IRQ_ARCH_and_TB.html">G3_IRQ_ARCH_and_TB.html</a>.</p>
+
+<div class="note">
+  <b>Where to go.</b>
+  <ul>
+    <li>Check register, gate matrix and nesting cases: <a href="G3_IRQ_ARCH_and_TB.html#tb">G3_IRQ_ARCH_and_TB.html section 9</a>.</li>
+    <li>Spurious interrupts and clear ordering CO-A to CO-D: <a href="G3_IRQ_ARCH_and_TB.html#spurious">section 10</a>.</li>
+    <li>Testbench inventory and evidence boundaries: <a href="G3_IRQ_ARCH_and_TB.html#evidence">section 11</a>.</li>
+    <li>Rev B versus the RTL on disk: <a href="G3_IRQ_ARCH_and_TB.html#evidence">section 12</a>.</li>
+  </ul>
+  <p>The previous content of this page is preserved verbatim at <a href="superseded/G3_vf_interrupt_verification.html">superseded/G3_vf_interrupt_verification.html</a>. Its upstream original, <code>ips/documentation/html/vf_interrupt_verification.html</code>, is unchanged. No claim on this stub is new evidence.</p>
+  <p>Unit verification and coverage remain owned by <a href="../G4_core_verification/G4_IRQ_UNIT_VERIFICATION.html">G4.12</a>; G3.6 timer integration and G6 end-to-end remain open.</p>
+</div>
+
+<p class="meta">Replaced 2026-11-12. This stub creates no verification result, no approval and no waiver.</p>
+
+</div>
+</body>
+</html>

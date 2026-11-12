@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hazards, CSRs and Traps</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../signoff/cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. Retained pre-port hazard/CSR/trap description; integrated legality, MDU and mepc changes require the maintained source map. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Core / Hazards, CSRs and traps</span></div>
+<div class="wrap">
+
+<h1>Core hazard unit, CSR register file and trap/MRET commit</h1>
+<p class="lead">How the 5-stage RV32IM_Zicsr core resolves data and control hazards, which CSRs it implements, and how a synchronous exception or MRET is committed at the write-back (WB) stage. Written from the RTL as it stands; for engineers reading or verifying the core.</p>
+<p class="meta">Scope: <code>hazard_unit.v</code>, <code>csr_regfile.v</code>, <code>wb_trap_mret_commit_controller.v</code>, <code>opcode_check.v</code> and the pipeline wiring in <code>top.v</code>. Interrupt-specific behaviour is on <a href="core_interrupts.html">core_interrupts.html</a> | Sources: see footer | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Where these blocks sit</a></li>
+<li><a href="#s2">Forwarding</a></li>
+<li><a href="#s3">Stalls and flushes</a></li>
+<li><a href="#s4">DEF-001 and the mem_stall_i gating</a></li>
+<li><a href="#s5">CSR register file</a></li>
+<li><a href="#s6">Exception sources and cause encoding</a></li>
+<li><a href="#s7">Trap commit at WB</a></li>
+<li><a href="#s8">MRET commit</a></li>
+<li><a href="#s9">Open points and limits</a></li>
+</ol></div>
+
+<h2 id="s1">1. Where these blocks sit</h2>
+<p>Pipeline stages are IF, ID, EX, MEM and WB, instantiated in <code>riscv_core/rtl/top.v</code> as <code>Fetch</code>, <code>Decode</code>, <code>Execute</code>, <code>Memory</code> and a write-back stage. Three blocks sit beside them. <code>hazard_unit</code> (instance <code>Forwarding_block</code>, <code>top.v:589</code>) produces forwarding selects, stalls and flushes. <code>wb_trap_mret_commit_controller</code> (<code>top.v:517</code>) turns an exception tag that reached WB into a redirect plus CSR updates. <code>csr_regfile</code> (<code>top.v:553</code>) holds the machine-mode CSRs. The design is machine-mode only: there is no privilege level other than M. <span class="tag exists">EXISTS</span></p>
+<p>Exceptions are <em>precise by tagging</em>: a stage that detects a fault sets <code>exc_valid</code>, <code>exc_cause</code>, <code>exc_tval</code> and <code>exc_pc</code> in its pipeline register, the tag travels with the instruction, side effects are suppressed on the way, and the trap is taken only when the tag is in WB (section 7).</p>
+
+<h2 id="s2">2. Forwarding</h2>
+<p>Forwarding exists only into the two EX operand multiplexers. The selects are <code>ForwardAE</code> for operand A and <code>ForwardBE</code> for operand B (<code>hazard_unit.v:127-137</code>). Figure 1 shows the paths.</p>
+
+<figure>
+<svg viewBox="0 0 960 304" role="img" aria-label="Forwarding paths: ALU_ResultM and ResultW feed the EX operand multiplexers, selected by hazard_unit">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ctrl" x="176" y="16" width="312" height="48" rx="6"/>
+<text class="tb mid" x="332" y="37">hazard_unit forwarding</text>
+<text class="ts mid" x="332" y="54">Rs1_E, Rs2_E compared with RD_M, RD_W</text>
+<rect class="bx-core" x="24" y="88" width="152" height="64" rx="6"/>
+<text class="tb mid" x="100" y="116">ID/EX</text>
+<text class="ts mid" x="100" y="134">RD1_E, RD2_E</text>
+<rect class="bx-core" x="248" y="88" width="168" height="64" rx="6"/>
+<text class="tb mid" x="332" y="116">Operand muxes</text>
+<text class="ts mid" x="332" y="134">srca_mux, srcb_mux</text>
+<rect class="bx-core" x="488" y="88" width="112" height="64" rx="6"/>
+<text class="tb mid" x="544" y="125">ALU</text>
+<rect class="bx-core" x="672" y="88" width="120" height="64" rx="6"/>
+<text class="tb mid" x="732" y="116">EX/MEM</text>
+<text class="ts mid" x="732" y="134">ALU_ResultM</text>
+<rect class="bx-core" x="840" y="88" width="104" height="64" rx="6"/>
+<text class="tb mid" x="892" y="116">MEM/WB</text>
+<text class="ts mid" x="892" y="134">ResultW</text>
+<path class="ar" d="M332 64 V88"/>
+<text class="ts" x="344" y="80">ForwardAE / ForwardBE</text>
+<path class="ar" d="M176 120 H248"/>
+<text class="ts mid" x="212" y="112">sel 00</text>
+<path class="ar" d="M416 120 H488"/>
+<text class="ts mid" x="452" y="112">Src_A/B</text>
+<path class="ar" d="M600 120 H672"/>
+<path class="ar" d="M792 120 H840"/>
+<path class="ar" d="M732 152 V216 H380 V152"/>
+<text class="ts" x="400" y="236">ALU_ResultM, ForwardAE/BE = 10 (priority 1)</text>
+<path class="ar" d="M892 152 V264 H296 V152"/>
+<text class="ts" x="316" y="284">ResultW, ForwardAE/BE = 01 (priority 2)</text>
+</svg>
+<figcaption><b>Figure 1.</b> Forwarding paths. Both selects default to 00 (register-file value). MEM-stage data wins over WB-stage data when both match. A load result is not forwarded from MEM (the EX/MEM path carries the address), so a consumer of a load waits one cycle and then takes the value from WB (section 3).</figcaption>
+</figure>
+
+<p>The mux wiring is <code>execute_cycle.v:233-247</code> (port a = register, b = <code>ResultW</code>, c = <code>ALU_ResultM</code>; the mux module itself was not opened, so the 00/01/10 to a/b/c mapping is inferred from port order).</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Signal</th><th>Equation as implemented</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><code>ForwardAE</code></td><td><code>rst==0</code> gives 00; else 10 if <code>RegWriteM &amp;&amp; Rs1_E!=0 &amp;&amp; RD_M==Rs1_E</code>; else 01 if <code>RegWriteW &amp;&amp; Rs1_E!=0 &amp;&amp; RD_W==Rs1_E</code>; else 00</td><td><code>riscv_core/rtl/hazard_unit.v:127-131</code></td></tr>
+<tr><td><code>ForwardBE</code></td><td>Same with <code>Rs2_E</code></td><td><code>hazard_unit.v:133-137</code></td></tr>
+<tr><td><code>RegWriteW</code> input</td><td>Is <code>RegWriteW_gated = RegWriteW &amp; valid_W &amp; ~exc_valid_W &amp; ~mret_commit</code>, so a WB instruction that is trapping never forwards</td><td><code>top.v:285,592</code></td></tr>
+<tr><td><code>RegWriteM</code> input</td><td>Driven ungated from the EX/MEM register. EX clears <code>RegWriteE_r</code> when an exception is tagged in EX, so a tagged instruction does not forward from MEM either</td><td><code>top.v:591</code>, <code>execute_cycle.v:411</code></td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. Stalls and flushes</h2>
+<p>Every stall and flush is built in <code>hazard_unit.v:146-202</code> from the terms below. Figure 2 is a source-by-output map and Figure 3 shows what each pipeline register does when both a flush and a stall arrive.</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>Equation</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><code>lwstall</code></td><td><code>ResultSrcE==01 &amp;&amp; (Rs1_D==RdE || Rs2_D==RdE) &amp;&amp; RdE!=0</code>. It compares both source fields whether or not the instruction in ID uses them, which is conservative</td><td><code>hazard_unit.v:148-151</code></td></tr>
+<tr><td><code>csr_stall</code></td><td><code>csr_valid_D</code> and the CSR address read in ID equals the address of a CSR write in EX, MEM or WB. The EX-stage enable is wired to <code>csr_valid_E</code> (any CSR instruction in EX), the WB-stage enable is the gated one</td><td><code>hazard_unit.v:155-158</code>, <code>top.v:620-622</code></td></tr>
+<tr><td><code>csr_gpr_stall</code></td><td><code>ResultSrcE==11</code> (CSR instruction in EX) and ID reads the same non-zero destination. The code comment also mentions MEM; the equation covers EX only</td><td><code>hazard_unit.v:163-167</code></td></tr>
+<tr><td><code>StallF</code>, <code>StallD</code></td><td><code>wb_redirect ? 0 : lwstall | csr_stall | csr_gpr_stall | stallMUL | mem_stall_i</code></td><td><code>hazard_unit.v:170-171</code></td></tr>
+<tr><td><code>StallE</code></td><td><code>wb_redirect ? 0 : mem_stall_i</code>. The comment says "M-ext or LSU", but <code>stallMUL</code> is not in the equation</td><td><code>hazard_unit.v:173</code></td></tr>
+<tr><td><code>StallM</code></td><td><code>wb_redirect ? 0 : mem_stall_i</code></td><td><code>hazard_unit.v:175</code></td></tr>
+<tr><td><code>exc_inflight_E / _M</code></td><td><code>valid_E &amp; exc_valid_E</code> / <code>valid_M &amp; exc_valid_M</code>: an exception-tagged instruction is in EX or MEM</td><td><code>hazard_unit.v:184-185</code></td></tr>
+<tr><td><code>FlushE</code></td><td><code>(lwstall &amp; ~mem_stall_i) | (csr_gpr_stall &amp; ~mem_stall_i) | PCSrcE | (csr_stall &amp; ~mem_stall_i) | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL</code>. <code>top.v</code> also ORs in <code>irq_flush_frontend</code> before the decode stage sees it</td><td><code>hazard_unit.v:192</code>, <code>top.v:327</code></td></tr>
+<tr><td><code>FlushD</code></td><td><code>PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | flush_pipeline_onehot[0]</code>, plus <code>irq_flush_frontend</code> in <code>top.v</code></td><td><code>hazard_unit.v:196</code>, <code>top.v:309</code></td></tr>
+<tr><td><code>FlushM</code></td><td><code>wb_redirect | flush_pipeline_onehot[2] | stallMUL</code></td><td><code>hazard_unit.v:199</code></td></tr>
+<tr><td><code>FlushW</code></td><td><code>wb_redirect | flush_pipeline_onehot[3]</code></td><td><code>hazard_unit.v:202</code></td></tr>
+<tr><td>Ports with no use</td><td><code>illegal_instr</code> and <code>csr_raddr_W</code> are inputs but appear in no equation</td><td><code>hazard_unit.v:49,53</code></td></tr>
+</tbody></table></div>
+
+<p>Load-use timing. A load in EX with a dependent instruction in ID raises <code>lwstall</code> for one cycle: fetch and decode hold, EX receives a bubble. In the next cycle the load is in MEM and the consumer is still in ID; it enters EX when the load is in WB and takes <code>ResultW</code> through select 01. One bubble results. <span class="tag exists">EXISTS</span></p>
+
+<figure>
+<svg viewBox="0 0 960 520" role="img" aria-label="Matrix of which hazard sources drive which stall and flush outputs">
+<rect class="lane" x="24" y="64" width="912" height="36"/>
+<rect class="lane" x="24" y="136" width="912" height="36"/>
+<rect class="lane" x="24" y="208" width="912" height="36"/>
+<rect class="lane" x="24" y="280" width="912" height="36"/>
+<rect class="lane" x="24" y="352" width="912" height="36"/>
+<rect class="lane" x="24" y="424" width="912" height="36"/>
+<text class="ts mid" x="540" y="18">Stall: hold the register</text>
+<text class="ts mid" x="756" y="18">Flush: insert a bubble</text>
+<text class="tb mid" x="360" y="48">StallF</text>
+<text class="tb mid" x="432" y="48">StallD</text>
+<text class="tb mid" x="504" y="48">StallE</text>
+<text class="tb mid" x="576" y="48">StallM</text>
+<text class="tb mid" x="648" y="48">FlushD</text>
+<text class="tb mid" x="720" y="48">FlushE</text>
+<text class="tb mid" x="792" y="48">FlushM</text>
+<text class="tb mid" x="864" y="48">FlushW</text>
+<path class="ln" d="M612 30 V472"/>
+<text class="tm end" x="312" y="88">lwstall</text>
+<text class="tm end" x="312" y="124">csr_stall</text>
+<text class="tm end" x="312" y="160">csr_gpr_stall</text>
+<text class="tm end" x="312" y="196">stallMUL</text>
+<text class="tm end" x="312" y="232">mem_stall_i</text>
+<text class="tm end" x="312" y="268">PCSrcE</text>
+<text class="tm end" x="312" y="304">exc_inflight_E</text>
+<text class="tm end" x="312" y="340">exc_inflight_M</text>
+<text class="tm end" x="312" y="376">wb_redirect</text>
+<text class="tm end" x="312" y="412">flush_pipeline_onehot[i]</text>
+<text class="tm end" x="312" y="448">irq_flush_frontend (top.v)</text>
+<!-- lwstall row y=82 -->
+<circle class="pill" cx="360" cy="82" r="9"/><circle class="pill" cx="432" cy="82" r="9"/>
+<rect class="bx-ctrl" x="696" y="72" width="48" height="20" rx="4"/><text class="tm mid" x="720" y="86">&amp;~ms</text>
+<!-- csr_stall y=118 -->
+<circle class="pill" cx="360" cy="118" r="9"/><circle class="pill" cx="432" cy="118" r="9"/>
+<rect class="bx-ctrl" x="696" y="108" width="48" height="20" rx="4"/><text class="tm mid" x="720" y="122">&amp;~ms</text>
+<!-- csr_gpr y=154 -->
+<circle class="pill" cx="360" cy="154" r="9"/><circle class="pill" cx="432" cy="154" r="9"/>
+<rect class="bx-ctrl" x="696" y="144" width="48" height="20" rx="4"/><text class="tm mid" x="720" y="158">&amp;~ms</text>
+<!-- stallMUL y=190 -->
+<circle class="pill" cx="360" cy="190" r="9"/><circle class="pill" cx="432" cy="190" r="9"/>
+<circle class="pill" cx="720" cy="190" r="9"/><circle class="pill" cx="792" cy="190" r="9"/>
+<!-- mem_stall y=226 -->
+<circle class="pill" cx="360" cy="226" r="9"/><circle class="pill" cx="432" cy="226" r="9"/>
+<circle class="pill" cx="504" cy="226" r="9"/><circle class="pill" cx="576" cy="226" r="9"/>
+<!-- PCSrcE y=262 -->
+<circle class="pill" cx="648" cy="262" r="9"/><circle class="pill" cx="720" cy="262" r="9"/>
+<!-- exc_E y=298 -->
+<circle class="pill" cx="648" cy="298" r="9"/>
+<!-- exc_M y=334 -->
+<circle class="pill" cx="648" cy="334" r="9"/><circle class="pill" cx="720" cy="334" r="9"/>
+<!-- wb_redirect y=370 -->
+<text class="ts mid" x="360" y="374">force 0</text><text class="ts mid" x="432" y="374">force 0</text>
+<text class="ts mid" x="504" y="374">force 0</text><text class="ts mid" x="576" y="374">force 0</text>
+<circle class="pill" cx="648" cy="370" r="9"/><circle class="pill" cx="720" cy="370" r="9"/>
+<circle class="pill" cx="792" cy="370" r="9"/><circle class="pill" cx="864" cy="370" r="9"/>
+<!-- onehot y=406 -->
+<circle class="pill" cx="648" cy="406" r="9"/><text class="tm mid" x="648" y="410">0</text>
+<circle class="pill" cx="720" cy="406" r="9"/><text class="tm mid" x="720" y="410">1</text>
+<circle class="pill" cx="792" cy="406" r="9"/><text class="tm mid" x="792" y="410">2</text>
+<circle class="pill" cx="864" cy="406" r="9"/><text class="tm mid" x="864" y="410">3</text>
+<!-- irq y=442 -->
+<circle class="pill" cx="648" cy="442" r="9"/><circle class="pill" cx="720" cy="442" r="9"/>
+<circle class="pill" cx="48" cy="496" r="8"/><text class="ts" x="64" y="500">drives the output</text>
+<rect class="bx-ctrl" x="200" y="486" width="48" height="20" rx="4"/><text class="tm mid" x="224" y="500">&amp;~ms</text>
+<text class="ts" x="260" y="500">drives it only while mem_stall_i = 0 (DEF-001 gating)</text>
+<text class="ts" x="640" y="500">0..3 = bit of flush_pipeline_onehot</text>
+</svg>
+<figcaption><b>Figure 2.</b> Which source drives which output. The three data-hazard bubbles reach FlushE only when <code>mem_stall_i</code> is low. <code>wb_redirect</code> forces all four stalls to zero and asserts all four flushes; <code>flush_pipeline_onehot</code> is 1111 on every trap or MRET commit, so it repeats the same flushes.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 960 336" role="img" aria-label="Update priority of each pipeline register: reset, then flush, then stall or hold, then load">
+<defs>
+  <marker id="p-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<text class="ts mid" x="252" y="22">1st</text><text class="ts mid" x="452" y="22">2nd</text><text class="ts mid" x="652" y="22">3rd</text><text class="ts mid" x="852" y="22">otherwise</text>
+<text class="tb" x="24" y="62">IF/ID</text>
+<rect class="bx-ctrl" x="168" y="32" width="168" height="48" rx="6"/><text class="tb mid" x="252" y="52">Reset</text><text class="ts mid" x="252" y="69">clear</text>
+<rect class="bx-ctrl" x="368" y="32" width="168" height="48" rx="6"/><text class="tb mid" x="452" y="52">FlushD</text><text class="ts mid" x="452" y="69">NOP bubble, valid 0</text>
+<rect class="bx-ctrl" x="568" y="32" width="168" height="48" rx="6"/><text class="tb mid" x="652" y="52">Hold</text><text class="ts mid" x="652" y="69">StallD | imem_stall_raw</text>
+<rect class="bx-core" x="768" y="32" width="168" height="48" rx="6"/><text class="tb mid" x="852" y="52">Load</text><text class="ts mid" x="852" y="69">next fetched word</text>
+<path class="ar" d="M336 56 H368"/><path class="ar" d="M536 56 H568"/><path class="ar" d="M736 56 H768"/>
+<text class="tb" x="24" y="134">ID/EX</text>
+<rect class="bx-ctrl" x="168" y="104" width="168" height="48" rx="6"/><text class="tb mid" x="252" y="124">Reset</text><text class="ts mid" x="252" y="141">clear</text>
+<rect class="bx-ctrl" x="368" y="104" width="168" height="48" rx="6"/><text class="tb mid" x="452" y="124">FlushE</text><text class="ts mid" x="452" y="141">bubble, valid_E 0</text>
+<rect class="bx-ctrl" x="568" y="104" width="168" height="48" rx="6"/><text class="tb mid" x="652" y="124">Hold</text><text class="ts mid" x="652" y="141">StallE</text>
+<rect class="bx-core" x="768" y="104" width="168" height="48" rx="6"/><text class="tb mid" x="852" y="124">Load</text><text class="ts mid" x="852" y="141">decoded instruction</text>
+<path class="ar" d="M336 128 H368"/><path class="ar" d="M536 128 H568"/><path class="ar" d="M736 128 H768"/>
+<text class="tb" x="24" y="206">EX/MEM</text>
+<rect class="bx-ctrl" x="168" y="176" width="168" height="48" rx="6"/><text class="tb mid" x="252" y="196">Reset</text><text class="ts mid" x="252" y="213">clear</text>
+<rect class="bx-ctrl" x="368" y="176" width="168" height="48" rx="6"/><text class="tb mid" x="452" y="196">FlushM</text><text class="ts mid" x="452" y="213">bubble</text>
+<rect class="bx-ctrl" x="568" y="176" width="168" height="48" rx="6"/><text class="tb mid" x="652" y="196">Hold</text><text class="ts mid" x="652" y="213">StallM</text>
+<rect class="bx-core" x="768" y="176" width="168" height="48" rx="6"/><text class="tb mid" x="852" y="196">Load</text><text class="ts mid" x="852" y="213">EX result and tags</text>
+<path class="ar" d="M336 200 H368"/><path class="ar" d="M536 200 H568"/><path class="ar" d="M736 200 H768"/>
+<text class="tb" x="24" y="278">MEM/WB</text>
+<rect class="bx-ctrl" x="168" y="248" width="168" height="48" rx="6"/><text class="tb mid" x="252" y="268">Reset</text><text class="ts mid" x="252" y="285">clear</text>
+<rect class="bx-ctrl" x="368" y="248" width="168" height="48" rx="6"/><text class="tb mid" x="452" y="268">FlushW</text><text class="ts mid" x="452" y="285">bubble</text>
+<rect class="bx-ctrl" x="568" y="248" width="168" height="48" rx="6"/><text class="tb mid" x="652" y="268">Hold</text><text class="ts mid" x="652" y="285">core_stall_gated (MEM)</text>
+<rect class="bx-core" x="768" y="248" width="168" height="48" rx="6"/><text class="tb mid" x="852" y="268">Load</text><text class="ts mid" x="852" y="285">MEM result and tags</text>
+<path class="ar" d="M336 272 H368"/><path class="ar" d="M536 272 H568"/><path class="ar" d="M736 272 H768"/>
+<text class="ts" x="168" y="324">Flush always outranks hold. wb_redirect also forces StallF/D/E/M to 0, so a trap redirect is never held back.</text>
+</svg>
+<figcaption><b>Figure 3.</b> Priority inside each pipeline register: IF/ID <code>fetch_cycle.v:244,260</code>; ID/EX <code>decode_cycle.v:273,305</code>; EX/MEM <code>execute_cycle.v:368,389</code>; MEM/WB <code>memory_cycle.v:240,260</code>. Because flush outranks hold in ID/EX, a flush that arrives during a memory stall destroys the instruction waiting in EX.</figcaption>
+</figure>
+
+<p>Other observations, all <span class="tag exists">EXISTS</span>: there is no <code>StallW</code>; MEM/WB holds on <code>core_stall_gated</code>, which is the LSU stall with misaligned accesses masked out (<code>memory_cycle.v:186,193</code>). Instruction-memory wait is added inside fetch (<code>StallF | imem_stall_raw</code>, <code>fetch_cycle.v:135,260</code>) and is not part of the hazard unit.</p>
+
+<h2 id="s4">4. DEF-001 and the mem_stall_i gating</h2>
+<p>Defect DEF-001 is "load-use flush inserted during MMIO memory stall drops loads" (<code>Verification/status/defects.csv</code>). Mechanism: during a multi-cycle MMIO access <code>mem_stall_i</code> holds IF, ID, EX and MEM (Figure 2). If the instruction held in EX is a load whose consumer is in ID, <code>lwstall</code> is also true. Without gating, <code>FlushE</code> would be asserted, and because flush outranks hold in ID/EX (Figure 3) the held load would be replaced by a bubble and lost. <span class="tag exists">EXISTS</span></p>
+<p>The current file gates the three data-hazard terms: <code>lwstall</code>, <code>csr_gpr_stall</code> and <code>csr_stall</code> are each ANDed with <code>~mem_stall_i</code> in <code>FlushE</code> (<code>hazard_unit.v:192</code>, rationale at <code>:189-191</code>). The stall outputs are not gated, so the hazard is still honoured: StallF/StallD hold the consumer in ID for as long as the memory stall lasts, and the bubble is inserted on the first cycle after it ends.</p>
+<div class="warn"><b>Status.</b> DEF-001 is FIXED-UNVERIFIED in <code>PHASE_STATUS.md</code> and <code>defects.csv</code>: the fix is in the file, but no directed regression that fails on the old RTL exists yet (action ACT-010). This page documents the equation, not a verification result. Branch and exception terms of FlushE (<code>PCSrcE</code>, <code>exc_inflight_M</code>, <code>wb_redirect</code>, <code>stallMUL</code>) are deliberately ungated; <code>top.v</code> additionally ORs <code>irq_flush_frontend</code> into FlushD and FlushE with no <code>mem_stall</code> gate. That last path is discussed on <a href="core_interrupts.html">core_interrupts.html</a> as an <span class="tag open">OPEN</span> point.</div>
+
+<h2 id="s5">5. CSR register file</h2>
+<p><code>csr_regfile.v</code> has one combinational read port (A), a synchronous normal write port (B, from WB) and an MRET/trap write path (C), with fixed priority in the write block: trap entry, then MRET, then normal write (<code>csr_regfile.v:159,172,184</code>). Figure 4 shows the precedence. All state resets asynchronously to zero (<code>:138-150</code>). <span class="tag exists">EXISTS</span></p>
+
+<figure>
+<svg viewBox="0 0 960 232" role="img" aria-label="CSR write precedence: trap entry, then MRET, then normal CSR instruction write">
+<defs>
+  <marker id="c-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<text class="ts mid" x="152" y="22">Highest priority</text>
+<rect class="bx-ctrl" x="24" y="40" width="256" height="96" rx="6"/>
+<text class="tb mid" x="152" y="62">1. Trap entry</text>
+<text class="ts mid" x="152" y="82">trap_valid_i</text>
+<text class="ts mid" x="152" y="98">mepc, mcause, mtval written</text>
+<text class="ts mid" x="152" y="114">MIE to MPIE, MIE = 0, MPP = 11</text>
+<rect class="bx-ctrl" x="352" y="40" width="256" height="96" rx="6"/>
+<text class="tb mid" x="480" y="62">2. MRET commit</text>
+<text class="ts mid" x="480" y="82">csr_write_en_mret_i | mret_commit_i</text>
+<text class="ts mid" x="480" y="98">MIE from MPIE, MPIE = 1</text>
+<text class="ts mid" x="480" y="114">MPP = 11</text>
+<rect class="bx-core" x="680" y="40" width="256" height="96" rx="6"/>
+<text class="tb mid" x="808" y="62">3. CSR instruction</text>
+<text class="ts mid" x="808" y="82">csr_write_en_normal_i</text>
+<text class="ts mid" x="808" y="98">address decode, masked write</text>
+<text class="ts mid" x="808" y="114">from WB (gated by valid and no trap)</text>
+<path class="ar" d="M280 88 H352"/><text class="ts mid" x="316" y="80">else</text>
+<path class="ar" d="M608 88 H680"/><text class="ts mid" x="644" y="80">else</text>
+<rect class="bx-bus" x="24" y="168" width="912" height="40" rx="6"/>
+<text class="ts mid" x="480" y="192">msip_r is a separate block (csr_regfile.v:207-215) and mcycle/minstret increment every cycle before any of the above (:153-154)</text>
+</svg>
+<figcaption><b>Figure 4.</b> Write precedence inside <code>csr_regfile</code>. The WB stage gates the normal write with <code>valid_W &amp; ~exc_valid_W &amp; ~mret_commit</code> (<code>top.v:286</code>), so in normal operation the three do not collide.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>CSR</th><th>Address</th><th>Write behaviour</th><th>Reset</th><th>Read value</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>mstatus</td><td>0x300</td><td>Mask 0x0000188A: bits 12, 11, 7, 3, 1 writable, rest kept. Trap and MRET set MPP = 11 but a CSR write can store any MPP</td><td>0</td><td>stored word</td><td><code>csr_regfile.v:98,186</code></td></tr>
+<tr><td>mie</td><td>0x304</td><td>Mask 0xFFFF0888: bits 31:16, 11, 7, 3</td><td>0</td><td>stored word</td><td><code>:99,187</code></td></tr>
+<tr><td>mtvec</td><td>0x305</td><td>Mask 0xFFFFFFFC: bits 1:0 are never written, so MODE stays 00 (direct)</td><td>0</td><td>stored word</td><td><code>:100,188</code></td></tr>
+<tr><td>mscratch</td><td>0x340</td><td>Full 32 bits</td><td>0</td><td>stored word</td><td><code>:101,189</code></td></tr>
+<tr><td>mepc</td><td>0x341</td><td>Full 32 bits (bits 1:0 not forced to zero on write); hardware writes it on trap entry</td><td>0</td><td>stored word</td><td><code>:102,190</code></td></tr>
+<tr><td>mcause</td><td>0x342</td><td>Full 32 bits; hardware writes <code>{is_interrupt, cause[30:0]}</code> on trap</td><td>0</td><td>stored word</td><td><code>:103,191</code></td></tr>
+<tr><td>mtval</td><td>0x343</td><td>Full 32 bits; hardware writes it on trap (zero for interrupts)</td><td>0</td><td>stored word</td><td><code>:104,192</code></td></tr>
+<tr><td>mip</td><td>0x344</td><td>Only bit 3 is writable, into <code>msip_r</code>. Other bits are live inputs</td><td>msip_r = 0</td><td><code>{fast_intr[15:0], 4'b0, ext, 3'b0, timer, 3'b0, msip|sw, 3'b0}</code></td><td><code>:105,207-217</code></td></tr>
+<tr><td>mintprio</td><td>0x7C0</td><td>Bits 1:0; upper bits ignored; trap and MRET do not change it</td><td>0</td><td>zero-extended</td><td><code>:106,193</code></td></tr>
+<tr><td>mcycle / mcycleh</td><td>0xB00 / 0xB80</td><td>Writable halves of a 64-bit counter that increments every clock</td><td>0</td><td>low / high half</td><td><code>:108,110,153,194-195</code></td></tr>
+<tr><td>minstret / minstreth</td><td>0xB02 / 0xB82</td><td>Writable; increments when <code>valid_W &amp; ~exc_valid_W</code></td><td>0</td><td>low / high half</td><td><code>:109,111,154,196-197</code>, <code>top.v:572</code></td></tr>
+</tbody></table></div>
+
+<p>Other facts, <span class="tag exists">EXISTS</span>: every other address reads as zero and ignores writes (<code>:131,198</code>). The module computes <code>csr_valid_o</code> for the 13 implemented addresses (<code>:231-243</code>) but <code>top.v:553-586</code> does not connect it, and the CSR instruction path does not raise an illegal-instruction exception for unknown addresses. There is no <code>misa</code>, <code>mhartid</code> or <code>mvendorid</code>. <code>mcause</code> is also left unconnected to the top level (<code>.mcause_out_o()</code>, <code>top.v:583</code>).</p>
+<p>CSR read-modify-write is computed in EX from the read port (<code>execute_cycle.v:333-341</code>): CSRRS and CSRRC with rs1 or uimm equal to zero do not write.</p>
+
+<h3>Shadow stack</h3>
+<div class="open"><span class="tag open">OPEN</span> <b>No shadow stack exists in the current <code>csr_regfile.v</code>.</b> The file has no stack, depth counter or silent-drop path (a search of the file for "stack", "depth" and "shadow" returns nothing). Rev B section 13.5 describes a two-deep stack of mepc, mcause, mpie and class at <code>csr_regfile.v:84-88</code>, pushed on interrupts and dropped silently at depth 2. That description matches an earlier revision of the file: lines 84-88 of the current file are part of the <code>mintprio</code> comment, and the header of <code>top.v</code> (lines 7-8) names "software-managed interrupt nesting" through <code>mintprio</code>. The file was last modified on 2026-10-29. Which version is the tape-out baseline is not stated in anything read; this page follows the file in the repository. Details on <a href="core_interrupts.html">core_interrupts.html</a>.</div>
+
+<h2 id="s6">6. Exception sources and cause encoding</h2>
+<p>The 6-bit pipeline cause has bit 5 as the interrupt flag and bits 4:0 as the code. <code>trap_cause_o</code> keeps only bits 4:0 and the interrupt flag goes to mcause bit 31 (<code>wb_trap_mret_commit_controller.v:71-72</code>, <code>csr_regfile.v:161</code>).</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Cause</th><th>Condition</th><th>Detected in</th><th>mtval</th><th>mepc</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>Taken branch or jump with target address bits [1:0] non-zero. The redirect is suppressed</td><td>EX</td><td>target address</td><td>PC of the branch</td><td><code>execute_cycle.v:285-290,480-483</code></td></tr>
+<tr><td>2</td><td>Opcode not in the 11-entry valid list (LUI, AUIPC, JAL, JALR, BRANCH, LOAD, STORE, OP-IMM, OP, FENCE, SYSTEM). Only the 7-bit opcode is checked; funct3 and funct7 are not</td><td>ID</td><td>the instruction word</td><td>PC in ID</td><td><code>opcode_check.v:30-43</code>, <code>decode_cycle.v:416,419</code></td></tr>
+<tr><td>3</td><td>Instruction word exactly 0x00100073 (EBREAK)</td><td>ID</td><td>the PC</td><td>PC in ID</td><td><code>decode_cycle.v:152,417,420</code></td></tr>
+<tr><td>11</td><td>Instruction word exactly 0x00000073 (ECALL); only the machine-mode code exists</td><td>ID</td><td>0</td><td>PC in ID</td><td><code>decode_cycle.v:151,417</code></td></tr>
+<tr><td>4 / 6</td><td>Misaligned load / store: LW needs addr[1:0]=0; LH, LHU, SH need addr[0]=0</td><td>MEM</td><td>address</td><td>PC in MEM</td><td><code>memory_cycle.v:121-139</code></td></tr>
+<tr><td>5 / 7</td><td>Load / store access fault: <code>core_err</code> from the load-store unit</td><td>MEM</td><td>address</td><td>PC in MEM</td><td><code>memory_cycle.v:132-141</code></td></tr>
+<tr><td>32 + id</td><td>Accepted interrupt, tagged onto the instruction in EX</td><td>EX</td><td>0</td><td>PC in EX</td><td><code>execute_cycle.v:459-478</code></td></tr>
+</tbody></table></div>
+
+<p><b>Priority.</b> The rule along the pipeline is that the first tag wins. A tag set in ID is carried unchanged through EX and MEM (<code>execute_cycle.v:466-478</code>, <code>memory_cycle.v:144-147</code>). In EX a new misaligned-target exception cannot coexist with an inbound tag because <code>branch_taken_raw</code> includes <code>~exc_valid_E</code> (<code>:283</code>). An interrupt is accepted only when no exception is already tagged (<code>irq_accept_E = valid_E &amp; irq_pending_i &amp; ~new_exc_valid_E &amp; ~exc_valid_E</code>, <code>:459</code>). In MEM an inbound tag beats a local fault. Within MEM a misaligned access beats an access fault (<code>:134-139</code>). Older instructions reach WB first, so program order decides between different instructions. <span class="tag exists">EXISTS</span></p>
+<p>A tagged instruction has its register write, memory write and CSR write enables cleared when it leaves EX (<code>execute_cycle.v:411-420</code>) and its memory request gated off in MEM (<code>memory_cycle.v:179-180</code>). <code>fetch_cycle</code> carries an exception tag channel into ID; no source that sets it (an instruction-fetch fault) was found in the files read. <span class="tag open">OPEN</span></p>
+
+<h2 id="s7">7. Trap commit at WB</h2>
+<p>In WB, <code>trap_commit = valid_W &amp; exc_valid_W</code> (<code>wb_trap_mret_commit_controller.v:64</code>). One commit does five things, shown in Figure 5.</p>
+<ul>
+<li>Redirect: <code>wb_trap_redirect_o = trap_commit | mret_commit</code>; the fetch stage uses <code>trap_target</code> as the next PC when it is high (<code>fetch_cycle.v:119</code>).</li>
+<li>Target: direct mode (and all exceptions) use <code>{mtvec[31:2], 2'b00}</code>. If <code>mtvec[1:0] == 01</code> and the trap is an interrupt the target is base + 4 x cause (<code>:98-103</code>). Because the CSR never stores 01 in the mode field (section 5), the vectored branch is unreachable today. <span class="tag exists">EXISTS</span> as logic, <span class="tag open">OPEN</span> as reachable behaviour.</li>
+<li>CSR capture on <code>trap_valid_o</code>: <code>mepc</code> from <code>exc_pc_W</code>; <code>mcause</code> from the flag and cause; <code>mtval</code> from <code>exc_tval_W</code> only for exceptions (<code>trap_addr_valid_o</code> is low for interrupts, so mtval becomes 0); <code>MPIE</code> gets <code>MIE</code>, <code>MIE</code> clears, <code>MPP</code> becomes 11 (<code>csr_regfile.v:159-167</code>).</li>
+<li>Flush: <code>flush_pipeline_onehot_o</code> is 1111 (<code>:106</code>), which together with <code>wb_redirect</code> clears IF/ID, ID/EX, EX/MEM and MEM/WB and releases all stalls.</li>
+<li>Interrupt feedback: for an interrupt commit, <code>wb_commit_irq_o</code> pulses and <code>clear_gateway_o</code> clears the gateway bit (cause 7 to bit 0; causes 16 to 27 to bits 1 to 12, <code>:78-92</code>).</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 960 600" role="img" aria-label="Sequence of a synchronous trap from tagging in ID to redirect at WB">
+<defs>
+  <marker id="t-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-core" x="26" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="90" y="37">IF</text>
+<rect class="bx-core" x="186" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="250" y="37">ID</text>
+<rect class="bx-core" x="346" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="410" y="37">EX</text>
+<rect class="bx-core" x="506" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="570" y="37">MEM</text>
+<rect class="bx-ctrl" x="666" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="730" y="37">WB commit</text>
+<rect class="bx-bus" x="826" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="890" y="37">csr_regfile</text>
+<path class="grp" d="M90 48 V584"/><path class="grp" d="M250 48 V584"/><path class="grp" d="M410 48 V584"/><path class="grp" d="M570 48 V584"/><path class="grp" d="M730 48 V584"/><path class="grp" d="M890 48 V584"/>
+
+<rect class="bx-ctrl" x="168" y="72" width="164" height="40" rx="6"/>
+<text class="tb mid" x="250" y="90">ID tags exception</text><text class="ts mid" x="250" y="105">cause 2, 3 or 11</text>
+<path class="ar" d="M250 136 H410"/><text class="ts mid" x="330" y="128">exc packet</text>
+<rect class="bx-ctrl" x="328" y="152" width="164" height="40" rx="6"/>
+<text class="tb mid" x="410" y="170">EX keeps the tag</text><text class="ts mid" x="410" y="185">writes off; may tag cause 0</text>
+<path class="ar" d="M410 224 H570"/><text class="ts mid" x="490" y="216">packet</text>
+<rect class="bx-ctrl" x="488" y="240" width="164" height="40" rx="6"/>
+<text class="tb mid" x="570" y="258">MEM keeps the tag</text><text class="ts mid" x="570" y="273">bus request off; may tag 4-7</text>
+<path class="ar" d="M570 312 H730"/><text class="ts mid" x="650" y="304">packet</text>
+<rect class="bx-ctrl" x="648" y="328" width="164" height="40" rx="6"/>
+<text class="tb mid" x="730" y="346">trap_commit</text><text class="ts mid" x="730" y="361">valid_W &amp; exc_valid_W</text>
+<path class="ar" d="M730 400 H890"/><text class="ts mid" x="810" y="392">trap_valid_o</text><text class="ts mid" x="810" y="418">pc, cause, tval</text>
+<rect class="bx-ctrl" x="788" y="432" width="164" height="40" rx="6"/>
+<text class="tb mid" x="870" y="450">mepc, mcause, mtval</text><text class="ts mid" x="870" y="465">MIE to MPIE, MIE = 0</text>
+<path class="ar" d="M730 504 H90"/>
+<text class="ts mid" x="170" y="496">wb_trap_redirect</text><text class="ts mid" x="490" y="496">trap_target</text>
+<path class="ar-d" d="M730 536 H250"/>
+<text class="ts mid" x="650" y="528">FlushD/E/M/W</text>
+<rect class="bx-ctrl" x="8" y="552" width="164" height="32" rx="6"/>
+<text class="tb mid" x="90" y="573">fetch handler at mtvec</text>
+</svg>
+<figcaption><b>Figure 5.</b> Trap-entry sequence for a synchronous exception. The tag is created early (ID, EX or MEM) but nothing architectural changes until the instruction reaches WB; the redirect and flushes then happen in the same cycle.</figcaption>
+</figure>
+
+<h2 id="s8">8. MRET commit</h2>
+<p>MRET is decoded in ID (<code>is_mret</code>, <code>decode_cycle.v:142,189</code>), carried as <code>is_mret_r</code> through every stage register, and committed at WB when <code>valid_W &amp; is_mret_W &amp; ~exc_valid_W</code> (<code>wb_trap_mret_commit_controller.v:65</code>). Figure 6 gives the flow. <span class="tag exists">EXISTS</span></p>
+
+<figure>
+<svg viewBox="0 0 960 336" role="img" aria-label="MRET commit flow: decode, carry, commit test, then redirect to mepc, mstatus restore and flush">
+<defs>
+  <marker id="m-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-core" x="24" y="24" width="176" height="56" rx="6"/><text class="tb mid" x="112" y="48">ID decodes MRET</text><text class="ts mid" x="112" y="65">is_mret</text>
+<rect class="bx-core" x="232" y="24" width="216" height="56" rx="6"/><text class="tb mid" x="340" y="48">Tag carried</text><text class="ts mid" x="340" y="65">ID/EX, EX/MEM, MEM/WB</text>
+<rect class="bx-ctrl" x="480" y="24" width="256" height="56" rx="6"/><text class="tb mid" x="608" y="48">WB: mret_commit?</text><text class="ts mid" x="608" y="65">valid_W &amp; is_mret_W &amp; ~exc_valid_W</text>
+<rect class="bx-ext" x="768" y="24" width="168" height="56" rx="6"/><text class="tb mid" x="852" y="48">exc_valid_W set</text><text class="ts mid" x="852" y="65">trap path instead</text>
+<path class="ar" d="M200 52 H232"/><path class="ar" d="M448 52 H480"/><path class="ar" d="M736 52 H768"/>
+<text class="ts mid" x="752" y="44">no</text>
+<path class="ln" d="M608 80 V120"/><path class="ln" d="M340 120 H852"/>
+<text class="ts" x="620" y="104">yes</text>
+<rect class="bx-ctrl" x="232" y="152" width="216" height="56" rx="6"/><text class="tb mid" x="340" y="176">Redirect</text><text class="ts mid" x="340" y="193">target = {mepc[31:2], 2'b00}</text>
+<rect class="bx-bus" x="480" y="152" width="256" height="56" rx="6"/><text class="tb mid" x="608" y="176">mstatus restore (PORT C)</text><text class="ts mid" x="608" y="193">MIE from MPIE, MPIE = 1, MPP = 11</text>
+<rect class="bx-ctrl" x="768" y="152" width="168" height="56" rx="6"/><text class="tb mid" x="852" y="176">Flush 1111</text><text class="ts mid" x="852" y="193">FlushD/E/M/W</text>
+<path class="ar" d="M340 120 V152"/><path class="ar" d="M608 120 V152"/><path class="ar" d="M852 120 V152"/>
+<rect class="bx-core" x="232" y="248" width="216" height="56" rx="6"/><text class="tb mid" x="340" y="272">IF resumes</text><text class="ts mid" x="340" y="289">at the saved PC</text>
+<path class="ar" d="M340 208 V248"/>
+</svg>
+<figcaption><b>Figure 6.</b> MRET commit. The MIE restore happens in <code>csr_regfile</code> on <code>csr_write_en_mret_i</code> or <code>mret_commit_i</code> (<code>csr_regfile.v:172-179</code>), using its own MPIE; the controller also computes <code>new_mstatus</code> (<code>wb_trap_mret_commit_controller.v:116-126</code>), but only bit 1 of that word is consumed by the register file (<code>csr_regfile.v:176-178</code>).</figcaption>
+</figure>
+
+<h2 id="s9">9. Open points and limits</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>DEF-001 fix</td><td><span class="tag exists">EXISTS</span> fixed, unverified</td><td>Gating is in <code>hazard_unit.v:192</code>; FIXED-UNVERIFIED until the directed regression (ACT-010) passes</td></tr>
+<tr><td>Shadow stack</td><td><span class="tag open">OPEN</span></td><td>Described by Rev B 13.5, absent from the current <code>csr_regfile.v</code></td></tr>
+<tr><td>Vectored mtvec</td><td><span class="tag specified">SPECIFIED</span> by Rev B 13.7, logic present, unreachable</td><td>Mode bits cannot be written (<code>csr_regfile.v:188</code>)</td></tr>
+<tr><td>Illegal CSR access</td><td><span class="tag open">OPEN</span></td><td>No trap for an unknown address; <code>csr_valid_o</code> unconnected</td></tr>
+<tr><td>Illegal-instruction coverage</td><td><span class="tag exists">EXISTS</span> as a limit</td><td>Only the 7-bit opcode is tested; reserved funct3/funct7 encodings are not detected</td></tr>
+<tr><td>Fetch-fault source</td><td><span class="tag open">OPEN</span></td><td>Tag channel exists; setter not found in the files read</td></tr>
+<tr><td>csr_gpr_stall for a CSR in MEM</td><td><span class="tag open">OPEN</span></td><td>Equation covers EX only; the M-stage CSR result path was not traced</td></tr>
+</tbody></table></div>
+<p>This page claims nothing about verification outcomes beyond the DEF-001 status. For what has been checked and what is still open, see <a href="verif_hazard_unit.html">verif_hazard_unit.html</a> and <a href="verif_csr_trap.html">verif_csr_trap.html</a>. Related pages: <a href="core_overview.html">core_overview.html</a>, <a href="core_fetch_decode.html">core_fetch_decode.html</a>, <a href="core_execute_mem_wb.html">core_execute_mem_wb.html</a>, <a href="core_interrupts.html">core_interrupts.html</a>, <a href="index.html">index.html</a>.</p>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/hazard_unit.v</code>, <code>csr_regfile.v</code>, <code>wb_trap_mret_commit_controller.v</code>, <code>opcode_check.v</code>, <code>top.v</code> (lines 196-335, 380-445, 510-633), <code>execute_cycle.v</code>, <code>decode_cycle.v</code>, <code>memory_cycle.v</code> and <code>fetch_cycle.v</code> (cited ranges only), <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/status/defects.csv</code>, Rev B sections 13.5 and 13.7.</div>
+</div>
+</body>
+</html>

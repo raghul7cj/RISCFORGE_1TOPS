@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>G3 IRQ architecture: decision and block contracts</title>
+<link rel="stylesheet" href="../../../documentation/html/assets/style.css">
+<style>
+  /* Light theme only for this report set. */
+  :root {
+    color-scheme: light;
+    --bg: #ffffff; --fg: #0f172a; --muted: #475569; --line: #e2e8f0; --soft: #f8fafc;
+    --accent: #1d4ed8; --accent-soft: #eff6ff;
+    --c-core: #dbeafe; --c-core-s: #2563eb;
+    --c-ctrl: #fef3c7; --c-ctrl-s: #d97706;
+    --c-mem: #dcfce7; --c-mem-s: #16a34a;
+    --c-bus: #f3e8ff; --c-bus-s: #9333ea;
+    --c-per: #fee2e2; --c-per-s: #dc2626;
+    --c-ver: #ccfbf1; --c-ver-s: #0d9488;
+    --c-ext: #f1f5f9; --c-ext-s: #64748b;
+    --ok: #15803d; --warn: #b45309; --bad: #b91c1c;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+  body { font-family: var(--font); color: var(--fg); background: var(--bg); line-height: 1.6; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 24px 80px; }
+  h1 { font-size: 28px; font-weight: 700; color: #0f172a; margin: 12px 0 6px; letter-spacing: -0.02em; }
+  h2 { font-size: 20px; font-weight: 600; color: #1e293b; margin: 36px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 16px; font-weight: 600; color: #334155; margin: 24px 0 6px; }
+  .lead { font-size: 15.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.55; }
+  .meta { font-size: 12px; color: #64748b; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .note { border-left: 4px solid var(--accent); background: var(--accent-soft); color: #1e3a8a; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 18px 0; font-size: 13.5px; line-height: 1.55; }
+  .warn { border-left: 4px solid #f59e0b; background: #fffbeb; color: #92400e; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 18px 0; font-size: 13.5px; }
+  .open { border-left: 4px solid #ef4444; background: #fef2f2; color: #991b1b; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 18px 0; font-size: 13.5px; }
+  .toc { background: var(--soft); border: 1px solid var(--line); border-radius: 8px; padding: 14px 20px; margin: 20px 0; max-width: 580px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .toc b { color: #1e293b; font-size: 14px; }
+  .toc ol { margin: 6px 0 0; padding-left: 22px; font-size: 13.5px; }
+  .toc li { margin: 4px 0; }
+  .tag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .tag.exists { color: #15803d; background: #ecfdf5; border: 1px solid #a7f3d0; }
+  .tag.specified { color: #854d0e; background: #fefce8; border: 1px solid #fef08a; }
+  .tag.open { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; }
+  code, .mono { font-family: var(--mono); font-size: 0.9em; background: #f1f5f9; color: #0f172a; padding: 2px 5px; border-radius: 4px; border: 1px solid #e2e8f0; }
+  table { border-collapse: separate; border-spacing: 0; width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; margin: 16px 0 24px; font-size: 13px; }
+  th { background: #f8fafc; font-weight: 600; color: #1e293b; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 8px 12px; }
+  td { border-bottom: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; padding: 8px 12px; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #fcfdfe; }
+  tbody tr:last-child td { border-bottom: none; }
+  th:last-child, td:last-child { border-right: none; }
+  tbody tr:hover td { background-color: #f1f5f9; }
+  figure { margin: 24px 0 28px; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  figure img { display: block; width: 100%; height: auto; border-radius: 4px; }
+  figcaption { font-size: 12.5px; color: #64748b; margin-top: 12px; line-height: 1.5; }
+  figcaption b { color: #0f172a; }
+  footer { font-size: 12px; color: #94a3b8; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 12px; }
+</style>
+</head>
+<body>
+<div class="topbar"><a class="brand" href="../../../documentation/html/index.html">RISCFORGE documentation</a><span class="crumb">/ Gates / G3 interrupt integration / Architecture decision</span></div>
+<div class="wrap">
+
+<h1>G3 IRQ architecture: decision and block contracts</h1>
+<p class="lead">The G3.4 architecture record: the SoC uses neither a PLIC nor a CLIC, and interrupts travel from six peripheral instances over the direct core ports into a 13-channel gateway and a three-class arbiter inside the core. This page holds the decision, the block contracts and the list of what is absent. The per-channel map, the take/return path and the test plan are in <a href="G3_IRQ_ARCH_and_TB.html">G3_IRQ_ARCH_and_TB.html</a>.</p>
+<p class="meta">Scope: <code>irq_gateway.v</code>, <code>irq_arbiter.v</code>, <code>csr_regfile.v</code>, <code>wb_trap_mret_commit_controller.v</code>, <code>top.v</code>, SoC interrupt wiring | Reviewed 2026-11-12 | <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note">
+  <b>Page roles.</b> This page is the architecture decision and block-contract record. <a href="G3_IRQ_ARCH_and_TB.html">G3_IRQ_ARCH_and_TB.html</a> is the single source of truth for the as-coded path and the testbench plan. <a href="../G4_core_verification/G4_IRQ_UNIT_VERIFICATION.html">G4.12</a> owns the unit verification and coverage claim. The earlier <code>G3_core_interrupts.html</code> and <code>G3_vf_interrupt_verification.html</code> are retained as archived copies under <a href="superseded/">superseded/</a>; their upstream originals under <code>ips/documentation/html/</code> are unchanged. The maintained CJ review package remains at <a href="../../../documentation/signoff/cj_review/index.html">documentation/signoff/cj_review</a>.
+</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#decision">Decision: no PLIC, no CLIC</a></li>
+<li><a href="#blocks">Block contracts</a></li>
+<li><a href="#channels">Implemented channel set</a></li>
+<li><a href="#absent">Not implemented or not reachable</a></li>
+<li><a href="#status">Status, evidence and limits</a></li>
+<li><a href="#sources">Sources</a></li>
+</ol></div>
+
+<h2 id="decision"><span id="plic"></span>1. Decision: no PLIC, no CLIC</h2>
+<p><b>Decision.</b> Interrupts are delivered over the direct core ports <code>timer_irq_i</code> and <code>fast_irq_i</code>. No external interrupt controller is instantiated. The subsystem ties <code>ext_irq_i</code> (<code>mip[11]</code>, MEIP) and <code>sw_irq_i</code> (<code>mip[3]</code>, MSIP) to zero (<code>riscforge_soc_subsystem.sv:1294-1295</code>), so there is no controller port left to attach a PLIC to without a wiring change, and the CLIC sources present in <code>ips/clic-master/</code> are instantiated nowhere in the SoC. <span class="tag exists">EXISTS</span></p>
+
+<p><b>Rationale.</b> The project direction favours a short, simple interrupt path over richer runtime reconfigurability. A single-hart MCU with a fixed peripheral set does not need PLIC priority reassignment, claim/complete ID delivery or CLIC table vectoring, and the direct path keeps the decision inside the core instead of adding a bus transaction to the entry sequence. This is an architecture tradeoff statement only: no latency, frequency or area advantage is claimed, and no comparative measurement was run.</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Capability</th><th>With PLIC or CLIC</th><th>With the implemented direct path</th></tr></thead>
+<tbody>
+<tr><td>Runtime per-source priority</td><td>Programmable per source</td><td>Fixed by class and channel order; only the class threshold is writable</td></tr>
+<tr><td>Interrupt identification</td><td>Claim/complete read returns the source ID</td><td><code>mcause</code> carries the cause; no claim register</td></tr>
+<tr><td>Vectoring</td><td>CLIC table or PLIC-driven dispatch</td><td><code>mtvec</code> direct; the vectored datapath exists but its mode field cannot be written (section 4)</td></tr>
+<tr><td>Pre-emption depth</td><td>Multiple levels with saved state in the controller</td><td>One <code>mepc</code>, <code>mcause</code> and MPIE set; nesting is a firmware protocol</td></tr>
+<tr><td>Reconfigurability retained</td><td>Full</td><td>Per-cause <code>mie</code>, global <code>mstatus.MIE</code>, 2-bit <code>mintprio</code> threshold, hardware round-robin history</td></tr>
+</tbody></table></div>
+
+<p><b>Disposition scope.</b> This is the G3.4 disposition: PLIC and CLIC are not used under the stated project direction, and the direct in-core interface is chosen. The supplied workbook cell is unchanged and blank; this record is not an approval and infers no approver. The standalone CLIC RTL remaining in the tree is not integration evidence.</p>
+
+<h2 id="blocks">2. Block contracts</h2>
+<p>Two blocks sit between the peripherals and the pipeline: <code>irq_gateway</code> and <code>irq_arbiter</code>. Both are implemented. The pipeline side is a contract with EX accept and WB commit, not a separate interrupt block.</p>
+
+<h3>2.1 Gateway: capture, latch, clear (<code>irq_gateway.v</code>)</h3>
+<p>The gateway vector is 13 bits: bit 0 is cause 7 and bits 12:1 are causes 27:16 (<code>irq_gateway.v:2</code>). <code>top.v:207</code> builds it as <code>{fast_irq_i[11:0], timer_irq_i}</code>. Capture depends on the per-bit mode constants in <code>top.v:208-209</code>: <code>edge_mode = 13'h0002</code> (GPIO only) and <code>event_mode = 13'h1fe9</code>; a bit in neither mask is treated as a level.</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Regime</th><th>Sources</th><th>Capture</th><th>Effect of the gateway clear strobe</th></tr></thead>
+<tbody>
+<tr><td>Edge</td><td>GPIO (bit 1)</td><td>Rising edge against a registered copy of the raw line</td><td>Latch clears; a new interrupt needs a new rising edge</td></tr>
+<tr><td>Event</td><td>Cause 7 and causes 18, 20-27 (bits 0, 3, 5-12)</td><td>Every cycle the raw line is high sets the latch</td><td>Latch clears; a held line re-sets it on the next cycle</td></tr>
+<tr><td>Level</td><td>I2C (bit 2), UART (bit 4)</td><td>None; the pending output is the raw level</td><td>No effect; only the peripheral or firmware can drop it</td></tr>
+</tbody></table></div>
+
+<ul>
+<li><b>Latch:</b> <code>pend_q &lt;= capture | (pend_q &amp; ~clear_i)</code> (<code>irq_gateway.v:14-27</code>). A same-cycle capture outranks the clear, so a new request is not lost and repeats coalesce.</li>
+<li><b>Clear decode:</b> a one-hot strobe produced by the WB trap commit, bit 0 for cause 7 and bit <code>cause-15</code> for causes 16-27 (<code>wb_trap_mret_commit_controller.v:80-92</code>). It is a commit consequence and always precedes the handler's first instruction.</li>
+<li><b>Minimum pulse:</b> one <code>clk_i</code> cycle on a latched source; narrower pulses are not guaranteed to be seen.</li>
+<li><b>Observability:</b> the <code>mip</code> bits fed by the gateway read <code>pend_o</code>, not the raw pin (<code>top.v:550-551</code>).</li>
+</ul>
+
+<h3>2.2 Arbiter: qualify, rotate, select, rank, gate (<code>irq_arbiter.v</code>)</h3>
+<p>The arbiter is combinational from <code>pend</code>, <code>mie</code>, <code>mstatus.MIE</code> and <code>mintprio</code> to <code>irq_pending_o</code>, <code>irq_id_o</code> and <code>irq_class_o</code>. Each step is a separate contract.</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Step</th><th>Contract</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>A1 Qualify</td><td><code>active = pend_i &amp; {mie_i[27:16], mie_i[7]} &amp; {13{mstatus_mie_i}}</code></td><td><code>irq_arbiter.v:20-21</code></td></tr>
+<tr><td>A2 Rotate</td><td>Round-robin pointers advance only on <code>wb_commit_i</code>, using the committed cause</td><td><code>irq_arbiter.v:24-40</code></td></tr>
+<tr><td>A3 Select</td><td>Class 2 fixed order; classes 1 and 0 cyclic from their pointer</td><td><code>irq_arbiter.v:42-97</code></td></tr>
+<tr><td>A4 Rank</td><td>Class 2 over class 1 over class 0</td><td><code>irq_arbiter.v:72-97</code></td></tr>
+<tr><td>A5 Gate</td><td>The single winner is offered only if <code>(class + 1) &gt; mintprio</code></td><td><code>irq_arbiter.v:99-100</code></td></tr>
+</tbody></table></div>
+
+<ul>
+<li><b>Class 2, fixed:</b> cause 7 &gt; 22 &gt; 24 &gt; 26 &gt; 20 &gt; 21 &gt; 23 &gt; 25.</li>
+<li><b>Class 1, round robin:</b> causes 19, 18, 27; after 19 the first candidate is 18, after 18 it is 27, after 27 it is 19.</li>
+<li><b>Class 0, round robin:</b> causes 17, 16; after 17 it is 16, after 16 it is 17.</li>
+<li><b>Winner before threshold:</b> A3 and A4 run before A5, so a blocked class-2 winner does not hand the slot to a lower class in the same cycle.</li>
+<li><b>Rotation is commit-driven:</b> acceptance alone does not move a pointer; only the committed cause does.</li>
+</ul>
+
+<div class="tablewrap"><table>
+<thead><tr><th><code>mintprio</code></th><th>Classes that can raise <code>irq_pending_o</code></th></tr></thead>
+<tbody>
+<tr><td>0 (reset)</td><td>0, 1, 2</td></tr>
+<tr><td>1</td><td>1, 2</td></tr>
+<tr><td>2</td><td>2 only</td></tr>
+<tr><td>3</td><td>none</td></tr>
+</tbody></table></div>
+
+<h3>2.3 CSR interface (<code>csr_regfile.v</code>)</h3>
+<ul>
+<li><b><code>mie</code>:</b> write mask <code>32'hFFFF0888</code> (<code>csr_regfile.v:187</code>), covering bits 31:16, 11 and 7. Bits 15:12 and 10:8 are not writable.</li>
+<li><b><code>mstatus.MIE</code>:</b> bit 3, the global gate. Trap entry clears MIE and saves it in MPIE; MRET restores it (<code>csr_regfile.v:172-179</code>).</li>
+<li><b><code>mintprio</code>:</b> 2 bits at 0x7C0, reset 0, not modified by trap entry or MRET. It is the only interrupt-related custom CSR that is decoded; <code>mintlvl</code> (0x7C1) and <code>mintctl</code> (0x7C2) are not.</li>
+<li><b><code>mtvec</code>:</b> the write preserves bits 1:0 (<code>csr_regfile.v:188</code>) and reset value is 0, so the mode field stays in direct mode (section 4).</li>
+</ul>
+
+<h3>2.4 Pipeline contract</h3>
+<p>EX accepts an interrupt only when it holds a valid instruction that carries no exception (<code>execute_cycle.v:459</code>). That instruction does not execute: it becomes a trap packet with <code>mcause = {1, id}</code> and its own PC in <code>mepc</code>, and the frontend is flushed. At WB the packet commits as a trap, which writes <code>mcause</code>/<code>mepc</code>, clears MIE, redirects fetch, advances the round-robin pointer for the committed cause and issues the one-hot gateway clear. MRET restores MIE from MPIE and redirects to <code>mepc</code> (<code>wb_trap_mret_commit_controller.v:64-132</code>). Acceptance, packet construction and the return sequence are detailed in <a href="G3_IRQ_ARCH_and_TB.html#take">G3_IRQ_ARCH_and_TB.html section 6</a>.</p>
+<p><b>Nesting and latency limits.</b> Trap entry clears global MIE, so IRQs are masked until firmware re-enables it. A handler may then be interrupted by requests allowed by <code>mie</code> and <code>mintprio</code>; software must save and restore the overwritten trap state and execution context. There is no automatic nesting stack or depth gate. Unit checks that trap/MRET preserve <code>mintprio</code> do not verify that firmware protocol. Divider abort is implemented, but no sub-four-cycle entry-latency guarantee is established. See <a href="G3_IRQ_ARCH_and_TB.html#gating">gating, nesting and evidence limits</a>.</p>
+
+<h2 id="channels"><span id="map"></span>3. Implemented channel set</h2>
+<p>Thirteen channels come from six peripheral instances: Timer 0 (four), Timer 1 (four), SPI (two), UART (one), I2C (one) and GPIO (one). The subsystem drives <code>fast_irq_i</code> as <code>{4'b0, twelve lines}</code> (<code>riscforge_soc_subsystem.sv:1280-1292</code>); the top four bits are zero. <span class="tag exists">EXISTS</span></p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Cause</th><th>Source signal</th><th>SoC port</th><th>Mode</th><th>Class</th></tr></thead>
+<tbody>
+<tr><td>7</td><td><code>timer0_irq_o[1]</code> Timer 0 ch0 compare</td><td><code>timer_irq_i</code></td><td>event</td><td>2</td></tr>
+<tr><td>16</td><td><code>gpio_global_interrupt_o</code></td><td><code>fast_irq_i[0]</code></td><td>edge</td><td>0</td></tr>
+<tr><td>17</td><td><code>i2c_interrupt_o</code> (<code>irq_flag &amp;&amp; IEN</code>)</td><td><code>fast_irq_i[1]</code></td><td>level</td><td>0</td></tr>
+<tr><td>18</td><td><code>spi_events_o[0]</code> threshold (<code>s_int_tx | s_int_rx</code>)</td><td><code>fast_irq_i[2]</code></td><td>event</td><td>1</td></tr>
+<tr><td>19</td><td><code>uart_int_o</code> (IIR-qualified)</td><td><code>fast_irq_i[3]</code></td><td>level</td><td>1</td></tr>
+<tr><td>20</td><td><code>timer0_irq_o[0]</code> Timer 0 ch0 overflow</td><td><code>fast_irq_i[4]</code></td><td>event</td><td>2</td></tr>
+<tr><td>21</td><td><code>timer0_irq_o[2]</code> Timer 0 ch1 overflow</td><td><code>fast_irq_i[5]</code></td><td>event</td><td>2</td></tr>
+<tr><td>22</td><td><code>timer0_irq_o[3]</code> Timer 0 ch1 compare</td><td><code>fast_irq_i[6]</code></td><td>event</td><td>2</td></tr>
+<tr><td>23</td><td><code>timer1_irq_o[0]</code> Timer 1 ch0 overflow</td><td><code>fast_irq_i[7]</code></td><td>event</td><td>2</td></tr>
+<tr><td>24</td><td><code>timer1_irq_o[1]</code> Timer 1 ch0 compare</td><td><code>fast_irq_i[8]</code></td><td>event</td><td>2</td></tr>
+<tr><td>25</td><td><code>timer1_irq_o[2]</code> Timer 1 ch1 overflow</td><td><code>fast_irq_i[9]</code></td><td>event</td><td>2</td></tr>
+<tr><td>26</td><td><code>timer1_irq_o[3]</code> Timer 1 ch1 compare</td><td><code>fast_irq_i[10]</code></td><td>event</td><td>2</td></tr>
+<tr><td>27</td><td><code>spi_events_o[1]</code> end of transfer</td><td><code>fast_irq_i[11]</code></td><td>event</td><td>1</td></tr>
+</tbody></table></div>
+
+<p>Only causes 17 and 19 are level-sensitive. The full per-channel table adds the clear/re-arm behaviour and the peripheral evidence, and is kept in one place: <a href="G3_IRQ_ARCH_and_TB.html#channels">G3_IRQ_ARCH_and_TB.html section 2</a>. Lines outside this set do not reach the arbiter: <code>fast_irq_i[15:12]</code> are tied to zero and <code>top.v:207</code> uses only bits 11:0, so <code>mip[31:28]</code> is constant 0; <code>ext_irq_i</code> and <code>sw_irq_i</code> feed <code>mip</code> directly but are outside the arbiter mask, so they can be read and can never trap; the subsystem ties both to 0.</p>
+
+<figure>
+  <img src="diagrams/irq_source_map.svg" alt="Source-to-interface map: six peripheral instances feed 13 channels through the subsystem ports, gateway, arbiter, execute accept and WB commit; PLIC and CLIC are absent and mip[11]/mip[3] have no delivery path.">
+  <figcaption><b>Figure 1.</b> Source-to-interface map, drawn from the inspected wiring. Solid boxes and arrows are present in the RTL; dashed red elements are absent (no PLIC, no CLIC, no delivery path from <code>mip[11]</code> or <code>mip[3]</code> to the arbiter). Feedback is the one-hot gateway clear and the commit-qualified round-robin advance. Not shown: peripheral register clearing, firmware, nesting, latency. Spec: <a href="diagrams/irq_source_map.spec.json">irq_source_map.spec.json</a>, validated by <code>diagram_tool.py</code>; Mermaid form: <a href="diagrams/irq_source_map.md">irq_source_map.md</a>.</figcaption>
+</figure>
+
+<h2 id="absent">4. Not implemented or not reachable</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th><th>What the sources show</th></tr></thead>
+<tbody>
+<tr><td>PLIC, CLIC</td><td><span class="tag exists">EXISTS</span> as decision</td><td>Not used. The direct path is the implemented interface; the standalone CLIC RTL is instantiated nowhere and is not integration evidence.</td></tr>
+<tr><td><code>mintlvl</code> 0x7C1, <code>mintctl</code> 0x7C2</td><td><span class="tag specified">SPECIFIED</span> only</td><td>Not decoded in <code>csr_regfile.v</code>; no register exists at those addresses.</td></tr>
+<tr><td>Hardware nesting: depth counter, shadow stack, automatic level save</td><td><span class="tag specified">SPECIFIED</span> only</td><td>No such object in the RTL. Nesting is a firmware protocol: save <code>mepc</code>/<code>mcause</code>, raise <code>mintprio</code>, set MIE.</td></tr>
+<tr><td>Vectored <code>mtvec</code> mode</td><td><span class="tag open">OPEN</span></td><td>The target datapath exists (<code>wb_trap_mret_commit_controller.v:98-103</code>), but the CSR write preserves <code>mtvec[1:0]</code> and reset is 0, so mode 01 cannot be reached (<code>csr_regfile.v:188</code>).</td></tr>
+<tr><td>AON watchdog, cause 28</td><td><span class="tag specified">SPECIFIED</span> only</td><td>The block is instantiated nowhere, its host port is TileLink rather than APB, <code>soft_rst_ni</code> is driven by nothing in the SoC, and there is no cause-28 slot in the vectors.</td></tr>
+<tr><td>MEIP / MSIP delivery</td><td><span class="tag exists">EXISTS</span> as wiring</td><td>Readable in <code>mip</code>, never delivered: the arbiter masks only <code>mie[27:16]</code> and <code>mie[7]</code>. The subsystem ties both inputs to 0; software can still set <code>mip[3]</code> by writing it, which also never traps.</td></tr>
+<tr><td><code>fast_irq_i[15:12]</code></td><td><span class="tag exists">EXISTS</span> as constant</td><td>Tied to zero by the subsystem and unused by <code>top.v</code>; <code>mip[31:28]</code> reads 0 and their <code>mie</code> bits have no effect.</td></tr>
+</tbody></table></div>
+
+<h2 id="status">5. Status, evidence and limits</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Claim</th><th>State</th><th>Basis</th></tr></thead>
+<tbody>
+<tr><td>13-channel gateway with edge/event/level capture and commit-time clear</td><td><span class="tag exists">EXISTS</span></td><td>RTL inspection; unit run in <code>tb_irq_restructure.sv</code></td></tr>
+<tr><td>Three-class arbiter, commit-driven round robin, <code>mintprio</code> threshold</td><td><span class="tag exists">EXISTS</span></td><td>RTL inspection; unit run in <code>tb_irq_restructure.sv</code></td></tr>
+<tr><td>Take in EX, commit at WB, MRET return, direct <code>mtvec</code></td><td><span class="tag exists">EXISTS</span></td><td>RTL inspection; no dedicated retained result on this page</td></tr>
+<tr><td>Peripheral event reaches its handler (G3.6), SoC end-to-end (G6)</td><td><span class="tag open">OPEN</span></td><td>No retained SoC-level result; unit and core-level runs are not E2E</td></tr>
+<tr><td>Rev B 13 versus restructured RTL</td><td><span class="tag open">OPEN</span></td><td>Plan has not been reconciled to the 13 on-disk channels; differences listed in <a href="G3_IRQ_ARCH_and_TB.html#evidence">G3_IRQ_ARCH_and_TB.html section 12</a></td></tr>
+</tbody></table></div>
+
+<p><b>Evidence.</b> The canonical unit record and coverage bins are <a href="../G4_core_verification/G4_IRQ_UNIT_VERIFICATION.html">G4.12 unit verification</a> and <a href="../G4_core_verification/G4_IRQ_UNIT_COVERAGE.html">G4.12 unit coverage</a>; this page does not restate them as a pass. The retained unit log is <code>Verification/artifacts/irq_restructure/irq_coverage_final_sim.log</code> (xsim, 2026-10-29), covering arbitration snapshots plus gateway, <code>mip</code>/<code>mie</code>, <code>mintprio</code> and commit checks at block level.</p>
+
+<div class="warn"><b>Limits.</b> This page is static inspection. It does not establish that a peripheral event reaches its handler, supplies no third timer oracle (D-19), and grades no nesting. No synthesis, timing, frequency or area result is quoted. No simulation was run for this page. Remaining open corners — interrupt acceptance during a multi-cycle MMIO stall, <code>mintprio</code> write ordering, and spurious/clear-ordering cases — are defined with their evidence gaps in <a href="G3_IRQ_ARCH_and_TB.html#stall">G3_IRQ_ARCH_and_TB.html</a>.</div>
+
+<p><b>Baseline identity.</b> The workspace is not a git checkout, so the diagram baseline is a content hash over the sources named in the spec: <code>worktree-sha256:1f0f44a12a3c2c4d48d2cbb734f73ecce3ac770036423694df3f8e0bde456a90</code>. If any of those files change, the diagram must be revalidated with <code>diagram_tool.py</code>.</p>
+
+<h2 id="sources">6. Sources</h2>
+<ul>
+<li>Core interrupt RTL: <code>riscv_core/rtl/irq_gateway.v</code>, <code>irq_arbiter.v</code>, <code>csr_regfile.v</code>, <code>wb_trap_mret_commit_controller.v</code>, <code>top.v</code>, <code>execute_cycle.v</code>.</li>
+<li>SoC wiring: <code>RTL_SOC/riscforge_soc_subsystem.sv:1278-1296</code>.</li>
+<li>Peripheral IRQ outputs: <code>apb_timer-master/rtl/timer.sv</code>, <code>spi_master_ip/spi_master/apb_spi_master.sv</code>, <code>apb_i2c-master/apb_i2c.sv</code>, <code>apb_uart-main/rtl/apb_uart.sv</code>, <code>gpio-master/gpio.sv</code>.</li>
+<li>Rev B sections 13.1-13.8; RISC-V Privileged Architecture, version 1.12-draft, for the machine-level interrupt CSRs.</li>
+<li>Consolidated path and test plan: <a href="G3_IRQ_ARCH_and_TB.html">G3_IRQ_ARCH_and_TB.html</a>. Upstream originals: <code>documentation/RISCFORGE IRQ Architecture.html</code>, <code>documentation/html/core_interrupts.html</code>, <code>documentation/html/vf_interrupt_verification.html</code>.</li>
+</ul>
+
+<footer>G3.4 architecture disposition · static RTL inspection · 2026-11-12 · no approval inferred</footer>
+
+</div>
+</body>
+</html>

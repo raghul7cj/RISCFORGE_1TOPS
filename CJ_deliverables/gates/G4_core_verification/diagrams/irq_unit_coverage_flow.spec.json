@@ -1,0 +1,68 @@
+{
+  "title": "IRQ unit coverage sampling flow",
+  "scope": "How one checked unit case becomes a functional bin in tb_irq_restructure; declared-bin measurement only, not a correctness proof.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main/rtl; sorted path:SHA256 lines for current IRQ TB, coverage plan and four RTL files",
+    "commit": "worktree-sha256:aaf5464efdce025caf69b3f535eb821c0d11f16b5febc7d7b2b8fbb781f5a8a6"
+  },
+  "nodes": [
+    {
+      "id": "DRIVE",
+      "label": "Drive a case: source, gates, priority",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 242,
+        "symbol": "initial begin"
+      }
+    },
+    {
+      "id": "CHECK",
+      "label": "Check observed output against expected",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 327,
+        "symbol": "if (irq_valid !== found || (found && (irq_id != expected_id || irq_class != expected_class)))"
+      }
+    },
+    {
+      "id": "SAMPLE",
+      "label": "Sample coverage: record the exercised bin",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 329,
+        "symbol": "eligibility_cov.sample(i,t,en,glob);"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "DRIVE",
+      "to": "CHECK",
+      "label": "stimulus settles, outputs observed",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 325,
+        "symbol": "threshold=t; mie=en ? (32'b1 << expected_id) : 0; global_mie=glob; #1;"
+      }
+    },
+    {
+      "from": "CHECK",
+      "to": "SAMPLE",
+      "label": "sample follows the fatal check",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 329,
+        "symbol": "eligibility_cov.sample(i,t,en,glob);"
+      }
+    }
+  ],
+  "unknowns": [
+    "Bins indicate exercised cases; coverage does not establish untested behavior or independent expected results.",
+    "Code coverage closure is not represented and remains open."
+  ]
+}

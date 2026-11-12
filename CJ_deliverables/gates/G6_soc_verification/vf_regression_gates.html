@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regression and Gates</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification / Regression model and gate policy</span></div>
+<div class="wrap">
+
+<h1>Regression Model and Gate Policy</h1>
+<p class="lead">How Rev B turns a pile of test runs into a verdict: the regression flow, the seven canonical gates G0 to G6, the three tiers they are decided at, the hard line between checker viability (G2) and coverage (G4), and the rule that stops any phase from demanding a gate that a later phase produces.</p>
+<p class="meta">Scope: Rev B section 6 (Tables 6.1 to 6.5, decisions D-023 to D-026) | Sources: Rev B plan text, <code>Verification/status/build_tracker.py</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">What a regression is, and the two verbs</a></li>
+<li><a href="#s2">The regression flow</a></li>
+<li><a href="#s3">The canonical gate register</a></li>
+<li><a href="#s4">Three tiers and what feeds what</a></li>
+<li><a href="#s5">G2 versus G4: viability versus coverage</a></li>
+<li><a href="#s6">Gate-to-phase dependency (D-023)</a></li>
+<li><a href="#s7">Partitions and convergence rules</a></li>
+<li><a href="#s8">The verdict record</a></li>
+<li><a href="#s9">Where the repository stands</a></li>
+</ol></div>
+
+<h2 id="s1">1. What a regression is, and the two verbs</h2>
+<p>Rev B defines a regression as three things together: a manifest (what runs), a schedule (when) and a gate policy (what the results must satisfy). The gate policy matters most, because it separates a regression that measures the design from one that only reports on the harness. <span class="tag specified">SPECIFIED</span></p>
+<p>The gate vocabulary is stated once, in Table 6.1 of Rev B, and every other section refers to it by identifier. If a figure and the register disagree, the register wins and the figure is the defect. This page follows the same rule: it summarises the register and never invents a different wording.</p>
+<p>Rev B uses exactly two verbs for checks, because in SVA a property that "fires" has failed:</p>
+<ul>
+<li><b>reported</b>: a checker or assertion produced a unique-ID finding.</li>
+<li><b>evaluated</b>: the check was sampled with its enabling (antecedent) condition satisfied.</li>
+</ul>
+<p>A gate that cannot be evaluated is <b>untested</b>. That is a verdict of its own: never a pass, never a waiver.</p>
+
+<h2 id="s2">2. The regression flow</h2>
+<p>Figure 1 lays the regression out as six steps with the gate decided at each. Rev B 6 draws this flow as a picture whose six step names are not present in the extractable plan text. <span class="tag open">OPEN</span> The step names below are therefore a reading derived from the evidence-artefact column of Table 6.1 and the partitions of Table 6.3, not a transcription. The tier assignment of each gate is exact.</p>
+
+<figure>
+<svg viewBox="0 0 960 252" role="img" aria-label="Regression flow in six steps with the gate decided at each step and its tier">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="lane" x="36" y="40" width="432" height="32" rx="4"/>
+<text class="tb mid" x="252" y="61">per-run: from one run's own artefacts</text>
+<rect class="lane" x="492" y="40" width="128" height="32" rx="4"/>
+<text class="tb mid" x="556" y="61">per-candidate</text>
+<rect class="lane" x="644" y="40" width="280" height="32" rx="4"/>
+<text class="tb mid" x="784" y="61">release: inputs, then P6 stamp</text>
+
+<rect class="bx-ver" x="36" y="96" width="128" height="64" rx="6"/>
+<text class="tb mid" x="100" y="120">Build</text>
+<text class="ts mid" x="100" y="138">elaborate, pin tool</text>
+<text class="ts mid" x="100" y="152">filelist diff</text>
+
+<rect class="bx-ver" x="188" y="96" width="128" height="64" rx="6"/>
+<text class="tb mid" x="252" y="120">Execute</text>
+<text class="ts mid" x="252" y="138">run test with seed</text>
+<text class="ts mid" x="252" y="152">count transfers</text>
+
+<rect class="bx-ver" x="340" y="96" width="128" height="64" rx="6"/>
+<text class="tb mid" x="404" y="120">Check</text>
+<text class="ts mid" x="404" y="138">findings, drain</text>
+<text class="ts mid" x="404" y="152">verdict record</text>
+
+<rect class="bx-ver" x="492" y="96" width="128" height="64" rx="6"/>
+<text class="tb mid" x="556" y="120">Merge campaign</text>
+<text class="ts mid" x="556" y="138">coverage, ledger</text>
+<text class="ts mid" x="556" y="152">traceability matrix</text>
+
+<rect class="bx-ext" x="644" y="96" width="128" height="64" rx="6"/>
+<text class="tb mid" x="708" y="120">Collect inputs</text>
+<text class="ts mid" x="708" y="138">compliance report</text>
+<text class="ts mid" x="708" y="152">formal proof log</text>
+
+<rect class="bx-ver" x="796" y="96" width="128" height="64" rx="6"/>
+<text class="tb mid" x="860" y="120">Stamp release</text>
+<text class="ts mid" x="860" y="138">frozen manifest</text>
+<text class="ts mid" x="860" y="152">once, in P6</text>
+
+<path class="ar-ver" d="M164 128 H188"/>
+<path class="ar-ver" d="M316 128 H340"/>
+<path class="ar-ver" d="M468 128 H492"/>
+<path class="ar-ver" d="M620 128 H644"/>
+<path class="ar-ver" d="M772 128 H796"/>
+
+<rect class="pill" x="82" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="100" y="197">G0</text>
+<rect class="pill" x="234" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="252" y="197">G1</text>
+<rect class="pill" x="386" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="404" y="197">G3</text>
+<rect class="pill" x="496" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="514" y="197">G2</text>
+<rect class="pill" x="540" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="558" y="197">G4</text>
+<rect class="pill" x="584" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="602" y="197">G6</text>
+<text class="ts mid" x="708" y="197">feeds G5</text>
+<rect class="pill" x="842" y="180" width="36" height="24" rx="12"/>
+<text class="tb mid" x="860" y="197">G5</text>
+
+<text class="ts mid" x="480" y="236">A gate that cannot be evaluated is reported untested, never passed.</text>
+</svg>
+<figcaption><b>Figure 1.</b> The regression flow with gates. Three gates are decided inside each run, three only on the merged campaign, and G5 once at release on a frozen manifest. Step names are derived from Table 6.1 evidence artefacts (see text).</figcaption>
+</figure>
+
+<h2 id="s3">3. The canonical gate register</h2>
+<p>This is a condensed rendering of Table 6.1. Predicates keep the exact operand names so they can be searched in the plan and in the tracker. <span class="tag specified">SPECIFIED</span></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Gate</th><th>Name</th><th>Tier</th><th>Pass predicate (operands are counts in the verdict record or campaign artefacts)</th><th>Evidence artefact</th><th>Owner role</th></tr></thead>
+<tbody>
+<tr><td>G0</td><td>Harness integrity</td><td>per-run</td><td><code>unresolved_modules == 0</code> and <code>extra_modules == 0</code> against the canonical module set; <code>tool_version</code> is a pinned version (Table 5.1); the artefact write test passes</td><td>Build and elaboration log; filelist diff report</td><td>Harness-CI owner</td></tr>
+<tr><td>G1</td><td>Stimulus reached the DUT</td><td>per-run</td><td><code>instructions_retired &gt; 0</code>, <code>axi_transfers &gt; 0</code>, <code>apb_transfers &gt; 0</code> and <code>attestation_words_written &gt; 0</code> for the partition. Time is in <code>clk_i</code> cycles; transactions are unitless counts</td><td>Verdict record counter block</td><td>Harness-CI owner</td></tr>
+<tr><td>G2</td><td>Checker viability</td><td>per-candidate</td><td>Every bound check ID has a viability record current for the candidate RTL identity, of kind <code>negative_case_pass</code> or <code>vacuity_proved</code>: <code>bound_check_ids_without_current_viability_record == 0</code></td><td>Checker-viability ledger</td><td>Block checker owner; consolidated by the closure owner</td></tr>
+<tr><td>G3</td><td>Checkers all pass</td><td>per-run</td><td><code>open_findings == 0</code>, <code>unexplained_ring_drops == 0</code> and <code>scoreboard_drain_satisfied</code></td><td>Verdict record; scoreboard drain report</td><td>Partition owner</td></tr>
+<tr><td>G4</td><td>Coverage closed</td><td>per-candidate</td><td>Every declared bin is hit, or waived (owner, reason, review date), or excluded as unreachable by design with a four-field record (D-054). An assertion-coverage bin counts as hit only if <code>antecedent_satisfied_count &gt;= 1</code> and the tool did not classify it vacuously true: <code>bins_declared - bins_hit - bins_waived - bins_excluded == 0</code></td><td>Merged coverage database; waiver ledger; exclusion register</td><td>Closure owner</td></tr>
+<tr><td>G5</td><td>Compliance and formal closed</td><td>release</td><td>(a) all applicable compliance tests pass at the candidate RTL identity, out-of-scope tests recorded with a reason; (b) every formal goal proved, waived with owner and date, or converted to a directed test: <code>applicable_failed + applicable_not_run == 0</code> and <code>open_unowned_formal_goals == 0</code></td><td>Compliance report; proof log</td><td>Compliance owner; Formal owner</td></tr>
+<tr><td>G6</td><td>Traceability complete</td><td>per-candidate</td><td>No orphan requirement, check, test or unlinked defect: <code>orphans == 0</code></td><td>Generated traceability matrix</td><td>Traceability owner</td></tr>
+</tbody>
+</table></div>
+<p>The compliance denominator behind G5 is the applicable set of 69 tests (I 38, M 8, Zicsr 7, privilege 16), not the 162 in the vendored tree; the other 93 (C 27, Zifencei 1, unratified K 65) are recorded with a reason (Table 6.4). Rev B says G5 is evaluated against 69 of 69, never 162.</p>
+<p>The owner-role column is binding to the role identifiers owned by Rev B 21.2. Severity wording in any gate row is the scale published in Table 21.2.7 (D-026); see <a href="vf_traceability_defects.html">the traceability and defects page</a>.</p>
+
+<h2 id="s4">4. Three tiers and what feeds what</h2>
+<p>Rev A required all seven gates of every run. Rev B's correction is that the gates consume different evidence:</p>
+<ul>
+<li><b>Per-run</b> (G0, G1, G3): decidable from one run's own artefacts, with no cross-run state.</li>
+<li><b>Per-candidate</b> (G2, G4, G6): decidable only from the union of a candidate's runs plus campaign artefacts that accumulate (viability ledger, merged coverage database, generated matrix). Requiring them per commit is the Rev A defect recorded as finding 15.</li>
+<li><b>Release</b> (G5): evaluated once per release, from a full compliance sweep and the formal property register.</li>
+</ul>
+<p>Only the release tier blocks sign-off, but the release gate in turn requires the others (see <a href="vf_signoff.html">sign-off</a>). Figure 2 shows which tier feeds which.</p>
+
+<figure>
+<svg viewBox="0 0 960 320" role="img" aria-label="Gate tier diagram: per-run gates feed per-candidate gates, which feed the release gate G5 together with the compliance report and formal proof log">
+<rect class="grp" x="24" y="48" width="232" height="232" rx="8"/>
+<text class="th mid" x="140" y="72">Per-run tier</text>
+<rect class="bx-ver" x="48" y="88" width="184" height="40" rx="6"/>
+<text class="tb mid" x="140" y="105">G0</text>
+<text class="ts mid" x="140" y="120">Harness integrity</text>
+<rect class="bx-ver" x="48" y="152" width="184" height="40" rx="6"/>
+<text class="tb mid" x="140" y="169">G1</text>
+<text class="ts mid" x="140" y="184">Stimulus reached the DUT</text>
+<rect class="bx-ver" x="48" y="216" width="184" height="40" rx="6"/>
+<text class="tb mid" x="140" y="233">G3</text>
+<text class="ts mid" x="140" y="248">Checkers all pass</text>
+
+<rect class="grp" x="360" y="48" width="232" height="232" rx="8"/>
+<text class="th mid" x="476" y="72">Per-candidate tier</text>
+<rect class="bx-ver" x="384" y="88" width="184" height="40" rx="6"/>
+<text class="tb mid" x="476" y="105">G2</text>
+<text class="ts mid" x="476" y="120">Checker viability</text>
+<rect class="bx-ver" x="384" y="152" width="184" height="40" rx="6"/>
+<text class="tb mid" x="476" y="169">G4</text>
+<text class="ts mid" x="476" y="184">Coverage closed</text>
+<rect class="bx-ver" x="384" y="216" width="184" height="40" rx="6"/>
+<text class="tb mid" x="476" y="233">G6</text>
+<text class="ts mid" x="476" y="248">Traceability complete</text>
+
+<rect class="grp" x="696" y="48" width="232" height="232" rx="8"/>
+<text class="th mid" x="812" y="72">Release tier</text>
+<rect class="bx-ext" x="720" y="88" width="184" height="40" rx="6"/>
+<text class="tb mid" x="812" y="113">Compliance report (P4)</text>
+<rect class="bx-ver" x="720" y="152" width="184" height="40" rx="6"/>
+<text class="tb mid" x="812" y="169">G5</text>
+<text class="ts mid" x="812" y="184">Compliance and formal closed</text>
+<rect class="bx-ext" x="720" y="216" width="184" height="40" rx="6"/>
+<text class="tb mid" x="812" y="241">Proof log (P5)</text>
+
+<path class="ar" d="M256 172 H384"/>
+<text class="ts mid" x="308" y="160">all runs pass</text>
+<path class="ar" d="M592 172 H720"/>
+<text class="ts mid" x="644" y="160">frozen manifest</text>
+<path class="ar-ver" d="M812 128 V152"/>
+<path class="ar-ver" d="M812 216 V192"/>
+<text class="ts mid" x="480" y="304">No per-run gate depends on formal or compliance; no per-candidate gate depends on formal.</text>
+</svg>
+<figcaption><b>Figure 2.</b> Gate tier diagram. Evidence flows left to right: a per-candidate gate needs G0, G1 and G3 satisfied on every run in the manifest; G5 needs G4 and G6 on the frozen manifest plus the compliance report and formal proof log, which are produced upstream, not gated.</figcaption>
+</figure>
+
+<h2 id="s5">5. G2 versus G4: viability versus coverage</h2>
+<p>Rev A used one word, "coverage", for two obligations, and G2 and G4 overlapped. Rev B separates them with three terms over one unit, the check ID (Table 6.2):</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Term</th><th>Predicate actually measured</th><th>Recorded by</th></tr></thead>
+<tbody>
+<tr><td>evaluated</td><td><code>antecedent_satisfied_count(check_id) &gt;= 1</code>: the DUT satisfied the antecedent at least once in the campaign</td><td>Coverage database</td></tr>
+<tr><td>non-vacuous</td><td>Recorded evidence the check can report: a deliberately injected fault made it report its unique-ID finding (<code>negative_case_pass</code>), or a formal result shows the antecedent is satisfiable (<code>vacuity_proved</code>)</td><td>Viability ledger</td></tr>
+<tr><td>vacuous</td><td>Evaluated and has no viability record: the check was sampled and still cannot report</td><td>(derived: coverage database minus ledger)</td></tr>
+</tbody>
+</table></div>
+<p>The boundary is hard and neither gate substitutes for the other. <b>G2 asks whether the checker can report</b>; its evidence is a fault-injection or self-test artefact. <b>G4 asks whether the design behaviour was observed</b>; its evidence is a bin count. G2 is stated over check IDs and G4 over coverage bins, and a bin that corresponds to a check ID contributes to G4 only; it never discharges G2. Figure 3 shows the four combinations.</p>
+
+<figure>
+<svg viewBox="0 0 960 376" role="img" aria-label="Two by two grid: checker can or cannot report against behaviour observed or never reached, showing which of G2 and G4 passes in each case">
+<text class="tb mid" x="372" y="46">Checker can report (G2 evidence)</text>
+<text class="tb mid" x="676" y="46">Checker cannot report (no G2 record)</text>
+
+<rect class="bx" x="24" y="88" width="184" height="96" rx="6"/>
+<text class="tb mid" x="116" y="132">Behaviour observed</text>
+<text class="ts mid" x="116" y="150">G4 bin hit</text>
+<rect class="bx" x="24" y="216" width="184" height="96" rx="6"/>
+<text class="tb mid" x="116" y="260">Behaviour never reached</text>
+<text class="ts mid" x="116" y="278">G4 bin unhit</text>
+
+<rect class="bx-ver" x="232" y="88" width="280" height="96" rx="6"/>
+<text class="tb mid" x="372" y="130">G2 pass, G4 pass</text>
+<text class="ts mid" x="372" y="150">both obligations met</text>
+<rect class="bx-ctrl" x="536" y="88" width="280" height="96" rx="6"/>
+<text class="tb mid" x="676" y="130">G4 pass, G2 fail</text>
+<text class="ts mid" x="676" y="150">vacuous: evaluated, cannot report</text>
+<rect class="bx-ctrl" x="232" y="216" width="280" height="96" rx="6"/>
+<text class="tb mid" x="372" y="258">G2 pass, G4 fail</text>
+<text class="ts mid" x="372" y="278">negative case ran once; behaviour not reached</text>
+<rect class="bx-ext" x="536" y="216" width="280" height="96" rx="6"/>
+<text class="tb mid" x="676" y="258">G2 fail, G4 fail</text>
+<text class="ts mid" x="676" y="278">neither shown</text>
+
+<text class="ts mid" x="480" y="346">A bin tied to a check ID counts toward G4 only. It never discharges G2.</text>
+</svg>
+<figcaption><b>Figure 3.</b> The G2/G4 boundary. The top-right cell is the case Rev A could not see: a check evaluated every night for the whole campaign that has never been shown capable of reporting. The bottom-left cell is the reverse.</figcaption>
+</figure>
+
+<h2 id="s6">6. Gate-to-phase dependency (D-023)</h2>
+<p>Rev A required phase P4 to satisfy G5, while formal closed in P5, an unsatisfiable phase graph. D-023 fixes it with these edges: <span class="tag specified">SPECIFIED</span></p>
+<div class="tablewrap"><table>
+<thead><tr><th>From</th><th>Relation</th><th>To</th></tr></thead>
+<tbody>
+<tr><td>per-run G0, G1, G3</td><td>no edge</td><td>formal, compliance</td></tr>
+<tr><td>per-candidate G2, G4, G6</td><td>require</td><td>G0, G1 and G3 satisfied on every run in the manifest</td></tr>
+<tr><td>release G5</td><td>requires</td><td>G4 and G6 on the frozen candidate manifest</td></tr>
+<tr><td>release G5</td><td>requires</td><td>formal property register closed (P5 output); compliance report at the candidate RTL identity</td></tr>
+</tbody>
+</table></div>
+<p>Consequences: P4 does not require G5; P4 produces the compliance artefact and P5 the proof log, and G5 is stamped once, in P6 (Release). Rev B 6 states that no per-candidate gate depends on formal. Rev B 21.1 additionally separates this from a <i>phase-entry condition</i> (such as core trust CT-1 to CT-5), which blocks a phase from starting but is not a gate and is never stamped. See <a href="vf_phases_overview.html">the phases overview</a> for the phase graph.</p>
+
+<h2 id="s7">7. Partitions and convergence rules</h2>
+<p>Table 6.3 assigns gates to regression partitions. The budgets are planning values (ASSUMED, D-024), not gates: a partition that overruns is a capacity observation, not a failure.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Partition</th><th>Gates evaluated</th><th>Cadence</th><th>Budget</th></tr></thead>
+<tbody>
+<tr><td>Smoke: one boot test, one peripheral test, checker self-proof, harness integrity</td><td>G0, G1, G3</td><td>every commit</td><td>under 10 minutes</td></tr>
+<tr><td>Nightly: full firmware suites, constrained-random seed set, fault injection, compliance sweep as an input</td><td>G0, G1, G3 per run; produces the artefacts G2, G4, G6 consume</td><td>every night</td><td>under 4 hours</td></tr>
+<tr><td>Weekly: nightly plus coverage merge, viability reconciliation, formal re-run</td><td>G0, G1, G3 per run; G2, G4, G6 provisional on the merged week, never stamped per run</td><td>weekly</td><td>under 12 hours</td></tr>
+<tr><td>Release: everything plus soak and cold-boot cycling</td><td>all seven; G5 stamped once on the frozen manifest</td><td>each candidate</td><td>under 48 hours</td></tr>
+</tbody>
+</table></div>
+<p>Table 6.5 states stimulus volumes as derivation rules, because a count with no derivation is an opinion. Where the number cannot yet be derived the rule is binding and the number is provisional (<code>TBD(D-025)</code> or <code>ASSUMED(D-024)</code>).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Stimulus</th><th>Binding rule (summary)</th><th>Provisional floor</th><th>Convergence criterion</th></tr></thead>
+<tbody>
+<tr><td>Register and mode sweeps</td><td>One directed case per implemented register identity of each APB instance, crossed with its supported access modes</td><td>TBD(D-025)</td><td>Every (register identity, access mode) pair is a hit bin</td></tr>
+<tr><td>Constrained-random seeds</td><td>Smallest N_seeds satisfying saturation (last seed produced no first-hit) and stability (over K consecutive partitions every convergence bin hit by at least H distinct seeds)</td><td>N_seeds &gt;= 20 nightly; H = 2; K = 3 (D-024)</td><td>Both clauses hold for K partitions, else N grows by the partition's seed count</td></tr>
+<tr><td>Reset and boot scenarios</td><td>One scenario per member of the reset-scenario set, over the five reset domains and release points, including the full 16-state boot FSM end to end</td><td>TBD(D-025)</td><td>All (domain, release point, activity state) bins hit; cold boot and warm boot with SRAM retained both reach S_DONE</td></tr>
+<tr><td>Cold-boot cycling</td><td>Smallest N_coldboot hitting each cold-boot bin at least H times, indexed by SRAM power-up class (uninitialised, retained, garbage-pattern)</td><td>N_coldboot &gt;= 1000; T_soak &gt;= 24 h (D-024)</td><td>All three classes seen at least H times; each of the 7 timeout monitors expires at least once in the release campaign</td></tr>
+<tr><td>Fault-injection classes</td><td>One class per error-response path in the error-policy table, each naming its expected check ID and finding</td><td>TBD(D-025); class list owed by section 10</td><td>Every class has an executed case that produced the named finding</td></tr>
+<tr><td>Peripheral software suites</td><td>One suite per APB instance</td><td>N_suites = 6</td><td>Every instance has a suite hitting all its bins</td></tr>
+<tr><td>Interrupt nesting</td><td>One scenario per software-visible source, crossed with the class pairs the arbiter permits</td><td>TBD(D-025)</td><td>Every (source, class pair) bin hit; maximum observed depth equals the architectural maximum</td></tr>
+<tr><td>ISA compliance</td><td>The applicable set of Table 6.4, executed whole; known failures carried in an expected-fail register</td><td>69 (fixed, not a floor)</td><td><code>applicable_failed + applicable_not_run == 0</code></td></tr>
+</tbody>
+</table></div>
+<p>Decisions recorded with this section: D-023 (tiering and the gate-to-phase edge), D-024 (convergence parameters are planning defaults, not RTL facts), D-025 (the volumes marked TBD depend on a requirement register and fault catalogue that do not yet exist), D-026 (severity vocabulary is external, Table 21.2.7).</p>
+
+<h2 id="s8">8. The verdict record</h2>
+<p>Every gate verdict is decided from a small set of artefacts. What a run must leave behind is defined across Rev B 5, 6, 19 and 21.7: <span class="tag specified">SPECIFIED</span></p>
+<ul>
+<li><b>Run identity</b> (Table 5.2, eight fields): RTL SHA-256, filelist SHA-256, tool version, seed, plusargs, scenario identifier, verdict, artefact locator. Section 21.7 adds ID-1, ID-2 and ID-3 and the identity hashes to every artefact header; a log missing any field is not evidence.</li>
+<li><b>Counter block</b> (G1 operands): <code>instructions_retired</code>, <code>axi_transfers</code>, <code>apb_transfers</code>, <code>attestation_words_written</code>.</li>
+<li><b>Checker operands</b> (G3): <code>open_findings</code>, <code>unexplained_ring_drops</code>, <code>scoreboard_drain_satisfied</code>.</li>
+<li><b>Verdict</b> per gate: pass, fail, or <b>untested</b>, never a blank and never a waiver.</li>
+</ul>
+<p>Per-candidate gates read the viability ledger, the merged coverage database with the waiver ledger and exclusion register, and the generated traceability matrix. No operand is a duration in seconds or a count of bus beats; time is counted in <code>clk_i</code> cycles (ASSUMED, D-036).</p>
+
+<h2 id="s9">9. Where the repository stands</h2>
+<p>Rev B describes the intended state. The tracker records the actual one. <span class="tag exists">EXISTS</span> in <code>Verification/status/build_tracker.py</code>:</p>
+<ul>
+<li>P0 is IN PROGRESS with entry met and gates G0, G1 at exit; the P0 checklist stood at MET 13, PARTIAL 5, NOT MET 2 of 20 (PHASE_STATUS.md, 2026-10-31). Every later phase is NOT STARTED, so P0 exit is not met.</li>
+<li>G1 counter items (instructions_retired, axi_transfers, apb_transfers, attestation_words_written, counter block retained) are MET; G0 module-set comparison (P0-G1.1, P0-G1.2) is PARTIAL pending a golden module set (ACT-003). One run package passing G0 and G1 together (P0-X3) is PARTIAL.</li>
+<li>The tracker holds the G0 to G6 register in the Rev B wording and defects DEF-001 to DEF-012.</li>
+<li>No G2, G4, G5 or G6 verdict has been stamped. Rev B 19.3 itself records that G6 fails at Rev B because six seed requirements carry no check ID.</li>
+<li>The tracker notes XSim cannot evaluate <code>cover property</code>; a coverage-tool decision (DEC-A) is pending, which bears on G4.</li>
+</ul>
+<p>This page claims no gate result. Evidence is "PASS for a stated boundary", never a percentage of requirements. Related pages: <a href="vf_overview.html">verification overview</a>, <a href="vf_checking_scoreboards.html">checking and scoreboards</a>, <a href="tracker_status.html">tracker status</a>, <a href="index.html">documentation index</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B plan text, section 6 (lines 973 to 1190) and sections 19 to 20 for cross-references; <code>Verification/status/build_tracker.py</code> (phase, gate and defect data); <code>Verification/status/PHASE_STATUS.md</code> (current status); <code>documentation/html/_src/AUTHORING_GUIDE.md</code>.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 370" role="img" aria-labelledby="ttl desc"><title id="ttl">Direct IRQ path and commit feedback</title><desc id="desc">Left-to-right static wiring from peripheral sources through the subsystem, gateway, arbiter and EX to WB. Separate feedback paths acknowledge gateway state and advance round robin. No PLIC or CLIC is integrated.</desc><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#475569"/></marker><marker id="feedback" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#0f766e"/></marker></defs><style>text{font-family:Segoe UI,Arial,sans-serif;fill:#172338}.heading{font-size:15px;font-weight:650}.label{font-size:12px;fill:#475569}.signal{font-family:Consolas,monospace;font-size:11px;fill:#475569}.flow{fill:none;stroke:#475569;stroke-width:1.6;marker-end:url(#arrow)}.back{fill:none;stroke:#0f766e;stroke-width:1.6;marker-end:url(#feedback)}.backlabel{font-size:12px;fill:#0f766e}.foot{font-size:12px;fill:#64748b}</style>
+<rect x="16" y="78" width="176" height="124" rx="8" fill="#eff6ff" stroke="#93c5fd"/><text class="heading" x="28" y="104">Peripheral sources</text>
+<text class="label" x="28" y="132">Timer 0: 4; Timer 1: 4</text>
+<text class="label" x="28" y="155">SPI: 2; UART: 1</text>
+<text class="label" x="28" y="178">I2C: 1; GPIO: 1</text>
+<rect x="222" y="78" width="180" height="124" rx="8" fill="#eff6ff" stroke="#93c5fd"/><text class="heading" x="234" y="104">SoC → core pins</text>
+<text class="label" x="234" y="132">fast_irq_i[11:0]</text>
+<text class="label" x="234" y="155">timer_irq_i: cause 7</text>
+<text class="label" x="234" y="178">irq_raw[12:0]</text>
+<rect x="432" y="78" width="172" height="124" rx="8" fill="#f0fdfa" stroke="#5eead4"/><text class="heading" x="444" y="104">IRQ gateway</text>
+<text class="label" x="444" y="132">GPIO: rising edge</text>
+<text class="label" x="444" y="155">Timers / SPI: events</text>
+<text class="label" x="444" y="178">I2C / UART: levels</text>
+<rect x="634" y="78" width="172" height="124" rx="8" fill="#f0fdfa" stroke="#5eead4"/><text class="heading" x="646" y="104">IRQ arbiter</text>
+<text class="label" x="646" y="132">Class 2: fixed order</text>
+<text class="label" x="646" y="155">Classes 1 / 0: RR</text>
+<text class="label" x="646" y="178">mie + MIE + mintprio</text>
+<rect x="836" y="78" width="158" height="124" rx="8" fill="#f8fafc" stroke="#cbd5e1"/><text class="heading" x="848" y="104">EX acceptance</text>
+<text class="label" x="848" y="132">Valid eligible item</text>
+<text class="label" x="848" y="155">becomes trap packet</text>
+<text class="label" x="848" y="178">Frontend flush</text>
+<rect x="1024" y="78" width="196" height="124" rx="8" fill="#f8fafc" stroke="#cbd5e1"/><text class="heading" x="1036" y="104">WB trap commit</text>
+<text class="label" x="1036" y="132">CSR entry + redirect</text>
+<text class="label" x="1036" y="155">Gateway acknowledgement</text>
+<text class="label" x="1036" y="178">Committed RR feedback</text>
+<path class="flow" d="M192 148H219"/>
+<path class="flow" d="M402 148H429"/>
+<path class="flow" d="M604 148H631"/>
+<path class="flow" d="M806 148H833"/>
+<path class="flow" d="M994 148H1021"/>
+<text class="foot" x="16" y="26">IMPLEMENTED WIRING · 13 serviced channels · static source inspection</text>
+<text class="signal" x="432" y="62">raw</text><text class="signal" x="634" y="62">pending</text><text class="signal" x="836" y="62">offer + id + class</text><text class="signal" x="1024" y="62">via MEM → WB</text>
+<path class="back" d="M1080 202V246H718V205"/><text class="backlabel" x="740" y="237">wb_commit_irq: advance matching RR history</text>
+<path class="back" d="M1158 202V282H518V205"/><text class="backlabel" x="585" y="273">clear_gateway_o[12:0]: acknowledge committed cause</text>
+<text class="foot" x="16" y="319">Not used: PLIC / CLIC. ext_irq_i and sw_irq_i are tied to 0; fast_irq_i[15:12] are tied to 0.</text>
+<text class="foot" x="16" y="344">mintprio = software-written class threshold (CSR 0x7C0). No automatic handler-depth tracking or context stack.</text>
+<text class="foot" x="16" y="365">Gateway acknowledgement clears captured edge/event state; level requests follow their peripheral input.</text></svg>

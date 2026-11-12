@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RISCFORGE Documentation</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><span class="brand">RISCFORGE documentation</span><span class="crumb">core, SoC units and the SoC verification framework</span></div>
+<div class="wrap">
+<h1>RISCFORGE documentation set</h1>
+<p class="lead">Design reference for the RV32IM_Zicsr core and the SoC units, verification notes for the important units, and the SoC verification framework of Verification Plan Rev B, written stage by stage with diagrams.</p>
+<p class="meta">Reviewed 2026-11-03 | 3 of 45 pages present | Labels: <span class="tag exists">EXISTS</span> in the repository, <span class="tag specified">SPECIFIED</span> by Rev B but not built, <span class="tag open">OPEN</span> unknown or undecided</p>
+<div class="note">Design facts come from the RTL and are cited to files. Verification claims are limited to retained evidence: a PASS is for a stated boundary, never a percentage of requirements. As of this review P0 exit is not met; see <a href="tracker_status.html">Current status</a>.</div>
+<div class="toc"><b>Contents</b><ol><li><a href="#start-here">Start here</a></li><li><a href="#core-design">Core design</a></li><li><a href="#core-unit-verification">Core unit verification</a></li><li><a href="#soc-design">SoC design</a></li><li><a href="#soc-unit-verification">SoC unit verification</a></li><li><a href="#soc-verification-framework-rev-b">SoC verification framework (Rev B)</a></li><li><a href="#stage-by-stage">Stage by stage</a></li></ol></div>
+<h2 id="start-here">Start here</h2>
+<p>Orientation, vocabulary and live status.</p>
+<div class="grid">
+<div class="card"><h3>Verification framework overview</h3><p>The master picture: DUT, seven layers, bands, gates and phases.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3><a href="glossary.html">Glossary and naming</a></h3><p>Rev B terms, gate and phase vocabulary, naming crosswalk.</p></div>
+<div class="card"><h3><a href="tracker_status.html">Current status</a></h3><p>Phase, P0 checklist, gates and open defects from the tracker.</p></div>
+</div>
+<h2 id="core-design">Core design</h2>
+<p>The RV32IM_Zicsr five-stage core, unit by unit.</p>
+<div class="grid">
+<div class="card"><h3>Core overview</h3><p>Top-level blocks, pipeline, ports and module hierarchy.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Fetch and decode</h3><p>PC, instruction memory controller, decoders, register file.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Execute, memory, write-back</h3><p>ALU, multiplier and divider, load/store unit, memory interface.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Hazards, CSRs and traps</h3><p>Hazard unit, CSR file, trap and mret commit.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Core interrupts</h3><p>Gateway, arbiter, mie and mstatus gating, take and return.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+</div>
+<h2 id="core-unit-verification">Core unit verification</h2>
+<p>What is checked for the important core units, and how.</p>
+<div class="grid">
+<div class="card"><h3>Core verification overview</h3><p>Assets, layers, core-trust conditions CT-1 to CT-5.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Hazard unit</h3><p>Forwarding, stalls, flushes, the DEF-001 regression design.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>CSR and trap</h3><p>CSR access matrix, trap entry and mret checks.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>RV32M unit</h3><p>Multiply and divide corner cases and reference model.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Load/store and memory interface</h3><p>Alignment, byte enables, MMIO routing, stalls.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Interrupt unit</h3><p>Gateway and arbiter checks, nesting, pre-emption.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+</div>
+<h2 id="soc-design">SoC design</h2>
+<p>The SoC around the core.</p>
+<div class="grid">
+<div class="card"><h3>SoC architecture</h3><p>Block diagram, address map, interrupt wiring, reset and clocks.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Memory and boot path</h3><p>SRAM, boot ROM, fetch demux, cold and warm boot.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Bootloader</h3><p>Sixteen-state FSM, SPI read, core release.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Fabric, bridge and monitors</h3><p>AXI-Lite crossbar, AXI-to-APB bridge, timeout monitors.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>APB peripherals</h3><p>GPIO, I2C, SPI, two timers, UART and the AON watchdog.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+</div>
+<h2 id="soc-unit-verification">SoC unit verification</h2>
+<p>Verification of the SoC-level units.</p>
+<div class="grid">
+<div class="card"><h3>Bootloader verification</h3><p>Existing benches, boot scenarios, check architecture.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Fabric verification</h3><p>Path scoreboard, monitors, error injection, evidence limits.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Peripheral verification</h3><p>Layered approach, evidence per device, closure heat-map.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>UART verification</h3><p>The adapter delta-loop investigation, staged fix and remaining work.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+</div>
+<h2 id="soc-verification-framework-rev-b">SoC verification framework (Rev B)</h2>
+<p>The Rev B plan, section by section, with diagrams.</p>
+<div class="grid">
+<div class="card"><h3>Strategy and environment</h3><p>Seven layers, independence, environment, stimulus.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3><a href="vf_regression_gates.html">Regression and gates</a></h3><p>Gates G0 to G6, tiers, convergence rules.</p></div>
+<div class="card"><h3>Checking and scoreboards</h3><p>Path and SRAM scoreboards, reference models, fault injection.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Coverage</h3><p>Code and functional coverage, closure loop and rules.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Reset and clock</h3><p>Release order, CDC and RDC, reset scenarios, soak.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Boot verification</h3><p>Boot chain checks, failure paths, cycle budget.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Interrupt verification</h3><p>Sources, regimes, arbiter, nesting, the check register.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Fabric and peripheral verification</h3><p>SoC map, peripheral matrix, sweeps, error policy.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Lock-step and compliance</h3><p>ISS lock-step, ISA compliance configurations.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Formal verification</h3><p>Property register, vacuity, critical-path groups.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Traceability and defects</h3><p>Requirement chain, severity, defect classes, lifecycle.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Sign-off and identity</h3><p>Sign-off criteria, RTL identity recipe, re-run matrix.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+</div>
+<h2 id="stage-by-stage">Stage by stage</h2>
+<p>One page per phase of the Rev B schedule.</p>
+<div class="grid">
+<div class="card"><h3>Phases and dependencies</h3><p>Phase register, dependency graph, entry criteria.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P0 Bring-up</h3><p>In progress. Exit criteria, run package, blockers.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P1a Core trust</h3><p>CT-1 to CT-5 in detail.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P1b SoC structural</h3><p>MMIO path binding, per-slot tap, single reporter.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P2 Models</h3><p>Register model, device VIPs, attestation.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P3 Architectural</h3><p>Reset, interrupts, fabric, firmware oracle.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P4 Closure</h3><p>Coverage, viability, traceability, candidate regression.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>Track F Formal</h3><p>Parallel formal track and milestones.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P5 Soak</h3><p>Campaign convergence and soak.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+<div class="card"><h3>P6 Release</h3><p>G5 stamp and sign-off statement.</p><div class="tags"><span class="tag open">PENDING</span></div></div>
+</div>
+<div class="sources"><b>Sources:</b> RTL under <code>rtl/ips</code>, <code>RISCFORGE_Verification_Plan_RevB.docx</code> (text extract in <code>_src/RevB_plan.txt</code>), <code>Verification/status</code> tracker. Page conventions: <code>_src/AUTHORING_GUIDE.md</code>. This index is generated by <code>_src/build_index_status.py</code>.</div>
+</div>
+</body>
+</html>

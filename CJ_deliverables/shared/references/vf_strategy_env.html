@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strategy, Environment, Stimulus</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification framework / Strategy, environment, stimulus</span></div>
+<div class="wrap">
+
+<h1>Strategy, Environment and Stimulus</h1>
+<p class="lead">How the plan chooses its checking mechanisms and why a checker must be independent of the design it judges; the seven layers with their mechanism, owner and independence source; the environment and the run record; and the five stimulus sources.</p>
+<p class="meta">Scope: Rev B sections 4, 5 and 7 | Sources: Rev B plan text, <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/status/defects.csv</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Strategy: weakest mechanism, independent oracle</a></li>
+<li><a href="#s2">The seven layers</a></li>
+<li><a href="#s3">Verification environment</a></li>
+<li><a href="#s4">What every run must record</a></li>
+<li><a href="#s5">Stimulus plan</a></li>
+<li><a href="#s6">Limits of this page</a></li>
+</ol></div>
+
+<h2 id="s1">1. Strategy: weakest mechanism, independent oracle</h2>
+<p>Rev B 4 has two halves. The first is a selection rule: <b>use the weakest mechanism that can detect the class of defect.</b> A handshake rule is a protocol assertion, a correspondence rule is a scoreboard, a value rule is a reference model. Using an assertion for a value defect is, in Rev B's words, the most common reason a bug survives a regression: a legal handshake can still carry wrong data.</p>
+<p>The second half is independence. A checker that reads the signal the stimulus drove, or a model derived from the RTL it judges, can only agree with the DUT. Rev B requires every model and checker to name an <b>independence source</b>, admissible only if it is a named artefact that exists in the repository, or a named external specification with a stated version, cited by a locator. Restating what the DUT drives, restating its arithmetic, or naming a document the repository lacks is not an independence source. <span class="tag specified">SPECIFIED</span></p>
+<p>Three Rev A defects are corrected by this rule (Rev B 4.1):</p>
+<ul>
+<li>An assertion written against the RTL is not independent of the RTL. The repository cites no ARM AMBA release, so the protocol layer is judged against the pinned upstream pulp-platform implementation the fabric was taken from, not "the AMBA specification".</li>
+<li>No device data sheet exists in the repository (no UART part number, no SPI, I2C or JEDEC version). Rev A rows that named data sheets as independence sources are replaced by what does exist.</li>
+<li>The privileged ISA version is <span class="tag open">OPEN</span> (TBD): no version string exists in the tree, so any L5 or L6 row carries a version obligation.</li>
+</ul>
+
+<h2 id="s2">2. The seven layers</h2>
+<p>A LAYER answers "where in the design does this apply" (see <a href="vf_overview.html#s3">the BAND/LAYER/CLASS table</a>). Table 4.1 of Rev B fixes, for each layer, one mechanism, one owner role and one independence source. Figure 3 shows the stack; the table gives the locators. A dashed independence box marks a stated limitation, not a clean independence claim.</p>
+
+<figure>
+<svg viewBox="0 0 960 470" role="img" aria-label="Layer stack: for each of seven layers, its question, primary mechanism, owner role and independence source. L3 and L4 independence boxes are dashed to mark stated limitations.">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<text class="tb" x="24" y="36">LAYER and question</text>
+<text class="tb" x="256" y="36">Primary mechanism</text>
+<text class="tb" x="520" y="36">Owner role</text>
+<text class="tb" x="648" y="36">Independence source</text>
+
+<rect class="bx-core" x="24" y="56" width="208" height="44" rx="6"/><text class="tb" x="36" y="75">L1 Protocol</text><text class="ts" x="36" y="91">is every transaction legal?</text>
+<rect class="bx-ver" x="256" y="56" width="232" height="44" rx="6"/><text class="tb" x="268" y="75">Assertions</text><text class="ts" x="268" y="91">immediate and concurrent</text>
+<rect class="bx-ctrl" x="520" y="56" width="96" height="44" rx="6"/><text class="tb" x="532" y="75">BCO</text><text class="ts" x="532" y="91">acct. CLO</text>
+<rect class="bx" x="648" y="56" width="288" height="44" rx="6"/><text class="ts" x="660" y="75">Pinned upstream pulp-platform fabric</text><text class="ts" x="660" y="91">implementation (no ARM AMBA release cited)</text>
+<path class="ar" d="M232 78 H256"/><path class="ar" d="M488 78 H520"/><path class="ar" d="M616 78 H648"/>
+
+<rect class="bx-core" x="24" y="112" width="208" height="44" rx="6"/><text class="tb" x="36" y="131">L2 Path</text><text class="ts" x="36" y="147">one request, exactly one effect?</text>
+<rect class="bx-ver" x="256" y="112" width="232" height="44" rx="6"/><text class="tb" x="268" y="131">End-to-end path scoreboard</text><text class="ts" x="268" y="147">MMIO and SRAM paths</text>
+<rect class="bx-ctrl" x="520" y="112" width="96" height="44" rx="6"/><text class="tb" x="532" y="131">PO</text><text class="ts" x="532" y="147">acct. CLO</text>
+<rect class="bx" x="648" y="112" width="288" height="44" rx="6"/><text class="ts" x="660" y="131">Sw/bsp/link.ld software address view</text><text class="ts" x="660" y="147">(the RTL never reads it)</text>
+<path class="ar" d="M232 134 H256"/><path class="ar" d="M488 134 H520"/><path class="ar" d="M616 134 H648"/>
+
+<rect class="bx-core" x="24" y="168" width="208" height="44" rx="6"/><text class="tb" x="36" y="187">L3 Register</text><text class="ts" x="36" y="203">right value held and returned?</text>
+<rect class="bx-ver" x="256" y="168" width="232" height="44" rx="6"/><text class="tb" x="268" y="187">Register reference model</text><text class="ts" x="268" y="203">built from declared offsets</text>
+<rect class="bx-ctrl" x="520" y="168" width="96" height="44" rx="6"/><text class="tb" x="532" y="187">BCO</text><text class="ts" x="532" y="203">acct. CLO</text>
+<rect class="bx-ext" x="648" y="168" width="288" height="44" rx="6"/><text class="ts" x="660" y="187">_reg_pkg.sv declarations, facts.yaml</text><text class="ts" x="660" y="203">weakest claim: stated limitation</text>
+<path class="ar" d="M232 190 H256"/><path class="ar" d="M488 190 H520"/><path class="ar" d="M616 190 H648"/>
+
+<rect class="bx-core" x="24" y="224" width="208" height="44" rx="6"/><text class="tb" x="36" y="243">L4 Device</text><text class="ts" x="36" y="259">device behaves per its spec?</text>
+<rect class="bx-ver" x="256" y="224" width="232" height="44" rx="6"/><text class="tb" x="268" y="243">Behavioural VIP</text><text class="ts" x="268" y="259">plus pin monitor</text>
+<rect class="bx-ctrl" x="520" y="224" width="96" height="44" rx="6"/><text class="tb" x="532" y="243">BCO</text><text class="ts" x="532" y="259">acct. CLO</text>
+<rect class="bx-ext" x="648" y="224" width="288" height="44" rx="6"/><text class="ts" x="660" y="243">I2C, SPI: external slave models</text><text class="ts" x="660" y="259">others: pin monitor only (limitation)</text>
+<path class="ar" d="M232 246 H256"/><path class="ar" d="M488 246 H520"/><path class="ar" d="M616 246 H648"/>
+
+<rect class="bx-core" x="24" y="280" width="208" height="44" rx="6"/><text class="tb" x="36" y="299">L5 Interrupt</text><text class="ts" x="36" y="315">right source, time, context?</text>
+<rect class="bx-ver" x="256" y="280" width="232" height="44" rx="6"/><text class="tb" x="268" y="299">Arbiter and gateway model</text><text class="ts" x="268" y="315">classes, round-robin, gates</text>
+<rect class="bx-ctrl" x="520" y="280" width="96" height="44" rx="6"/><text class="tb" x="532" y="299">BCO (core)</text><text class="ts" x="532" y="315">acct. DO</text>
+<rect class="bx" x="648" y="280" width="288" height="44" rx="6"/><text class="ts" x="660" y="299">Privileged semantics (version TBD)</text><text class="ts" x="660" y="315">plus the intended map, Rev B Table 14.1</text>
+<path class="ar" d="M232 302 H256"/><path class="ar" d="M488 302 H520"/><path class="ar" d="M616 302 H648"/>
+
+<rect class="bx-core" x="24" y="336" width="208" height="44" rx="6"/><text class="tb" x="36" y="355">L6 Privilege</text><text class="ts" x="36" y="371">traps and CSRs correct?</text>
+<rect class="bx-ver" x="256" y="336" width="232" height="44" rx="6"/><text class="tb" x="268" y="355">CSR and trap model</text><text class="ts" x="268" y="371">plus compliance</text>
+<rect class="bx-ctrl" x="520" y="336" width="96" height="44" rx="6"/><text class="tb" x="532" y="355">CO</text><text class="ts" x="532" y="371">acct. DO</text>
+<rect class="bx" x="648" y="336" width="288" height="44" rx="6"/><text class="ts" x="660" y="355">Privileged spec, semantics only</text><text class="ts" x="660" y="371">version TBD: largest specification gap</text>
+<path class="ar" d="M232 358 H256"/><path class="ar" d="M488 358 H520"/><path class="ar" d="M616 358 H648"/>
+
+<rect class="bx-core" x="24" y="392" width="208" height="44" rx="6"/><text class="tb" x="36" y="411">L7 Firmware</text><text class="ts" x="36" y="427">did software see what it intended?</text>
+<rect class="bx-ver" x="256" y="392" width="232" height="44" rx="6"/><text class="tb" x="268" y="411">Self-checking firmware</text><text class="ts" x="268" y="427">plus mailbox oracle</text>
+<rect class="bx-ctrl" x="520" y="392" width="96" height="44" rx="6"/><text class="tb" x="532" y="411">PO</text><text class="ts" x="532" y="427">acct. DO</text>
+<rect class="bx" x="648" y="392" width="288" height="44" rx="6"/><text class="ts" x="660" y="411">Mailbox is DUT state; intent must come</text><text class="ts" x="660" y="427">from a record that is not the test</text>
+<path class="ar" d="M232 414 H256"/><path class="ar" d="M488 414 H520"/><path class="ar" d="M616 414 H648"/>
+<text class="ts" x="24" y="460">Owner roles are drawn from Rev B Table 21.2.1 and published per layer in Table 21.2.12; "acct." = accountable.</text>
+</svg>
+<figcaption><b>Figure 3.</b> The seven layers. Each layer has one mechanism (teal) and one owner role (amber). The right-hand box names what the mechanism is judged against; dashed boxes (L3, L4) mark independence that Rev B itself records as a limitation.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Layer</th><th>Mechanism</th><th>Owner / accountable</th><th>Independence source and locator (Rev B Table 4.1)</th></tr></thead>
+<tbody>
+<tr><td>L1 Protocol</td><td>Immediate and concurrent assertions</td><td>BCO / CLO</td><td><code>axi_lite_xbar.sv:16,22-33</code>, <code>axi_lite_to_apb.sv:267-280,377-378</code>, configured at <code>riscforge_soc_subsystem.sv:419-439</code>. Bound to the implementation profile, since no AMBA release is cited</td></tr>
+<tr><td>L2 Path</td><td>End-to-end path scoreboard</td><td>PO / CLO</td><td><code>Sw/bsp/link.ld:14-15</code>; corroborated by the bootloader's separate address generator <code>clear_addr_q</code>/<code>dest_addr_q</code> at <code>bootloader.sv:521-535</code></td></tr>
+<tr><td>L3 Register</td><td>Register reference model</td><td>BCO / CLO</td><td>Offset, width and reset parameters in <code>*_reg_pkg.sv</code> headers (e.g. <code>aon_timer_reg_pkg.sv:13,152-165</code>, <code>gpio_reg_pkg.sv:167-185</code>) and <code>facts.yaml:registers</code>. Recorded as the weakest claim</td></tr>
+<tr><td>L4 Device</td><td>Behavioural VIP plus pin monitor</td><td>BCO / CLO</td><td>I2C and SPI: <code>i2c_slave_at24c02/</code>, <code>spi_slave_infinion/S25fs512s/</code>. UART, GPIO, Timer 0, Timer 1: pin monitor against the declared port contract only, an open limitation (Rev B 9)</td></tr>
+<tr><td>L5 Interrupt</td><td>Arbiter and gateway model</td><td>BCO (core) / DO</td><td>Privileged semantics for mip, mie, mstatus (version TBD) and the intended map in Rev B Table 14.1. Rev B states the RTL is wrong against these semantics in three places (<code>csr_regfile.v:84-88,165-204</code>)</td></tr>
+<tr><td>L6 Privilege</td><td>CSR and trap model plus compliance</td><td>CO / DO</td><td>RISC-V privileged specification, semantics only; tree is 2.1.12-era, version <span class="tag open">OPEN</span> (TBD)</td></tr>
+<tr><td>L7 Firmware</td><td>Self-checking firmware plus mailbox oracle</td><td>PO / DO</td><td>Intent traceable to design-owner records (Rev B Tables 3.3, 1.5). Rev A's "test intent, declared in the test" is inadmissible: the test is the thing being judged</td></tr>
+</tbody></table></div>
+<p>The owner abbreviations (BCO, CLO, PO, DO, CO) are roles from Rev B Table 21.2.1, which is outside the sections summarised here; this page does not expand them. Two rows, L3 and L4, are recorded in Rev B section 10 as stated limitations rather than satisfied independence claims. Layers are placed in the checking picture on <a href="vf_checking_scoreboards.html">vf_checking_scoreboards.html</a> and in the coverage dimensions on <a href="vf_coverage.html">vf_coverage.html</a>.</p>
+
+<h2 id="s3">3. Verification environment</h2>
+<p>One rule defines the environment: <b>everything that describes the design under test is generated from the canonical RTL at run time.</b> No flow carries its own copy of the RTL, its filelist or its register offsets. Rev B calls this the highest-leverage item in the plan, because it removes the class of defect where a green report describes a design that is not the one being taped out. This is the intended state; it is not a claim about the repository today. <span class="tag specified">SPECIFIED</span></p>
+
+<h3>3.1 Measured deltas from the intended state</h3>
+<p>Rev B 5 records three deltas, each an OPEN defect rather than a silent exception. The status column is checked against <code>Verification/status/defects.csv</code>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Delta (Rev B 5)</th><th>Measured at Rev B</th><th>Decision</th><th>Current status in defects.csv</th></tr></thead>
+<tbody>
+<tr><td>Filelist health</td><td>15 of 40 filelists have an unresolvable entry; two <code>timer.sv</code> sources compiled by different filelists; 9 name a missing directory; one names an absolute path</td><td>D-114</td><td>Duplicate <code>timer.sv</code>: DEF-004 FIXED-CONVERGED (copies byte-identical on 2026-10-31, ID-1 is 0). Unresolvable and absolute entries: DEF-005 <span class="tag open">OPEN</span>; the golden <code>soc_subsystem.f</code> has 0 unresolved and 0 absolute</td></tr>
+<tr><td>UART OBI chain</td><td><code>soc_subsystem.f</code> claimed the OBI chain was removed; false, since <code>apb_uart.sv:52</code> instantiates <code>apb_uart_wrap</code> chaining to <code>apb_to_obi</code> and <code>obi_uart</code></td><td>D-015</td><td>DEF-006 FIXED-VERIFIED (bridged OBI UART in the tier-3 filelist elaborates clean). The zero-delay loop in <code>apb_to_obi</code>, DEF-002, is FIXED-VERIFIED with the fix applied to both golden copies</td></tr>
+<tr><td>Register header</td><td>No <code>soc_regs.h</code>; only hand-written <code>Sw/bsp/link.ld:12-15</code> (ISRAM and DSRAM, no MMIO)</td><td>D-008</td><td>Not a defect-register item; the generator remains <span class="tag specified">SPECIFIED</span></td></tr>
+</tbody></table></div>
+
+<h3>3.2 Architecture of the environment</h3>
+<p>Figure 4 shows the pieces and how a run flows through them. The canonical RTL feeds generators, which produce the filelist for the testbench and the register header and linker script for firmware. Stimulus drives the DUT; monitors observe it; scoreboards and reference models judge; the reporter produces one verdict record; coverage and verdicts are kept in the artefact store. Three execution domains exist because the tools differ in capability (Rev B 5): an interactive domain for bring-up (Verilator, Vivado XSim, no bind, no countable coverage), a compliance domain (Icarus <code>vvp</code> through RISCOF, because the compliance DUT uses array-port connections the SoC-level simulators cannot elaborate), and a nightly domain where a full SystemVerilog simulator binds checkers into the fabric. Synopsys VCS U-2023.03 is the tool of record for coverage and is a licensed remote tool, not a local execution domain.</p>
+
+<figure>
+<svg viewBox="0 0 1040 520" role="img" aria-label="Environment architecture: canonical RTL feeds generators; generators produce a filelist for the testbench and a header and linker script for firmware; inside the testbench stimulus and device VIPs drive the DUT, monitors, scoreboards and a reporter follow; coverage and the artefact store hold the evidence.">
+<rect class="bx-core" x="24" y="40" width="208" height="64" rx="6"/>
+<text class="tb mid" x="128" y="66">Canonical RTL</text><text class="ts mid" x="128" y="84">one tree, SHA-256 per run</text>
+<rect class="bx-ctrl" x="304" y="40" width="264" height="64" rx="6"/>
+<text class="tb mid" x="436" y="66">Generators (SPECIFIED)</text><text class="ts mid" x="436" y="84">filelist, register header, linker script</text>
+<path class="ar" d="M232 72 H304"/>
+<path class="ar" d="M336 104 V128 H128 V288"/>
+<text class="ts" x="140" y="214">header + linker script</text>
+<path class="ar" d="M520 104 V152"/>
+<text class="ts" x="532" y="134">filelist</text>
+
+<rect class="bx-ver" x="24" y="288" width="208" height="64" rx="6"/>
+<text class="tb mid" x="128" y="314">Firmware and BSP</text><text class="ts mid" x="128" y="332">bare-metal C + assembly,</text><text class="ts mid" x="128" y="346">mailbox oracle</text>
+
+<rect class="grp" x="272" y="152" width="752" height="224" rx="8"/>
+<text class="tb" x="288" y="172">Testbench top (nightly simulator)</text>
+<rect class="bx-ver" x="296" y="184" width="160" height="56" rx="6"/>
+<text class="tb mid" x="376" y="208">Stimulus drivers</text><text class="ts mid" x="376" y="225">BFMs, generators, injector</text>
+<rect class="bx-ver" x="480" y="184" width="136" height="56" rx="6"/>
+<text class="tb mid" x="548" y="208">Device VIPs</text><text class="ts mid" x="548" y="225">I2C, SPI slave models</text>
+<rect class="bx-core" x="296" y="288" width="160" height="64" rx="6"/>
+<text class="tb mid" x="376" y="316">DUT</text><text class="ts mid" x="376" y="334">SoC RTL</text>
+<rect class="bx-ver" x="504" y="288" width="144" height="64" rx="6"/>
+<text class="tb mid" x="576" y="312">Monitors</text><text class="ts mid" x="576" y="330">bus taps, pins,</text><text class="ts mid" x="576" y="344">interrupts</text>
+<rect class="bx-ver" x="696" y="288" width="160" height="64" rx="6"/>
+<text class="tb mid" x="776" y="312">Scoreboards</text><text class="ts mid" x="776" y="330">and reference models</text>
+<rect class="bx-ver" x="904" y="288" width="104" height="64" rx="6"/>
+<text class="tb mid" x="956" y="316">Reporter</text><text class="ts mid" x="956" y="334">verdict record</text>
+<path class="ar-ver" d="M376 240 V288"/>
+<path class="ar-ver" d="M500 240 V264 H440 V288"/>
+<path class="ar" d="M232 320 H296"/>
+<path class="ar-ver" d="M456 320 H504"/>
+<path class="ar-ver" d="M648 320 H696"/>
+<path class="ar-ver" d="M856 320 H904"/>
+
+<rect class="bx-mem" x="520" y="424" width="240" height="64" rx="6"/>
+<text class="tb mid" x="640" y="450">Coverage database</text><text class="ts mid" x="640" y="468">merged, tool of record</text>
+<path class="ar-ver" d="M576 352 V424"/>
+<rect class="bx-mem" x="840" y="424" width="176" height="64" rx="6"/>
+<text class="tb mid" x="928" y="450">Artefact store</text><text class="ts mid" x="928" y="468">logs, verdicts, waivers</text>
+<path class="ar-ver" d="M940 352 V424"/>
+<path class="ar" d="M760 456 H840"/>
+</svg>
+<figcaption><b>Figure 4.</b> Environment architecture. Top row: one RTL tree and the generators that derive every flow's inputs from it. Inside the dashed testbench: stimulus and device VIPs drive the DUT, and the observe, judge, report chain runs left to right. Green boxes hold evidence. The compliance domain (Icarus <code>vvp</code> via RISCOF) uses the same canonical RTL but a different DUT wrapper and is not drawn.</figcaption>
+</figure>
+
+<h3>3.3 Components and what pins them</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Component</th><th>Role</th><th>Pinned by</th><th>Failure mode if unpinned</th></tr></thead>
+<tbody>
+<tr><td>Canonical RTL</td><td>The one core and SoC source tree</td><td>SHA-256 recorded per run</td><td>Compliance and SoC results describe different designs</td></tr>
+<tr><td>Filelist generator</td><td>Per-flow filelist from the canonical module set (<span class="tag specified">SPECIFIED</span>)</td><td>Generator version plus module-set hash</td><td>A flow silently compiles a stale module set</td></tr>
+<tr><td>Register header generator</td><td>Header from the RTL address maps (<span class="tag specified">SPECIFIED</span>; extraction points include <code>riscforge_soc_subsystem.sv:683-690</code>, <code>gpio_reg_pkg.sv:167-185</code>, <code>spi_master_apb_if.sv:13-22</code>)</td><td>Generated file hash</td><td>Drivers and RTL disagree on offsets</td></tr>
+<tr><td>Linker script generator</td><td>Script from memory-map parameters (<span class="tag specified">SPECIFIED</span>; today only hand-written <code>Sw/bsp/link.ld:12-15</code>)</td><td>Generated file hash</td><td>Software links against a stale memory map</td></tr>
+<tr><td>Interactive simulator</td><td>Local bring-up (Verilator, Vivado XSim)</td><td>Tool version in every log header</td><td>A failure reproduces on one machine only</td></tr>
+<tr><td>Nightly simulator</td><td>Regression with checker binding</td><td>Tool version in every log header</td><td>Coverage differs between local and nightly</td></tr>
+<tr><td>Compliance toolchain</td><td>ISA suite via Icarus <code>vvp</code> and RISCOF, vendored snapshot v2.4.4 (D-009)</td><td>Toolchain version plus suite commit</td><td>A pass cannot be reproduced</td></tr>
+<tr><td>Artefact store</td><td>Logs, signatures, coverage, waivers, verdicts</td><td>Directory layout plus retention policy</td><td>A result cannot be cited; provenance is lost</td></tr>
+</tbody></table></div>
+<p>Rev B Figure 5.2 adds three identity checks (ID-1, ID-2, ID-3) that stop a run executed against the wrong RTL. In the current status they are stamped with the run: P0-G3.3 is MET and ID-1 is 0 after the timer copies converged, while the ID-2 and ID-3 checkers are not yet written (DEF-005; <code>Verification/status/PHASE_STATUS.md</code>).</p>
+
+<h2 id="s4">4. What every run must record</h2>
+<p>Rev B Table 5.2 is the single run-record obligation. A run missing any of the eight fields is not evidence (REQ-2008, <span class="tag specified">SPECIFIED</span>). Gate G0 consumes the eight fields; reproducibility (QG-10) is measured on the first, second, fourth and fifth only, because the others do not affect reproduction. See <a href="vf_regression_gates.html">vf_regression_gates.html</a> for the gates.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Field</th><th>Why it is mandatory</th><th>In QG-10 subset</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>RTL hash</td><td>Ties the result to an exact design state: canonical filelist plus four anchor files (<code>soc_subsystem.f</code>, <code>riscforge_soc_subsystem.sv</code>, <code>bootloader.sv</code>, <code>csr_regfile.v</code>), D-022</td><td>yes</td></tr>
+<tr><td>2</td><td>Filelist hash</td><td>Proves the flow compiled what it claimed to</td><td>yes</td></tr>
+<tr><td>3</td><td>Tool and version</td><td>Reproducible on a known tool</td><td>no</td></tr>
+<tr><td>4</td><td>Plusargs</td><td>Distinguishes cold from warm boot, timeouts, image selection</td><td>yes</td></tr>
+<tr><td>5</td><td>Seed</td><td>Makes a random-stimulus failure reproducible</td><td>yes</td></tr>
+<tr><td>6</td><td>Scenario identifier</td><td>Names the test, suite or compliance case</td><td>no</td></tr>
+<tr><td>7</td><td>Verdict</td><td>Makes the result machine-readable</td><td>no</td></tr>
+<tr><td>8</td><td>Artefact locator</td><td>Binds the record to logs, signatures and coverage</td><td>no</td></tr>
+</tbody></table></div>
+<p>Rev A listed five fields; Rev B lists eight. The P0 checklist tracks these: P0-G3.1 to G3.5 (hashes, identity checks, seed, plusargs) are MET, while P0-G3.6 (exact run command) is PARTIAL and the run-package script is an open action (<code>PHASE_STATUS.md</code>).</p>
+
+<h2 id="s5">5. Stimulus plan</h2>
+<p>Stimulus comes from five sources, each with a declared target and a rule for what "covered" means; without both, stimulus volume is "an opinion" (Rev B 7). Directed stimulus proves that a specific sequence works; random proves the legal space contains no failure; fault injection proves the checkers are alive; software suites prove the system does something useful; compliance proves architectural conformance. Removing any one leaves a defect class unaddressed. Every run is configured by boot mode (cold or warm), plusargs and seed, which are the fields of section 4. Figure 5 follows one source from declaration to DUT.</p>
+
+<figure>
+<svg viewBox="0 0 1040 430" role="img" aria-label="Stimulus flow: a run configuration of boot mode, plusargs, seed and scenario identifier selects among five stimulus sources, each with a declared target; each source has a driver that applies it to the DUT.">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<text class="tb" x="24" y="36">Run configuration</text>
+<text class="tb" x="264" y="36">Source and declared target</text>
+<text class="tb" x="536" y="36">Driver</text>
+<text class="tb" x="856" y="36">DUT</text>
+
+<rect class="bx-ctrl" x="24" y="64" width="192" height="340" rx="6"/>
+<text class="tb" x="40" y="92">Per-run inputs</text>
+<text class="ts" x="40" y="116">boot mode: cold or warm</text>
+<text class="ts" x="40" y="136">plusargs: timeouts, image</text>
+<text class="ts" x="40" y="156">seed (or none stated)</text>
+<text class="ts" x="40" y="176">scenario identifier</text>
+<text class="ts" x="40" y="212">All four go into the</text>
+<text class="ts" x="40" y="228">8-field run record, so</text>
+<text class="ts" x="40" y="244">the run can be repeated.</text>
+
+<rect class="bx-ver" x="264" y="64" width="224" height="52" rx="6"/><text class="tb" x="276" y="84">Directed</text><text class="ts" x="276" y="102">one case per set member</text>
+<rect class="bx-ver" x="264" y="136" width="224" height="52" rx="6"/><text class="tb" x="276" y="156">Constrained random</text><text class="ts" x="276" y="174">legal space; &gt;= 20 seeds nightly</text>
+<rect class="bx-ver" x="264" y="208" width="224" height="52" rx="6"/><text class="tb" x="276" y="228">Fault injection</text><text class="ts" x="276" y="246">one class per error path</text>
+<rect class="bx-ver" x="264" y="280" width="224" height="52" rx="6"/><text class="tb" x="276" y="300">Software suites</text><text class="ts" x="276" y="318">6 C suites + interrupt tests</text>
+<rect class="bx-ver" x="264" y="352" width="224" height="52" rx="6"/><text class="tb" x="276" y="372">ISA compliance</text><text class="ts" x="276" y="390">69 applicable of 162 tests</text>
+
+<rect class="bx-ctrl" x="536" y="64" width="240" height="52" rx="6"/><text class="tb" x="548" y="84">Directed sequences</text><text class="ts" x="548" y="102">boot, reset, modes, nesting</text>
+<rect class="bx-ctrl" x="536" y="136" width="240" height="52" rx="6"/><text class="tb" x="548" y="156">BFM + injector</text><text class="ts" x="548" y="174">AXI-Lite master, APB slave, IRQ</text>
+<rect class="bx-ctrl" x="536" y="208" width="240" height="52" rx="6"/><text class="tb" x="548" y="228">Fault injector</text><text class="ts" x="548" y="246">address, data, response, wait, reset</text>
+<rect class="bx-ctrl" x="536" y="280" width="240" height="52" rx="6"/><text class="tb" x="548" y="300">Firmware image</text><text class="ts" x="548" y="318">bare-metal C + assembly via BSP</text>
+<rect class="bx-ctrl" x="536" y="352" width="240" height="52" rx="6"/><text class="tb" x="548" y="372">RISCOF flow</text><text class="ts" x="548" y="390">Icarus vvp, vendored v2.4.4 tests</text>
+
+<path class="ar" d="M216 90 H264"/><path class="ar" d="M216 162 H264"/><path class="ar" d="M216 234 H264"/><path class="ar" d="M216 306 H264"/><path class="ar" d="M216 378 H264"/>
+<path class="ar" d="M488 90 H536"/><path class="ar" d="M488 162 H536"/><path class="ar" d="M488 234 H536"/><path class="ar" d="M488 306 H536"/><path class="ar" d="M488 378 H536"/>
+<rect class="bx-core" x="856" y="64" width="160" height="340" rx="6"/>
+<text class="tb mid" x="936" y="212">DUT</text>
+<text class="ts mid" x="936" y="232">SoC level;</text>
+<text class="ts mid" x="936" y="248">compliance runs on</text>
+<text class="ts mid" x="936" y="264">a core wrapper</text>
+<path class="ar" d="M776 90 H856"/><path class="ar" d="M776 162 H856"/><path class="ar" d="M776 234 H856"/><path class="ar" d="M776 306 H856"/><path class="ar" d="M776 378 H856"/>
+</svg>
+<figcaption><b>Figure 5.</b> Stimulus flow. The per-run inputs on the left choose and seed each source. Each source has a driver that applies it to the DUT, and each declares what "covered" means, shown in the second column. The compliance source runs on a core-level wrapper in a different simulator (Rev B 5, 17), not on the full SoC.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Source</th><th>Content</th><th>Target (Rev B Table 7.1)</th><th>"Covered" means</th></tr></thead>
+<tbody>
+<tr><td>Directed</td><td>Boot, reset, peripheral modes, interrupt nesting</td><td>TBD(D-025): one directed case per member of each declared set</td><td>Every register identity, documented mode and (domain, release point, activity state) bin exercised at least once. Rev A's "30 scenarios" is withdrawn</td></tr>
+<tr><td>Constrained random</td><td>AXI-Lite master, APB slave response, interrupt injector</td><td>N_seeds &gt;= 20 nightly (ASSUMED(D-024)); weekly per saturation and stability clauses</td><td>Only the legal space is generated; the BFM never repairs protocol. Rev A's "200 seeds weekly" is withdrawn</td></tr>
+<tr><td>Fault injection</td><td>Address, data, strobe, response, wait state, decode hole, reset</td><td>One class per error-response path; class list TBD(D-025)</td><td>Each injected fault is named by the check ID it is expected to trip</td></tr>
+<tr><td>Software suites</td><td>Bare-metal C suites plus assembly interrupt tests</td><td>N_suites = 6 C suites, one per APB window (<code>NUM_APB_SLAVES = 6</code>, <code>riscforge_soc_subsystem.sv:244</code>)</td><td>Each test is self-checking and also passes the testbench-side gates independently. Rev A's "seven suites / 14 tests" is withdrawn</td></tr>
+<tr><td>ISA compliance</td><td>RV32I, M, Zicsr, privilege</td><td>69 applicable of 162 present, executed whole (38 + 8 + 7 + 16 = 69; 27 + 1 + 65 = 93 excluded)</td><td>A suite sweep from the vendored tree, never a hand-picked subset; the 93 are recorded with a reason</td></tr>
+</tbody></table></div>
+<p>Every target is derived from a rule in Rev B Table 6.5; none is a carried-forward Rev A number. Volumes that cannot be derived are tagged TBD(D-025) with a binding rule, and provisional floors are tagged ASSUMED(D-024). The fault-class list, reset-scenario volume and interrupt-nesting volume remain TBD, so stimulus volume is only partly fixed. <span class="tag specified">SPECIFIED</span></p>
+<div class="warn">Boot modes: the run record's plusargs distinguish cold from warm boot. Warm boot today is triggered by an external <code>soft_rst_ni</code>, not by a watchdog (see <a href="vf_overview.html#s5">the overview</a>), so warm-boot stimulus is an external event.</div>
+
+<h2 id="s6">6. Limits of this page</h2>
+<ul>
+<li>Everything in sections 2, 3.2, 4 and 5 describes what Rev B specifies. The page does not claim any of the environment, generators, scoreboards or random stimulus is built. Status comes from <code>PHASE_STATUS.md</code> (P0 in progress; P1a onward not started) and <code>defects.csv</code>.</li>
+<li>RTL locators are quoted from Rev B and were not re-read for this page.</li>
+<li>Owner role names are not expanded here; see Rev B Table 21.2.1 and <a href="vf_phases_overview.html">vf_phases_overview.html</a>.</li>
+<li>Term definitions: <a href="glossary.html">glossary</a>. Overview and master map: <a href="vf_overview.html">vf_overview.html</a>. All pages: <a href="index.html">index</a>.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> Rev B sections 4, 5 and 7 (extracted text, with Tables 1.4 and 6.1 for context), <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/status/defects.csv</code>.</div>
+</div>
+</body>
+</html>

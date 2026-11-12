@@ -1,0 +1,21 @@
+{
+  "title": "G1 five-stage trap path",
+  "scope": "As-coded synchronous exception and interrupt packet path through the active RV32 core; no timing or verification closure claim.",
+  "baseline": { "repo": "RISCFORGE_1TOPS-main/rtl worktree; six active RTL SHA-256 hashes combined", "commit": "worktree-sha256:1c138abb1a5cb11b9580baa228b4aefc8b34c14fbeb0a3f8eba3e49033c41dfc" },
+  "nodes": [
+    { "id": "IF", "label": "IF · fetch_cycle", "status": "present", "source": { "path": "ips/riscv_core/rtl/fetch_cycle.v", "line": 191, "symbol": "assign exc_valid_F" } },
+    { "id": "ID", "label": "ID · decode_cycle", "status": "present", "source": { "path": "ips/riscv_core/rtl/decode_cycle.v", "line": 418, "symbol": "assign new_exc_valid_D" } },
+    { "id": "EX", "label": "EX · execute_cycle", "status": "present", "source": { "path": "ips/riscv_core/rtl/execute_cycle.v", "line": 502, "symbol": "assign irq_accept_E" } },
+    { "id": "MEM", "label": "MEM · memory_cycle", "status": "present", "source": { "path": "ips/riscv_core/rtl/memory_cycle.v", "line": 132, "symbol": "wire exc_valid_mem_local" } },
+    { "id": "WB", "label": "WB · wb_trap_mret_commit_controller", "status": "present", "source": { "path": "ips/riscv_core/rtl/wb_trap_mret_commit_controller.v", "line": 64, "symbol": "assign trap_commit" } },
+    { "id": "IRQ", "label": "irq_arbiter", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 236, "symbol": "irq_arbiter u_irq_arbiter" } }
+  ],
+  "edges": [
+    { "from": "IF", "to": "ID", "label": "IF/ID exception packet", "status": "present", "source": { "path": "ips/riscv_core/rtl/fetch_cycle.v", "line": 307, "symbol": "exc_valid_reg <= exc_valid_F" } },
+    { "from": "ID", "to": "EX", "label": "ID/EX exception packet", "status": "present", "source": { "path": "ips/riscv_core/rtl/decode_cycle.v", "line": 368, "symbol": "exc_valid_r <= next_exc_valid_D" } },
+    { "from": "EX", "to": "MEM", "label": "EX/MEM exception packet", "status": "present", "source": { "path": "ips/riscv_core/rtl/execute_cycle.v", "line": 468, "symbol": "exc_valid_r <= next_exc_valid_E" } },
+    { "from": "MEM", "to": "WB", "label": "MEM/WB exception packet", "status": "present", "source": { "path": "ips/riscv_core/rtl/memory_cycle.v", "line": 276, "symbol": "exc_valid_r      <= exc_valid_mem_final" } },
+    { "from": "IRQ", "to": "EX", "label": "irq_pending → irq_accept_E", "status": "present", "source": { "path": "ips/riscv_core/rtl/top.v", "line": 419, "symbol": ".irq_pending_i(irq_pending)" } }
+  ],
+  "unknowns": [ "Runtime ordering and precise side-effect behavior are not asserted by this static path diagram." ]
+}

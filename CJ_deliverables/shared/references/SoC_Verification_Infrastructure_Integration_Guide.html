@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SoC Verification Infrastructure: Integration Guide</title>
+<style>
+:root{--bg:#fff;--fg:#1c2733;--mut:#5a6878;--ln:#c9d2dc;--ac:#1f5fa8;--ac2:#e6eef9;--ok:#2e7d4f;--box:#f5f7fa;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14191f;--fg:#e4e9ef;--mut:#9aa7b5;--ln:#33404d;--ac:#6ea8e6;--ac2:#1b2a3a;--ok:#5fb98a;--box:#1a2129}}
+:root[data-theme="dark"]{--bg:#14191f;--fg:#e4e9ef;--mut:#9aa7b5;--ln:#33404d;--ac:#6ea8e6;--ac2:#1b2a3a;--ok:#5fb98a;--box:#1a2129}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 "Segoe UI",system-ui,Arial,sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 20px 48px}
+h1{font-size:30px;line-height:1.2;margin:0 0 6px}
+h2{font-size:21px;margin:36px 0 10px;padding-bottom:4px;border-bottom:2px solid var(--ac)}
+h3{font-size:16px;margin:20px 0 6px}
+p{margin:8px 0}
+.sub{font-size:17px;color:var(--mut);margin:0}
+.meta{font-size:13px;color:var(--mut);margin:10px 0 18px;padding-bottom:12px;border-bottom:1px solid var(--ln)}
+nav ol{margin:6px 0 0;padding-left:22px;columns:2}
+a{color:var(--ac)}
+ul,ol{padding-left:22px;margin:6px 0}
+li{margin:3px 0}
+figure{margin:18px 0;padding:10px;border:1px solid var(--ln);border-radius:6px;background:var(--box);overflow-x:auto}
+figcaption{font-size:13px;color:var(--mut);margin-top:6px}
+svg{max-width:100%;height:auto;display:block;margin:0 auto}
+svg text{font:12px "Segoe UI",Arial,sans-serif;fill:var(--fg)}
+svg .t{font-weight:600}
+svg .s{font-size:11px}
+svg .m{fill:var(--mut)}
+.b{fill:var(--bg);stroke:var(--ac);stroke-width:1.4}
+.a{fill:var(--ac2);stroke:var(--ac);stroke-width:1.4}
+.z{fill:none;stroke:var(--mut);stroke-width:1.2;stroke-dasharray:5 4}
+.l{fill:none;stroke:var(--mut);stroke-width:1.4;marker-end:url(#ar)}
+.l2{marker-start:url(#ar)}
+.d{stroke-dasharray:4 3}
+.step{border-left:4px solid var(--ac);padding:1px 0 1px 14px;margin:16px 0}
+.step h3{margin:0 0 4px}
+.proof{color:var(--ok);font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:10px 0}
+th,td{border:1px solid var(--ln);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--ac2)}
+.wrap{overflow-x:auto}
+.note{background:var(--ac2);border:1px solid var(--ln);border-radius:6px;padding:8px 12px;margin:12px 0;font-size:14px}
+code{font:13px Consolas,"Courier New",monospace;background:var(--box);padding:1px 4px;border-radius:3px}
+@media print{
+:root{--bg:#fff;--fg:#000;--mut:#444;--ln:#aaa;--ac:#1f5fa8;--ac2:#e6eef9;--ok:#1f6a40;--box:#fff}
+@page{margin:16mm}
+body{font-size:10.5pt}
+main{max-width:none;padding:0}
+h2{break-after:avoid}
+h3{break-after:avoid}
+figure,.step,table,.note{break-inside:avoid}
+nav ol{columns:1}
+a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--mut)"/></marker></defs></svg>
+<main>
+<header>
+<h1>SoC Verification Infrastructure</h1>
+<p class="sub">Integration guide: from C tests to drivers, interrupt service routines and a working SoC</p>
+<p class="meta">Single-core RV32IM_Zicsr SoC, bare-metal C, machine mode. Version 1.0, infrastructure edition.</p>
+</header>
+
+<nav aria-label="Contents">
+<strong>Contents</strong>
+<ol>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#basics">Unit and peripheral testing basics</a></li>
+<li><a href="#method">SoC-level methodology</a></li>
+<li><a href="#build">Building the infrastructure</a></li>
+<li><a href="#drivers">Developing drivers and ISRs on the infrastructure</a></li>
+<li><a href="#late">Late-stage components: register model, C models, DPI-C, ISS co-simulation</a></li>
+<li><a href="#debug">Debugging with the infrastructure</a></li>
+<li><a href="#fpga">Carrying the infrastructure to the FPGA</a></li>
+</ol>
+</nav>
+
+<h2 id="intro">1. Introduction</h2>
+<p>This guide explains how to build the verification infrastructure for the SoC <em>before</em> writing the tests that use it. The order of work is C test programs first, then peripheral drivers, then interrupt service routines (ISRs), and finally a working application on the complete SoC. Test cases are deliberately out of scope: they can be derived later, or taken from your existing catalogue, once the infrastructure can run and judge them.</p>
+<h3>Guiding ideas</h3>
+<ul>
+<li><strong>Firmware is the stimulus and the testbench is the judge.</strong> Software runs on the real core. The testbench only observes and checks.</li>
+<li><strong>Checks fire by themselves.</strong> A failure should name the property that broke, not send you reading a log.</li>
+<li><strong>Every check has an independent source of expected behaviour</strong>: an assertion, a register predictor, a pin model or an instruction-set simulator (ISS).</li>
+<li><strong>One ELF per test</strong> runs unchanged on RTL simulation, the ISS and the FPGA.</li>
+<li><strong>Build in thin slices.</strong> Prove each piece with a trivial program before adding the next.</li>
+<li><strong>Add models late.</strong> The register model, C models through DPI-C and ISS co-simulation come after the basic checks work.</li>
+</ul>
+<p>Suggested tool roles: xsim for the daily inner loop, VCS or Xcelium for regressions, coverage and DPI-C co-simulation, Vivado for the FPGA build, and Jasper or VC Formal for small control blocks such as the interrupt arbiter. AI assistants, including the AMD Ross MCP servers for Vivado, fit well for drafting drivers, scripts and first versions of checkers. Every generated artefact must still pass the same checks and an independent review.</p>
+
+<h2 id="basics">2. Unit and peripheral testing basics</h2>
+<h3>Unit testbench</h3>
+<p>A unit testbench verifies one module. Its parts are a transaction, a driver that applies it, a monitor that observes the outputs, a scoreboard that compares them with a reference function, and a covergroup that records what was exercised. Sequences come in three flavours: directed, constrained-random and corner. The strength is speed and depth on small blocks such as the ALU, hazard unit or arbiter. The weakness is that the bench trusts the interface assumptions of its own model.</p>
+<h3>Peripheral testbench</h3>
+<p>A peripheral testbench wraps one IP with a bus agent (an APB master), a register model that knows reset values, access types and side effects, a pin model or protocol monitor on the external side, and an interrupt monitor. These parts are reused at SoC level, so write them as reusable components from the start.</p>
+<h3>What these levels cannot see</h3>
+<ul>
+<li>The real address decode and the bus ordering produced by the core's load/store unit.</li>
+<li>Byte strobes and hidden reads generated by compiled C code.</li>
+<li>Interrupts arriving at arbitrary points in the pipeline.</li>
+<li>Reset and boot sequences across blocks.</li>
+<li>Assumptions made in driver and ISR code.</li>
+</ul>
+<figure>
+<svg viewBox="0 0 760 130" role="img" aria-label="Three test levels: unit, peripheral and SoC testbench">
+<rect class="b" x="10" y="14" width="220" height="86" rx="5"/>
+<text class="t" x="120" y="40" text-anchor="middle">Unit testbench</text>
+<text x="120" y="62" text-anchor="middle">one module, reference function</text>
+<text x="120" y="82" text-anchor="middle">fast, deep, near-exhaustive</text>
+<rect class="a" x="270" y="14" width="220" height="86" rx="5"/>
+<text class="t" x="380" y="40" text-anchor="middle">Peripheral testbench</text>
+<text x="380" y="62" text-anchor="middle">IP, bus agent, pin model</text>
+<text x="380" y="82" text-anchor="middle">registers, protocol, interrupt pin</text>
+<rect class="b" x="530" y="14" width="220" height="86" rx="5"/>
+<text class="t" x="640" y="40" text-anchor="middle">SoC testbench</text>
+<text x="640" y="62" text-anchor="middle">firmware is the stimulus</text>
+<text x="640" y="82" text-anchor="middle">integration, software contract</text>
+<path class="l" d="M230 57H268"/><path class="l" d="M490 57H528"/>
+<text class="m" x="380" y="122" text-anchor="middle">reused upward: monitors, pin models, register model</text>
+</svg>
+<figcaption>Figure 1. Test levels and what is carried upward.</figcaption>
+</figure>
+
+<h2 id="method">3. SoC-level methodology</h2>
+<h3>Firmware as stimulus</h3>
+<p>Tests are C programs compiled with GCC. The image is preloaded into ISRAM and DSRAM (warm boot) or loaded from a flash model by the bootloader (cold boot). The program runs on the real RTL and reports its result through a mailbox word in DSRAM that the testbench watches.</p>
+<h3>Observe and check in layers</h3>
+<p>The testbench taps the design at fixed observation points and checks each layer against an independent source. Lower layers are blamed first, because a protocol error explains many higher-level failures.</p>
+<div class="wrap"><table>
+<tr><th>Layer</th><th>What is observed</th><th>Expected behaviour comes from</th></tr>
+<tr><td>Protocol</td><td>AXI-Lite and APB handshakes</td><td>Assertions</td></tr>
+<tr><td>Path</td><td>Core access to AXI transaction to APB transfer</td><td>Scoreboard using the address map</td></tr>
+<tr><td>Register</td><td>Peripheral register reads and writes</td><td>Register predictor</td></tr>
+<tr><td>Peripheral function</td><td>UART, GPIO, I2C, SPI, timer behaviour at the pins</td><td>Pin models and protocol monitors</td></tr>
+<tr><td>Interrupt</td><td>Source, pending, grant, accept, acknowledge</td><td>Independent interrupt predictor</td></tr>
+<tr><td>CPU state</td><td>Retired instructions, CSRs, traps</td><td>ISS (Spike)</td></tr>
+<tr><td>Firmware result</td><td>Mailbox status, checksum</td><td>The test itself and host-computed values</td></tr>
+</table></div>
+<h3>First failing check</h3>
+<p>When a check fires, the failure reporter records the cycle, check ID, expected and actual values, and freezes the ring buffers that hold the last transactions of every monitor. It blames the lowest layer that failed first and marks later failures as downstream. The output is a one-page report with the last retired instructions disassembled, so a person reads one page instead of the full log.</p>
+<h3>Pass rule</h3>
+<p>A test passes only when the mailbox reports PASS, no checker failed, the checkers actually saw activity (no vacuous pass), no predicted event is left unobserved, and no timeout occurred.</p>
+<figure>
+<svg viewBox="0 0 760 340" role="img" aria-label="SoC testbench infrastructure architecture">
+<rect class="b" x="10" y="16" width="130" height="38" rx="4"/><text class="t" x="75" y="39" text-anchor="middle">C sources</text>
+<rect class="b" x="10" y="76" width="130" height="38" rx="4"/><text class="t" x="75" y="99" text-anchor="middle">GCC toolchain</text>
+<rect class="b" x="10" y="136" width="130" height="38" rx="4"/><text class="t" x="75" y="159" text-anchor="middle">ELF</text>
+<rect class="b" x="10" y="196" width="130" height="38" rx="4"/><text class="t" x="75" y="219" text-anchor="middle">Memory images</text>
+<rect class="b" x="10" y="256" width="130" height="38" rx="4"/><text class="t" x="75" y="279" text-anchor="middle">Disassembly pc map</text>
+<path class="l" d="M75 54V76"/><path class="l" d="M75 114V136"/><path class="l" d="M75 174V196"/><path class="l" d="M10 155H3V275H10"/>
+<rect class="z" x="165" y="8" width="450" height="324" rx="6"/>
+<text class="m s" x="175" y="324">Simulation top</text>
+<rect class="a" x="180" y="24" width="120" height="40" rx="4"/><text class="t" x="240" y="48" text-anchor="middle">Boot and preload</text>
+<rect class="b" x="330" y="24" width="270" height="84" rx="4"/>
+<text class="t" x="465" y="48" text-anchor="middle">DUT: SoC</text>
+<text x="465" y="68" text-anchor="middle">core, memories, fabric,</text>
+<text x="465" y="86" text-anchor="middle">peripherals, IRQ gateway</text>
+<path class="l" d="M140 215H152V44H180"/><path class="l" d="M300 44H330"/>
+<rect class="b" x="180" y="128" width="270" height="44" rx="4"/><text class="t" x="315" y="146" text-anchor="middle">Monitors (passive taps)</text><text class="s" x="315" y="162" text-anchor="middle">fetch, retire, LSU, AXI, APB, IRQ</text>
+<rect class="a" x="470" y="128" width="130" height="44" rx="4"/><text class="t" x="535" y="146" text-anchor="middle">Pin models</text><text class="s" x="535" y="162" text-anchor="middle">UART GPIO I2C SPI</text>
+<path class="l d" d="M360 108V128"/><path class="l l2" d="M535 108V128"/>
+<rect class="b" x="180" y="192" width="270" height="50" rx="4"/><text class="t" x="315" y="212" text-anchor="middle">Checkers</text><text class="s" x="315" y="230" text-anchor="middle">assertions, scoreboards, predictors</text>
+<rect class="a" x="470" y="192" width="130" height="50" rx="4"/><text class="t" x="535" y="212" text-anchor="middle">Mailbox, watchdog</text><text class="s" x="535" y="230" text-anchor="middle">PASS, FAIL, hang</text>
+<path class="l" d="M315 172V192"/>
+<rect class="a" x="180" y="262" width="270" height="50" rx="4"/><text class="t" x="315" y="282" text-anchor="middle">Failure reporter</text><text class="s" x="315" y="300" text-anchor="middle">first failing check, report</text>
+<path class="l" d="M315 242V262"/><path d="M535 242V287" class="l" style="marker-end:none"/><path class="l" d="M450 287H630"/>
+<rect class="b" x="630" y="262" width="120" height="50" rx="4"/><text class="t" x="690" y="282" text-anchor="middle">Result</text><text class="s" x="690" y="300" text-anchor="middle">PASS/FAIL + report</text>
+</svg>
+<figcaption>Figure 2. Infrastructure architecture: build side on the left, simulation top in the dashed frame.</figcaption>
+</figure>
+
+<h2 id="build">4. Building the infrastructure</h2>
+<p>Build the eight steps in order. Each step ends with a proof: a small program or an injected fault that shows the step works. Do not start the next step until the proof passes.</p>
+
+<div class="step"><h3>Step 1. Toolchain, startup and mailbox</h3>
+<p>Pin the GCC version and flags (<code>-march=rv32im_zicsr -mabi=ilp32</code>), and make sure no library brings compressed or atomic instructions. Write the startup file (stack, <code>.bss</code>, <code>.data</code>, trap vector, call <code>main</code>), a linker script that places <code>.text</code> in ISRAM and <code>.data</code>, <code>.bss</code>, stack and mailbox in DSRAM, and a mailbox layout with status, test ID, argument, character output and error code. Produce the listing, symbol file and a pc map (PC to function and source line) from the ELF.</p>
+<p class="proof">Proof: the same hello program prints through the mailbox on Spike and on RTL.</p></div>
+
+<div class="step"><h3>Step 2. Testbench shell and memory preload</h3>
+<p>Create the top module with clock and reset, a backdoor loader for the image into ISRAM and DSRAM, the mailbox address read from the ELF symbol, a per-test watchdog, and a boot-mode switch. Warm boot is the default; cold boot through the flash model is added once the bootloader is stable.</p>
+<p class="proof">Proof: a trivial PASS program ends the simulation; an infinite loop trips the watchdog and reports the last PC.</p></div>
+
+<div class="step"><h3>Step 3. Monitors and transactions</h3>
+<p>Add passive monitors for fetch, retire, load/store, AXI-Lite (AW, W, B, AR and R as separate events), APB, the interrupt lines and the pins. Each monitor emits timestamped transaction objects on one shared cycle counter and keeps a ring buffer of the most recent ones. Write them as SystemVerilog interfaces plus small classes so they can become UVM agents later without a rewrite.</p>
+<p class="proof">Proof: transaction counts match a known program, for example ten stores produce ten load/store transactions.</p></div>
+
+<div class="step"><h3>Step 4. Checkers and failure reporter</h3>
+<p>Bind protocol assertions on every fabric interface and add a path scoreboard: each core MMIO access must appear as one AXI transaction and one APB transfer on the slot given by the address map, with the same data, strobes and response. Add the reporter with first-fatal logic. Give every checker a fault-injection switch (for example, force one byte strobe) so you can prove it fires.</p>
+<p class="proof">Proof: each injected fault is named by the correct check ID in the report, and every assertion has a cover that is hit.</p></div>
+
+<div class="step"><h3>Step 5. C test harness and register access layer</h3>
+<p>Provide macros for 32-bit volatile register access, test begin and end with ID and PASS/FAIL, check macros that write the error code, a cycle-counter timeout helper, and a panic handler. Generate address headers from the same address map the testbench uses. Use 32-bit accesses until sub-word MMIO is verified, because compilers emit byte and halfword accesses for narrow registers.</p>
+<p class="proof">Proof: a reset-value sweep of one peripheral runs and the register predictor, once present, agrees with every read.</p></div>
+
+<div class="step"><h3>Step 6. Drivers and pin models</h3>
+<p>Give each peripheral a register struct, an init function, polled operations with timeouts and error codes, and a pin model with error injection (UART monitor, GPIO driver and monitor, I2C slave model, SPI flash model). Develop each driver against its pin model so the wire is checked, not only the register read-back.</p>
+<p class="proof">Proof: one polled transfer per peripheral is verified at the pins.</p></div>
+
+<div class="step"><h3>Step 7. ISR framework and interrupt monitor</h3>
+<p>Write the trap entry that saves caller-saved registers, a dispatch table keyed by cause, and an unexpected-interrupt handler that fails the test. Fix the ISR rules: acknowledge, record, return, with no blocking calls. Add the interrupt monitor that logs raise, pending, grant, accept and acknowledge, together with an interrupt predictor written from the interrupt specification, not from the RTL.</p>
+<p class="proof">Proof: a register-canary test shows no corruption across an ISR, and a timer tick test produces the exact expected count.</p></div>
+
+<div class="step"><h3>Step 8. Regression runner and triage</h3>
+<p>Create a manifest with test ID, source, boot mode, timeout and seeds, and a runner that builds, simulates and collects results. Every log starts with seed, git hash, ELF hash and RTL hash. Bucket failures by signature (check ID, PC, cause) and replay a failing seed with waveforms on.</p>
+<p class="proof">Proof: a nightly run completes unattended, and a seeded failure produces exactly one report.</p></div>
+
+<figure>
+<svg viewBox="0 0 760 190" role="img" aria-label="Infrastructure build roadmap">
+<g>
+<rect class="b" x="2" y="20" width="86" height="56" rx="4"/><text class="t s" x="45" y="44" text-anchor="middle">1 Toolchain</text><text class="s" x="45" y="60" text-anchor="middle">startup, mailbox</text>
+<rect class="b" x="96" y="20" width="86" height="56" rx="4"/><text class="t s" x="139" y="44" text-anchor="middle">2 TB shell</text><text class="s" x="139" y="60" text-anchor="middle">preload</text>
+<rect class="b" x="190" y="20" width="86" height="56" rx="4"/><text class="t s" x="233" y="44" text-anchor="middle">3 Monitors</text><text class="s" x="233" y="60" text-anchor="middle">transactions</text>
+<rect class="b" x="284" y="20" width="86" height="56" rx="4"/><text class="t s" x="327" y="44" text-anchor="middle">4 Checkers</text><text class="s" x="327" y="60" text-anchor="middle">reporter</text>
+<rect class="b" x="378" y="20" width="86" height="56" rx="4"/><text class="t s" x="421" y="44" text-anchor="middle">5 C harness</text><text class="s" x="421" y="60" text-anchor="middle">access layer</text>
+<rect class="b" x="472" y="20" width="86" height="56" rx="4"/><text class="t s" x="515" y="44" text-anchor="middle">6 Drivers</text><text class="s" x="515" y="60" text-anchor="middle">pin models</text>
+<rect class="b" x="566" y="20" width="86" height="56" rx="4"/><text class="t s" x="609" y="44" text-anchor="middle">7 ISR</text><text class="s" x="609" y="60" text-anchor="middle">framework</text>
+<rect class="b" x="660" y="20" width="86" height="56" rx="4"/><text class="t s" x="703" y="44" text-anchor="middle">8 Regression</text><text class="s" x="703" y="60" text-anchor="middle">runner</text>
+</g>
+<path class="l" d="M88 48H96"/><path class="l" d="M182 48H190"/><path class="l" d="M276 48H284"/><path class="l" d="M370 48H378"/><path class="l" d="M464 48H472"/><path class="l" d="M558 48H566"/><path class="l" d="M652 48H660"/>
+<path class="l" d="M703 76V98H160V120"/>
+<text class="m s" x="430" y="94" text-anchor="middle">then add the late-stage components</text>
+<rect class="a" x="60" y="120" width="200" height="50" rx="4"/><text class="t" x="160" y="142" text-anchor="middle">Register model</text><text class="s" x="160" y="158" text-anchor="middle">predictor table, headers</text>
+<rect class="a" x="290" y="120" width="200" height="50" rx="4"/><text class="t" x="390" y="142" text-anchor="middle">C models and DPI-C</text><text class="s" x="390" y="158" text-anchor="middle">shared functional models</text>
+<rect class="a" x="520" y="120" width="200" height="50" rx="4"/><text class="t" x="620" y="142" text-anchor="middle">ISS co-simulation</text><text class="s" x="620" y="158" text-anchor="middle">Spike, retire port, adapter</text>
+<path class="l" d="M260 145H290"/><path class="l" d="M490 145H520"/>
+</svg>
+<figcaption>Figure 3. Build order: eight infrastructure steps, then the late-stage components.</figcaption>
+</figure>
+
+<h2 id="drivers">5. Developing drivers and ISRs on the infrastructure</h2>
+<p>With the infrastructure in place, each new peripheral follows one loop. Write a small C test using raw register access, extract the working sequence into driver functions, and run a polled test checked at the pins. When all checks are clean, add the interrupt-driven variant with its ISR and acknowledge, and confirm the interrupt monitor and predictor agree. Only then compose the application on top of the drivers. If any check fires, use the first failing check to fix the problem and rerun.</p>
+<p>For a peripheral whose driver you must write from scratch: read the RTL register list, define the register struct, write init and a polled operation with a timeout, observe the wire, add the error cases, and look at one waveform to confirm the sequence. Third-party IP often differs from its documentation, so treat the pin model as the authority. An AI assistant can draft the driver from the register description; require that it passes the pin-level test and have a second, independent reviewer compare it with the specification.</p>
+<figure>
+<svg viewBox="0 0 760 180" role="img" aria-label="Driver and ISR development loop">
+<rect class="b" x="10" y="60" width="105" height="54" rx="4"/><text class="t" x="62" y="82" text-anchor="middle">C test</text><text class="s" x="62" y="100" text-anchor="middle">raw register access</text>
+<rect class="b" x="135" y="60" width="105" height="54" rx="4"/><text class="t" x="187" y="82" text-anchor="middle">Driver</text><text class="s" x="187" y="100" text-anchor="middle">functions, timeouts</text>
+<rect class="b" x="260" y="60" width="105" height="54" rx="4"/><text class="t" x="312" y="82" text-anchor="middle">Polled test</text><text class="s" x="312" y="100" text-anchor="middle">checked at the pins</text>
+<polygon class="a" points="375,87 420,53 465,87 420,121"/><text class="t s" x="420" y="84" text-anchor="middle">Checks</text><text class="t s" x="420" y="98" text-anchor="middle">clean?</text>
+<rect class="b" x="490" y="60" width="120" height="54" rx="4"/><text class="t" x="550" y="82" text-anchor="middle">Interrupt variant</text><text class="s" x="550" y="100" text-anchor="middle">ISR, ack, IRQ monitor</text>
+<rect class="b" x="630" y="60" width="120" height="54" rx="4"/><text class="t" x="690" y="82" text-anchor="middle">Application</text><text class="s" x="690" y="100" text-anchor="middle">built on drivers</text>
+<path class="l" d="M115 87H135"/><path class="l" d="M240 87H260"/><path class="l" d="M365 87H375"/><path class="l" d="M465 87H490"/><path class="l" d="M610 87H630"/>
+<text class="m s" x="478" y="80">yes</text>
+<path class="l" d="M420 121V160H62V114"/>
+<text class="m s" x="240" y="154" text-anchor="middle">no: read the first failing check, fix, rerun</text>
+</svg>
+<figcaption>Figure 4. Development loop for each peripheral, from C test to application.</figcaption>
+</figure>
+
+<h2 id="late">6. Late-stage components</h2>
+<p>Add these after the basic checks are stable. Each one replaces a weaker check with a stronger independent one.</p>
+<h3>Register model</h3>
+<p>Keep one description per peripheral: address, width, reset value, per-field access (read-write, read-only, write-1-to-clear, read-clear, self-clearing) and side effects. Generate the C header, the SystemVerilog predictor table and the documentation from it; generate a UVM RAL from the same source when you reach the UVM stage. The predictor applies side effects (FIFO pop, W1C, read-clear), which a plain mirror cannot. Only peripheral and fabric registers belong here. CPU registers (GPRs, <code>mstatus</code>, <code>mepc</code>, <code>mcause</code>, <code>mie</code>, <code>mip</code>) are checked by the ISS comparison.</p>
+<h3>C models and DPI-C</h3>
+<p>Write a functional model in C when behaviour must be shared between the testbench and host-side unit tests, or when the expected value is awkward in SystemVerilog (CRC, UART frame generation, an interrupt predictor you want to reuse). Model register-level behaviour from the specification, not from the RTL. Import the functions into SystemVerilog with <code>import "DPI-C"</code>, pass plain integers, keep state inside the model, and never consume simulation time in C. Watch for monitors calling a model twice for one side-effect read, and for state leaking between seeds.</p>
+<h3>ISS co-simulation</h3>
+<p>Add a retire port (RVFI style) behind an <code>ifdef</code> carrying PC, instruction, register write, memory access, trap and interrupt information. A DPI-C bridge passes each retire to a C++ adapter that steps Spike, configured for machine mode, <code>rv32im_zicsr</code> and your <code>misa</code>, and compares PC, register writes, CSR writes and traps. Spike does not model peripherals, so MMIO loads take the data the DUT returned. For interrupts, tell Spike which source the DUT accepted (pass <code>mip</code> sampled before and after the retire), and check separately in the interrupt predictor that the accepted source was legal and in the right order. Synchronise <code>mcycle</code> and <code>minstret</code> from the DUT, and start comparing at the first ISRAM instruction because Spike reserves the low addresses.</p>
+<figure>
+<svg viewBox="0 0 760 310" role="img" aria-label="Late-stage infrastructure: register model, DPI-C and ISS co-simulation">
+<rect class="b" x="295" y="10" width="170" height="38" rx="4"/><text class="t" x="380" y="33" text-anchor="middle">Register description</text>
+<rect class="a" x="20" y="10" width="170" height="38" rx="4"/><text class="t" x="105" y="33" text-anchor="middle">C headers</text>
+<rect class="a" x="550" y="10" width="200" height="110" rx="4"/><text class="t" x="650" y="36" text-anchor="middle">SV checkers</text><text class="s" x="650" y="56" text-anchor="middle">register predictor</text><text class="s" x="650" y="72" text-anchor="middle">interrupt predictor</text><text class="s" x="650" y="88" text-anchor="middle">scoreboards, later RAL</text>
+<path class="l" d="M295 29H190"/><path class="l" d="M465 29H550"/>
+<rect class="b" x="295" y="80" width="170" height="56" rx="4"/><text class="t" x="380" y="102" text-anchor="middle">DUT</text><text class="s" x="380" y="120" text-anchor="middle">retire port, IRQ accept</text>
+<path class="l d" d="M465 108H550"/><text class="m s" x="507" y="102" text-anchor="middle">monitors</text>
+<rect class="b" x="295" y="170" width="170" height="38" rx="4"/><text class="t" x="380" y="193" text-anchor="middle">DPI-C bridge</text>
+<path class="l" d="M380 136V170"/>
+<rect class="a" x="550" y="170" width="200" height="38" rx="4"/><text class="t" x="650" y="193" text-anchor="middle">C functional models</text>
+<path class="l l2" d="M465 189H550"/><path class="l" d="M650 120V170"/><text class="m s" x="660" y="150">calls via DPI-C</text>
+<rect class="b" x="295" y="240" width="170" height="38" rx="4"/><text class="t" x="380" y="263" text-anchor="middle">Co-sim adapter (C++)</text>
+<path class="l" d="M380 208V240"/>
+<rect class="a" x="550" y="240" width="200" height="38" rx="4"/><text class="t" x="650" y="263" text-anchor="middle">Spike ISS</text>
+<path class="l l2" d="M465 259H550"/>
+<rect class="b" x="20" y="240" width="190" height="38" rx="4"/><text class="t" x="115" y="263" text-anchor="middle">Compare and report</text>
+<path class="l" d="M295 259H210"/>
+</svg>
+<figcaption>Figure 5. Late-stage infrastructure: shared register description, C models through DPI-C, and ISS co-simulation.</figcaption>
+</figure>
+
+<h2 id="debug">7. Debugging with the infrastructure</h2>
+<ol>
+<li>Reproduce with the recorded seed and ELF hash, then shrink to the smallest program.</li>
+<li>Read the failure report before opening waveforms: check ID, layer, expected and actual values, last retired instructions.</li>
+<li>Look at the disassembly at the failing PC for access width, missing <code>volatile</code>, hidden reads and reordering.</li>
+<li>Write one hypothesis and one experiment that separates it from the next; change one thing at a time.</li>
+<li>When the cause is confirmed, add a regression test that fails without the fix and an assertion that would have caught it.</li>
+</ol>
+
+<h2 id="fpga">8. Carrying the infrastructure to the FPGA</h2>
+<p>The same ELF runs on the board. The mailbox output is replaced by UART output in the same PASS/FAIL line format, so one script parses simulation and board logs. Keep a retire ring buffer readable over UART after a hang and use ILA probes on the retire port, interrupt state and AXI MMIO channel. Two things differ and must be controlled: the clock-frequency constant used by every divider and timeout (one definition, shared by both builds), and the models replaced by real devices (flash, EEPROM, sensors), which must be checked against their datasheets.</p>
+
+<div class="note">Scope of this version: infrastructure methodology only. Test case derivation, coverage closure and sign-off are intentionally left for later versions that build on this infrastructure.</div>
+</main>
+</body>
+</html>

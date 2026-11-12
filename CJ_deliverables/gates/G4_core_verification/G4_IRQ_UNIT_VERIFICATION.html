@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IRQ Unit Verification · CJ G4.12 | RISCFORGE</title>
+<style>
+:root{--ink:#18202c;--sub:#526174;--line:#dbe2ea;--tint:#f8fafc;--blue:#125a91;--green:#15803d;--green-bg:#eaf7ee;--amber:#a85b00;--amber-bg:#fff5df}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:980px;padding:28px 30px 40px;color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,Segoe UI,Arial,sans-serif}
+header{border-bottom:1px solid var(--line);padding-bottom:16px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+h1{font-family:Archivo,"IBM Plex Sans",system-ui,sans-serif;font-size:30px;margin:8px 0 10px;letter-spacing:-.02em}
+h2{font-family:Archivo,"IBM Plex Sans",system-ui,sans-serif;font-size:20px;margin:0 0 10px}
+h3{font-size:15px;margin:0 0 6px}
+.lede{color:var(--sub);font-size:16px;margin:0 0 12px}
+.scope{border-left:4px solid var(--amber);background:var(--amber-bg);padding:10px 14px;font-size:13px;margin:14px 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:var(--sub)}
+.meta strong{color:var(--ink);margin-right:5px}
+nav{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;margin-top:16px}
+nav a{color:var(--blue);text-decoration:none}
+nav a[aria-current]{font-weight:700;color:var(--ink);border-bottom:2px solid var(--blue)}
+section{margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+.kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:14px 0}
+.card{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--tint)}
+.card strong{display:block;font-size:22px;line-height:1.2}
+.card span{font-size:12px;color:var(--sub)}
+.note{border:1px solid var(--line);border-radius:6px;padding:10px 14px;font-size:13px;margin:14px 0;background:var(--tint)}
+.note.success{border-color:#bfe3c8;background:var(--green-bg)}
+.note.warn{border-color:#f0d7a8;background:var(--amber-bg)}
+.diagram{margin:16px 0 0}
+.diagram svg{display:block;width:100%;height:auto}
+figcaption{font-size:11px;color:var(--sub);margin-top:8px}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--tint);font-weight:600}
+code,.mono{font-family:"IBM Plex Mono",Consolas,monospace;font-size:12px;overflow-wrap:anywhere}
+.source-list{list-style:none;padding:0;font-size:13px}
+.source-list li{margin:6px 0}
+a{color:var(--blue)}
+footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--sub)}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">RISCFORGE / Core / Interrupt interface · CJ G4.12 unit evidence</div>
+<h1>IRQ unit verification</h1>
+<p class="lede">How the interrupt blocks were stimulated, checked and measured, and where the evidence stops.</p>
+<div class="meta">
+<span><strong>Level</strong> Unit</span>
+<span><strong>Simulators</strong> XSim 2022.2 / Xcelium 24.09</span>
+<span><strong>Latest retained run</strong> 11 November 2026</span>
+<span><strong>Official workbook status, 4.12</strong> In Progress</span>
+</div>
+<p class="scope"><strong>Scope:</strong> supporting unit evidence for subgate 4.12. The four blocks are separately instantiated and driven by the bench; they are not connected as a pipeline. This page does not close pipeline interrupt entry, is not SoC integration evidence and does not change official workbook status.</p>
+<nav aria-label="Related documentation">
+<a href="G4_report.html">G4 gate report</a>
+<a href="G4_IRQ_UNIT_VERIFICATION.html" aria-current="page">IRQ unit verification</a>
+<a href="G4_IRQ_UNIT_COVERAGE.html">IRQ unit coverage</a>
+<a href="../G3_interrupt_integration/interrupt_interface_index.html">G3 interrupt interface (architecture)</a>
+</nav>
+</header><p class="note"><strong>12-Nov source/evidence recheck:</strong> the retained run below is valid for its saved inputs: all 28 output hashes and four current RTL source hashes match. The current <code>tb_irq_restructure.sv</code> has changed (constants/helper/checker refactoring), so its latest revision is not covered by this result. A refresh through <code>ssh vlsi</code> was blocked before simulation by a connection-level Permission denied error. <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/evidence_recheck_20261112.json">Hash recheck</a> · <a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261112T043538Z_c91939b7/ATTEMPT_STATUS.md">Refresh attempt</a> · <a href="IRQ_COVERAGE_HANDOFF_20261112.md">Coverage handoff</a>.</p>
+
+<p class="meta"><strong>IRQ UNIT FILES:</strong> <a href="../../../Verification/irq_unit/README.md">folder / TB inventory</a> &middot; <a href="../../../Verification/irq_unit/STIMULUS.md">STIMULUS + CHECKS</a> &middot; <a href="../../../Verification/irq_unit/irq_unit.f">FILELIST</a> &middot; <a href="../../../Verification/irq_unit/run.ps1">RUN: XCELIUM / IMC</a></p><section>
+<div class="kicker">01 / Evidence</div>
+<h2>What ran</h2>
+<div class="grid">
+<div class="card"><strong>Pass</strong><span>Unit test reached its pass marker</span></div>
+<div class="card"><strong>196,608</strong><span>Arbiter decision snapshots checked</span></div>
+<div class="card"><strong>14 / 14</strong><span>Declared functional groups hit</span></div>
+</div>
+<div class="note success"><strong>Observed:</strong> the focused test passed in XSim on 29 October 2026 (retained log, earlier bench revision) and, separately, in Xcelium 24.09 on 11 November 2026. The Xcelium/IMC run generated a code-coverage report and recorded 471 of 471 declared functional bins. Each is a directed unit run, not a fresh rerun for this page.</div>
+<div class="note warn"><strong>Code coverage is not closed:</strong> Xcelium reports uncovered blocks and toggles. Its default expression metric covers logical operators in conditions only. The earlier XSim XCRG code-report attempt failed; the Xcelium report provides separate evidence.</div>
+<div class="note"><strong>Retained identity:</strong> run <span class="mono">irq-unit_20261111T185206Z_03e8a574</span>; functional status pass, coverage status reported, no input-hash mismatches before or after the run. These are retained artifacts, not a rerun performed for this page.</div>
+</section>
+
+<section>
+<div class="kicker">02 / Testbench structure</div>
+<h2>Stimulus, checks and coverage</h2>
+<figure class="diagram"><svg viewBox="0 0 860 210" role="img" aria-labelledby="tbtitle tbdesc"><title id="tbtitle">Unit verification structure</title><desc id="tbdesc">Directed stimulus separately drives four instantiated RTL blocks. A reference calculation and directed expected results check outputs; coverage is sampled after checks.</desc><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#6e8196"/></marker></defs><g fill="#fff" stroke="#b9c8d8" stroke-width="1.5"><rect x="10" y="42" width="156" height="75" rx="5"/><rect x="205" y="16" width="190" height="125" rx="5"/><rect x="443" y="42" width="171" height="75" rx="5"/><rect x="663" y="42" width="185" height="75" rx="5"/></g><g text-anchor="middle"><text x="88" y="67" font-size="14" font-weight="700">Directed stimulus</text><text x="88" y="89" font-size="11">vectors · masks · commit</text><text x="300" y="41" font-size="14" font-weight="700">Unit instances</text><text x="300" y="65" font-size="11">gateway · arbiter</text><text x="300" y="84" font-size="11">CSR · commit decoder</text><text x="300" y="109" font-size="10">separately driven</text><text x="528" y="67" font-size="14" font-weight="700">Expected behavior</text><text x="528" y="89" font-size="11">reference + direct checks</text><text x="755" y="67" font-size="14" font-weight="700">Coverage sample</text><text x="755" y="89" font-size="11">after the related check</text></g><g stroke="#6e8196" fill="none" stroke-width="1.5" marker-end="url(#arr)"><path d="M166 79H203"/><path d="M395 79H441"/><path d="M614 79H661"/></g><text x="429" y="180" text-anchor="middle" font-size="11" fill="#526174">Block checks do not exercise the complete connected core pipeline</text></svg><figcaption>Structure retained from the earlier G3 page. The reference calculation independently selects from testbench priority lists and RR state; it is not the older SoC predictor. The diagram does not show pipeline entry, peripheral timing, firmware or nesting.</figcaption></figure>
+<p>The signature block is <span class="mono">tb_irq_restructure</span>. It instantiates <span class="mono">irq_gateway</span>, <span class="mono">irq_arbiter</span>, <span class="mono">wb_trap_mret_commit_controller</span> and <span class="mono">csr_regfile</span> as four separate <code>DUT</code> blocks, drives their inputs directly and observes their outputs independently. No core pipeline, fetch/decode stage, peripheral or firmware is present.</p>
+<p>The existing SoC IRQ predictor still models the previous hardware nesting stack. It is not used as the oracle in this unit run and should not be treated as validation of the new interface.</p>
+</section>
+
+<section>
+<div class="kicker">03 / Checks</div>
+<h2>What each unit check establishes</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th style="width:23%">Area</th><th>Observed check</th></tr></thead>
+<tbody>
+<tr><td>Arbiter</td><td>All 8,192 pending vectors, four thresholds and six RR pointer combinations, with all source enables and MIE on. Each valid winner and class is compared to the testbench calculation.</td></tr>
+<tr><td>Gating</td><td>Each source is tested individually across threshold, source enable and global MIE. One-hot source masks are also tested with all sources pending at threshold 0.</td></tr>
+<tr><td>Gateway</td><td>Per-source event capture, separated and adjacent events, event/ack coincidence, held events, GPIO edge behavior and level pass-through are checked.</td></tr>
+<tr><td>CSR</td><td>Interrupt-enable bits, pending visibility, threshold transitions and masking, selected trap state and MRET status restoration are checked at the CSR interface.</td></tr>
+<tr><td>Commit decoder</td><td>Each supported committed cause produces its matching one-hot clear; invalid and synchronous cases do not clear a source. This is a block-level decoder check.</td></tr>
+<tr><td>RR feedback</td><td>Matching committed causes rotate preference; no commit and other-class commits preserve the tested preference.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section>
+<div class="kicker">04 / Review and limits</div>
+<h2>What is still open</h2>
+<div class="grid">
+<div class="card"><h3>Selective masks</h3><p>Multiple pending sources with selective enables are not crossed with all thresholds and RR states. This includes lower-priority selection when a higher-priority request is disabled.</p></div>
+<div class="card"><h3>Mapping independence</h3><p>The arbiter reference and RTL share the same cause-to-vector convention. A separately reviewed source map and explicit mapping checks would strengthen the oracle.</p></div>
+<div class="card"><h3>Code coverage</h3><p>Review uncovered items in the IMC report. Arbiter block coverage is 55 of 56; the uncovered item is the committed-cause default branch. Other blocks include functionality outside this IRQ-focused test.</p></div>
+<div class="card"><h3>Outside this unit run</h3><p>Peripheral timing, the connected core pipeline, firmware and nesting are not tested. CSR ordering and MUL/DIV interruption remain separate pipeline hypotheses.</p></div>
+</div>
+<p>Two independent GPT-6 Luna reviews were read-only. Their valid shared concern was selective-mask coverage; their examples and claims were checked against the testbench before inclusion. No simulation was run by the reviewers.</p>
+<div class="note warn"><strong>Historical tb1 diagnostic:</strong> a legacy <a href="../../../Verification/tb1_interrupts.sv">tb1_interrupts.sv</a> run is now retained at <a href="../../../Verification/artifacts/g4_12_remote_20261112_000351/results/legacy_tb1/console.log">legacy_tb1/console.log</a>. It reports 0 of 7 scenarios passing and the same log shows <code>$readmem</code> open failures for the per-test images. The tb1 source encodes older cause, priority and completion expectations, so these historical failures require source/expectation reconciliation; they are not by themselves DUT defects. See <a href="../../../Verification/artifacts/g4_12_remote_20261112_000351/RESULTS.md">RESULTS.md</a>.</div>
+</section>
+
+<section>
+<div class="kicker">05 / Evidence links</div>
+<h2>Inspect and reproduce</h2>
+<ul class="source-list">
+<li><a href="../../../Verification/irq_unit/tb_irq_restructure.sv">Unit testbench (canonical)</a></li>
+<li><a href="../../../Verification/irq_unit/IRQ_UNIT_COVERAGE_PLAN.md">Unit coverage plan</a></li>
+<li><a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/summary.json">Retained run summary (11 Nov 2026)</a></li>
+<li><a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/functional_summary.txt">Xcelium functional coverage summary (471/471)</a></li>
+<li><a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/metrics_summary.txt">Xcelium per-metric summary</a></li>
+<li><a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/code_html/index.html">Xcelium / IMC code coverage report</a></li>
+<li><a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/simulation.log">Xcelium simulation log</a></li>
+<li><a href="../../../Verification/artifacts/vlsi_auto/irq-unit_20261111T185206Z_03e8a574/results/xrun.log">Xcelium xrun log</a></li>
+<li><a href="../../../Verification/irq_unit/run_irq_unit_coverage.ps1">Vivado unit coverage runner</a></li>
+<li><a href="../../../Verification/artifacts/xcelium_irq_20261030_004317/xrun.log">Earlier 30 October 2026 Xcelium log (superseded run)</a></li>
+<li><a href="../../../Verification/artifacts/irq_restructure/irq_coverage_final_sim.log">XSim simulation log, 29 October 2026 (earlier bench revision)</a></li>
+<li><a href="../../../Verification/artifacts/irq_unit_coverage_20261029_233839_967/code_report.log">Earlier XSim code-report generation log (report-generation failure)</a></li>
+<li><a href="diagrams/irq_unit_bench.spec.json">Validated bench-structure diagram spec</a></li>
+</ul>
+</section>
+<footer>RISCFORGE · CJ G4.12 IRQ unit verification · Evidence is limited to the named run and scope · Official status is owned by the workbook.</footer>
+</body>
+</html>

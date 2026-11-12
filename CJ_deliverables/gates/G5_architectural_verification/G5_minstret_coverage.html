@@ -1,0 +1,104 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>minstret directed coverage closure</title><style>
+body{margin:0;font:14px/1.55 "IBM Plex Sans",system-ui;color:var(--foreground,#18202c)}
+h2,h3{font-family:Archivo,system-ui;line-height:1.25}h2{font-size:24px;margin:12px 0}h3{font-size:17px;margin:22px 0 12px}p{margin:12px 0}
+.score{display:flex;justify-content:space-between;gap:12px;margin:20px 0 8px;font-size:17px}
+.meter{height:12px;border-radius:6px;background:var(--success,#15803d)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bin{border:1px solid var(--border,#ddd);border-radius:7px;padding:10px;display:grid;grid-template-columns:16px 1fr;gap:4px;font-size:12px;overflow-wrap:anywhere}
+.bin small{display:none;grid-column:2;color:var(--muted-foreground,#666)}.hits .bin small{display:block}.bin b{color:var(--success,#15803d)}
+.scope{font-size:12px;color:var(--muted-foreground,#666)}label{font-size:12px;cursor:pointer}
+.diagram{padding:16px;background:white;border-radius:8px;margin:12px 0}.diagram svg{width:100%;height:auto;display:block}summary{cursor:pointer;font-weight:600}details{margin:12px 0}
+@media(max-width:450px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.score{font-size:15px}}
+@media print{*{print-color-adjust:exact}label{display:none}}
+</style><body><h2>minstret: directed checklist closed</h2>
+<p>Real instruction execution on the patched core. Independent expected PC paths, per-cycle counter checks, final memory checks, and a timer interrupt driven through the input pin.</p>
+<div class="score"><strong>29 / 29 functional bins</strong><span>12 / 12 runs passed</span></div>
+<div class="meter" role="meter" aria-label="Functional bins closed" aria-valuemin="0" aria-valuemax="29" aria-valuenow="29"></div>
+<p class="scope">0, 1, 4 and 9 wait cycles applied to three programs. Every named bin has checked passing evidence; no waivers.</p>
+<label><input type="checkbox" onchange="document.body.classList.toggle('hits',this.checked)"> Show observed hit totals</label>
+<details open><summary>How the counter avoids repeated WB counts</summary><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 350" role="img" aria-labelledby="title desc">
+<title id="title">WB occupancy to exactly-once minstret event</title>
+<desc id="desc">Current retirement-counter input path only; not a claim about every architectural side effect. Baseline plus the saved hashed source overlay.</desc>
+<style>text{font:13px system-ui,sans-serif;fill:#18202c}.box{fill:#eef4fc;stroke:#345e98;stroke-width:1.3}.arrow{stroke:#526879;stroke-width:1.5;fill:none;marker-end:url(#head)}.label{font-size:11px;fill:#475063}</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#526879"/></marker></defs>
+<path class="arrow" d="M220,39 L270,39 L270,145 L310,145"><title>ips_reorganized/riscv_core/rtl/top.v :: assign instr_retired_W =</title></path>
+<text class="label" x="275" y="60">valid; no exception</text>
+<path class="arrow" d="M220,127 L285,127 L285,160 L310,160"><title>ips_reorganized/riscv_core/rtl/top.v :: (mret_commit | (~mem_stall_out &amp; ~FlushW));</title></path>
+<text class="label" x="228" y="115">not held</text>
+<path class="arrow" d="M220,215 L285,215 L285,181 L310,181"><title>ips_reorganized/riscv_core/rtl/top.v :: (mret_commit | (~mem_stall_out &amp; ~FlushW));</title></path>
+<text class="label" x="228" y="235">not flushed</text>
+<path class="arrow" d="M220,303 L270,303 L270,196 L310,196"><title>ips_reorganized/riscv_core/rtl/top.v :: (mret_commit | (~mem_stall_out &amp; ~FlushW));</title></path>
+<text class="label" x="275" y="290">commit override</text>
+<path class="arrow" d="M540,171 L590,171"><title>ips_reorganized/riscv_core/rtl/top.v :: .instr_retired_i(instr_retired_W),</title></path>
+<text class="label" x="548" y="155">pulse</text>
+<g><title>ips_reorganized/riscv_core/rtl/memory_cycle.v :: reg valid_W_r;</title><rect class="box" x="10" y="10" width="210" height="58" rx="8"/>
+<text x="22" y="33">MEM/WB packet</text>
+<text x="22" y="52">valid + exception</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/memory_cycle.v :: assign mem_stall_out = core_stall_gated;</title><rect class="box" x="10" y="98" width="210" height="58" rx="8"/>
+<text x="22" y="121">Memory hold</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/top.v :: wire FlushW;</title><rect class="box" x="10" y="186" width="210" height="58" rx="8"/>
+<text x="22" y="209">WB flush</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/wb_trap_mret_commit_controller.v :: assign mret_commit =</title><rect class="box" x="10" y="274" width="210" height="58" rx="8"/>
+<text x="22" y="297">MRET commit</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/top.v :: assign instr_retired_W =</title><rect class="box" x="310" y="130" width="230" height="78" rx="8"/>
+<text x="322" y="153">Retirement qualification</text>
+<text x="322" y="172">instr_retired_W</text>
+</g>
+<g><title>ips_reorganized/riscv_core/rtl/csr_regfile.v :: if (instr_retired_i)</title><rect class="box" x="590" y="140" width="180" height="62" rx="8"/>
+<text x="602" y="163">CSR minstret</text>
+<text x="602" y="182">increment on event</text>
+</g>
+</svg>
+</div><p class="scope">Source 25d7b8ebf4ae + overlay 8647af8b6fe7. <a href="../../../Verification/minstret_retirement/docs/diagrams/retirement.spec.json">Saved validated spec</a> · <a href="../../../Verification/minstret_retirement/docs/diagrams/retirement.md">every box/arrow citation</a>.</p></details><details><summary>How the directed test reaches a verdict</summary><div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 420" role="img" aria-labelledby="title desc">
+<title id="title">Directed retirement verification chain</title>
+<desc id="desc">Real core with injected memory waits and timer input. An expected instruction path and final-state checks support the declared functional bins; not full-SoC peripheral verification.</desc>
+<style>text{font:13px system-ui,sans-serif;fill:#18202c}.box{fill:#eef4fc;stroke:#345e98;stroke-width:1.3}.arrow{stroke:#526879;stroke-width:1.5;fill:none;marker-end:url(#head)}.label{font-size:11px;fill:#475063}</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#526879"/></marker></defs>
+<path class="arrow" d="M235,44 L285,44"><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: HERE / f&quot;{case}.S&quot;</title></path>
+<text class="label" x="238" y="30">assemble</text>
+<path class="arrow" d="M285,44 L258,44 L258,130 L125,130 L125,170"><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: f&quot;+HEX={image.with_suffix</title></path>
+<text class="label" x="18" y="120">ELF / SRAM images</text>
+<path class="arrow" d="M395,73 L395,110"><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: reference = execute_reference(words, labels)</title></path>
+<text class="label" x="410" y="96">assembled words</text>
+<path class="arrow" d="M125,238 L125,320"><title>ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv :: .timer_irq_i(timer_irq)</title></path>
+<text class="label" x="140" y="280">memory / waits / timer</text>
+<path class="arrow" d="M235,350 L285,350"><title>ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv :: before_count=dut.csr_file.minstret_r;</title></path>
+<text class="label" x="237" y="337">WB/CSR</text>
+<path class="arrow" d="M395,168 L395,310"><title>ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv :: $readmemh(reference,expected_pc</title></path>
+<text class="label" x="410" y="234">expected PCs</text>
+<path class="arrow" d="M505,348 L565,348"><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: passed = result.returncode == 0</title></path>
+<text class="label" x="510" y="331">verdict</text>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: for case in [</title><rect class="box" x="15" y="15" width="220" height="58" rx="8"/>
+<text x="27" y="38">Three assembly programs</text>
+</g>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: riscv64-unknown-elf-gcc</title><rect class="box" x="285" y="15" width="220" height="58" rx="8"/>
+<text x="297" y="38">ELF + SRAM image build</text>
+</g>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv :: module tb_checklist;</title><rect class="box" x="15" y="170" width="220" height="68" rx="8"/>
+<text x="27" y="193">TB memory + timer drivers</text>
+</g>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: def execute_reference(</title><rect class="box" x="285" y="110" width="220" height="58" rx="8"/>
+<text x="297" y="133">Software path reference</text>
+</g>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv :: top #(.RESET_PC</title><rect class="box" x="15" y="320" width="220" height="62" rx="8"/>
+<text x="27" y="343">Real top core</text>
+</g>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/tb_checklist.sv :: before_count=dut.csr_file.minstret_r;</title><rect class="box" x="285" y="310" width="220" height="74" rx="8"/>
+<text x="297" y="333">PC + counter + memory</text>
+<text x="297" y="352">checks at clock edges</text>
+</g>
+<g><title>ips_reorganized/Verification/minstret_retirement/checklist/run_checklist.py :: summary[&quot;functional_checklist_closed&quot;]</title><rect class="box" x="565" y="310" width="200" height="74" rx="8"/>
+<text x="577" y="333">Passing-bin collection</text>
+<text x="577" y="352">coverage.json</text>
+</g>
+</svg>
+</div><p class="scope">Source 25d7b8ebf4ae + overlay 8647af8b6fe7. <a href="../../../Verification/minstret_retirement/docs/diagrams/testbench.spec.json">Saved validated spec</a> · <a href="../../../Verification/minstret_retirement/docs/diagrams/testbench.md">every box/arrow citation</a>.</p></details><p class="scope">Ground-truth specs and every box/arrow citation are in ../docs/diagrams/. Both diagrams passed the saved-spec validator.</p><h3>Completed instructions</h3><div class="grid"><div class="bin"><b>✓</b><span>ADD</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>SUB</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>MUL</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>DIV</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>LW</span><small>8 checked hits</small></div><div class="bin"><b>✓</b><span>SW</span><small>12 checked hits</small></div><div class="bin"><b>✓</b><span>BEQ taken</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>BEQ not taken</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>BNE taken</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>BNE not taken</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>JAL</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>JALR</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>CSRRW</span><small>40 checked hits</small></div><div class="bin"><b>✓</b><span>CSRRS</span><small>28 checked hits</small></div><div class="bin"><b>✓</b><span>CSRRC</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>CSRRWI</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>CSRRSI</span><small>8 checked hits</small></div><div class="bin"><b>✓</b><span>CSRRCI</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>MRET</span><small>24 checked hits</small></div><div class="bin"><b>✓</b><span>NOP</span><small>180 checked hits</small></div></div><h3>Events that do not increment</h3><div class="grid"><div class="bin"><b>✓</b><span>ECALL</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>EBREAK</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>illegal</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>misaligned load</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>misaligned store</span><small>4 checked hits</small></div><div class="bin"><b>✓</b><span>wrong path</span><small>12 checked hits</small></div><div class="bin"><b>✓</b><span>bubble</span><small>568 checked hits</small></div><div class="bin"><b>✓</b><span>stall</span><small>70 checked hits</small></div><div class="bin"><b>✓</b><span>interrupt</span><small>4 checked hits</small></div></div>
+<h3>Artifacts and scope</h3><p>Three ELF / .bin / hex / disassembly sets, 12 cycle traces and logs, coverage JSON, and verified source/artifact hashes. No additional RTL changes in this campaign.</p>
+<p class="scope">Icarus 12.0 · GCC 13.2 · 11 November 2026 · Campaign 20261111T090729Z.
+Functional bins cover the declared checklist only. Statement/toggle/FSM coverage, counter writes/overflow and broader interrupt combinations remain open. Current SoC rerun: smoke, probe and Dhrystone PASS; CoreMark CRCs match but the one-iteration duration is invalid. No published score.</p>
+<script>console.log('declared bins',document.querySelectorAll('.bin').length);console.log('horizontal overflow',document.documentElement.scrollWidth>innerWidth);</script></body></html>

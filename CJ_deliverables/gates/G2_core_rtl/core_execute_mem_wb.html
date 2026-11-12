@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Execute, Memory, Write-back</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.kv td:first-child { white-space: nowrap; }
+</style>
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../signoff/cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. Retained pre-port pipeline description: MDU ownership/abort and redirect-stall logic changed. The existing ALU already clears JALR bit zero; issue #17 is withdrawn. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Core / Execute, memory and write-back</span></div>
+<div class="wrap">
+
+<h1>Execute, memory and write-back stages</h1>
+<p class="lead">How the RISCFORGE core computes results, resolves branches, runs the M extension, talks to data memory and writes results back. For engineers who need to read the RTL or write checks against it.</p>
+<p class="meta">Scope: EX, MEM and WB stages of the 5-stage RV32IM_Zicsr core, plus the data-side memory bridge | Sources: <code>riscv_core/rtl/*.v</code>, <code>*.sv</code> listed at the end | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Where these stages sit</a></li>
+<li><a href="#s2">Execute stage</a></li>
+<li><a href="#s3">M extension: multiplier and divider</a></li>
+<li><a href="#s4">Memory stage and load/store unit</a></li>
+<li><a href="#s5">Hybrid memory interface</a></li>
+<li><a href="#s6">Write-back</a></li>
+<li><a href="#s7">Status, limits and open points</a></li>
+</ol></div>
+
+<h2 id="s1">1. Where these stages sit</h2>
+<p><span class="tag exists">EXISTS</span> Execution is split over three modules instantiated in <code>riscv_core/rtl/top.v</code>: <code>execute_cycle</code> (includes the EX/MEM pipeline register), <code>memory_cycle</code> (includes the MEM/WB register and the load/store unit <code>ls_unit</code>) and <code>writeback_cycle</code> (a pure multiplexer). The memory bridge <code>hybrid_mem_interface</code> is <em>not</em> inside <code>memory_cycle</code>: <code>memory_cycle</code> exposes a <code>lsu_mem_*</code> bus (<code>memory_cycle.v:70-77</code>) and the SoC wrapper instantiates the bridge as <code>i_core_data_if</code> (<code>RTL_SOC/riscforge_soc_subsystem.sv:1301</code>). The header comment of <code>memory_cycle.v</code> still lists the bridge and a <code>Data_Memory</code> as children; the code does not.</p>
+<p>Hazard handling, forwarding select logic, CSR file and trap commit live in <a href="core_hazards_csr_traps.html">Hazards, CSR and traps</a>. Fetch and decode are in <a href="core_fetch_decode.html">Fetch and decode</a>; a one-page map is in <a href="core_overview.html">Core overview</a>.</p>
+
+<h2 id="s2">2. Execute stage</h2>
+<p><span class="tag exists">EXISTS</span> <code>execute_cycle</code> applies forwarding, runs the ALU, decides branches and jumps, forms the LUI/AUIPC and M-extension results, handles the CSR read-modify-write value, merges exceptions and registers everything into EX/MEM. Figure 1 shows the ALU and branch path; Figure 2 shows how the final result and the EX/MEM register are built.</p>
+
+<figure>
+<svg viewBox="0 0 1040 380" role="img" aria-label="Execute stage datapath: forwarding muxes, ALU source mux, ALU, branch unit, target adder and redirect gate">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<!-- operand sources -->
+<text class="t end" x="96" y="92">RD1_E</text>
+<path class="ar" d="M100 88 H112"/>
+<text class="t end" x="96" y="188">RD2_E</text>
+<path class="ar" d="M100 184 H112"/>
+<!-- forwarding muxes -->
+<rect class="bx-core" x="112" y="64" width="96" height="48" rx="6"/>
+<text class="tb mid" x="160" y="84">SrcA mux</text>
+<text class="ts mid" x="160" y="100">ForwardA_E</text>
+<rect class="bx-core" x="112" y="160" width="96" height="48" rx="6"/>
+<text class="tb mid" x="160" y="180">SrcB mux</text>
+<text class="ts mid" x="160" y="196">ForwardB_E</text>
+<text class="ts mid" x="132" y="26">ResultW</text>
+<path class="ar" d="M132 34 V64"/>
+<text class="ts mid" x="196" y="26">ALU_ResultM</text>
+<path class="ar" d="M196 34 V64"/>
+<path class="ar" d="M132 240 V208"/>
+<text class="ts mid" x="132" y="254">ResultW</text>
+<path class="ar" d="M196 240 V208"/>
+<text class="ts mid" x="196" y="254">ALU_ResultM</text>
+<!-- operand lines -->
+<path class="ar" d="M208 88 H432"/>
+<text class="ts mid" x="320" y="80">Src_A</text>
+<path class="ar" d="M208 184 H304"/>
+<text class="ts mid" x="256" y="176">Src_B_interim</text>
+<!-- ALUSrc mux -->
+<rect class="bx-core" x="304" y="160" width="96" height="48" rx="6"/>
+<text class="tb mid" x="352" y="180">ALUSrc mux</text>
+<text class="ts mid" x="352" y="196">ALUSrcE</text>
+<path class="ar" d="M352 240 V208"/>
+<text class="ts mid" x="352" y="254">Imm_Ext_E</text>
+<path class="ar" d="M400 184 H432"/>
+<!-- ALU -->
+<rect class="bx-core" x="432" y="64" width="112" height="144" rx="6"/>
+<text class="tb mid" x="488" y="128">ALU</text>
+<text class="ts mid" x="488" y="146">A, B to alu_r</text>
+<text class="ts mid" x="488" y="162">flags[2:0]</text>
+<text class="ts mid" x="488" y="26">ALUControlE</text>
+<path class="ar" d="M488 34 V64"/>
+<!-- JB unit -->
+<path class="ar" d="M544 88 H640"/>
+<text class="ts mid" x="592" y="80">flags[2:0]</text>
+<rect class="bx-ctrl" x="640" y="64" width="120" height="48" rx="6"/>
+<text class="tb mid" x="700" y="84">JB_unit</text>
+<text class="ts mid" x="700" y="100">branch / jump</text>
+<text class="ts mid" x="700" y="26">BranchE, JumpE</text>
+<path class="ar" d="M700 34 V64"/>
+<path class="ar" d="M760 88 H832"/>
+<text class="ts mid" x="796" y="80">yes, JALRE</text>
+<!-- redirect gate -->
+<rect class="bx-ctrl" x="832" y="56" width="192" height="56" rx="6"/>
+<text class="tb mid" x="928" y="74">Redirect gate</text>
+<text class="ts mid" x="928" y="90">yes &amp; valid_E &amp; ~exc_valid_E</text>
+<text class="ts mid" x="928" y="103">&amp; target[1:0] == 0</text>
+<text class="ts mid" x="928" y="26">PCSrcE to IF, hazard_unit</text>
+<path class="ar" d="M928 56 V34"/>
+<!-- target select -->
+<rect class="bx-core" x="832" y="152" width="192" height="48" rx="6"/>
+<text class="tb mid" x="928" y="172">Target select</text>
+<text class="ts mid" x="928" y="188">JALRE ? alu_r : PCTarget_jb</text>
+<path class="ar" d="M928 152 V112"/>
+<text class="ts" x="938" y="136">PCTargetE</text>
+<path class="ar" d="M980 200 V226"/>
+<text class="ts mid" x="980" y="240">PCTargetE to IF</text>
+<!-- alu_r -->
+<path class="ar" d="M544 176 H832"/>
+<text class="ts mid" x="640" y="168">alu_r</text>
+<circle class="arrowhead" cx="592" cy="176" r="3"/>
+<path class="ar" d="M592 176 V340"/>
+<text class="ts mid" x="592" y="356">alu_r to Fig. 2</text>
+<!-- PC adder -->
+<rect class="bx-core" x="640" y="232" width="120" height="48" rx="6"/>
+<text class="tb mid" x="700" y="252">PC_Adder</text>
+<text class="ts mid" x="700" y="268">PCE + Imm_Ext_E</text>
+<path class="ar" d="M672 312 V280"/>
+<text class="ts mid" x="672" y="326">PCE</text>
+<path class="ar" d="M728 312 V280"/>
+<text class="ts mid" x="728" y="326">Imm_Ext_E</text>
+<path class="ar" d="M760 256 H860 V200"/>
+<text class="ts mid" x="810" y="248">PCTarget_jb</text>
+</svg>
+<figcaption><b>Figure 1.</b> Execute datapath. Operands pass the two forwarding muxes (sources: write-back result and the EX/MEM result), then the ALU. ALU comparison flags feed JB_unit; the target is either the ALU sum (JALR) or PCE + immediate; a misaligned target blocks the redirect (<code>execute_cycle.v:233-290</code>). Src_A and Src_B_interim also feed the M unit (Figure 2) and, for Src_B_interim, the store-data register.</figcaption>
+</figure>
+
+<h3>2.1 Units in the execute stage</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Unit</th><th>Purpose</th><th>Ports (main)</th><th>Behaviour</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><code>Mux_3_by_1</code> (x2)</td><td>Forwarding mux for operand A and B</td><td>a, b, c [31:0]; s [1:0]; d</td><td>Combinational: <code>s[1]</code> picks c over a, then <code>s[0]</code> picks b. Instantiated with a = register-file data, b = <code>ResultW</code>, c = <code>ALU_ResultM</code>. Select 00 = no forward, 01 = WB, 10 = MEM. Select 11 returns b, but the hazard unit never produces 11.</td><td><code>Mux_3_by_1.v:30-31</code>, <code>execute_cycle.v:233-247</code>, <code>hazard_unit.v:127-137</code></td></tr>
+<tr><td><code>Mux2</code></td><td>ALU source B: register or immediate</td><td>a, b, s, c</td><td>Combinational; <code>ALUSrcE</code> = 1 chooses <code>Imm_Ext_E</code>. Only operand B is muxed; the pre-mux value (<code>Src_B_interim</code>) is what the M unit and the store-data register use.</td><td><code>Mux2.v:29</code>, <code>execute_cycle.v:249-254</code></td></tr>
+<tr><td><code>ALU</code></td><td>RV32I arithmetic, logic, shift, compare, JALR sum</td><td>A, B [31:0]; ALUControl [3:0]; Result; Zero; flags [2:0]</td><td>Combinational. Codes: 0000 ADD, 0001 SUB, 0100 AND, 0101 OR, 0110 JALR (A+B with bit 0 cleared), 0111 XOR, 1000 SLL, 1001 SRL, 1010 SRA, 1100 SLTU, 1111 SLT; any other code gives 0. Flags are always computed from A and B: [2] A==B, [1] signed A&lt;B, [0] unsigned A&lt;B. Shift amount is <code>B[4:0]</code>.</td><td><code>ALU.v:40-67</code></td></tr>
+<tr><td><code>JB_unit</code></td><td>Branch condition and jump detect</td><td>flags [2:0]; J [1:0]; B [3:0]; yes; JALR</td><td>Combinational. <code>B[3]</code> = branch, <code>B[2:0]</code> = funct3: BEQ uses flag 2, BNE its inverse, BLT/BGE flag 1, BLTU/BGEU flag 0. <code>yes = branch_taken | J[1]</code>; <code>JALR = J[1] &amp; ~J[0]</code>, so JAL is J=11 and JALR is J=10 (inferred from these two equations).</td><td><code>JB_unit.v:9-22</code></td></tr>
+<tr><td><code>PC_Adder</code></td><td>Branch/JAL target and AUIPC value</td><td>a, b, c</td><td>Adds <code>PCE</code> and <code>Imm_Ext_E</code>. Module not re-read for this page beyond its instantiation.</td><td><code>execute_cycle.v:266-270</code></td></tr>
+<tr><td>Redirect logic (inside <code>execute_cycle</code>)</td><td>Gate the PC redirect</td><td>out: <code>PCSrcE</code>, <code>PCTargetE</code></td><td><code>branch_taken_raw = yes &amp; valid_E &amp; ~exc_valid_E</code>. Target is <code>alu_r</code> for JALR, else <code>PCTarget_jb</code>. If <code>target[1:0] != 0</code> the redirect is suppressed and a cause-0 exception is raised with tval = target. Not gated by <code>StallM</code> by design.</td><td><code>execute_cycle.v:283-290, 480-483</code></td></tr>
+<tr><td>Result select</td><td>Pick the value stored in EX/MEM</td><td>out: <code>ResultE</code></td><td><code>m_valid_out ? result_M : (isLUIE ? (LUISrcE ? Imm_Ext_E : PCTarget_jb) : alu_r)</code>. So LUI = immediate, AUIPC = PC + immediate.</td><td><code>execute_cycle.v:292-293</code></td></tr>
+<tr><td>CSR value logic</td><td>New CSR value for CSRRW/S/C and immediate forms</td><td>in: <code>csr_rdata_i</code>; out: <code>csr_new_val_E</code>, <code>csr_write_en_E</code></td><td>Operand is the zero-extended 5-bit immediate or <code>Src_A</code>. Set = old OR operand, clear = old AND NOT operand. Set/clear write only if the rs1/uimm field is non-zero. Old and new values travel to WB. CSR semantics are on the hazards/CSR page.</td><td><code>execute_cycle.v:333-341</code></td></tr>
+</tbody></table></div>
+
+<figure>
+<svg viewBox="0 0 1040 400" role="img" aria-label="Result select between ALU, LUI/AUIPC and M unit, then the EX/MEM register with hazard unit controls">
+<rect class="bx-core" x="24" y="48" width="200" height="48" rx="6"/>
+<text class="tb mid" x="124" y="68">ALU result</text>
+<text class="ts mid" x="124" y="84">alu_r (Figure 1)</text>
+<rect class="bx-core" x="24" y="128" width="200" height="48" rx="6"/>
+<text class="tb mid" x="124" y="148">LUI / AUIPC mux</text>
+<text class="ts mid" x="124" y="164">LUISrcE ? Imm : PC+Imm</text>
+<rect class="bx-core" x="24" y="200" width="200" height="64" rx="6"/>
+<text class="tb mid" x="124" y="220">rv32m_unit</text>
+<text class="ts mid" x="124" y="236">start_M = is_M &amp; ~m_started</text>
+<text class="ts mid" x="124" y="250">abort = irq_accept_E &amp; stallMUL</text>
+<rect class="bx-core" x="312" y="48" width="168" height="208" rx="6"/>
+<text class="tb mid" x="396" y="136">ResultE select</text>
+<text class="ts mid" x="396" y="156">priority, top first:</text>
+<text class="ts mid" x="396" y="172">m_valid_out: result_M</text>
+<text class="ts mid" x="396" y="186">isLUIE: LUI / AUIPC</text>
+<text class="ts mid" x="396" y="200">else: alu_r</text>
+<path class="ar" d="M224 72 H312"/>
+<text class="ts mid" x="268" y="64">alu_r</text>
+<path class="ar" d="M224 152 H312"/>
+<text class="ts mid" x="268" y="144">LUI_result_E</text>
+<path class="ar" d="M224 232 H312"/>
+<text class="ts mid" x="268" y="224">result_M</text>
+<path class="ar" d="M480 152 H560"/>
+<text class="ts mid" x="520" y="144">ResultE</text>
+<rect class="bx-bus" x="560" y="96" width="216" height="112" rx="6"/>
+<text class="tb mid" x="668" y="116">EX/MEM register</text>
+<text class="ts mid" x="668" y="134">ALU_ResultM &lt;= ResultE</text>
+<text class="ts mid" x="668" y="148">WriteDataM &lt;= Src_B_interim</text>
+<text class="ts mid" x="668" y="162">RegWriteE1, RD_E1, lsunitE</text>
+<text class="ts mid" x="668" y="176">valid_M, exception, CSR fields</text>
+<path class="ar" d="M776 152 H848"/>
+<rect class="bx-mem" x="848" y="128" width="168" height="48" rx="6"/>
+<text class="tb mid" x="932" y="148">memory_cycle</text>
+<text class="ts mid" x="932" y="164">MEM stage (Figure 5)</text>
+<rect class="bx-ctrl" x="560" y="296" width="216" height="48" rx="6"/>
+<text class="tb mid" x="668" y="316">hazard_unit</text>
+<text class="ts mid" x="668" y="332">StallM, FlushM (FlushM has stallMUL)</text>
+<path class="ar" d="M668 296 V208"/>
+<text class="ts" x="678" y="262">FlushM, then StallM</text>
+<path class="ar" d="M124 264 V320 H560"/>
+<text class="ts mid" x="340" y="312">stallMUL</text>
+</svg>
+<figcaption><b>Figure 2.</b> Result path into EX/MEM. The M-unit result is injected when its <code>valid_out</code> arrives; while it works, stallMUL makes the hazard unit flush EX/MEM, so bubbles move on (<code>hazard_unit.v:192,199</code>; register priority reset, then flush, then stall, <code>execute_cycle.v:346-432</code>).</figcaption>
+</figure>
+
+<h3>2.2 EX/MEM register, flush and stall</h3>
+<p><span class="tag exists">EXISTS</span> The EX/MEM register has asynchronous active-low reset and then three priorities: <code>FlushM</code> clears every field; otherwise <code>StallM</code> holds every field; otherwise it loads. <code>StallM = wb_redirect ? 0 : mem_stall_i</code> (<code>hazard_unit.v:175</code>) and <code>FlushM = wb_redirect | flush_pipeline_onehot[2] | stallMUL</code> (<code>:199</code>). Because flush beats stall, a multi-cycle M instruction fills EX/MEM with bubbles until the result is ready.</p>
+<p><span class="tag exists">EXISTS</span> Loading a bubble versus a real instruction: when <code>m_valid_out</code> is high, <code>RD_E1 = rd_me</code> and <code>RegWriteE1 = 1</code> (the M result commits through the normal ALU-result path); when an M instruction is in EX and no result is ready, <code>RegWriteE1 = 0</code> (<code>execute_cycle.v:329-331</code>). The ID/EX register is also flushed when stallMUL is high (<code>hazard_unit.v:192</code>, flush branch at <code>decode_cycle.v:273</code>), so the M instruction does not stay in EX; the M unit holds the operands itself. <span class="tag open">OPEN</span> I derived this sequence from the RTL and did not confirm it in a waveform on this page; <a href="verif_rv32m.html">M-extension verification</a> is the place to look for evidence.</p>
+
+<h3>2.3 Exceptions and interrupts raised in EX</h3>
+<p><span class="tag exists">EXISTS</span> Priority of the exception packet carried into MEM: (1) local misaligned branch/jump target (cause 0), (2) exception already in the pipeline from fetch/decode, (3) an accepted interrupt, which turns the instruction in EX into a trap packet with cause <code>{1'b1, irq_id_i[4:0]}</code> (<code>execute_cycle.v:459-482</code>). <code>irq_accept_E = valid_E &amp; irq_pending_i &amp; ~new_exc_valid_E &amp; ~exc_valid_E</code>. An accepted interrupt while the M unit is busy aborts it (<code>div_abort_o = irq_accept_E &amp; stallMUL</code>). Cause encoding, CSR update and redirect are on <a href="core_hazards_csr_traps.html">Hazards, CSR and traps</a>.</p>
+
+<h2 id="s3">3. M extension: multiplier and divider</h2>
+<p><span class="tag exists">EXISTS</span> Decode flags an instruction as M when opcode is <code>0110011</code> and <code>InstrD[31:25] == 0000001</code> (<code>decode_cycle.v:369</code>). <code>execute_cycle</code> pulses <code>start_M</code> once (guarded by the <code>m_started</code> flag, cleared on <code>m_valid_out</code> or abort) and hands <code>Src_A</code>, <code>Src_B_interim</code>, <code>op_E</code> (funct3) and <code>RD_E</code> to <code>rv32m_unit</code> (<code>execute_cycle.v:300-327</code>).</p>
+<p><code>rv32m_unit</code> splits by <code>funct3[2]</code>: 0 goes to the multiplier <code>rv32m_mul</code>, 1 to the divider <code>rv32m_div</code>. Its stall output is <code>mul_stall | div_stall | valid_in</code> (<code>rv32m_unit.v:85</code>), so the stall is already high in the cycle the instruction starts.</p>
+
+<figure>
+<svg viewBox="0 0 1040 330" role="img" aria-label="Multiplier pipeline: operand extension, Booth encoding, partial products, register, CSA tree, register, adder, select and output register">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="grp" x="12" y="40" width="1016" height="112" rx="8"/>
+<text class="ts" x="24" y="58">Stage 1: operands to registered partial products</text>
+<rect class="grp" x="12" y="200" width="496" height="112" rx="8"/>
+<text class="ts" x="24" y="218">Stage 2: compress 18 rows to 2</text>
+<rect class="grp" x="516" y="200" width="512" height="112" rx="8"/>
+<text class="ts" x="528" y="218">Stage 3: add, select half, register</text>
+
+<rect class="bx-core" x="24" y="72" width="208" height="64" rx="6"/>
+<text class="tb mid" x="128" y="94">Operand extension</text>
+<text class="ts mid" x="128" y="110">mcand, mplier: 33 bits</text>
+<text class="ts mid" x="128" y="124">sign / zero by funct3</text>
+<rect class="bx-core" x="272" y="72" width="208" height="64" rx="6"/>
+<text class="tb mid" x="376" y="94">booth_enc x17</text>
+<text class="ts mid" x="376" y="110">radix-4 groups of mplier_pad</text>
+<text class="ts mid" x="376" y="124">to neg, zero, two</text>
+<rect class="bx-core" x="520" y="72" width="208" height="64" rx="6"/>
+<text class="tb mid" x="624" y="94">pp_gen x17</text>
+<text class="ts mid" x="624" y="110">pp[i]: 66 bits, shifted 2i</text>
+<text class="ts mid" x="624" y="124">pp_neg correction bits</text>
+<rect class="bx-bus" x="768" y="72" width="208" height="64" rx="6"/>
+<text class="tb mid" x="872" y="94">Register 1 (s1_*)</text>
+<text class="ts mid" x="872" y="110">17 pp, s1_corr, rd, valid</text>
+<text class="ts mid" x="872" y="124">s1_upper, s1_funct3</text>
+<path class="ar" d="M232 104 H272"/>
+<path class="ar" d="M480 104 H520"/>
+<path class="ar" d="M728 104 H768"/>
+
+<path class="ar" d="M872 136 V184 H128 V232"/>
+
+<rect class="bx-core" x="24" y="232" width="208" height="64" rx="6"/>
+<text class="tb mid" x="128" y="254">Dadda CSA tree</text>
+<text class="ts mid" x="128" y="270">18 rows to 2 (sum, carry)</text>
+<text class="ts mid" x="128" y="284">18, 12, 8, 6, 4, 3, 2</text>
+<rect class="bx-bus" x="272" y="232" width="208" height="64" rx="6"/>
+<text class="tb mid" x="376" y="254">Register 2 (s2_*)</text>
+<text class="ts mid" x="376" y="270">s2_sum, s2_carry</text>
+<text class="ts mid" x="376" y="284">rd, valid, upper</text>
+<rect class="bx-core" x="528" y="232" width="200" height="64" rx="6"/>
+<text class="tb mid" x="628" y="254">Carry-propagate add</text>
+<text class="ts mid" x="628" y="270">s2_sum + s2_carry</text>
+<text class="ts mid" x="628" y="284">low 64 bits kept</text>
+<rect class="bx-bus" x="768" y="232" width="208" height="64" rx="6"/>
+<text class="tb mid" x="872" y="254">Select, output reg</text>
+<text class="ts mid" x="872" y="270">upper ? [63:32] : [31:0]</text>
+<text class="ts mid" x="872" y="284">result, rd_out, valid_out</text>
+<path class="ar" d="M232 264 H272"/>
+<path class="ar" d="M480 264 H528"/>
+<path class="ar" d="M728 264 H768"/>
+</svg>
+<figcaption><b>Figure 3.</b> Multiplier <code>rv32m_mul</code>: three registered stages, so a result appears three clock edges after <code>valid_in</code> (<code>rv32m_mul.v:134, 228, 251</code>). The tree has 16 carry-save adders in six levels (<code>:169-218</code>).</figcaption>
+</figure>
+
+<h3>3.1 Multiplier details</h3>
+<ul>
+<li><span class="tag exists">EXISTS</span> Operands are extended to 33 bits. rs1 is signed for MUL, MULH, MULHSU; rs2 is signed for MUL and MULH only (<code>rv32m_mul.v:45-49</code>). <code>upper</code> is true for every funct3 except 000.</li>
+<li><span class="tag exists">EXISTS</span> Booth encoder per 3-bit group: <code>neg = bits[2]</code>; <code>zero</code> when all three bits are equal; <code>two</code> when bits[1] equals bits[0] but differs from bits[2] (<code>booth_enc.v:8-10</code>). Seventeen groups cover the 35-bit padded multiplier.</li>
+<li><span class="tag exists">EXISTS</span> <code>pp_gen</code> sign-extends the multiplicand to 66 bits, shifts by 2i (one more when <code>two</code>), and for a negative digit outputs the one's complement inside the shifted window; <code>pp_neg = neg &amp; ~zero</code> becomes a +1 correction at bit 2i. The 17 correction bits are packed into one extra row <code>corr</code> (<code>pp_gen.v:33-38</code>, <code>rv32m_mul.v:103-122</code>).</li>
+<li><span class="tag exists">EXISTS</span> CSA levels: 18 to 12 (6 adders), 12 to 8 (4), 8 to 6 (2), 6 to 4 (2), 4 to 3 (1), 3 to 2 (1). The <code>csa</code> module computes bitwise sum and majority; the caller shifts the carry left one place. The module's carry port is 66 bits wide but the instances connect 65-bit nets, so the top carry bit is dropped; only the low 64 bits of the product are used, so this does not affect the result.</li>
+<li><span class="tag exists">EXISTS</span> The wrapper holds <code>stall</code> high for the issue cycle plus two more cycles (<code>mul_stall_cnt</code> loaded with 2, <code>rv32m_unit.v:66-83</code>). Counted from the RTL, the stall is high in cycles 0, 1, 2 and <code>valid_out</code> is high in cycle 3, where cycle 0 is the cycle <code>valid_in</code> is high. This is code reading, not a simulation result.</li>
+<li><span class="tag open">OPEN</span> <code>rv32m_mul</code> has no abort input. On an abort the wrapper clears its stall counter, but <code>valid_in</code> already inside the multiplier pipeline is not cancelled (<code>rv32m_unit.v:36-47</code>). Whether a late multiplier result after an interrupt abort is harmless is not shown by the code alone.</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 1040 340" role="img" aria-label="Divider state machine: IDLE, COMPUTE, CORRECT, DONE with edge-case shortcut and abort">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-ctrl" x="24" y="120" width="136" height="64" rx="6"/>
+<text class="tb mid" x="92" y="144">IDLE</text>
+<text class="ts mid" x="92" y="162">latch flags, rd, operands</text>
+<rect class="bx-core" x="296" y="120" width="136" height="64" rx="6"/>
+<text class="tb mid" x="364" y="144">COMPUTE</text>
+<text class="ts mid" x="364" y="162">shift P:Q, add or sub D</text>
+<rect class="bx-core" x="568" y="120" width="136" height="64" rx="6"/>
+<text class="tb mid" x="636" y="144">CORRECT</text>
+<text class="ts mid" x="636" y="162">SD to binary, sign fix</text>
+<rect class="bx-ctrl" x="840" y="120" width="136" height="64" rx="6"/>
+<text class="tb mid" x="908" y="144">DONE</text>
+<text class="ts mid" x="908" y="162">drive result, valid</text>
+
+<path class="ar" d="M160 152 H296"/>
+<text class="ts mid" x="228" y="132">valid_in and</text>
+<text class="ts mid" x="228" y="145">normal operands</text>
+<path class="ar" d="M432 152 H568"/>
+<text class="ts mid" x="500" y="144">cnt == 31</text>
+<path class="ar" d="M704 152 H840"/>
+<text class="ts mid" x="772" y="144">always</text>
+<path class="ar" d="M340 120 V96 H388 V120"/>
+<text class="ts mid" x="364" y="86">cnt != 31: 32 iterations</text>
+<path class="ar" d="M908 120 V56 H92 V120"/>
+<text class="ts mid" x="500" y="48">DONE to IDLE: valid_out = 1, stall = 0</text>
+<path class="ar" d="M92 184 V240 H908 V184"/>
+<text class="ts mid" x="500" y="232">rs2 == 0, or signed INT_MIN / -1: edge_result set, stall = 1</text>
+
+<rect class="bx-ext" x="24" y="272" width="992" height="48" rx="6"/>
+<text class="ts mid" x="520" y="292">abort_i (irq_accept_E &amp; stallMUL) returns any state to IDLE with stall = 0 and valid_out = 0</text>
+<text class="ts mid" x="520" y="308">The divider has an abort input; the multiplier does not.</text>
+</svg>
+<figcaption><b>Figure 4.</b> Divider <code>rv32m_div</code>: a four-state machine running a non-restoring division, one quotient bit per COMPUTE cycle (<code>rv32m_div.v:80-218</code>).</figcaption>
+</figure>
+
+<h3>3.2 Divider details</h3>
+<ul>
+<li><span class="tag exists">EXISTS</span> IDLE: on <code>valid_in</code> it stores rd and the operation flags (<code>s_is_div</code> etc.), and sets <code>stall</code>. Division by zero gives all-ones for DIV/DIVU and rs1 for REM/REMU. Signed overflow (rs1 = 0x80000000 and rs2 = 0xFFFFFFFF, signed ops only) gives 0x80000000 for DIV and 0 for REM. Both shortcuts jump straight to DONE. Otherwise the magnitudes are loaded (two's complement negate for signed ops with a negative operand), P is cleared and the dividend sits in <code>quotient</code> (<code>:116-151</code>).</li>
+<li><span class="tag exists">EXISTS</span> COMPUTE: <code>cnt</code> counts 0 to 31, so 32 iterations. Each cycle P and quotient shift left as one register pair; P becomes <code>p_shl - D</code> if the shifted value is non-negative, else <code>p_shl + D</code>, and the quotient bit is the inverse of the sign (<code>:94-99, 167-173</code>).</li>
+<li><span class="tag exists">EXISTS</span> CORRECT: the quotient register holds signed digits; <code>Q - ~Q</code> converts to binary. If P ended negative, the quotient is decremented and the remainder is P + D. Sign is then applied: quotient negated if the operand signs differ, remainder negated if the dividend was negative (<code>:69-74, 200-203</code>).</li>
+<li><span class="tag exists">EXISTS</span> Counted from the state machine: a normal divide spends 1 cycle in IDLE (the start cycle), 32 in COMPUTE, 1 in CORRECT and 1 in DONE, with <code>valid_out</code> high the cycle after DONE; an edge case skips COMPUTE and CORRECT. The count is read from the code, not simulated. <code>stall</code> falls in the same edge that raises <code>valid_out</code>, so the result cycle is not stalled.</li>
+</ul>
+
+<h3>3.3 Instruction table</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>funct3</th><th>Instruction</th><th>rs1 treated as</th><th>rs2 treated as</th><th>Result</th><th>Handled by</th></tr></thead>
+<tbody>
+<tr><td>000</td><td>MUL</td><td>signed</td><td>signed</td><td>product[31:0]</td><td>rv32m_mul</td></tr>
+<tr><td>001</td><td>MULH</td><td>signed</td><td>signed</td><td>product[63:32]</td><td>rv32m_mul</td></tr>
+<tr><td>010</td><td>MULHSU</td><td>signed</td><td>unsigned</td><td>product[63:32]</td><td>rv32m_mul</td></tr>
+<tr><td>011</td><td>MULHU</td><td>unsigned</td><td>unsigned</td><td>product[63:32]</td><td>rv32m_mul</td></tr>
+<tr><td>100</td><td>DIV</td><td>signed</td><td>signed</td><td>quotient; /0 gives 0xFFFFFFFF; INT_MIN / -1 gives 0x80000000</td><td>rv32m_div</td></tr>
+<tr><td>101</td><td>DIVU</td><td>unsigned</td><td>unsigned</td><td>quotient; /0 gives 0xFFFFFFFF</td><td>rv32m_div</td></tr>
+<tr><td>110</td><td>REM</td><td>signed</td><td>signed</td><td>remainder (sign of dividend); /0 gives rs1; INT_MIN % -1 gives 0</td><td>rv32m_div</td></tr>
+<tr><td>111</td><td>REMU</td><td>unsigned</td><td>unsigned</td><td>remainder; /0 gives rs1</td><td>rv32m_div</td></tr>
+</tbody></table></div>
+<p>Sources: <code>rv32m_mul.v:45-57</code>, <code>rv32m_div.v:43-50, 127-135, 200-203</code>. The values match the RISC-V M-extension definition as I know it, but this page reports what the RTL does, not a compliance result.</p>
+
+<h3>3.4 Latency summary</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Operation</th><th>Stall behaviour (from code)</th><th>Result visible</th><th>Label</th></tr></thead>
+<tbody>
+<tr><td>MUL family</td><td>3 stall cycles (issue + 2)</td><td>cycle 3 after issue</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>DIV/REM, normal</td><td>stall from issue until DONE</td><td>about 35 cycles after issue: 1 + 32 + 1 + 1, result the cycle after DONE</td><td><span class="tag exists">EXISTS</span> (code reading)</td></tr>
+<tr><td>DIV/REM, /0 or overflow</td><td>stall for issue + DONE</td><td>cycle 2 after issue</td><td><span class="tag exists">EXISTS</span> (code reading)</td></tr>
+<tr><td>Measured cycle counts in simulation</td><td>not collected for this page</td><td>-</td><td><span class="tag open">OPEN</span></td></tr>
+</tbody></table></div>
+
+<h2 id="s4">4. Memory stage and load/store unit</h2>
+<p><span class="tag exists">EXISTS</span> <code>memory_cycle</code> contains <code>ls_unit</code>, the misalignment check, the request gate, the stall gate and the MEM/WB register. The control bus <code>lsunitM[4:0]</code> is: bit 4 enable, bit 3 store, bits 2:0 funct3 (<code>ls_unit.v:34-38</code>). Figure 5 shows data flow.</p>
+
+<figure>
+<svg viewBox="0 0 1040 420" role="img" aria-label="Memory stage: EX/MEM outputs feed misalignment check, store alignment and load formatting; request gate drives the memory request bus; response bus returns data, stall and error">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-bus" x="24" y="168" width="152" height="88" rx="6"/>
+<text class="tb mid" x="100" y="190">EX/MEM outputs</text>
+<text class="ts mid" x="100" y="206">ALU_ResultM (address)</text>
+<text class="ts mid" x="100" y="222">WriteDataM (rs2)</text>
+<text class="ts mid" x="100" y="238">lsunitM, valid_M</text>
+<path class="ln" d="M176 212 H220"/>
+<path class="ln" d="M220 72 V324"/>
+<path class="ar" d="M220 72 H264"/>
+<path class="ar" d="M220 180 H264"/>
+<path class="ar" d="M220 324 H264"/>
+
+<rect class="bx-ctrl" x="264" y="40" width="200" height="72" rx="6"/>
+<text class="tb mid" x="364" y="58">Misalignment check</text>
+<text class="ts mid" x="364" y="74">LW, SW: addr[1:0] != 0</text>
+<text class="ts mid" x="364" y="88">LH, LHU, SH: addr[0] != 0</text>
+<text class="ts mid" x="364" y="102">cause 4 load / 6 store</text>
+<rect class="bx-core" x="264" y="144" width="200" height="72" rx="6"/>
+<text class="tb mid" x="364" y="162">ls_unit: store align</text>
+<text class="ts mid" x="364" y="177">SB: be 0001 shifted by offset</text>
+<text class="ts mid" x="364" y="191">SH: 0011 or 1100; SW: 1111</text>
+<text class="ts mid" x="364" y="205">wdata shifted by 8 x offset</text>
+<rect class="bx-core" x="264" y="288" width="200" height="72" rx="6"/>
+<text class="tb mid" x="364" y="306">ls_unit: load format</text>
+<text class="ts mid" x="364" y="321">byte / half select by addr[1:0]</text>
+<text class="ts mid" x="364" y="335">LB, LH: sign-extend</text>
+<text class="ts mid" x="364" y="349">LBU, LHU: zero; LW: raw</text>
+
+<path class="ar" d="M464 72 H552"/>
+<text class="ts mid" x="508" y="64">misalign</text>
+<rect class="bx-ctrl" x="552" y="40" width="216" height="72" rx="6"/>
+<text class="tb mid" x="660" y="58">Request gate</text>
+<text class="ts mid" x="660" y="74">req = lsunit[4]</text>
+<text class="ts mid" x="660" y="88">we = lsunit[4] &amp; lsunit[3]</text>
+<text class="ts mid" x="660" y="102">&amp; valid_M &amp; ~exc / misalign</text>
+<path class="ar" d="M768 72 H928 V144"/>
+<text class="ts mid" x="848" y="64">lsu_mem_req, lsu_mem_we</text>
+
+<path class="ar" d="M464 180 H840"/>
+<text class="ts mid" x="652" y="172">lsu_mem_wdata, lsu_mem_be</text>
+<rect class="bx-bus" x="840" y="144" width="176" height="72" rx="6"/>
+<text class="tb mid" x="928" y="162">Request bus</text>
+<text class="ts mid" x="928" y="177">req, we, addr</text>
+<text class="ts mid" x="928" y="191">wdata, be</text>
+<text class="ts mid" x="928" y="205">to hybrid_mem_interface</text>
+
+<path class="ar" d="M464 324 H552"/>
+<text class="ts mid" x="508" y="316">formatted</text>
+<rect class="bx-core" x="552" y="288" width="216" height="72" rx="6"/>
+<text class="tb mid" x="660" y="308">MEM/WB register</text>
+<text class="ts mid" x="660" y="324">ReadDataM_r &lt;= formatted data</text>
+<text class="ts mid" x="660" y="338">held while core_stall_gated</text>
+<path class="ar" d="M840 324 H768"/>
+<text class="ts mid" x="804" y="316">stall, err</text>
+<rect class="bx-bus" x="840" y="288" width="176" height="72" rx="6"/>
+<text class="tb mid" x="928" y="308">Response bus</text>
+<text class="ts mid" x="928" y="324">lsu_mem_rdata</text>
+<text class="ts mid" x="928" y="338">lsu_mem_stall, _err</text>
+<path class="ar" d="M928 360 V396 H364 V360"/>
+<text class="ts mid" x="650" y="388">lsu_mem_rdata to load format</text>
+</svg>
+<figcaption><b>Figure 5.</b> Memory stage. Stores are aligned and given byte enables before the bus; loads are formatted from the raw word by address offset and funct3 (<code>ls_unit.v:74-159</code>). A misaligned access never reaches the bus (<code>memory_cycle.v:179-180</code>).</figcaption>
+</figure>
+
+<h3>4.1 Behaviour</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Behaviour</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Store alignment</td><td>SB: byte enable <code>0001</code> shifted by address[1:0], data shifted by 8 x offset. SH: <code>0011</code> (address bit 1 = 0) or <code>1100</code>, data shifted by 16 for the upper half. SW: <code>1111</code>. Other funct3: enables 0000. Not a store: enables 0000.</td><td><code>ls_unit.v:123-159</code></td></tr>
+<tr><td>Load formatting</td><td>LB/LBU select the byte by offset; LH/LHU select the lower or upper half by address bit 1; LW passes the word. Signed versions replicate the sign bit. Undefined funct3 or non-load: 0.</td><td><code>ls_unit.v:74-118</code></td></tr>
+<tr><td>Misalignment</td><td>Checked from <code>ALU_ResultM</code> and <code>lsunitM</code>: LW, LH, LHU, SW, SH. Causes: 4 load misaligned, 6 store misaligned, 5 load access fault, 7 store access fault. tval is the address. An exception already carried from EX wins.</td><td><code>memory_cycle.v:115-147</code></td></tr>
+<tr><td>Request gating</td><td><code>lsu_mem_req</code> and <code>lsu_mem_we</code> are the raw ls_unit values ANDed with <code>valid_M</code> and no earlier exception and no misalignment.</td><td><code>memory_cycle.v:179-180</code></td></tr>
+<tr><td>Stall</td><td><code>core_stall = mem_req &amp; mem_stall</code> in ls_unit; <code>mem_stall_out = core_stall &amp; ~(misaligned)</code>. The hazard unit freezes IF, ID and EX with it; EX/MEM holds via StallM. The MEM/WB register holds while the gated stall is high and loads when it falls.</td><td><code>ls_unit.v:50</code>, <code>memory_cycle.v:186-193, 260-265</code>, <code>hazard_unit.v:170-175</code></td></tr>
+<tr><td>Access fault</td><td><code>core_err = mem_err</code> from the bridge; a fault becomes cause 5 or 7 on a valid MEM instruction.</td><td><code>ls_unit.v:51</code>, <code>memory_cycle.v:132-139</code></td></tr>
+<tr><td>MEM/WB register</td><td>Async reset, then <code>FlushW</code> clears, then stall holds, else loads all fields including formatted read data and the CSR old/new values.</td><td><code>memory_cycle.v:219-287</code></td></tr>
+</tbody></table></div>
+<p>Detailed verification of these units is on <a href="verif_lsu_memif.html">LSU and memory interface verification</a>.</p>
+
+<h2 id="s5">5. Hybrid memory interface</h2>
+<p><span class="tag exists">EXISTS</span> <code>hybrid_mem_interface</code> decodes <code>mem_addr</code> into three outcomes and routes the request. Figure 6 shows the routing, Figure 7 the handshake state machines and stall formation.</p>
+
+<figure>
+<svg viewBox="0 0 1040 380" role="img" aria-label="Address decode routing LSU requests to SRAM port, AXI4-Lite master, or access fault">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-bus" x="24" y="168" width="176" height="64" rx="6"/>
+<text class="tb mid" x="112" y="190">LSU request bus</text>
+<text class="ts mid" x="112" y="206">mem_req, mem_we, mem_addr</text>
+<text class="ts mid" x="112" y="220">mem_wdata, mem_be</text>
+<path class="ar" d="M200 200 H264"/>
+<rect class="bx-ctrl" x="264" y="152" width="232" height="96" rx="6"/>
+<text class="tb mid" x="380" y="172">Address decode</text>
+<text class="ts mid" x="380" y="190">SRAM: base .. base+4*depth-1</text>
+<text class="ts mid" x="380" y="206">MMIO: MMIO_BASE .. MMIO_LIMIT</text>
+<text class="ts mid" x="380" y="222">neither range: addr_fault</text>
+<path class="ln" d="M496 200 H548"/>
+<path class="ln" d="M548 84 V312"/>
+<path class="ar" d="M548 84 H600"/>
+<path class="ar" d="M548 200 H600"/>
+<path class="ar" d="M548 312 H600"/>
+<rect class="bx-mem" x="600" y="48" width="208" height="72" rx="6"/>
+<text class="tb mid" x="704" y="66">SRAM port</text>
+<text class="ts mid" x="704" y="82">sram_en = req &amp; in SRAM range</text>
+<text class="ts mid" x="704" y="96">sram_addr = mem_addr[31:2]</text>
+<text class="ts mid" x="704" y="110">wmask = mem_be, we = mem_we</text>
+<rect class="bx-bus" x="600" y="164" width="208" height="72" rx="6"/>
+<text class="tb mid" x="704" y="182">AXI4-Lite master</text>
+<text class="ts mid" x="704" y="198">aw/w valid (write FSM)</text>
+<text class="ts mid" x="704" y="212">ar valid (read FSM)</text>
+<text class="ts mid" x="704" y="226">addr, data, strb from LSU bus</text>
+<rect class="bx-ctrl" x="600" y="280" width="208" height="64" rx="6"/>
+<text class="tb mid" x="704" y="300">Access fault</text>
+<text class="ts mid" x="704" y="316">mem_err = addr_fault</text>
+<text class="ts mid" x="704" y="330">no SRAM or AXI access</text>
+<path class="ar" d="M808 84 H872"/>
+<rect class="bx-mem" x="872" y="52" width="144" height="64" rx="6"/>
+<text class="tb mid" x="944" y="74">DSRAM</text>
+<text class="ts mid" x="944" y="90">SoC-level memory</text>
+<text class="ts mid" x="944" y="104">sram_* port</text>
+<path class="ar" d="M808 200 H872"/>
+<rect class="bx-ext" x="872" y="168" width="144" height="64" rx="6"/>
+<text class="tb mid" x="944" y="190">AXI-Lite xbar</text>
+<text class="ts mid" x="944" y="206">m_axi_req_o,</text>
+<text class="ts mid" x="944" y="220">m_axi_resp_i</text>
+<path class="ar" d="M808 312 H872"/>
+<rect class="bx-ctrl" x="872" y="292" width="144" height="40" rx="6"/>
+<text class="tb mid" x="944" y="316">mem_err to LSU</text>
+</svg>
+<figcaption><b>Figure 6.</b> Request routing. SoC instance parameters: DMEM base 0x0002_0000, MMIO 0x4000_0000 to 0x4FFF_FFFF (<code>RTL_SOC/riscforge_soc_subsystem.sv:1301-1305</code>); module defaults differ (<code>hybrid_mem_interface.sv:17-20</code>). Read data returns from the SRAM, or the AXI read channel, whichever range matched.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 1040 570" role="img" aria-label="State machines for SRAM read, AXI write and AXI read, and the mem_stall expression">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<!-- lane 1 -->
+<rect class="lane" x="12" y="16" width="1016" height="120" rx="8"/>
+<text class="tb" x="24" y="80">SRAM read</text>
+<rect class="bx-mem" x="200" y="60" width="104" height="40" rx="6"/>
+<text class="tb mid" x="252" y="85">IDLE</text>
+<rect class="bx-mem" x="480" y="60" width="104" height="40" rx="6"/>
+<text class="tb mid" x="532" y="85">WAIT</text>
+<path class="ar" d="M304 80 H480"/>
+<text class="ts mid" x="392" y="72">sram req and read</text>
+<path class="ar" d="M532 100 V124 H252 V100"/>
+<text class="ts mid" x="392" y="118">next cycle</text>
+<text class="ts" x="640" y="68">mem_stall = 1 in the IDLE cycle of a read;</text>
+<text class="ts" x="640" y="84">WAIT cycle: stall 0, sram_rdata valid;</text>
+<text class="ts" x="640" y="100">writes are not stalled.</text>
+<!-- lane 2 -->
+<rect class="lane" x="12" y="144" width="1016" height="208" rx="8"/>
+<text class="tb" x="24" y="236">AXI write</text>
+<rect class="bx-bus" x="200" y="200" width="104" height="64" rx="6"/>
+<text class="tb mid" x="252" y="236">IDLE</text>
+<rect class="bx-bus" x="400" y="160" width="104" height="40" rx="6"/>
+<text class="tb mid" x="452" y="185">WAIT_ADDR</text>
+<rect class="bx-bus" x="400" y="264" width="104" height="40" rx="6"/>
+<text class="tb mid" x="452" y="289">WAIT_DATA</text>
+<rect class="bx-bus" x="640" y="212" width="104" height="40" rx="6"/>
+<text class="tb mid" x="692" y="237">WAIT_RESP</text>
+<path class="ar" d="M304 212 H352 V180 H400"/>
+<text class="ts end" x="346" y="196">w_ready only</text>
+<path class="ar" d="M304 232 H640"/>
+<text class="ts mid" x="568" y="224">aw_ready and w_ready</text>
+<path class="ar" d="M304 252 H352 V284 H400"/>
+<text class="ts end" x="346" y="276">aw_ready only</text>
+<path class="ar" d="M504 180 H692 V212"/>
+<text class="ts mid" x="598" y="172">aw_ready</text>
+<path class="ar" d="M504 284 H692 V252"/>
+<text class="ts mid" x="598" y="276">w_ready</text>
+<path class="ar" d="M744 232 H800 V328 H252 V264"/>
+<text class="ts mid" x="520" y="320">b_valid</text>
+<text class="ts" x="830" y="220">stall until WAIT_RESP with b_valid;</text>
+<text class="ts" x="830" y="236">AW and W valid are driven</text>
+<text class="ts" x="830" y="252">from the LSU bus in IDLE.</text>
+<!-- lane 3 -->
+<rect class="lane" x="12" y="360" width="1016" height="120" rx="8"/>
+<text class="tb" x="24" y="428">AXI read</text>
+<rect class="bx-bus" x="200" y="404" width="104" height="40" rx="6"/>
+<text class="tb mid" x="252" y="429">IDLE</text>
+<rect class="bx-bus" x="480" y="404" width="104" height="40" rx="6"/>
+<text class="tb mid" x="532" y="429">WAIT_READ</text>
+<path class="ar" d="M304 424 H480"/>
+<text class="ts mid" x="392" y="416">ar_ready</text>
+<path class="ar" d="M532 444 V468 H252 V444"/>
+<text class="ts mid" x="392" y="462">r_valid</text>
+<text class="ts" x="640" y="412">stall until WAIT_READ with r_valid;</text>
+<text class="ts" x="640" y="428">arvalid is driven only in IDLE;</text>
+<text class="ts" x="640" y="444">r data is forwarded on that cycle.</text>
+<!-- final -->
+<rect class="bx-ctrl" x="320" y="498" width="400" height="56" rx="6"/>
+<text class="tb mid" x="520" y="520">mem_stall</text>
+<text class="ts mid" x="520" y="538">sram_stall_needed | axi_wr_busy | axi_rd_busy</text>
+</svg>
+<figcaption><b>Figure 7.</b> Bridge handshake machines (<code>hybrid_mem_interface.sv:125-325</code>). The stall seen by the core is formed combinationally from the machine state and the response, not from registered flags (<code>:375-382</code>).</figcaption>
+</figure>
+
+<h3>5.1 Handshake and stall rules</h3>
+<ul>
+<li><span class="tag exists">EXISTS</span> <b>SRAM:</b> the request goes out directly (<code>sram_addr = mem_addr[31:2]</code>, mask = byte enables). A read is stalled for exactly one cycle in the IDLE state, then the WAIT state delivers <code>sram_rdata</code>; a write is not stalled (<code>:97-152</code>). The port comments mention a "2-cycle latency" while the in-code comment describes one stall cycle; the state machine shows one.</li>
+<li><span class="tag exists">EXISTS</span> <b>AXI write:</b> in IDLE, with a write to the MMIO range, <code>awvalid</code> and <code>wvalid</code> assert together in the same cycle. Next state depends on which of <code>aw_ready</code>, <code>w_ready</code> was seen: both go to WAIT_RESP; only one leaves the other channel pending in WAIT_ADDR or WAIT_DATA, each polling its own ready. WAIT_RESP asserts <code>bready</code> and leaves on <code>b_valid</code> (<code>:157-214</code>). A comment records that the ready checks were once swapped and deadlocked the first MMIO access.</li>
+<li><span class="tag exists">EXISTS</span> <b>AXI read:</b> <code>arvalid</code> is high only in IDLE with a read request; IDLE moves to WAIT_READ when <code>ar_ready</code> is seen; WAIT_READ asserts <code>rready</code> and leaves on <code>r_valid</code> (<code>:265-291</code>). AW, W and AR payloads come straight from the LSU bus, relying on the pipeline staying frozen (<code>:344-356</code>).</li>
+<li><span class="tag exists">EXISTS</span> <b>Stall:</b> <code>mem_stall = sram_stall_needed | axi_wr_busy | axi_rd_busy</code>, where busy means an active request that has not reached its completing response. So the completing cycle is not stalled and the access retires on that cycle (<code>:375-382</code>).</li>
+<li><span class="tag exists">EXISTS</span> <b>Error:</b> <code>mem_err = addr_fault | (write done with non-OKAY resp) | (read done with non-OKAY resp)</code>, reported on the completing cycle (<code>:387-389</code>). An address outside both ranges is an immediate fault with no stall.</li>
+<li><span class="tag exists">EXISTS</span> <b>Read data:</b> SRAM range returns <code>sram_rdata</code>; otherwise the AXI read data on the release cycle; otherwise the held register (<code>:391-396</code>).</li>
+<li><span class="tag open">OPEN</span> Minimum and maximum MMIO latency depend on the crossbar and peripheral response times, which are outside these files.</li>
+</ul>
+
+<h2 id="s6">6. Write-back</h2>
+<p><span class="tag exists">EXISTS</span> <code>writeback_cycle</code> is a four-way multiplexer on <code>ResultSrcW</code> (<code>writeback_cycle.v:34-37</code>). The decoder sets the select: 01 for loads, 10 for JAL and JALR, 11 for SYSTEM (CSR), 00 otherwise (<code>Main_Decoder.v:173-180</code>). M-extension results use the 00 path because the result is injected as <code>ALU_ResultM</code>.</p>
+
+<figure>
+<svg viewBox="0 0 1040 290" role="img" aria-label="Write-back multiplexer selecting among ALU result, read data, PC plus 4 and old CSR value, feeding the register file and forwarding paths">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-core" x="24" y="56" width="200" height="40" rx="6"/>
+<text class="tb mid" x="124" y="73">ALU_ResultW</text>
+<text class="ts mid" x="124" y="88">ALU, LUI/AUIPC, M result</text>
+<rect class="bx-mem" x="24" y="104" width="200" height="40" rx="6"/>
+<text class="tb mid" x="124" y="121">ReadDataW</text>
+<text class="ts mid" x="124" y="136">formatted load data</text>
+<rect class="bx-core" x="24" y="152" width="200" height="40" rx="6"/>
+<text class="tb mid" x="124" y="169">PCPlus4W</text>
+<text class="ts mid" x="124" y="184">JAL / JALR link value</text>
+<rect class="bx-core" x="24" y="200" width="200" height="40" rx="6"/>
+<text class="tb mid" x="124" y="217">old_csr_W</text>
+<text class="ts mid" x="124" y="232">CSR value before write</text>
+<path class="ar" d="M224 76 H360"/>
+<text class="ts mid" x="336" y="68">00</text>
+<path class="ar" d="M224 124 H360"/>
+<text class="ts mid" x="336" y="116">01</text>
+<path class="ar" d="M224 172 H360"/>
+<text class="ts mid" x="336" y="164">10</text>
+<path class="ar" d="M224 220 H360"/>
+<text class="ts mid" x="336" y="212">11</text>
+<rect class="bx-core" x="360" y="40" width="160" height="216" rx="6"/>
+<text class="tb mid" x="440" y="144">ResultW mux</text>
+<text class="ts mid" x="440" y="162">select: ResultSrcW</text>
+<text class="ts mid" x="440" y="12">ResultSrcW[1:0]</text>
+<path class="ar" d="M440 18 V40"/>
+<path class="ar" d="M520 148 H700"/>
+<text class="ts mid" x="610" y="140">ResultW</text>
+<circle class="arrowhead" cx="700" cy="148" r="3"/>
+<path class="ar" d="M700 148 V84 H780"/>
+<path class="ar" d="M700 148 V212 H780"/>
+<rect class="bx-mem" x="780" y="60" width="236" height="48" rx="6"/>
+<text class="tb mid" x="898" y="80">Register file write data</text>
+<text class="ts mid" x="898" y="96">enable: RegWriteW_gated</text>
+<rect class="bx-ctrl" x="780" y="188" width="236" height="48" rx="6"/>
+<text class="tb mid" x="898" y="208">Forwarding source</text>
+<text class="ts mid" x="898" y="224">SrcA / SrcB mux, select 01</text>
+</svg>
+<figcaption><b>Figure 8.</b> Write-back multiplexer. The same <code>ResultW</code> wire writes the register file and feeds the execute forwarding muxes (<code>top.v:333, 416</code>). The write enable is <code>RegWriteW &amp; valid_W &amp; ~exc_valid_W &amp; ~mret_commit</code> (<code>top.v:285</code>).</figcaption>
+</figure>
+
+<h2 id="s7">7. Status, limits and open points</h2>
+<ul>
+<li><span class="tag exists">EXISTS</span> DEF-001 (<code>hazard_unit.v</code>, FlushE gated with <code>~mem_stall_i</code>) is present in the current file. The tracker status is FIXED-UNVERIFIED: no directed regression exists yet. It concerns load-use flush during an MMIO stall, which is the interaction between Figure 5 and the hazard unit (<code>Verification/status/defects.csv</code>).</li>
+<li>P0 bring-up is IN PROGRESS (13 of 20 checklist items met on 2026-10-31); later phases, including core trust (P1a), have not started (<code>Verification/status/PHASE_STATUS.md</code>). Nothing on this page is a verification result; it describes the RTL.</li>
+<li><span class="tag open">OPEN</span> Cycle counts for the M unit and MMIO accesses are derived from code, with no waveform evidence here.</li>
+<li><span class="tag open">OPEN</span> Whether a multiplier result can emerge after an interrupt abort (section 3.1).</li>
+<li><span class="tag open">OPEN</span> Stale header comments in <code>memory_cycle.v</code> (bridge and <code>Data_Memory</code> listed as children) and port comments in <code>hybrid_mem_interface.sv</code> ("2-cycle latency"); code is the authority.</li>
+<li>This page does not cover instruction fetch, decode, the CSR file, trap commit or the AXI crossbar. See <a href="index.html">the index</a> and <a href="core_overview.html">Core overview</a>.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/execute_cycle.v</code>, <code>ALU.v</code>, <code>JB_unit.v</code>, <code>Mux2.v</code>, <code>Mux_3_by_1.v</code>, <code>rv32m_unit.v</code>, <code>rv32m_mul.v</code>, <code>rv32m_div.v</code>, <code>booth_enc.v</code>, <code>csa.v</code>, <code>pp_gen.v</code>, <code>memory_cycle.v</code>, <code>ls_unit.v</code>, <code>hybrid_mem_interface.sv</code>, <code>writeback_cycle.v</code>; excerpts of <code>hazard_unit.v</code>, <code>decode_cycle.v</code>, <code>Main_Decoder.v</code>, <code>top.v</code>; <code>RTL_SOC/riscforge_soc_subsystem.sv</code> (bridge instance); <code>Verification/status/PHASE_STATUS.md</code>, <code>defects.csv</code>.</div>
+</div>
+</body>
+</html>

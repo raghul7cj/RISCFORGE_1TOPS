@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hazard Unit Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Core verification / Hazard unit</span></div>
+<div class="wrap">
+
+<h1>Hazard Unit Verification</h1>
+<p class="lead">What must be checked in <code>riscv_core/rtl/hazard_unit.v</code>, the evidence that exists today (none dedicated), a proposed unit-level test plan, and a directed regression for DEF-001.</p>
+<p class="meta">Scope: forwarding, load-use stall, branch and trap flush, CSR stalls, mem_stall and stallMUL interaction | Sources: <code>hazard_unit.v</code>, <code>top.v</code>, Stage 3 proof, <code>defects.csv</code>, <code>PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">What the unit does</a></li>
+<li><a href="#s2">What must be checked</a></li>
+<li><a href="#s3">Existing evidence</a></li>
+<li><a href="#s4">Check architecture</a></li>
+<li><a href="#s5">Proposed unit-level test plan</a></li>
+<li><a href="#s6">DEF-001 directed regression</a></li>
+<li><a href="#s7">Assertion ideas</a></li>
+<li><a href="#s8">Limits of this page</a></li>
+</ol></div>
+
+<h2 id="s1">1. What the unit does</h2>
+<p>The unit is purely combinational (204 lines). Its inputs come from the pipeline stages and from the WB trap controller; its outputs are two forwarding selects and the stall and flush strobes for each pipeline register. See <a href="core_hazards_csr_traps.html">hazards, CSRs and traps</a> for the architecture description.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Function</th><th>As implemented</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Forwarding</td><td><code>ForwardAE/BE</code> = 2'b10 if <code>RegWriteM</code> and the source register is non-zero and equals <code>RD_M</code>; else 2'b01 for the W stage; else 2'b00. M has priority. Forced to 2'b00 while <code>rst == 0</code>.</td><td><code>hazard_unit.v:127-137</code></td></tr>
+<tr><td>Load-use</td><td><code>lwstall</code> when <code>ResultSrcE == 01</code>, <code>RdE != 0</code>, and <code>Rs1_D</code> or <code>Rs2_D</code> equals <code>RdE</code>. The compare does not check whether the D instruction really uses rs2.</td><td><code>:146-151</code></td></tr>
+<tr><td>CSR stalls</td><td><code>csr_stall</code>: a CSR read in D hits an address with a pending write in E, M or W. <code>csr_gpr_stall</code>: <code>ResultSrcE == 11</code> and D reads <code>RdE</code>. At the instance, <code>csr_write_en_E</code> is wired to <code>csr_valid_E</code>, so any SYSTEM-opcode instruction in E counts as a pending write.</td><td><code>:154-167</code>; <code>top.v:622</code></td></tr>
+<tr><td>Stalls</td><td><code>StallF</code>, <code>StallD</code> = lwstall, csr_stall, csr_gpr_stall, stallMUL or mem_stall. <code>StallE</code> and <code>StallM</code> = mem_stall only. All forced to 0 on <code>wb_redirect</code>. The header comment says StallE also covers M-extension stalls; the code does not.</td><td><code>:170-175</code></td></tr>
+<tr><td>Flushes</td><td><code>FlushE</code> = (lwstall, csr_gpr_stall, csr_stall each gated by <code>~mem_stall_i</code>) | PCSrcE | exc_inflight_M | wb_redirect | flush_pipeline_onehot[1] | stallMUL. <code>FlushD</code>, <code>FlushM</code>, <code>FlushW</code> follow.</td><td><code>:192-202</code></td></tr>
+</tbody></table></div>
+
+<h2 id="s2">2. What must be checked</h2>
+<ul>
+<li><b>Forwarding correctness.</b> The right source wins (M over W), x0 is never forwarded, and the select is 00 when no match exists.</li>
+<li><b>Load-use stall.</b> One bubble when a load in E feeds D; no bubble when the load is not in E; no stall on x0.</li>
+<li><b>Branch, jump and trap flush.</b> A taken branch flushes D and E. A WB redirect flushes all four registers and overrides every stall.</li>
+<li><b>CSR stalls.</b> A CSR read waits for an older CSR write to the same address; a GPR consumer waits for a CSR result.</li>
+<li><b>mem_stall interaction.</b> While <code>mem_stall_i</code> holds the pipeline, no data-hazard bubble may enter E. This is the DEF-001 rule.</li>
+<li><b>stallMUL interaction.</b> The M-extension stall freezes F and D and flushes E and M. Its interaction with <code>mem_stall_i</code> is not covered by the DEF-001 fix (scenario H-11).</li>
+</ul>
+
+<h2 id="s3">3. Existing evidence</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Evidence</th><th>What it shows</th><th>Limit</th><th>Label</th></tr></thead>
+<tbody>
+<tr><td>Dedicated hazard-unit testbench</td><td>None found. Searches for the module name in testbenches and Verification files hit only documents, the tracker and filelists.</td><td>The module has no unit-level verification.</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>RISCOF report (46 of 47 pass)</td><td>I and M programs run with forwarding and load-use in play.</td><td>Signature-only, no RTL identity, hazard coverage not measured.</td><td><span class="tag exists">EXISTS</span> (indirect)</td></tr>
+<tr><td>Stage 3 proof (PASSED 2026-10-24)</td><td>After the fix, the firmware counters read 14 and 4. This exercises the DEF-001 sequence once, at one MMIO latency.</td><td>One scenario; not tied to the current file by hash (ACT-007); no negative control.</td><td><span class="tag exists">EXISTS</span> (indirect)</td></tr>
+<tr><td><code>tb1_interrupts.sv</code> test 5</td><td>During a DIV stall, <code>irq_accept_E</code> stays low.</td><td>Tests interrupt acceptance, not forwarding or flushes.</td><td><span class="tag exists">EXISTS</span> (adjacent)</td></tr>
+<tr><td>Older 5-stage tree</td><td>Plan text lists "pipeline hazard correctness" as a must-pass goal (<code>Documentation/04_Verification/VERIFICATION_PLAN.md</code>). No hazard testbench is in its <code>tb/</code> folder.</td><td>Goal, not evidence.</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+</tbody></table></div>
+<p>Rev B 16 lists the hazard stalls as the least-covered paths and relies on the lock-step to reach them (<code>hazard_unit.v:154-168</code> is cited there). It specifies no unit-level hazard testbench; the plan below is a proposal.</p>
+
+<h2 id="s4">4. Check architecture</h2>
+<p>Figure 1 shows a unit-level environment. Because the DUT is combinational, the reference model is an independent re-statement of the rules above, written from the specification table and not copied from the RTL. Assertions bind to the DUT ports and report independently of the scoreboard.</p>
+<figure>
+<svg viewBox="0 0 960 400" role="img" aria-label="Check architecture for the hazard unit: stimulus feeds DUT and reference model; scoreboard compares; assertions bind to the DUT">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ver" x="296" y="16" width="176" height="56" rx="6"/>
+<text class="tb mid" x="384" y="40">Assertions</text>
+<text class="ts mid" x="384" y="58">bound to DUT ports</text>
+<rect class="bx-ver" x="40" y="120" width="176" height="56" rx="6"/>
+<text class="tb mid" x="128" y="144">Stimulus</text>
+<text class="ts mid" x="128" y="162">directed + random</text>
+<rect class="bx-core" x="296" y="120" width="176" height="56" rx="6"/>
+<text class="tb mid" x="384" y="144">hazard_unit (DUT)</text>
+<text class="ts mid" x="384" y="162">combinational</text>
+<rect class="bx-ver" x="296" y="248" width="176" height="56" rx="6"/>
+<text class="tb mid" x="384" y="272">Reference model</text>
+<text class="ts mid" x="384" y="290">rules from the spec</text>
+<rect class="bx-ver" x="576" y="120" width="176" height="56" rx="6"/>
+<text class="tb mid" x="664" y="144">Scoreboard</text>
+<text class="ts mid" x="664" y="162">compare every cycle</text>
+<rect class="bx-ver" x="800" y="120" width="136" height="56" rx="6"/>
+<text class="tb mid" x="868" y="144">Verdict</text>
+<text class="ts mid" x="868" y="162">+ coverage bins</text>
+
+<path class="ar-ver" d="M216 148 H296"/>
+<text class="ts mid" x="256" y="140">inputs</text>
+<path class="ar-ver" d="M128 176 V276 H296"/>
+<path class="ar-ver" d="M472 148 H576"/>
+<text class="ts mid" x="524" y="140">outputs</text>
+<path class="ar-ver" d="M472 276 H664 V176"/>
+<text class="ts mid" x="568" y="268">expected</text>
+<path class="ar-ver" d="M752 148 H800"/>
+<path class="ar-ver" d="M384 72 V120"/>
+<path class="ar-bad" d="M472 44 H868 V120"/>
+<text class="ts mid" x="670" y="36">assertion failure</text>
+<text class="ts" x="40" y="352">The oracle is a separate statement of the rules. A model copied from the RTL equations would repeat any error in them.</text>
+<text class="ts" x="40" y="372">System level: the same program also runs through the lock-step ISS once it exists (CT-2).</text>
+</svg>
+<figcaption><b>Figure 1.</b> Unit-level check architecture. Stimulus drives the DUT and the reference model identically; the scoreboard compares outputs; assertions report on their own path.</figcaption>
+</figure>
+
+<h2 id="s5">5. Proposed unit-level test plan</h2>
+<p>None of these tests exists as code. "SPECIFIED" here means Rev B requires the behaviour to be covered (through lock-step or directed tests) but no test is written; "OPEN" means the intended behaviour needs a decision or analysis first. Signal names are the ports of <code>hazard_unit</code>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Scenario</th><th>Stimulus</th><th>Expected</th><th>Oracle</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>H-01</td><td>Forward from M</td><td>RegWriteM=1, RD_M=Rs1_E=5</td><td>ForwardAE=10</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-02</td><td>Forward from W</td><td>RegWriteW=1, RD_W=Rs2_E=7, no M match</td><td>ForwardBE=01</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-03</td><td>M beats W</td><td>RD_M=RD_W=Rs1_E=9, both RegWrite=1</td><td>ForwardAE=10</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-04</td><td>x0 never forwarded; reset</td><td>RD_M=0=Rs1_E; then rst=0 with a match</td><td>Select 00 in both</td><td>Reference model, assertion A-1</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-05</td><td>Load-use bubble</td><td>ResultSrcE=01, RdE=Rs1_D=6</td><td>lwstall: StallF, StallD, FlushE=1 (mem_stall_i=0)</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-06</td><td>Load-use, x0 and non-load</td><td>RdE=0; ResultSrcE=00 with match</td><td>No stall</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-07</td><td>Spurious rs2 compare</td><td>I-type in D whose imm bits equal RdE of a load in E</td><td>Stall asserted (conservative, as implemented). Decision needed whether this is intended.</td><td>Reference model after decision</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>H-08</td><td>Branch flush</td><td>PCSrcE=1</td><td>FlushD=FlushE=1</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-09</td><td>WB redirect overrides stalls</td><td>wb_redirect=1 with lwstall, mem_stall, stallMUL</td><td>All Stall*=0; all Flush*=1</td><td>Reference model, assertion A-3</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-10</td><td>CSR-to-CSR and CSR-to-GPR stalls</td><td>csr_valid_D, csr_raddr_D equals csr_addr_E/M/W with write enable; ResultSrcE=11 with D match</td><td>csr_stall or csr_gpr_stall; no stall when no match</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-11</td><td>mem_stall concurrent with stallMUL</td><td>mem_stall_i=1 and stallMUL=1 together</td><td>Not defined by the sources read. FlushE includes <code>stallMUL</code> with no <code>~mem_stall_i</code> gate, the same shape as DEF-001. Reachability and intended behaviour must be analysed first.</td><td>To be decided</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>H-12</td><td>DEF-001 sequence at system level</td><td>Section 6 program</td><td>Final memory value is correct</td><td>Architectural result, ISS</td><td><span class="tag specified">SPECIFIED</span> (ACT-010)</td></tr>
+<tr><td>H-13</td><td>Exception wake</td><td>valid_E and exc_valid_E; then valid_M and exc_valid_M</td><td>FlushD for both; FlushE for the M case</td><td>Reference model</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>H-14</td><td>Register-file write-through and store-data forwarding</td><td>Write and read of one register in one cycle; store after producer</td><td>Correct value reaches the consumer</td><td>ISS</td><td><span class="tag open">OPEN</span> (register file and store path were not read for this page)</td></tr>
+</tbody></table></div>
+
+<h2 id="s6">6. DEF-001 directed regression</h2>
+<p><b>Sequence.</b> Taken from the instructions the Stage 3 firmware executes (<code>stage3.dis</code> addresses 0x109c4 to 0x109d0), reduced to its essentials:</p>
+<pre><code>        lw   a7, 0(a0)       # MMIO read: mem_stall_i high while the bridge answers
+        lw   a5, 736(a2)     # DSRAM load enters EX during the stall
+        addi a5, a5, 1       # consumer in ID: lwstall
+        sw   a5, 736(a2)     # makes the loaded value observable</code></pre>
+<p><b>Setup.</b> Preload the DSRAM word with a known value K. Set a5 to a different sentinel before the sequence, for example 0xDEADBEEF. A second variant starts with an MMIO store (<code>sw</code> to the MMIO address) instead of the read, since the second occurrence in the disassembly (0x10a0c to 0x10a1c) follows a store.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Outcome</th><th>Value stored at the end</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Expected (fixed RTL)</td><td>K + 1</td><td>The load executed; a5 was loaded from DSRAM before the add.</td></tr>
+<tr><td>Failing (FlushE without the gate)</td><td>0xDEADBEF0 (sentinel + 1)</td><td>The load was flushed in EX; a5 kept its old value, as the Stage 3 counters did.</td></tr>
+</tbody></table></div>
+<p>Figure 2 shows the two behaviours cycle by cycle. The cycle positions are illustrative: the real MMIO latency depends on the bridge and is not fixed by the sources read.</p>
+<figure>
+<svg viewBox="0 0 960 436" role="img" aria-label="Timing comparison of fixed and original FlushE behaviour during an MMIO stall">
+<text class="th mid" x="260" y="24">c0</text>
+<text class="th mid" x="380" y="24">c1</text>
+<text class="th mid" x="500" y="24">c2</text>
+<text class="th mid" x="620" y="24">c3</text>
+<text class="th mid" x="740" y="24">c4</text>
+<text class="th mid" x="860" y="24">c5</text>
+<path class="ln" d="M200 32 V420 M320 32 V420 M440 32 V420 M560 32 V420 M680 32 V420 M800 32 V420 M920 32 V420"/>
+
+<text class="t end" x="184" y="70">mem_stall_i</text>
+<path class="ln" d="M200 76 H320 V56 H680 V76 H920"/>
+
+<text class="tb" x="40" y="118">Current hazard_unit.v (fixed)</text>
+<text class="t end" x="184" y="152">lwstall</text>
+<path class="ln" d="M200 156 H320 V136 H800 V156 H920"/>
+<text class="t end" x="184" y="196">FlushE</text>
+<path class="ln" d="M200 200 H680 V180 H800 V200 H920"/>
+<text class="t end" x="184" y="236">EX holds</text>
+<rect class="bx-core" x="204" y="216" width="112" height="28" rx="4"/><text class="ts mid" x="260" y="234">lw a7 MMIO</text>
+<rect class="bx-core" x="324" y="216" width="112" height="28" rx="4"/><text class="ts mid" x="380" y="234">lw a5 held</text>
+<rect class="bx-core" x="444" y="216" width="112" height="28" rx="4"/><text class="ts mid" x="500" y="234">lw a5 held</text>
+<rect class="bx-core" x="564" y="216" width="112" height="28" rx="4"/><text class="ts mid" x="620" y="234">lw a5 held</text>
+<rect class="bx-core" x="684" y="216" width="112" height="28" rx="4"/><text class="ts mid" x="740" y="234">lw a5 leaves</text>
+<rect class="bx-ext" x="804" y="216" width="112" height="28" rx="4"/><text class="ts mid" x="860" y="234">bubble</text>
+
+<text class="tb" x="40" y="278">Original (FlushE = lwstall | ...)</text>
+<text class="t end" x="184" y="312">lwstall</text>
+<path class="ln" d="M200 316 H320 V296 H440 V316 H920"/>
+<text class="t end" x="184" y="356">FlushE</text>
+<path class="ln" d="M200 360 H320 V340 H440 V360 H920"/>
+<text class="t end" x="184" y="396">EX holds</text>
+<rect class="bx-core" x="204" y="376" width="112" height="28" rx="4"/><text class="ts mid" x="260" y="394">lw a7 MMIO</text>
+<rect class="bx-core" x="324" y="376" width="112" height="28" rx="4"/><text class="ts mid" x="380" y="394">lw a5</text>
+<rect class="bx-ext" x="444" y="376" width="112" height="28" rx="4"/><text class="ts mid" x="500" y="394">NOP (load lost)</text>
+<rect class="bx-ext" x="564" y="376" width="112" height="28" rx="4"/><text class="ts mid" x="620" y="394">NOP</text>
+<rect class="bx-ext" x="684" y="376" width="112" height="28" rx="4"/><text class="ts mid" x="740" y="394">NOP</text>
+<rect class="bx-core" x="804" y="376" width="112" height="28" rx="4"/><text class="ts mid" x="860" y="394">addi, stale a5</text>
+</svg>
+<figcaption><b>Figure 2.</b> Fixed versus original behaviour. In the fixed run FlushE is masked while mem_stall_i is high, so the load stays in EX and one legitimate bubble follows at c4. In the original run FlushE fires at c1, replaces the load with a NOP, and the consumer reads a stale a5.</figcaption>
+</figure>
+<p><b>Pass criteria for the regression.</b> (1) The final value is K + 1 for read-first and store-first variants, over MMIO latencies of 1 to N cycles and with the consumer using rs1 and, separately, rs2. (2) Mutation check: with the three <code>~mem_stall_i</code> terms removed from <code>FlushE</code>, the test must fail; this is the "fails on old RTL" condition of ACT-010. (3) The same test is repeated for the other two gated terms: a CSR read (<code>csr_gpr_stall</code>) and a CSR-to-CSR dependency (<code>csr_stall</code>) following the MMIO access. A second person must review the test before DEF-001 can close.</p>
+
+<h2 id="s7">7. Assertion ideas</h2>
+<p>All are <span class="tag specified">SPECIFIED</span> proposals for CT-3. Each needs a viability record (a negative case that makes it fire).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Property in words</th><th>Port names</th></tr></thead>
+<tbody>
+<tr><td>A-1</td><td>A forward select is never non-zero for source register 0.</td><td><code>Rs1_E</code>, <code>Rs2_E</code>, <code>ForwardAE</code>, <code>ForwardBE</code></td></tr>
+<tr><td>A-2 (DEF-001)</td><td>While <code>mem_stall_i</code> is high and none of PCSrcE, wb_redirect, <code>flush_pipeline_onehot[1]</code>, stallMUL or an in-flight M-stage exception is active, FlushE is low.</td><td><code>mem_stall_i</code>, <code>FlushE</code></td></tr>
+<tr><td>A-3</td><td>When <code>wb_redirect</code> is high, every Stall output is low and every Flush output is high.</td><td><code>wb_redirect</code>, <code>Stall*</code>, <code>Flush*</code></td></tr>
+<tr><td>A-4</td><td>StallE and StallM equal mem_stall_i unless wb_redirect.</td><td><code>StallE</code>, <code>StallM</code></td></tr>
+<tr><td>A-5</td><td>lwstall implies StallF and StallD (unless wb_redirect).</td><td><code>ResultSrcE</code>, <code>StallF</code>, <code>StallD</code></td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Limits of this page</h2>
+<ul>
+<li>It does not claim the hazard unit is correct beyond the DEF-001 sequence passing once in the Stage 3 run.</li>
+<li>H-11 is a question raised by reading the code, not a defect finding.</li>
+<li>The core-wide picture is on <a href="verif_core_overview.html">Core verification overview</a>. Related units: <a href="verif_rv32m.html">RV32M</a>, <a href="verif_lsu_memif.html">LSU and memory interface</a>, <a href="verif_interrupt_unit.html">interrupt unit</a>, and <a href="vf_core_lockstep_compliance.html">lock-step and compliance</a>.</li>
+</ul>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/hazard_unit.v</code>, <code>riscv_core/rtl/top.v:589-631</code>, <code>Verification/artifacts/stage_proofs/20261024_stage3_monitor_count/README.md</code> and <code>stimuli/stage3.dis</code>, <code>Verification/status/defects.csv</code>, <code>Verification/status/PHASE_STATUS.md</code>, <code>Verification/tb1_interrupts.sv</code> (test 5), Rev B 16 (hazard cause list).</div>
+</div>
+</body>
+</html>

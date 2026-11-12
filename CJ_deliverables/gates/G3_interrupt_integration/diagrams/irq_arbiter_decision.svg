@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 426" role="img" aria-label="Arbiter decision order: active mask, class 2 fixed priority, class 1 round robin, class 0 round robin, then the threshold gate">
+<style>text{font-family:Segoe UI,Arial,sans-serif;fill:#0f172a}.tb{font-size:13px;font-weight:600}.ts{font-size:11px;fill:#475569}.mid{text-anchor:middle}.bx-bus{fill:#eff6ff;stroke:#2563eb;stroke-width:1.4}.bx-ctrl{fill:#f8fafc;stroke:#94a3b8;stroke-width:1.4}.ar{fill:none;stroke:#64748b;stroke-width:1.5;marker-end:url(#arr)}</style><defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#5b667a"/></marker>
+</defs>
+<rect class="bx-bus" x="24" y="16" width="520" height="40" rx="6"/>
+<text class="tb mid" x="284" y="40">active = pend_i &amp; {mie[27:16], mie[7]} &amp; {13{MIE}}</text>
+<rect class="bx-ctrl" x="24" y="88" width="520" height="72" rx="6"/>
+<text class="tb mid" x="284" y="112">Class 2, real-time: fixed priority</text>
+<text class="ts mid" x="284" y="132">cause 7 &gt; 22 &gt; 24 &gt; 26 &gt; 20 &gt; 21 &gt; 23 &gt; 25</text>
+<text class="ts mid" x="284" y="148">checked first</text>
+<rect class="bx-ctrl" x="24" y="192" width="520" height="72" rx="6"/>
+<text class="tb mid" x="284" y="216">Class 1, stream: cyclic round robin</text>
+<text class="ts mid" x="284" y="236">causes 19, 18, 27; rr_ptr_c1 names the first candidate</text>
+<text class="ts mid" x="284" y="252">pointer moves past the cause that last committed</text>
+<rect class="bx-ctrl" x="24" y="296" width="520" height="72" rx="6"/>
+<text class="tb mid" x="284" y="320">Class 0, background: round robin</text>
+<text class="ts mid" x="284" y="340">causes 17 and 16; rr_ptr_c0 names the first candidate</text>
+<text class="ts mid" x="284" y="356">checked last</text>
+<rect class="bx-bus" x="640" y="192" width="288" height="72" rx="6"/>
+<text class="tb mid" x="784" y="216">Winner eligibility gate</text>
+<text class="ts mid" x="784" y="236">irq_pending_o = winner_valid &amp;&amp;</text>
+<text class="ts mid" x="784" y="252">(winner_class + 1) &gt; mintprio</text>
+<path class="ar" d="M284 56 V88"/>
+<path class="ar" d="M284 160 V192"/><text class="ts" x="296" y="180">none active</text>
+<path class="ar" d="M284 264 V296"/><text class="ts" x="296" y="284">none active</text>
+<path class="ar" d="M544 124 H784 V192"/><text class="ts" x="558" y="114">class 2 winner</text>
+<path class="ar" d="M544 228 H640"/><text class="ts" x="553" y="216">winner</text>
+<path class="ar" d="M544 332 H784 V264"/><text class="ts" x="558" y="353">class 0 winner</text>
+<text class="ts mid" x="480" y="400">Output: eligible IRQ offer to EX. Acceptance and WB trap commitment follow in the pipeline.</text>
+<text class="ts mid" x="480" y="418">No handler-depth tracking or automatic context save/restore is performed by this arbiter.</text>
+</svg>

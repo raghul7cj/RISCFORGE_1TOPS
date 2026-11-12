@@ -1,0 +1,90 @@
+{
+  "title": "IRQ unit bench structure",
+  "scope": "Four separately instantiated IRQ blocks driven and checked by tb_irq_restructure; not connected pipeline behavior and not SoC integration.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main/rtl; sorted path:SHA256 lines for current IRQ TB, coverage plan and four RTL files",
+    "commit": "worktree-sha256:aaf5464efdce025caf69b3f535eb821c0d11f16b5febc7d7b2b8fbb781f5a8a6"
+  },
+  "nodes": [
+    {
+      "id": "STIM",
+      "label": "Directed stimulus",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 242,
+        "symbol": "initial begin"
+      }
+    },
+    {
+      "id": "BLK",
+      "label": "Unit instances: gateway, arbiter, CSR, commit decoder",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 25,
+        "symbol": "irq_gateway gw (.clk_i(clk), .rst_ni(rst_n), .irq_raw_i(raw),"
+      },
+      "note": "Separate unit instantiations; current source lines are linked in the spec."
+    },
+    {
+      "id": "EXP",
+      "label": "Expected behavior: reference + direct checks",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 326,
+        "symbol": "found=en && glob && (expected_class+1 > t);"
+      }
+    },
+    {
+      "id": "COV",
+      "label": "Coverage sample after the related check",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 329,
+        "symbol": "eligibility_cov.sample(i,t,en,glob);"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "STIM",
+      "to": "BLK",
+      "label": "TB signals drive block inputs",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 25,
+        "symbol": ".irq_raw_i(raw)"
+      }
+    },
+    {
+      "from": "BLK",
+      "to": "EXP",
+      "label": "irq_valid, irq_id, irq_class observed",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 327,
+        "symbol": "if (irq_valid !== found || (found && (irq_id != expected_id || irq_class != expected_class)))"
+      }
+    },
+    {
+      "from": "EXP",
+      "to": "COV",
+      "label": "sample only after the check",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/irq_unit/tb_irq_restructure.sv",
+        "line": 329,
+        "symbol": "eligibility_cov.sample(i,t,en,glob);"
+      }
+    }
+  ],
+  "unknowns": [
+    "Connected pipeline entry, peripheral source timing, firmware and nesting are not represented.",
+    "The arbiter reference and RTL share one cause-to-vector convention; the diagram does not claim an independent mapping model."
+  ]
+}

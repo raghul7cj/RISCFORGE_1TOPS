@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fabric Verification</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification / Fabric</span></div>
+<div class="wrap">
+
+<h1>Fabric Verification</h1>
+<p class="lead">How the AXI-Lite crossbar, the AXI-Lite to APB bridge, the APB decode and the timeout monitors are checked: the path scoreboard, the monitors and assertions that exist, what each bench proves and where the evidence stops.</p>
+<p class="meta">Scope: the MMIO fabric and the SRAM-path checks specified for it | Sources: <code>Verification/step4_checkers/</code>, <code>Verification/infrastructure/monitors/</code>, <code>Verification/components/fabric/</code>, run <code>20261019_run02</code> artefacts, Rev B sections 8 and 14 | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<p>Design side: <a href="soc_fabric.html">SoC bus fabric design</a>. Related: <a href="vf_checking_scoreboards.html">checking and scoreboards</a>, <a href="vf_fabric_peripheral.html">fabric and peripheral verification plan</a>, <a href="soc_architecture.html">SoC architecture</a>, <a href="soc_peripherals.html">SoC peripherals</a>, <a href="core_execute_mem_wb.html">core memory stage</a>, <a href="index.html">index</a>.</p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Status and boundary</a></li>
+<li><a href="#s2">The path scoreboard</a></li>
+<li><a href="#s3">Check architecture</a></li>
+<li><a href="#s4">Monitors and checkers that exist</a></li>
+<li><a href="#s5">Timeout and error injection</a></li>
+<li><a href="#s6">What the benches prove and their limits</a></li>
+<li><a href="#s7">Rev B obligations and the 39 scoreboard rules</a></li>
+<li><a href="#s8">The SRAM-path scoreboard</a></li>
+<li><a href="#s9">Evidence and gap table</a></li>
+</ol></div>
+
+<h2 id="s1">1. Status and boundary</h2>
+<p>Project status is taken from <code>Verification/status/PHASE_STATUS.md</code> (generated 2026-10-31). P0 bring-up is <b>IN PROGRESS</b>: 13 of 20 exit-checklist items are met, 5 partial and 2 not met. Fabric-specific phases are not started: P1b (SoC structural path) and P3.3 (fabric and bridge) both read NOT STARTED. The evidence on this page is therefore component-level and pre-sign-off. Every result is "PASS for a stated boundary", not a share of the fabric requirements.</p>
+<p>Defects touching this area, from <code>Verification/status/defects.csv</code>: DEF-001 (load-use flush during an MMIO memory stall drops loads) is in the current <code>hazard_unit.v</code> but is <b>FIXED-UNVERIFIED</b>, with no regression test yet, so MMIO-path tests that depend on stall behaviour are not yet trustworthy at the core boundary. DEF-002 (UART delta loop in <code>apb_to_obi</code>) is fixed in both golden copies and verified. DEF-005 (unresolvable and absolute-path filelist entries) is OPEN.</p>
+
+<h2 id="s2">2. The path scoreboard</h2>
+<p>The claim to be proved, from <code>Verification/step4_checkers/STEP4_SPEC.md</code> section 7.1: every core MMIO access appears as exactly one AXI-Lite transaction and, if the address decodes to an APB rule, exactly one APB transfer on the slot the address map gives, with the same direction, address, data, byte strobes and response, within the timing budgets. This is exactly-once accounting along the chain LSU to AXI to APB.</p>
+<ul>
+<li><b>A single record, not a queue.</b> The bridge retires one transaction at a time (<code>axi_lite_to_apb.sv:294-358</code>), so at most one transaction is in flight across it. A single record plus a claimed-by flag is exact. At the LSU tap a second concurrent access would mean the stall mechanism failed; that is detected explicitly as <code>PATH-3013</code> rather than hidden by a queue.</li>
+<li><b>The prediction is read from the RTL.</b> The bridge generates an APB transfer only for a decoded address and either a read or a write with non-zero strobes (<code>axi_lite_to_apb.sv:299</code>). The scoreboard predicts that: a zero-strobe write is a silent OKAY, even to an unmapped address, and an unmapped read is DECERR (<code>STEP4_SPEC.md</code> section 7.3).</li>
+<li><b>Second master.</b> The bootloader writes through the same bridge slot 4 without the core. The scoreboard lets it claim the record when the core did not, so its APB[4] traffic is not seen as a ghost transfer.</li>
+<li><b>Fifteen checks</b> <code>PATH-3001</code> to <code>PATH-3015</code> cover reaching the fabric, one APB transfer per AXI transaction, slot, address alignment, write data, byte strobes at both hops, read data, PSLVERR surviving as SLVERR, direction, latency, the timeout path, one outstanding access, DECERR for the unmapped hole and the zero-strobe no-op. <span class="tag exists">EXISTS</span></li>
+<li><b>Vacuity guard.</b> A suite that observes no MMIO traffic reports CLEAN but is flagged VACUOUS PASS. The rule exists because an earlier bench held the stall high from the first cycle and produced 17 transactions with zero checks (<code>STEP4_SPEC.md</code> section 3.2).</li>
+</ul>
+<p>The Step 4 identifiers (<code>PATH-3001..3015</code>) are the implemented set. Rev B uses <code>PATH-0001..0010</code> for the separate SRAM-path scoreboard (section 8). A written mapping between the Step 4 check list and the Rev B rule inventory was not found. <span class="tag open">OPEN</span></p>
+
+<h2 id="s3">3. Check architecture</h2>
+<p>Figure 1 shows where each observer attaches. The monitors and assertions bind to nets in the SoC; they do not sit in the data path.</p>
+
+<figure>
+<svg viewBox="0 0 960 504" role="img" aria-label="Check architecture: the MMIO path from core LSU to APB slots with three observation taps feeding monitors, SVA, the path scoreboard, a fault injector and the failure reporter">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ver" x="96" y="72" width="840" height="56" rx="6"/>
+<text class="tb mid" x="516" y="96">step4_hub, step4_reporter</text>
+<text class="ts mid" x="516" y="114">first-fatal blame, frozen windows, one-page report, vacuity counters</text>
+<rect class="bx-ver" x="96" y="184" width="544" height="56" rx="6"/>
+<text class="tb mid" x="368" y="208">step4_path_scoreboard</text>
+<text class="ts mid" x="368" y="226">one in-flight record: LSU, AXI master 2, APB slot</text>
+<rect class="bx-ver" x="688" y="184" width="248" height="56" rx="6"/>
+<text class="tb mid" x="812" y="208">step4_fault_inject</text>
+<text class="ts mid" x="812" y="226">11 injectors, one hop each</text>
+<path class="ar-ver" d="M368 184 V128"/>
+<path class="ar-ver" d="M812 184 V128"/>
+<rect class="bx-ver" x="140" y="296" width="192" height="56" rx="6"/>
+<text class="tb mid" x="236" y="320">rf_lsu_monitor</text>
+<text class="ts mid" x="236" y="338">LSU request record</text>
+<rect class="bx-ver" x="420" y="296" width="216" height="56" rx="6"/>
+<text class="tb mid" x="528" y="320">rf_axil_monitor</text>
+<text class="ts mid" x="528" y="338">+ step4_axi_sva, core and boot</text>
+<rect class="bx-ver" x="712" y="296" width="224" height="56" rx="6"/>
+<text class="tb mid" x="824" y="320">rf_apb_monitor</text>
+<text class="ts mid" x="824" y="338">+ step4_apb_sva, 6 slots</text>
+<path class="ar-ver" d="M236 296 V240"/>
+<path class="ar-ver" d="M528 296 V240"/>
+<path class="ar-ver" d="M748 296 V268 H592 V240"/>
+<path class="ar-bad" d="M840 240 V296"/>
+<text class="ts" x="848" y="272">corrupted view</text>
+<rect class="bx-core" x="24" y="416" width="120" height="56" rx="6"/>
+<text class="tb mid" x="84" y="440">Core LSU</text><text class="ts mid" x="84" y="458">core_lsu_*</text>
+<rect class="bx-core" x="168" y="416" width="120" height="56" rx="6"/>
+<text class="tb mid" x="228" y="440">hybrid_mem_if</text><text class="ts mid" x="228" y="458">mem_err</text>
+<rect class="bx-ctrl" x="312" y="416" width="144" height="56" rx="6"/>
+<text class="tb mid" x="384" y="440">AXI tmo monitor</text><text class="ts mid" x="384" y="458">64 / 131072 cycles</text>
+<rect class="bx-bus" x="480" y="416" width="136" height="56" rx="6"/>
+<text class="tb mid" x="548" y="440">xbar</text><text class="ts mid" x="548" y="458">SLV0 to MST2</text>
+<rect class="bx-bus" x="640" y="416" width="144" height="56" rx="6"/>
+<text class="tb mid" x="712" y="440">axi_lite_to_apb</text><text class="ts mid" x="712" y="458">one FSM</text>
+<rect class="bx-per" x="808" y="416" width="128" height="56" rx="6"/>
+<text class="tb mid" x="872" y="440">APB slots 0-5</text><text class="ts mid" x="872" y="458">6 tmo monitors</text>
+<path class="ar" d="M144 444 H168"/><path class="ar" d="M288 444 H312"/><path class="ar" d="M456 444 H480"/><path class="ar" d="M616 444 H640"/><path class="ar" d="M784 444 H808"/>
+<path class="ar-ver" d="M228 416 V352"/>
+<text class="ts" x="236" y="388">A: lsu_mem_* signals</text>
+<path class="ar-ver" d="M548 416 V352"/>
+<text class="ts" x="556" y="388">B: xbar_slv[0], after the monitor</text>
+<path class="ar-ver" d="M872 416 V352"/>
+<text class="ts end" x="864" y="408">C: apb_req, apb_resp</text>
+</svg>
+<figcaption><b>Figure 1.</b> Observation points. Tap A is the core LSU bus, tap B is the AXI-Lite master port after the timeout monitor (so the abort path is visible), tap C is the six APB request and response sets (<code>Verification/step4_checkers/step4_bind.svh:23-33,159</code>). The scoreboard and the assertions bind to the same nets; arrows show which observed events feed the scoreboard. The fault injector publishes a corrupted view on one hop and leaves the others intact.</figcaption>
+</figure>
+
+<h2 id="s4">4. Monitors and checkers that exist</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Component</th><th>What it does</th><th>Where</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td><code>rf_monitors.sv</code> classes</td><td>Passive monitors with ring buffers and a shared timebase: fetch, retire, LSU, AXI-Lite, APB, IRQ and pin. They freeze on the first fatal so the window around it survives.</td><td><code>Verification/infrastructure/monitors/rf_monitors.sv:37-945</code></td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Module forms of the monitors</td><td><code>lsu_monitor</code>, <code>axi_lite_monitor</code>, <code>apb_monitor</code> (6 slots), <code>retire</code>, <code>fetch</code>, <code>irq</code> modules</td><td><code>Verification/infrastructure/monitors/*.sv</code></td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>step4_axi_sva</code></td><td>11 AXI-Lite assertions <code>AXIL-1001..1011</code>: payload stability while stalled, VALID held until READY, no X, no EXOKAY, B only after AW and W, stall bound 64, accepted read answered</td><td><code>Verification/step4_checkers/step4_axi_sva.sv</code>; bound at SLV0 and SLV1</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>step4_apb_sva</code></td><td>9 APB assertions <code>APB-2001..2009</code>, including at most one PSEL across all six slots, word-aligned PADDR, stable setup-to-access, PSLVERR only in access</td><td><code>Verification/step4_checkers/step4_apb_sva.sv</code>; one instance for six slots</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>step4_path_scoreboard</code></td><td>Checks <code>PATH-3001..3015</code>, section 2</td><td><code>Verification/step4_checkers/step4_path_scoreboard.sv</code></td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>step4_hub</code>, <code>step4_reporter</code>, <code>step4_disasm</code></td><td>Event mailbox, layered blame (a lower layer reassigns blame), one-page report with disassembled retire window</td><td><code>Verification/step4_checkers/</code></td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>step4_fault_inject</code></td><td>Eleven hop-specific injectors, section 5</td><td><code>Verification/step4_checkers/step4_fault_inject.sv</code></td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Not bound</td><td>Crossbar master ports MST0 and MST1 (ISRAM, DSRAM) carry no assertions</td><td><code>STEP4_SPEC.md</code> section 14.4</td><td><span class="tag open">OPEN</span></td></tr>
+</tbody></table></div>
+<p>Every assertion has a matching <code>cover property</code>, but XSim reports the cover statements as unsupported, so the self-proof checks the procedural checker and fault matrix, not coverage closure (<code>Verification/artifacts/component_first/20261019_run02/monitor/step4_selfproof/README.md</code>).</p>
+
+<h2 id="s5">5. Timeout and error injection</h2>
+<p>The framework rule: a path scoreboard compares two observation points, so an injector must corrupt exactly one hop. Corrupting both would show the scoreboard a consistent world (<code>STEP4_SPEC.md</code> section 9.1).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Injector</th><th>Hop broken</th><th>Check expected</th></tr></thead>
+<tbody>
+<tr><td><code>FI_STROBE</code></td><td>APB PSTRB only</td><td>PATH-3007</td></tr>
+<tr><td><code>FI_STROBE_AXI</code></td><td>AXI WSTRB only</td><td>PATH-3007</td></tr>
+<tr><td><code>FI_WDATA</code> / <code>FI_AXI_WDATA</code></td><td>APB PWDATA / AXI W data</td><td>PATH-3006</td></tr>
+<tr><td><code>FI_RDATA</code></td><td>APB PRDATA</td><td>PATH-3008</td></tr>
+<tr><td><code>FI_TIMEOUT</code></td><td>PRDATA replaced by the timeout sentinel</td><td>PATH-3008</td></tr>
+<tr><td><code>FI_PADDR</code></td><td>APB PADDR</td><td>PATH-3005</td></tr>
+<tr><td><code>FI_AXI_ADDR</code></td><td>AXI AW / AR address</td><td>PATH-3001</td></tr>
+<tr><td><code>FI_SLVERR</code></td><td>APB PSLVERR only</td><td>PATH-3009</td></tr>
+<tr><td><code>FI_RESP</code></td><td>AXI response code, against the unmapped hole</td><td>PATH-3014</td></tr>
+<tr><td><code>FI_WAIT</code></td><td>APB PREADY late</td><td>APB-2004</td></tr>
+</tbody></table></div>
+<ul>
+<li><b>Observation-side by default.</b> Injection publishes a corrupted view; the RTL is untouched. This proves the checker logic. <span class="tag exists">EXISTS</span></li>
+<li><b>DUT-side force/release</b> is the only way to prove the real timeout path end to end (a stuck PREADY must make <code>apb_timeout_monitor</code> fire). It is behind <code>+define+STEP4_FORCE_FI</code> and off by default. No retained run uses it. <span class="tag open">OPEN</span></li>
+<li><b>Wait-state limits.</b> A wait-state injection must exceed the stall bound (64) to trip <code>APB-2004</code> and stay below the slot timeout (16 cycles for five slots) or the monitor converts it to SLVERR first. For the 16-cycle slots the two constraints conflict, so APB-2004 is exercised only through a slot or bound arrangement that has room between them. How the self-proof resolved this was not checked. <span class="tag open">OPEN</span></li>
+<li><b>Ordering invariant.</b> The APB monitors must answer before the AXI-Lite monitor (16 or 65536 cycles against 131072). No check asserts this yet (<code>STEP4_SPEC.md</code> section 14.2). <span class="tag open">OPEN</span></li>
+</ul>
+
+<h2 id="s6">6. What the benches prove and their limits</h2>
+<p>All results below come from checkpoint <code>Verification/artifacts/component_first/20261019_run02</code>, Vivado XSim 2022.2, unless stated. Records are in <code>Verification/components/fabric/*.md</code>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Bench</th><th>Result</th><th>DUT is real RTL?</th><th>Responders</th><th>What it does not show</th></tr></thead>
+<tbody>
+<tr><td><code>tb_axi_lite_to_apb</code></td><td>28/28 pass</td><td>Real <code>axi_lite_to_apb</code></td><td>Behavioural BFM, 2 APB slots (<code>tb_axi_lite_to_apb.sv:27-28</code>)</td><td>SoC map, six slots, crossbar, peripherals. The 28 checks are not yet mapped to the plan's test basis (<code>components/fabric/axi_lite_to_apb.md</code>)</td></tr>
+<tr><td><code>soc_gpio_aperture_tb</code></td><td>43/43 pass</td><td>Real bridge with the SoC address map</td><td>Synthetic APB responders</td><td>Reads and writes across six slots, select masks, GPIO 2 KB edge, hole and unmapped cases. No peripheral RTL, no firmware traffic</td></tr>
+<tr><td><code>tb_apb_timeout_monitor</code></td><td>14/14 pass</td><td>Real <code>apb_timeout_monitor</code></td><td>Stimulus only</td><td>Threshold of 3 cycles, not the 16 or 65536 of the SoC. No bridge or core in the loop</td></tr>
+<tr><td><code>tb_axi_lite_xbar</code> (27 test cases)</td><td>No retained run</td><td>Real crossbar</td><td>Behavioural memories and APB model</td><td>Status NO_RETAINED_RUN in <code>components/fabric/axi_lite_xbar.md</code></td></tr>
+<tr><td>Monitor smoke, challenge, stress</td><td>Smoke pass; 25 challenges pass; 165 checks, 0 failures</td><td>Stub / probe DUTs</td><td>Structural stubs</td><td>Proves the monitors capture and join; not SoC accounting (<code>monitor/exact_join_fixed/README.md</code>)</td></tr>
+<tr><td>Exact-join bench</td><td>One UART write recorded once at each layer; <code>be=1111</code> at all three</td><td>Deterministic monitor stub</td><td>Stub</td><td>First run failed with <code>be=0000</code>; <code>rf_monitors.sv</code> was changed to build the record atomically. Post-fix run passes</td></tr>
+<tr><td>Step 4 self-proof</td><td>Disassembler 31/31; clean traffic 0 findings (LSU 17, AXI writes 8, reads 9, APB 14); fault matrix 11 of 11 named correctly</td><td>No: <code>step4_apb_bridge_model</code></td><td>Bridge model</td><td>Validates checker and injection logic, not real SoC timeout propagation or firmware accounting (<code>monitor/step4_selfproof/README.md</code>)</td></tr>
+</tbody></table></div>
+<p><b>Synthetic versus real.</b> The one place where the real bridge and the SoC map are exercised together is the aperture bench, and its slaves are synthetic. No retained run puts the real core, crossbar, bridge, monitors and peripherals together under the Step 4 checkers. <span class="tag open">OPEN</span></p>
+<p><b>Conflicting statements.</b> <code>STEP4_SPEC.md</code> section 10 says XSim cannot elaborate <code>axi_lite_to_apb</code> because of its unpacked-array parameter-type ports, yet the bridge and aperture benches above elaborated and ran it in XSim 2022.2 (<code>bridge/elab.log</code>). The spec's section 14.1 also describes the fault matrix as not green, while the later self-proof README reports it green. The later run evidence supersedes the spec text; the spec was not updated. <span class="tag open">OPEN</span></p>
+
+<h2 id="s7">7. Rev B obligations and the 39 scoreboard rules</h2>
+<p>Rev B section 14 states the fabric as 2 masters, 3 targets and an internal error slave, and lists eleven required properties FP-1 to FP-11 (Table 14.3), twelve checker attachment points CP-1 to CP-12 (Table 8.2) and the 18-element inventory (Table 14.2). Summarised by group:</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Group</th><th>Properties</th><th>Rev B intent</th><th>Existing evidence</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Protocol</td><td>FP-1, FP-2</td><td>Stable payload while stalled; no X when VALID</td><td>AXIL-1001..1007 and APB-2003/2009 written and bound; self-proof only</td><td><span class="tag exists">EXISTS</span> (not run on SoC)</td></tr>
+<tr><td>Decode</td><td>FP-4, FP-5</td><td>Each region reaches the intended target; no-rule address gets DECERR from the error slave</td><td>Aperture bench covers the APB level; no crossbar decode run; error slave unreachable by any master in the full SoC</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Arbitration</td><td>FP-3, FP-11</td><td>Fair grants across two masters; SRAM mux port 0 beats port 1</td><td>None found</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>Bridge</td><td>FP-7, FP-9</td><td>No W without AW; exactly one APB transfer per AXI transaction</td><td>PATH-3003 written; bridge bench TC1-TC10; no SoC run</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Timeout</td><td>FP-6, FP-10</td><td>Abort is a legal transaction; each of the 7 monitors fires at its threshold, blocks, recovers, sets sticky without an interrupt</td><td>APB monitor unit bench (3-cycle threshold); AXI-Lite monitor: no bench found</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Configuration</td><td>FP-8</td><td>The deployed crossbar configuration (CUT_ALL_AX, 0 stages, ID width 0) is the one exercised</td><td>No retained crossbar run</td><td><span class="tag open">OPEN</span></td></tr>
+</tbody></table></div>
+<p>Rev B Table 8.1 sets scoreboard-rule <b>targets</b> by layer, 39 in total. They are targets derived from the check inventory, not achievements, and the rule count would move if the inventory changed (Rev B 8.3). The L2 figure is 25 because the SRAM-path scoreboard adds ten rules to the fifteen MMIO rules. <span class="tag specified">SPECIFIED</span></p>
+
+<figure>
+<svg viewBox="0 0 960 336" role="img" aria-label="Bar chart of the 39 Rev B scoreboard rules by layer: L1 4, L2 25 (15 MMIO plus 10 SRAM), L3 2, L4 2, L5 3, L6 1, L7 2">
+<text class="tm end" x="184" y="64">L1 Protocol</text>
+<rect class="bx-ver" x="200" y="48" width="96" height="24" rx="3"/><text class="t" x="304" y="65">4</text>
+<text class="tm end" x="184" y="100">L2 Path</text>
+<rect class="bx-ver" x="200" y="84" width="360" height="24" rx="3"/>
+<rect class="bx-bus" x="560" y="84" width="240" height="24" rx="3"/><text class="t" x="808" y="101">25 (15 MMIO + 10 SRAM)</text>
+<text class="tm end" x="184" y="136">L3 Register</text>
+<rect class="bx-ver" x="200" y="120" width="48" height="24" rx="3"/><text class="t" x="256" y="137">2</text>
+<text class="tm end" x="184" y="172">L4 Device</text>
+<rect class="bx-ver" x="200" y="156" width="48" height="24" rx="3"/><text class="t" x="256" y="173">2</text>
+<text class="tm end" x="184" y="208">L5 Interrupt</text>
+<rect class="bx-ver" x="200" y="192" width="72" height="24" rx="3"/><text class="t" x="280" y="209">3</text>
+<text class="tm end" x="184" y="244">L6 Privilege</text>
+<rect class="bx-ver" x="200" y="228" width="24" height="24" rx="3"/><text class="t" x="232" y="245">1</text>
+<text class="tm end" x="184" y="280">L7 Firmware</text>
+<rect class="bx-ver" x="200" y="264" width="48" height="24" rx="3"/><text class="t" x="256" y="281">2</text>
+<rect class="bx-ver" x="200" y="304" width="16" height="16" rx="3"/><text class="ts" x="224" y="316">MMIO-path rules</text>
+<rect class="bx-bus" x="360" y="304" width="16" height="16" rx="3"/><text class="ts" x="384" y="316">SRAM-path rules PATH-0001..0010</text>
+</svg>
+<figcaption><b>Figure 2.</b> Rev B Table 8.1 scoreboard-rule targets by layer, 39 in total (4 + 25 + 2 + 2 + 3 + 1 + 2). Targets, not implemented checks. One bar unit is one rule.</figcaption>
+</figure>
+<p>Layer summary: L1 protocol rules sit beside 45 targeted assertions; L2 path holds the MMIO and SRAM scoreboards; L3 to L7 carry the register, device, interrupt, privilege and firmware rules and belong to other pages (<a href="vf_checking_scoreboards.html">checking and scoreboards</a>). The fabric-relevant bus-error check is CP-8: every error response must become exactly one precise access fault with the specified CSR state (cause 5 or 7, <code>mtval</code> = the faulting address, no shadow-stack push), and no clean access may become one (Rev B Tables 8.6 to 8.8). Not implemented. <span class="tag specified">SPECIFIED</span></p>
+
+<h2 id="s8">8. The SRAM-path scoreboard</h2>
+<p>The MMIO scoreboard starts at the LSU and ends at the bridge, so three paths had no checker: the fetch demux to BootROM and ISRAM, the hybrid interface to the DSRAM direct port, and the privileged-write-only ISRAM AXI port. Rev B 8.4 adds a scoreboard with four scored properties: transaction accounting, route exclusivity, arbitration, and write protection. It reuses the <code>PATH-NNNN</code> family. It is a specification only; no RTL of it was found in the repository. <span class="tag specified">SPECIFIED</span></p>
+
+<figure>
+<svg viewBox="0 0 960 464" role="img" aria-label="SRAM path observation points CP-9 to CP-12: fetch demux to boot ROM and ISRAM, direct DSRAM port, the two AXI-Lite SRAM interfaces and the SRAM muxes">
+<rect class="bx-core" x="24" y="48" width="120" height="56" rx="6"/>
+<text class="tb mid" x="84" y="72">Core fetch</text><text class="ts mid" x="84" y="90">no handshake</text>
+<rect class="bx-bus" x="184" y="48" width="160" height="56" rx="6"/>
+<text class="tb mid" x="264" y="72">instr_fetch_demux</text><text class="ts mid" x="264" y="90">3 outcomes</text>
+<rect class="bx-bus" x="400" y="48" width="160" height="56" rx="6"/>
+<text class="tb mid" x="480" y="72">sram_mux (ISRAM)</text><text class="ts mid" x="480" y="90">port 0 beats port 1</text>
+<rect class="bx-mem" x="616" y="48" width="160" height="56" rx="6"/>
+<text class="tb mid" x="696" y="72">ISRAM</text><text class="ts mid" x="696" y="90">32 KB sram_sp</text>
+<rect class="bx-mem" x="184" y="152" width="160" height="56" rx="6"/>
+<text class="tb mid" x="264" y="176">boot_rom</text><text class="ts mid" x="264" y="194">16 words</text>
+<rect class="bx-mem" x="400" y="152" width="160" height="56" rx="6"/>
+<text class="tb mid" x="480" y="176">axi_lite_sram_if</text><text class="ts mid" x="480" y="194">ISRAM, privilege gate</text>
+<rect class="bx-bus" x="616" y="152" width="160" height="56" rx="6"/>
+<text class="tb mid" x="696" y="176">xbar MST0</text><text class="ts mid" x="696" y="194">no master in full SoC</text>
+<rect class="bx-core" x="24" y="256" width="120" height="56" rx="6"/>
+<text class="tb mid" x="84" y="280">Core data port</text><text class="ts mid" x="84" y="298">hybrid_mem_if</text>
+<rect class="bx-bus" x="400" y="256" width="160" height="56" rx="6"/>
+<text class="tb mid" x="480" y="280">sram_mux (DSRAM)</text><text class="ts mid" x="480" y="298">port 0 beats port 1</text>
+<rect class="bx-mem" x="616" y="256" width="160" height="56" rx="6"/>
+<text class="tb mid" x="696" y="280">DSRAM</text><text class="ts mid" x="696" y="298">32 KB sram_sp</text>
+<rect class="bx-mem" x="400" y="360" width="160" height="56" rx="6"/>
+<text class="tb mid" x="480" y="384">axi_lite_sram_if</text><text class="ts mid" x="480" y="402">DSRAM, no gate</text>
+<rect class="bx-bus" x="616" y="360" width="160" height="56" rx="6"/>
+<text class="tb mid" x="696" y="384">xbar MST1</text><text class="ts mid" x="696" y="402">bootloader writes only</text>
+<path class="ar" d="M144 76 H184"/><path class="ar" d="M344 76 H400"/><path class="ar" d="M560 76 H616"/>
+<path class="ar" d="M264 104 V152"/>
+<path class="ar" d="M480 152 V104"/><text class="ts" x="488" y="132">port 1</text>
+<path class="ar" d="M616 180 H560"/>
+<path class="ar" d="M144 284 H400"/><text class="ts mid" x="272" y="276">direct port, DSRAM range</text>
+<path class="ar" d="M560 284 H616"/>
+<path class="ar" d="M480 360 V312"/><text class="ts" x="488" y="340">port 1</text>
+<path class="ar" d="M616 388 H560"/>
+<rect class="pill" x="184" y="24" width="48" height="18" rx="9"/><text class="ts mid" x="208" y="37">CP-9</text>
+<rect class="pill" x="400" y="24" width="48" height="18" rx="9"/><text class="ts mid" x="424" y="37">CP-12</text>
+<rect class="pill" x="400" y="128" width="48" height="18" rx="9"/><text class="ts mid" x="424" y="141">CP-11</text>
+<rect class="pill" x="248" y="244" width="48" height="18" rx="9"/><text class="ts mid" x="272" y="257">CP-10</text>
+<rect class="pill" x="400" y="232" width="48" height="18" rx="9"/><text class="ts mid" x="424" y="245">CP-12</text>
+<rect class="pill" x="400" y="336" width="48" height="18" rx="9"/><text class="ts mid" x="424" y="349">CP-11</text>
+<text class="th" x="24" y="372">Scored rules</text>
+<text class="t" x="24" y="394">PATH-0001 to 0003: fetch and demux</text>
+<text class="t" x="24" y="412">PATH-0004: DSRAM access, one port-0 request</text>
+<text class="t" x="24" y="430">PATH-0005 to 0007: mux grant, rvalid, data</text>
+<text class="t" x="24" y="448">PATH-0008 to 0010: AXI gates on the SRAM interfaces</text>
+</svg>
+<figcaption><b>Figure 3.</b> SRAM-path attachment points CP-9 to CP-12 (Rev B Table 8.2). Elements exist in RTL; the checks that observe them are specified. PATH-0008 to PATH-0010 (the ISRAM and DSRAM AXI gates) need a master-side BFM on the crossbar and are not reachable in the full-SoC configuration.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Rule</th><th>Statement (short)</th><th>Reachable in full SoC?</th></tr></thead>
+<tbody>
+<tr><td>PATH-0001</td><td>One retired core fetch gives exactly one demux grant</td><td>Yes</td></tr>
+<tr><td>PATH-0002</td><td>Demux decode has three outcomes: ROM, ISRAM, or neither (then no grant, no rvalid)</td><td>Yes</td></tr>
+<tr><td>PATH-0003</td><td>A BootROM fetch gives no SRAM mux request and no AXI transaction</td><td>Yes</td></tr>
+<tr><td>PATH-0004</td><td>A DSRAM load or store gives one mux port-0 request and no crossbar transaction</td><td>Yes</td></tr>
+<tr><td>PATH-0005</td><td>Contended cycle: port 0 granted, port 1 not</td><td>Yes</td></tr>
+<tr><td>PATH-0006</td><td>rvalid only to the port granted in the previous cycle</td><td>Yes</td></tr>
+<tr><td>PATH-0007</td><td>Strobes and write data cross the mux unchanged</td><td>Yes</td></tr>
+<tr><td>PATH-0008</td><td>ISRAM AXI write with <code>prot[0]=0</code> gives one SLVERR and no SRAM write</td><td>No (fabric-only configuration)</td></tr>
+<tr><td>PATH-0009</td><td>ISRAM AXI access after boot done gives one SLVERR</td><td>No (fabric-only configuration)</td></tr>
+<tr><td>PATH-0010</td><td>DSRAM AXI access after boot done is not rejected (negative control)</td><td>No (fabric-only configuration)</td></tr>
+</tbody></table></div>
+<p>Source: Rev B Tables 8.4 and 8.5. Rev B states that a check may not be reported green in a configuration whose stimulus cannot be produced. <span class="tag specified">SPECIFIED</span></p>
+
+<h2 id="s9">9. Evidence and gap table</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Obligation</th><th>Evidence today</th><th>Status</th><th>Gap</th></tr></thead>
+<tbody>
+<tr><td>Bridge component behaviour</td><td>28/28 pass, <code>bridge/sim.log</code></td><td><span class="tag exists">EXISTS</span></td><td>Map the 28 checks to the plan; 2-slot BFM only</td></tr>
+<tr><td>SoC APB aperture and slot decode</td><td>43/43 pass, <code>gpio_aperture/sim.log</code></td><td><span class="tag exists">EXISTS</span></td><td>Synthetic responders; no peripheral RTL or firmware</td></tr>
+<tr><td>APB timeout monitor RTL</td><td>14/14 pass, 3-cycle threshold</td><td><span class="tag exists">EXISTS</span></td><td>SoC thresholds (16, 65536), blocking and recovery with a real slave</td></tr>
+<tr><td>AXI-Lite timeout monitor RTL</td><td>None found</td><td><span class="tag open">OPEN</span></td><td>Unit bench for StInject and StDrain, late-response swallow</td></tr>
+<tr><td>Crossbar arbitration, decode, contention</td><td>Bench <code>tb_axi_lite_xbar.sv</code> written (27 cases); no retained run</td><td><span class="tag open">OPEN</span></td><td>Retain a run with per-case verdicts</td></tr>
+<tr><td>Monitor infrastructure</td><td>Smoke, challenge (25), stress (165 checks) pass; exact join passes after fix</td><td><span class="tag exists">EXISTS</span></td><td>Stub DUTs; real-SoC accounting not shown</td></tr>
+<tr><td>Step 4 checkers and fault matrix</td><td>Self-proof green: 0 findings clean, 11 of 11 faults named</td><td><span class="tag exists">EXISTS</span></td><td>Run against a bridge model; real SoC run needed</td></tr>
+<tr><td>Path scoreboard on real SoC with firmware</td><td>None retained</td><td><span class="tag open">OPEN</span></td><td>Non-vacuous run on real core and bridge</td></tr>
+<tr><td>Timeout injection through bridge and core</td><td>None retained; DUT-side force off by default</td><td><span class="tag open">OPEN</span></td><td>Stuck PREADY end to end to an access fault</td></tr>
+<tr><td>APB-before-AXI ordering invariant</td><td>Not asserted</td><td><span class="tag open">OPEN</span></td><td>Directed test in SoC regression</td></tr>
+<tr><td>Bus error to access fault (CP-8)</td><td>None</td><td><span class="tag specified">SPECIFIED</span></td><td>Trap model; depends on DEF-001 verification</td></tr>
+<tr><td>Fairness, FP-3 and SRAM mux FP-11</td><td>None</td><td><span class="tag specified">SPECIFIED</span></td><td>Checks not written</td></tr>
+<tr><td>SRAM-path scoreboard PATH-0001..0010</td><td>None</td><td><span class="tag specified">SPECIFIED</span></td><td>Not written; 0008-0010 need a master-side BFM</td></tr>
+<tr><td>Slot 4 expected path (bridge, bootloader, SPI)</td><td>Aperture bench routes slot 4 only as a select mask</td><td><span class="tag specified">SPECIFIED</span></td><td>Per-slot expected-path parameter in the scoreboard</td></tr>
+<tr><td>Crossbar master ports MST0, MST1 unbound</td><td>No assertions</td><td><span class="tag open">OPEN</span></td><td>Bind if SRAM agents become multi-transaction</td></tr>
+</tbody></table></div>
+
+<div class="sources"><b>Sources read:</b> <code>Verification/step4_checkers/STEP4_SPEC.md</code>, <code>step4_bind.svh</code> (selected lines), <code>Verification/infrastructure/monitors/rf_monitors.sv</code> (header and class list), <code>lsu_monitor.sv</code>, <code>axi_lite_monitor.sv</code>, <code>apb_monitor.sv</code> (headers), <code>Verification/components/fabric/*.md</code>, run <code>20261019_run02</code> logs and READMEs for bridge, gpio_aperture, monitor (apb_timeout_unit, smoke, challenge, stress, exact_join_fixed, step4_selfproof), <code>axi_lite_xbar/tb_axi_lite_xbar.sv</code> and <code>axi_lite_to_apb/tb_axi_lite_to_apb.sv</code> (headers), <code>Verification/status/PHASE_STATUS.md</code>, <code>defects.csv</code>, <code>P0_EXECUTION_CONTRACT.md</code>, Rev B sections 8 and 14.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Interrupt Path</title>
+<link rel="stylesheet" href="../../../documentation/html/assets/style.css">
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../../../documentation/signoff/cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. Retained interrupt-path description; use the maintained review for the common source/evidence baseline and unresolved decisions. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside>
+<div class="topbar"><a class="brand" href="../../../documentation/html/index.html">RISCFORGE documentation</a><span class="crumb">/ Core / Interrupts</span></div>
+<div class="wrap">
+
+<h1>Core interrupt path</h1>
+<p class="lead">How an interrupt line becomes a trap in the RV32IM_Zicsr core: which lines are wired into <code>mip</code>, how the gateway and arbiter choose a winner, what gates delivery, and how the trap and MRET return work. Written from the RTL files as they are now; for engineers writing firmware or interrupt checks.</p>
+<p class="meta">Scope: <code>irq_gateway.v</code>, <code>irq_arbiter.v</code>, interrupt wiring in <code>top.v</code>, <code>csr_regfile.v</code>, <code>execute_cycle.v</code> and the commit controller | Sources: see footer | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Path overview</a></li>
+<li><a href="#s2">Sources wired into the core</a></li>
+<li><a href="#s3">Gateway: capture regimes</a></li>
+<li><a href="#s4">Arbiter: classes, round robin, threshold</a></li>
+<li><a href="#s5">Gating by mie, mstatus.MIE and mintprio</a></li>
+<li><a href="#s6">Taking the interrupt, and returning</a></li>
+<li><a href="#s7">Interrupt during a multi-cycle MMIO access</a></li>
+<li><a href="#s8">mtvec modes</a></li>
+<li><a href="#s9">EXISTS, SPECIFIED, OPEN, and evidence</a></li>
+</ol></div>
+
+<h2 id="s1">1. Path overview</h2>
+<p>The whole interrupt path is inside the core; no external interrupt controller is in the path (<code>top.v:204-245</code>). That is a project decision, not a missing block: the PLIC and CLIC are not used, and the direct interface is chosen (<a href="G3_IRQ_Architecture.html#plic">decision and rationale</a>, <a href="G3_IRQ_Architecture.html#map">13-channel map</a>). Figure 1 shows it. Peripheral lines enter the gateway, the arbiter picks one winner and raises <code>irq_pending</code>, the EX stage converts the instruction it holds into an interrupt trap packet, and the packet is committed at WB by the same controller that handles exceptions (see <a href="../../../documentation/html/core_hazards_csr_traps.html">core_hazards_csr_traps.html</a>). <span class="tag exists">EXISTS</span></p>
+
+<figure>
+<svg viewBox="0 0 960 376" role="img" aria-label="Block diagram: peripheral lines to gateway, arbiter, execute stage, WB commit controller and csr_regfile with feedback paths">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-per" x="24" y="64" width="144" height="64" rx="6"/>
+<text class="tb mid" x="96" y="88">Peripheral lines</text><text class="ts mid" x="96" y="104">fast_irq_i[11:0]</text><text class="ts mid" x="96" y="118">timer_irq_i</text>
+<rect class="bx-ctrl" x="232" y="64" width="144" height="64" rx="6"/>
+<text class="tb mid" x="304" y="88">irq_gateway</text><text class="ts mid" x="304" y="104">13-bit capture</text><text class="ts mid" x="304" y="118">edge / event / level</text>
+<rect class="bx-ctrl" x="440" y="64" width="144" height="64" rx="6"/>
+<text class="tb mid" x="512" y="88">irq_arbiter</text><text class="ts mid" x="512" y="104">3 classes, round robin</text><text class="ts mid" x="512" y="118">mintprio gate</text>
+<rect class="bx-core" x="648" y="64" width="144" height="64" rx="6"/>
+<text class="tb mid" x="720" y="88">execute_cycle</text><text class="ts mid" x="720" y="104">irq_accept_E</text><text class="ts mid" x="720" y="118">tags EX packet</text>
+<path class="ar" d="M168 96 H232"/><text class="ts mid" x="200" y="88">raw</text>
+<path class="ar" d="M376 96 H440"/><text class="ts mid" x="408" y="88">pend_o</text>
+<path class="ar" d="M584 96 H648"/><text class="ts mid" x="616" y="88">winner</text>
+
+<rect class="bx-ctrl" x="200" y="240" width="192" height="64" rx="6"/>
+<text class="tb mid" x="296" y="264">WB commit controller</text><text class="ts mid" x="296" y="282">wb_trap_mret_commit_controller</text>
+<rect class="bx-bus" x="456" y="240" width="144" height="64" rx="6"/>
+<text class="tb mid" x="528" y="264">csr_regfile</text><text class="ts mid" x="528" y="282">mip, mie, mstatus</text>
+<rect class="bx-ext" x="648" y="240" width="144" height="64" rx="6"/>
+<text class="tb mid" x="720" y="264">ext_irq_i, sw_irq_i</text><text class="ts mid" x="720" y="282">mip[11], mip[3] only</text>
+
+<path class="ar" d="M792 96 H840 V336 H296 V304"/>
+<text class="ts" x="420" y="328">tagged packet through EX/MEM and MEM/WB</text>
+<path class="ar" d="M392 272 H456"/><text class="ts mid" x="424" y="264">trap/mret</text>
+<path class="ar-d" d="M648 272 H600"/><text class="ts mid" x="624" y="264">mip</text>
+<path class="ar" d="M290 240 V128"/><text class="ts end" x="282" y="184">clear_gateway_o</text>
+<path class="ar" d="M360 240 V184 H480 V128"/><text class="ts" x="372" y="176">wb_commit_irq</text>
+<path class="ar" d="M540 240 V128"/><text class="ts" x="548" y="184">mie, MIE, mintprio</text>
+</svg>
+<figcaption><b>Figure 1.</b> Interrupt path. The dashed box is not connected to the arbiter: external and software interrupt bits reach <code>mip</code> only. The three upward arrows are the feedback: gateway clear, round-robin update, and the enables and threshold read from the CSRs.</figcaption>
+</figure>
+
+<h2 id="s2">2. Sources wired into the core</h2>
+<p>The gateway vector is 13 bits: bit 0 is cause 7 (machine timer, MTIP) and bits 12:1 are causes 27:16 (<code>irq_gateway.v:2</code>). <code>top.v:207</code> builds it as <code>{fast_irq_i[11:0], timer_irq_i}</code>. The SoC drives <code>fast_irq_i</code> with <code>{4'b0, ...}</code> followed by the twelve peripheral lines (<code>RTL_SOC/riscforge_soc_subsystem.sv:1275-1287</code>); the top four bits are zero. <span class="tag exists">EXISTS</span></p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Gateway bit</th><th>mip bit / mcause</th><th>Source (SoC comments)</th><th>Capture regime</th><th>Arbiter class</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>7 (MTIP)</td><td>Timer 0 compare match (<code>timer0_irq_o[1]</code>)</td><td>event</td><td>2</td></tr>
+<tr><td>1</td><td>16</td><td>GPIO global interrupt</td><td>edge</td><td>0</td></tr>
+<tr><td>2</td><td>17</td><td>I2C</td><td>level</td><td>0</td></tr>
+<tr><td>3</td><td>18</td><td>SPI event 0</td><td>event</td><td>1</td></tr>
+<tr><td>4</td><td>19</td><td>UART</td><td>level</td><td>1</td></tr>
+<tr><td>5</td><td>20</td><td>Timer 0 channel 0 overflow</td><td>event</td><td>2</td></tr>
+<tr><td>6</td><td>21</td><td>Timer 0 channel 1 overflow</td><td>event</td><td>2</td></tr>
+<tr><td>7</td><td>22</td><td>Timer 0 channel 1 compare</td><td>event</td><td>2</td></tr>
+<tr><td>8</td><td>23</td><td>Timer 1 channel 0 overflow</td><td>event</td><td>2</td></tr>
+<tr><td>9</td><td>24</td><td>Timer 1 channel 0 compare</td><td>event</td><td>2</td></tr>
+<tr><td>10</td><td>25</td><td>Timer 1 channel 1 overflow</td><td>event</td><td>2</td></tr>
+<tr><td>11</td><td>26</td><td>Timer 1 channel 1 compare</td><td>event</td><td>2</td></tr>
+<tr><td>12</td><td>27</td><td>SPI end of transfer (<code>spi_events_o[1]</code>)</td><td>event</td><td>1</td></tr>
+</tbody></table></div>
+<p>Regimes from <code>top.v:208-209</code> (<code>edge_mode = 13'h0002</code>, <code>event_mode = 13'h1fe9</code>; neither set means level). The peripheral IRQ outputs were also inspected: timer outputs are single-cycle match pulses (<code>timer.sv:53-70</code>), <code>spi_events_o[0]</code> is <code>s_int_tx | s_int_rx</code> and <code>[1]</code> is end-of-transfer (<code>apb_spi_master.sv:116-117</code>), <code>i2c_interrupt_o</code> is a registered <code>irq_flag &amp;&amp; IEN</code> level, UART <code>INT</code> follows the IIR condition, and GPIO <code>global_interrupt_o</code> is a level selected by <code>cfg.glbl_intrpt_mode</code> (<code>gpio.sv:140</code>). The per-channel view is in <a href="G3_IRQ_Architecture.html#map">G3_IRQ_Architecture.html section 13</a>.</p>
+
+<p><b>Lines that do not reach the arbiter.</b></p>
+<ul>
+<li><code>fast_irq_i[15:12]</code>: the SoC ties them to zero and <code>top.v:207</code> uses only bits 11:0, so mip[31:28] is constant 0 (<code>top.v:550</code>). Their <code>mie</code> bits (31:28) are writable but have no effect.</li>
+<li><code>ext_irq_i</code> (mip[11], MEIP) and <code>sw_irq_i</code> (mip[3], MSIP) go straight into <code>mip</code> without passing the gateway (<code>top.v:575-576</code>, <code>csr_regfile.v:217</code>). The arbiter only looks at <code>mie[27:16]</code> and <code>mie[7]</code> (<code>irq_arbiter.v:20</code>), so these two can be seen in <code>mip</code> but can never cause a trap. The SoC ties both inputs to 0 (<code>riscforge_soc_subsystem.sv:1289-1290</code>); software can still set mip[3] by writing it (<code>csr_regfile.v:211-217</code>), which also never traps.</li>
+<li>The bits of <code>mip</code> that come from the gateway read the gateway output <code>pend_o</code>, not the raw pin (<code>top.v:550-551</code>).</li>
+</ul>
+<div class="open"><span class="tag open">OPEN</span> <b>Rev B section 13 and the files disagree.</b> Rev B 13.1 describes a gateway and arbiter six sources wide, says mip[20] to mip[26] are provably zero because the core drops mip[10:4], and describes a two-deep shadow stack with a depth-2 delivery gate. The current files are thirteen sources wide, wire causes 20 to 26, and contain no shadow stack or depth gate. <code>irq_gateway.v</code>, <code>irq_arbiter.v</code>, <code>csr_regfile.v</code> and <code>top.v</code> were last modified on 2026-10-29, and an <code>irq_restructure</code> verification folder from the same day exists. This page follows the files. The Rev B text appears to describe the state before that restructure; the plan has not been reconciled.</div>
+
+<h2 id="s3">3. Gateway: capture regimes</h2>
+<p>The gateway keeps a registered copy of each raw line and a pending latch (<code>irq_gateway.v:14-27</code>).</p>
+<ul>
+<li><b>Capture:</b> <code>(raw &amp; event_mode) | (raw &amp; ~raw_q &amp; edge_mode)</code>. Event lines are captured in every cycle they are asserted. Edge lines are captured on a rising edge.</li>
+<li><b>Latch:</b> <code>pend_q &lt;= capture | (pend_q &amp; ~clear_i)</code>. A capture in the same cycle as a clear wins, so a new event is never lost; further captures while already pending coalesce into one.</li>
+<li><b>Output:</b> for edge and event lines, the latch; for level lines (neither mode bit set), the raw line unchanged (<code>:29-30</code>). A level line therefore stays pending until the peripheral drops it, and the clear strobe has no effect on it.</li>
+<li><b>Clear:</b> <code>clear_gateway_o</code> is a one-hot pulse generated when an interrupt trap commits: cause 7 clears bit 0, causes 16 to 27 clear bit (cause - 15) (<code>wb_trap_mret_commit_controller.v:80-92</code>). The mode vectors are constants in <code>top.v</code>, not registers.</li>
+</ul>
+<p>Consequences, <span class="tag exists">EXISTS</span>: a pending edge or event interrupt that is masked stays latched and fires when enabled. An interrupt is cleared only when it is taken, so a handler for a level line must silence the peripheral itself, otherwise the interrupt re-fires after MRET. The comment in <code>top.v:210</code> states that GPIO software must deassert and rearm its output.</p>
+
+<h2 id="s4">4. Arbiter: classes, round robin, threshold</h2>
+<p>The arbiter first masks the pending vector, then picks one winner by class, then applies the class threshold. Figure 2 shows the order.</p>
+
+<figure>
+<svg viewBox="0 0 960 392" role="img" aria-label="Arbiter decision order: active mask, class 2 fixed priority, class 1 round robin, class 0 round robin, then the threshold gate">
+<defs>
+  <marker id="a-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-bus" x="24" y="16" width="520" height="40" rx="6"/>
+<text class="tb mid" x="284" y="40">active = pend_i &amp; mie[27:16], mie[7] &amp; mstatus.MIE</text>
+<rect class="bx-ctrl" x="24" y="88" width="520" height="72" rx="6"/>
+<text class="tb mid" x="284" y="112">Class 2, real-time: fixed priority</text>
+<text class="ts mid" x="284" y="132">cause 7 > 22 > 24 > 26 > 20 > 21 > 23 > 25</text>
+<text class="ts mid" x="284" y="148">checked first</text>
+<rect class="bx-ctrl" x="24" y="192" width="520" height="72" rx="6"/>
+<text class="tb mid" x="284" y="216">Class 1, stream: cyclic round robin</text>
+<text class="ts mid" x="284" y="236">causes 19, 18, 27; rr_ptr_c1 names the first candidate</text>
+<text class="ts mid" x="284" y="252">pointer moves past the cause that last committed</text>
+<rect class="bx-ctrl" x="24" y="296" width="520" height="72" rx="6"/>
+<text class="tb mid" x="284" y="320">Class 0, background: round robin</text>
+<text class="ts mid" x="284" y="340">causes 17 and 16; rr_ptr_c0 names the first candidate</text>
+<text class="ts mid" x="284" y="356">checked last</text>
+<rect class="bx-bus" x="640" y="192" width="288" height="72" rx="6"/>
+<text class="tb mid" x="784" y="216">Pre-emption gate</text>
+<text class="ts mid" x="784" y="236">irq_pending_o = winner valid and</text>
+<text class="ts mid" x="784" y="252">(class + 1) > mintprio</text>
+<path class="ar" d="M284 56 V88"/>
+<path class="ar" d="M284 160 V192"/><text class="ts" x="296" y="180">none active</text>
+<path class="ar" d="M284 264 V296"/><text class="ts" x="296" y="284">none active</text>
+<path class="ar" d="M544 124 H784 V192"/>
+<path class="ar" d="M544 228 H640"/>
+<path class="ar" d="M544 332 H784 V264"/>
+</svg>
+<figcaption><b>Figure 2.</b> Arbiter order (<code>irq_arbiter.v:20-102</code>). Class 2 beats class 1 beats class 0. Only the single winner is compared with the threshold; a lower-class interrupt is not offered when the winner is blocked, because the winner is chosen before the threshold is applied.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Behaviour</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Round-robin update</td><td>The pointers change only on <code>wb_commit_i</code>, using the committed cause: after 19 the first candidate becomes 18; after 18 it becomes 27; after 27 it becomes 19; after 17 it becomes 16; after 16 it becomes 17. A taken interrupt that is not in classes 1 or 0 does not move them</td><td><code>irq_arbiter.v:24-40</code></td></tr>
+<tr><td>Threshold</td><td><code>mintprio</code> 0: all classes eligible. 1: class 0 blocked. 2: only class 2. 3: none. Mapping from the compare <code>(class + 1) &gt; mintprio</code></td><td><code>irq_arbiter.v:99-100</code>, <code>csr_regfile.v:79-80</code></td></tr>
+<tr><td>Outputs</td><td><code>irq_pending_o</code>, 5-bit <code>irq_id_o</code>, 2-bit <code>irq_class_o</code>; <code>top.v</code> widens the id to 31 bits</td><td><code>irq_arbiter.v:16-18</code>, <code>top.v:245</code></td></tr>
+</tbody></table></div>
+<p>The arbiter is purely combinational between pend/enable inputs and its outputs, so <code>irq_pending</code> follows <code>mie</code>, <code>MIE</code> and <code>mintprio</code> in the same cycle they change.</p>
+
+<h2 id="s5">5. Gating by mie, mstatus.MIE and mintprio</h2>
+<p>An interrupt is offered to the pipeline only when all three hold: its <code>pend</code> bit is set, its <code>mie</code> bit is set (bit 7 for MTIP, bits 27:16 for the fast lines), and <code>mstatus.MIE</code> (bit 3) is set (<code>irq_arbiter.v:20-21</code>). The threshold <code>mintprio</code> is then applied to the winner's class. The EX stage adds the last condition: it must hold a valid instruction that carries no exception (<code>execute_cycle.v:459</code>). <span class="tag exists">EXISTS</span></p>
+<ul>
+<li>Trap entry clears MIE and saves it in MPIE; MRET restores it (<code>csr_regfile.v:159-179</code>). So by default no nested interrupt is taken inside a handler.</li>
+<li><b>Nesting is software-managed.</b> The header of <code>top.v</code> (lines 7-8) names <code>mintprio</code> (0x7C0) as the mechanism. Neither trap entry nor MRET changes it (<code>csr_regfile.v:79-80</code>). A handler that wants to be pre-empted by higher classes writes <code>mintprio</code> and sets MIE. <code>mepc</code>, <code>mcause</code> and the saved MPIE are single registers, so a nested trap overwrites them; the handler has to save them first.</li>
+<li><b>No hardware nesting cap or shadow stack</b> was found in the current RTL (no depth counter in the arbiter or the CSR file). Rev B describes a depth-2 gate and a two-deep stack; see the OPEN note in section 2. <span class="tag specified">SPECIFIED</span> by Rev B 13.5 only.</li>
+<li>The RTL itself records an unverified ordering corner case: an interrupt may be accepted in EX using an old <code>mintprio</code> while an older <code>mintprio</code> write is still in flight and could commit first (<code>csr_regfile.v:81-89</code>). The comment lists options and says it is not implemented behaviour. <span class="tag open">OPEN</span></li>
+</ul>
+
+<h2 id="s6">6. Taking the interrupt, and returning</h2>
+<p>Figure 3 shows the sequence when no memory stall is active.</p>
+<ol>
+<li>The arbiter raises <code>irq_pending</code> with an id and class. When EX holds a valid instruction with no exception, <code>irq_accept_E</code> is true (<code>execute_cycle.v:459</code>). That instruction does not execute: its register, memory and CSR write enables are cleared and it becomes a trap packet with cause <code>{1, id}</code>, <code>mtval</code> 0 and <code>mepc</code> equal to its own PC (<code>:411-420,466-478</code>).</li>
+<li>In the same cycle <code>irq_flush_frontend</code> clears IF/ID and ID/EX (<code>top.v:309,327</code>), removing the younger instructions. If a multi-cycle divide is running, it is aborted (<code>div_abort</code>, <code>execute_cycle.v:297</code>) and will restart after return.</li>
+<li>The packet moves through EX/MEM and MEM/WB. At WB the controller commits it as a trap: <code>trap_valid</code>, the redirect, the 1111 flush, <code>wb_commit_irq</code> (round-robin update) and the gateway clear (<code>wb_trap_mret_commit_controller.v:64-92</code>).</li>
+<li><code>csr_regfile</code> writes <code>mepc</code>, <code>mcause</code> (bit 31 set), <code>mtval</code> = 0, MPIE = MIE, MIE = 0, MPP = 11. Fetch continues at the <code>mtvec</code> target (section 8).</li>
+</ol>
+
+<figure>
+<svg viewBox="0 0 960 644" role="img" aria-label="Sequence: interrupt accepted in EX, committed at WB, CSR update, feedback to arbiter and gateway, redirect to handler">
+<defs>
+  <marker id="s-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-ctrl" x="26" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="90" y="37">Arbiter, gateway</text>
+<rect class="bx-core" x="186" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="250" y="37">EX</text>
+<rect class="bx-core" x="346" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="410" y="37">MEM</text>
+<rect class="bx-ctrl" x="506" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="570" y="37">WB commit</text>
+<rect class="bx-bus" x="666" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="730" y="37">csr_regfile</text>
+<rect class="bx-core" x="826" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="890" y="37">Fetch</text>
+<path class="grp" d="M90 48 V628"/><path class="grp" d="M250 48 V628"/><path class="grp" d="M410 48 V628"/><path class="grp" d="M570 48 V628"/><path class="grp" d="M730 48 V628"/><path class="grp" d="M890 48 V628"/>
+
+<path class="ar" d="M90 120 H250"/><text class="ts mid" x="170" y="112">irq_pending, id</text>
+<rect class="bx-ctrl" x="174" y="136" width="152" height="56" rx="6"/>
+<text class="tb mid" x="250" y="154">irq_accept_E</text><text class="ts mid" x="250" y="170">cause = {1, id}</text><text class="ts mid" x="250" y="184">mepc = PCE</text>
+<path class="ar-d" d="M250 224 H890"/><text class="ts mid" x="810" y="216">irq_flush_frontend</text>
+<path class="ar" d="M250 256 H410"/><text class="ts mid" x="330" y="248">packet</text>
+<path class="ar" d="M410 288 H570"/><text class="ts mid" x="490" y="280">packet</text>
+<rect class="bx-ctrl" x="494" y="304" width="152" height="40" rx="6"/>
+<text class="tb mid" x="570" y="322">trap_commit</text><text class="ts mid" x="570" y="337">is_interrupt = cause[5]</text>
+<path class="ar" d="M570 376 H730"/><text class="ts mid" x="650" y="368">trap_valid_o</text><text class="ts mid" x="650" y="394">cause, pc</text>
+<rect class="bx-bus" x="654" y="408" width="152" height="56" rx="6"/>
+<text class="tb mid" x="730" y="426">CSR update</text><text class="ts mid" x="730" y="442">mepc = PCE, mtval = 0</text><text class="ts mid" x="730" y="456">MIE to MPIE, MIE = 0</text>
+<path class="ar" d="M570 496 H90"/><text class="ts mid" x="170" y="488">wb_commit_irq</text>
+<path class="ar" d="M570 528 H90"/><text class="ts mid" x="170" y="520">clear_gateway_o</text>
+<path class="ar" d="M570 560 H890"/><text class="ts mid" x="810" y="552">wb_trap_redirect</text>
+<rect class="bx-core" x="814" y="580" width="136" height="40" rx="6"/>
+<text class="tb mid" x="882" y="598">Handler fetch</text><text class="ts mid" x="882" y="613">at mtvec base</text>
+</svg>
+<figcaption><b>Figure 3.</b> Interrupt take, no memory stall. The instruction that was in EX is replaced by the trap packet and is re-executed after MRET because <code>mepc</code> holds its PC.</figcaption>
+</figure>
+
+<p><b>Return.</b> The handler ends with MRET. It is carried as a tag to WB; when it commits, <code>wb_trap_redirect</code> sends fetch to <code>{mepc[31:2], 2'b00}</code>, MIE is restored from MPIE, MPIE is set to 1, MPP to 11, and the pipeline is flushed (<code>wb_trap_mret_commit_controller.v:65,103,128-132</code>, <code>csr_regfile.v:172-179</code>). The flow diagram is Figure 6 on <a href="../../../documentation/html/core_hazards_csr_traps.html#s8">core_hazards_csr_traps.html</a>. If the handler changed <code>mepc</code> the return goes there, and <code>mintprio</code> stays as the handler left it. <span class="tag exists">EXISTS</span></p>
+
+<h2 id="s7">7. Interrupt during a multi-cycle MMIO access</h2>
+<p>A memory-mapped access can hold the pipeline for several cycles through <code>mem_stall_i</code>: StallF, StallD, StallE and StallM are asserted and the instruction in MEM waits (<code>hazard_unit.v:170-175</code>). Figure 4 traces an interrupt that becomes pending while an MMIO load X is waiting in MEM and a younger instruction Y is held in EX. It is read from the RTL and has not been simulated.</p>
+
+<figure>
+<svg viewBox="0 0 960 604" role="img" aria-label="Sequence: interrupt pending during an MMIO stall; irq_flush_frontend clears younger stages while EX/MEM is held">
+<defs>
+  <marker id="x-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-ctrl" x="26" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="90" y="37">Arbiter</text>
+<rect class="bx-core" x="186" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="250" y="37">EX (Y)</text>
+<rect class="bx-core" x="346" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="410" y="37">MEM (X)</text>
+<rect class="bx-mem" x="506" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="570" y="37">LSU, bus</text>
+<rect class="bx-ctrl" x="666" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="730" y="37">Hazard unit</text>
+<rect class="bx-core" x="826" y="16" width="128" height="32" rx="6"/><text class="tb mid" x="890" y="37">IF/ID, ID/EX</text>
+<path class="grp" d="M90 48 V588"/><path class="grp" d="M250 48 V588"/><path class="grp" d="M410 48 V588"/><path class="grp" d="M570 48 V588"/><path class="grp" d="M730 48 V588"/><path class="grp" d="M890 48 V588"/>
+
+<path class="ar" d="M410 112 H570"/><text class="ts mid" x="490" y="104">MMIO request</text>
+<path class="ar" d="M570 144 H730"/><text class="ts mid" x="650" y="136">lsu_core_stall</text>
+<rect class="bx-ctrl" x="654" y="160" width="152" height="40" rx="6"/>
+<text class="tb mid" x="730" y="178">mem_stall_i = 1</text><text class="ts mid" x="730" y="193">StallF/D/E/M held</text>
+<path class="ar" d="M90 240 H250"/><text class="ts mid" x="170" y="232">irq_pending = 1</text>
+<rect class="bx-ctrl" x="174" y="256" width="152" height="40" rx="6"/>
+<text class="tb mid" x="250" y="274">irq_accept_E = 1</text><text class="ts mid" x="250" y="289">no stall term</text>
+<path class="ar-bad" d="M250 336 H890"/><text class="ts mid" x="810" y="328">irq_flush_frontend</text>
+<rect class="bx-ext" x="814" y="352" width="140" height="40" rx="6"/>
+<text class="tb mid" x="884" y="370">FlushD, FlushE</text><text class="ts mid" x="884" y="385">even while stalled</text>
+<rect class="bx-ctrl" x="334" y="352" width="152" height="40" rx="6"/>
+<text class="tb mid" x="410" y="370">EX/MEM held</text><text class="ts mid" x="410" y="385">StallM: tag not stored</text>
+<rect class="bx-ext" x="174" y="424" width="152" height="40" rx="6"/>
+<text class="tb mid" x="250" y="442">Y has no packet</text><text class="ts mid" x="250" y="457">and no redirect (OPEN)</text>
+<path class="ar" d="M570 504 H410"/><text class="ts mid" x="490" y="496">stall ends</text>
+<rect class="bx-ctrl" x="174" y="528" width="152" height="40" rx="6"/>
+<text class="tb mid" x="250" y="546">Next instruction</text><text class="ts mid" x="250" y="561">taken; mepc = its PC</text>
+</svg>
+<figcaption><b>Figure 4.</b> Interrupt pending during an MMIO stall, as read from the RTL. Dashed boxes mark the point that is not settled.</figcaption>
+</figure>
+
+<div class="open"><span class="tag open">OPEN</span> <b>Possible loss of an instruction when an interrupt is accepted during a memory stall.</b> Facts read: (1) <code>irq_accept_E</code> has no <code>mem_stall</code> term (<code>execute_cycle.v:459</code>); (2) <code>top.v</code> ORs <code>irq_flush_frontend</code> into FlushD and FlushE after the hazard unit, so the DEF-001 gating in <code>hazard_unit.v:192</code> does not cover it (<code>top.v:309,327</code>); (3) in ID/EX flush outranks hold (<code>decode_cycle.v:273,305</code>); (4) EX/MEM is held by StallM, so the trap packet built from Y is not stored (<code>execute_cycle.v:389-409</code>). On that reading Y leaves ID/EX with no packet, the instruction in IF/ID is cleared as well, and no redirect to Y's PC was found. The next valid instruction that reaches EX would then be taken, with its own PC in <code>mepc</code>, and Y would not be re-executed. This is the same class of fault as DEF-001. It has not been simulated, and no regression or retained evidence for it was found. It needs a directed test (an interrupt asserted while a stalled MMIO load is in MEM) before it is called a defect or cleared.</div>
+
+<h2 id="s8">8. mtvec modes</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Mode</th><th>mtvec[1:0]</th><th>Trap target</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>Direct</td><td>00</td><td>{mtvec[31:2], 00} for every exception and interrupt</td><td><span class="tag exists">EXISTS</span>, reachable (reset value 0)</td></tr>
+<tr><td>Vectored</td><td>01</td><td>Interrupts: base + 4 x cause; exceptions still use base</td><td>Logic <span class="tag exists">EXISTS</span> at <code>wb_trap_mret_commit_controller.v:98-103</code>. Rev B 13.7 lists it as <span class="tag specified">SPECIFIED</span>/unreachable. <span class="tag open">OPEN</span>: the CSR write keeps bits 1:0 at their old value (<code>csr_regfile.v:188</code>), reset is 0, so the mode field cannot become 01</td></tr>
+<tr><td>Values 10 and 11</td><td>-</td><td>Not reachable for the same reason</td><td><span class="tag exists">EXISTS</span> (mask)</td></tr>
+</tbody></table></div>
+<p>All interrupts therefore enter at the same handler address, and software reads <code>mcause</code> (bit 31 set, code in bits 4:0) to dispatch. The CLIC mentioned in Rev B 13.1 is real RTL that is not integrated and carries no line in this path (<span class="tag specified">SPECIFIED</span>, not integrated).</p>
+
+<h2 id="s9">9. EXISTS, SPECIFIED, OPEN, and evidence</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>13-source gateway, three-class arbiter, round-robin pointers, mintprio threshold</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Interrupt take in EX, commit at WB, MRET return, direct mtvec</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>MEIP and MSIP as visible but undeliverable mip bits</td><td><span class="tag exists">EXISTS</span> as wiring; Rev B 13.1 records MSIP as a defect rather than a feature</td></tr>
+<tr><td>Vectored mtvec; depth-2 nesting gate; hardware shadow stack; CLIC</td><td><span class="tag specified">SPECIFIED</span> by Rev B 13.1, 13.5, 13.7. Not present or not reachable in the current RTL</td></tr>
+<tr><td>Interrupt acceptance during a memory stall</td><td><span class="tag open">OPEN</span> (section 7)</td></tr>
+<tr><td>mintprio write ordering corner case</td><td><span class="tag open">OPEN</span> (RTL comment <code>csr_regfile.v:81-89</code>)</td></tr>
+<tr><td>Rev B 13 versus restructured RTL</td><td><span class="tag open">OPEN</span> (section 2)</td></tr>
+</tbody></table></div>
+
+<p><b>Evidence.</b> <code>Verification/artifacts/irq_restructure/irq_coverage_final_sim.log</code> (xsim, 2026-10-29) ends with a PASS line for 196608 arbitration snapshots plus gateway, mip/mie, mintprio and commit checks, from <code>Verification/tb_irq_restructure.sv</code>. That is a PASS for the stated unit-level boundary of those blocks. It is not an interrupt-in-pipeline test and says nothing about section 7. Other folders (<code>irq_unit_coverage_*</code>, <code>xcelium_irq_*</code>) exist and were not read. <code>PHASE_STATUS.md</code> lists phase P3.2 (Interrupts) as NOT STARTED and P0 as IN PROGRESS (13 of 20 checklist items met on 2026-10-31); DEF-001 is FIXED-UNVERIFIED. See <a href="../G4_core_verification/G4_IRQ_UNIT_VERIFICATION.html">IRQ unit verification (G4.12)</a> and <a href="../G4_core_verification/G4_IRQ_UNIT_COVERAGE.html">IRQ unit coverage (G4.12)</a> for the canonical unit record.</p>
+<p>Related pages: <a href="../../../documentation/html/core_hazards_csr_traps.html">core_hazards_csr_traps.html</a>, <a href="#">core_overview.html</a>, <a href="#">core_fetch_decode.html</a>, <a href="../../../documentation/html/core_execute_mem_wb.html">core_execute_mem_wb.html</a>, <a href="../../../documentation/html/verif_hazard_unit.html">verif_hazard_unit.html</a>, <a href="../../../documentation/html/verif_csr_trap.html">verif_csr_trap.html</a>, <a href="../../../documentation/html/index.html">index.html</a>.</p>
+
+<div class="sources"><b>Sources read:</b> <code>riscv_core/rtl/irq_gateway.v</code>, <code>irq_arbiter.v</code>, <code>csr_regfile.v</code>, <code>wb_trap_mret_commit_controller.v</code>, <code>top.v</code> (interrupt wiring), <code>execute_cycle.v</code>, <code>decode_cycle.v</code> (cited ranges), <code>hazard_unit.v</code>, <code>RTL_SOC/riscforge_soc_subsystem.sv:1272-1291</code>, <code>Verification/artifacts/irq_restructure/irq_coverage_final_sim.log</code>, <code>Verification/status/PHASE_STATUS.md</code>, <code>defects.csv</code>, Rev B sections 13.1 and 13.7.</div>
+</div>
+</body>
+</html>
