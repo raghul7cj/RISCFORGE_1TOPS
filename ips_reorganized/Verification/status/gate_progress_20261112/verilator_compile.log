@@ -1,0 +1,737 @@
+%Warning-REDEFMACRO: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_apb_if.sv:14:46: Redefining existing define: 'REG_STATUS', with different value: '4'b0000'
+                     /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:219:1: ... Location of previous definition, with value: '3'b011'
+                     ... For warning description see https://verilator.org/warn/REDEFMACRO?v=5.020
+                     ... Use "/* verilator lint_off REDEFMACRO */" and lint_on around source to disable this message.
+%Warning-PINMISSING: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/execute_cycle.v:260:9: Cell has missing pin: 'Zero'
+  260 |     ALU alu_inst (
+      |         ^~~~~~~~
+%Warning-PINMISSING: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/top.v:314:7: Cell has missing pin: 'imem_stall'
+  314 |     ) Fetch (
+      |       ^~~~~
+%Warning-PINMISSING: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/top.v:571:30: Cell has missing pin: 'csr_valid_o'
+  571 |     csr_regfile #(.XLEN(32)) csr_file (
+      |                              ^~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/cf_math_pkg.sv:18:9: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   18 | package cf_math_pkg;
+      |         ^~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_pkg.sv:7:9: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+    7 | package obi_pkg;
+      |         ^~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_pkg.sv:9:9: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+    9 | package obi_uart_pkg;
+      |         ^~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/apb_to_obi.sv:11:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   11 | module apb_to_obi #(
+      |        ^~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_modem.sv:12:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   12 | module obi_uart_modem import obi_uart_pkg::*; #()
+      |        ^~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_baudgen.sv:12:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   12 | module obi_uart_baudgen import obi_uart_pkg::*; #()
+      |        ^~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:11:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   11 | module obi_uart_rx import obi_uart_pkg::*; #()
+      |        ^~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_tx.sv:11:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   11 | module obi_uart_tx #()
+      |        ^~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_interrupts.sv:12:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   12 | module obi_uart_interrupts import obi_uart_pkg::*; #()
+      |        ^~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_register.sv:11:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   11 | module obi_uart_register import obi_uart_pkg::*; #(
+      |        ^~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart.sv:11:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   11 | module obi_uart #(
+      |        ^~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/rtl/apb_uart_wrap.sv:11:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   11 | module apb_uart_wrap #(
+      |        ^~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/axi_pkg.sv:23:9: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   23 | package axi_pkg;
+      |         ^~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/gpio-master/gpio_reg_pkg.sv:7:9: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+    7 | package gpio_reg_pkg;
+      |         ^~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/apb/apb_pkg.sv:15:9: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   15 | package apb_pkg;
+      |         ^~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/addr_decode_dync.sv:40:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   40 | module addr_decode_dync #(
+      |        ^~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/addr_decode.sv:35:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   35 | module addr_decode #(
+      |        ^~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/fifo_v3.sv:15:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   15 | module fifo_v3 #(
+      |        ^~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/fall_through_register.sv:16:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   16 | module fall_through_register #(
+      |        ^~~~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/spill_register.sv:17:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   17 | module spill_register #(
+      |        ^~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/spill_register_flushable.sv:18:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   18 | module spill_register_flushable #(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/counter.sv:14:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   14 | module counter #(
+      |        ^~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/rr_arb_tree.sv:49:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   49 | module rr_arb_tree #(
+      |        ^~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/lzc.sv:17:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   17 | module lzc #(
+      |        ^~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/onehot_to_bin.sv:15:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   15 | module onehot_to_bin #(
+      |        ^~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/delta_counter.sv:13:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   13 | module delta_counter #(
+      |        ^~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/id_queue.sv:50:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   50 | module id_queue #(
+      |        ^~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/sync.sv:13:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   13 | module sync #(
+      |        ^~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/stream_register.sv:16:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   16 | module stream_register #(
+      |        ^~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_err_slv.sv:19:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   19 | module axi_err_slv #(
+      |        ^~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_atop_filter.sv:37:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   37 | module axi_atop_filter #(
+      |        ^~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_atop_filter.sv:379:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+  379 | module axi_atop_filter_intf #(
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_to_axi.sv:18:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   18 | module axi_lite_to_axi #(
+      |        ^~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_to_axi.sv:97:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   97 | module axi_lite_to_axi_intf #(
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_demux.sv:27:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   27 | module axi_lite_demux #(
+      |        ^~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_demux.sv:485:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+  485 | module axi_lite_demux_intf #(
+      |        ^~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_mux.sv:23:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   23 | module axi_lite_mux #(
+      |        ^~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_mux.sv:459:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+  459 | module axi_lite_mux_intf #(
+      |        ^~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/axi_lite_xbar.sv:22:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   22 | module axi_lite_xbar #(
+      |        ^~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/axi_lite_xbar.sv:244:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+  244 | module axi_lite_xbar_intf #(
+      |        ^~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_to_apb/axi_lite_to_apb.sv:50:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   50 | module axi_lite_to_apb #(
+      |        ^~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_to_apb/axi_lite_to_apb.sv:387:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+  387 | module axi_lite_to_apb_intf #(
+      |        ^~~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/bus_monitors/apb_timeout_monitor.sv:29:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   29 | module apb_timeout_monitor #(
+      |        ^~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: /tmp/rf_sram_p8l2l145/source/ips/bus_monitors/axi_lite_timeout_monitor.sv:28:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   28 | module axi_lite_timeout_monitor #(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~
+                       /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:139:8: ... Location of module with timescale
+  139 | module i2c_master_bit_ctrl
+      |        ^~~~~~~~~~~~~~~~~~~
+%Warning-WIDTHCONCAT: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:433:5: Unsized numbers/parameters not allowed in concatenations.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut'
+  433 |     NoMstPorts:         NUM_MST_PORTS,
+      |     ^~~~~~~~~~
+%Warning-WIDTHCONCAT: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:434:5: Unsized numbers/parameters not allowed in concatenations.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut'
+  434 |     MaxMstTrans:        MAX_MST_TRANS,
+      |     ^~~~~~~~~~~
+%Warning-WIDTHCONCAT: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:435:5: Unsized numbers/parameters not allowed in concatenations.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut'
+  435 |     MaxSlvTrans:        MAX_SLV_TRANS,
+      |     ^~~~~~~~~~~
+%Warning-WIDTHCONCAT: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:442:5: Unsized numbers/parameters not allowed in concatenations.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut'
+  442 |     AxiAddrWidth:       AXI_ADDR_WIDTH,
+      |     ^~~~~~~~~~~~
+%Warning-WIDTHCONCAT: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:443:5: Unsized numbers/parameters not allowed in concatenations.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut'
+  443 |     AxiDataWidth:       AXI_DATA_WIDTH,
+      |     ^~~~~~~~~~~~
+%Warning-WIDTHCONCAT: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:444:5: Unsized numbers/parameters not allowed in concatenations.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut'
+  444 |     NoAddrRules:        NUM_XBAR_RULES
+      |     ^~~~~~~~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_to_axi.sv:36:27: Operator VAR 'AxiSize' expects 32 bits on the Initial value, but Initial value's CASTWRAP generates 3 bits.
+                                                                                                         : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_xbar.gen_slv_port_demux[0].i_dec_err_conv'
+   36 |   localparam int unsigned AxiSize = axi_pkg::size_t'($unsigned($clog2(AxiDataWidth/8)));
+      |                           ^~~~~~~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/gpio-master/gpio_reg_top.sv:57:19: Operator ASSIGNW expects 11 bits on the Assign RHS, but Assign RHS's SEL generates 32 bits.
+                                                                                       : ... note: In instance 'soc_benchmark_tb.dut.i_gpio_apb_wrap.i_gpio.i_gpio.i_reg_file'
+   57 |   assign reg_addr = reg_intf_req.addr;
+      |                   ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:175:62: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l1c0' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  175 |     csa u_l1_0(.a(l0[0]), .b(l0[1]),  .c(l0[2]),  .s(l1s0), .co(l1c0));
+      |                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:176:62: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l1c1' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  176 |     csa u_l1_1(.a(l0[3]), .b(l0[4]),  .c(l0[5]),  .s(l1s1), .co(l1c1));
+      |                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:177:62: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l1c2' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  177 |     csa u_l1_2(.a(l0[6]), .b(l0[7]),  .c(l0[8]),  .s(l1s2), .co(l1c2));
+      |                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:178:62: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l1c3' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  178 |     csa u_l1_3(.a(l0[9]), .b(l0[10]), .c(l0[11]), .s(l1s3), .co(l1c3));
+      |                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:179:62: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l1c4' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  179 |     csa u_l1_4(.a(l0[12]),.b(l0[13]), .c(l0[14]), .s(l1s4), .co(l1c4));
+      |                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:180:62: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l1c5' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  180 |     csa u_l1_5(.a(l0[15]),.b(l0[16]), .c(l0[17]), .s(l1s5), .co(l1c5));
+      |                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:187:84: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l2c0' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  187 |     csa u_l2_0(.a(l1s0),        .b(l1s1),        .c({l1c0[64:0],1'b0}), .s(l2s0), .co(l2c0));
+      |                                                                                    ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:188:84: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l2c1' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  188 |     csa u_l2_1(.a(l1s2),        .b(l1s3),        .c({l1c1[64:0],1'b0}), .s(l2s1), .co(l2c1));
+      |                                                                                    ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:189:84: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l2c2' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  189 |     csa u_l2_2(.a(l1s4),        .b(l1s5),        .c({l1c2[64:0],1'b0}), .s(l2s2), .co(l2c2));
+      |                                                                                    ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:190:94: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l2c3' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  190 |     csa u_l2_3(.a({l1c3[64:0],1'b0}),.b({l1c4[64:0],1'b0}),.c({l1c5[64:0],1'b0}), .s(l2s3), .co(l2c3));
+      |                                                                                              ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:196:70: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l3c0' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  196 |     csa u_l3_0(.a(l2s0), .b(l2s1), .c({l2c0[64:0],1'b0}), .s(l3s0), .co(l3c0));
+      |                                                                      ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:197:70: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l3c1' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  197 |     csa u_l3_1(.a(l2s2), .b(l2s3), .c({l2c1[64:0],1'b0}), .s(l3s1), .co(l3c1));
+      |                                                                      ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:205:70: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l4c0' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  205 |     csa u_l4_0(.a(l3s0), .b(l3s1), .c({l3c0[64:0],1'b0}), .s(l4s0), .co(l4c0));
+      |                                                                      ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:206:76: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l4c1' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  206 |     csa u_l4_1(.a({l3c1[64:0],1'b0}), .b(l2c2_sh), .c(l2c3_sh), .s(l4s1), .co(l4c1));
+      |                                                                            ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:212:70: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'l5c0' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  212 |     csa u_l5_0(.a(l4s0), .b(l4s1), .c({l4c0[64:0],1'b0}), .s(l5s0), .co(l5c0));
+      |                                                                      ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:219:76: Output port connection 'co' expects 66 bits on the pin connection, but pin connection's VARREF 'final_cout' generates 65 bits.
+                                                                                        : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  219 |     csa u_l6(.a(l5s0), .b({l5c0[64:0],1'b0}), .c(l4c1_sh), .s(final_sum), .co(final_cout));
+      |                                                                            ^~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/rv32m_mul.v:248:30: Operator ASSIGNW expects 64 bits on the Assign RHS, but Assign RHS's ADD generates 66 bits.
+                                                                                       : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.Execute.m_unit.u_mul'
+  248 |     wire [63:0] product_full = s2_sum + s2_carry;    
+      |                              ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_tx.sv:169:21: Operator ASSIGN expects 3 bits on the Assign RHS, but Assign RHS's CONST '1'h0' generates 1 bits.
+                                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_tx'
+  169 |         tsr_count_d = 1'b0;
+      |                     ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:229:31: Operator ADD expects 6 bits on the RHS, but RHS's VARREF 'word_len_bits' generates 3 bits.
+                                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  229 |     character_length = (6'd02 +word_len_bits +reg_read_i.lcr.par_en +reg_read_i.lcr.stop_bits);
+      |                               ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:229:46: Operator ADD expects 6 bits on the RHS, but RHS's SEL generates 1 bits.
+                                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  229 |     character_length = (6'd02 +word_len_bits +reg_read_i.lcr.par_en +reg_read_i.lcr.stop_bits);
+      |                                              ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:229:69: Operator ADD expects 6 bits on the RHS, but RHS's SEL generates 1 bits.
+                                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  229 |     character_length = (6'd02 +word_len_bits +reg_read_i.lcr.par_en +reg_read_i.lcr.stop_bits);
+      |                                                                     ^
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:229:22: Operator ASSIGN expects 4 bits on the Assign RHS, but Assign RHS's ADD generates 6 bits.
+                                                                                                     : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  229 |     character_length = (6'd02 +word_len_bits +reg_read_i.lcr.par_en +reg_read_i.lcr.stop_bits);
+      |                      ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:230:39: Operator SHIFTL expects 6 bits on the LHS, but LHS's VARREF 'character_length' generates 4 bits.
+                                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  230 |     timeout_level = (character_length << 2) + 6'd01;
+      |                                       ^~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/i2c_master_bit_ctrl.sv:248:41: Operator ASSIGNDLY expects 14 bits on the Assign RHS, but Assign RHS's SHIFTR generates 16 bits.
+                                                                                                  : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c.byte_controller.bit_controller'
+  248 |       else if (~|filter_cnt) filter_cnt <= clk_cnt >> 2;  
+      |                                         ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_fifo.sv:110:36: Operator EQ expects 32 bits on the LHS, but LHS's VARREF 'pointer_in' generates 4 bits.
+                                                                                                         : ... note: In instance 'soc_benchmark_tb.dut.i_apb_spi_master.u_txfifo'
+  110 |                     if (pointer_in == $unsigned(BUFFER_DEPTH - 1))
+      |                                    ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_fifo.sv:123:37: Operator EQ expects 32 bits on the LHS, but LHS's VARREF 'pointer_out' generates 4 bits.
+                                                                                                         : ... note: In instance 'soc_benchmark_tb.dut.i_apb_spi_master.u_txfifo'
+  123 |                     if (pointer_out == $unsigned(BUFFER_DEPTH - 1))
+      |                                     ^~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_err_slv.sv:196:23: Operator ASSIGN expects 32 bits on the Assign RHS, but Assign RHS's VARREF 'RespData' generates 64 bits.
+                                                                                                     : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_xbar.gen_slv_port_demux[0].i_axi_err_slv'
+  196 |     err_resp.r.data   = RespData;
+      |                       ^
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_to_axi.sv:43:7: Operator PATMEMBER expects 3 bits on the Pattern value, but Pattern value's VARREF 'AxiSize' generates 32 bits.
+                                                                                                       : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_xbar.gen_slv_port_demux[0].i_dec_err_conv'
+   43 |       size:  AxiSize,
+      |       ^~~~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/axi/axi_lite_to_axi.sv:60:7: Operator PATMEMBER expects 3 bits on the Pattern value, but Pattern value's VARREF 'AxiSize' generates 32 bits.
+                                                                                                       : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_xbar.gen_slv_port_demux[0].i_dec_err_conv'
+   60 |       size:  AxiSize,
+      |       ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/wb_trap_mret_commit_controller.v:72:32: Operator ASSIGNW expects 31 bits on the Assign RHS, but Assign RHS's REPLICATE generates 30 bits.
+                                                                                                            : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.wb_commit'
+   72 |     assign trap_cause_o        = {25'b0, exc_cause_W[4:0]};
+      |                                ^
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/riscv_core/rtl/wb_trap_mret_commit_controller.v:89:32: Bit extraction of var[12:0] requires 4 bit index, not 5 bits.
+                                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_riscv_core.wb_commit'
+   89 |                 clear_gateway_r[exc_cause_W[4:0] - 5'd15] = 1'b1;
+      |                                ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_controller.sv:222:30: Operator ASSIGN expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 14 bits.
+                                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_apb_spi_master.u_spictrl'
+  222 |             counter_tx       = {8'h0,spi_cmd_len};
+      |                              ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_controller.sv:232:30: Operator ASSIGN expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 14 bits.
+                                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_apb_spi_master.u_spictrl'
+  232 |             counter_tx       = {8'h0,spi_addr_len};
+      |                              ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_controller.sv:301:30: Operator ASSIGN expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 14 bits.
+                                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_apb_spi_master.u_spictrl'
+  301 |             counter_tx       = {8'h0,spi_addr_len};
+      |                              ^
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:41:25: Operator ASSIGNW expects 2 bits on the Assign RHS, but Assign RHS's SEL generates 3 bits.
+                                                                                         : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   41 |     assign register_adr = PADDR['d2 + 2:2];
+      |                         ^
+%Warning-ASCRANGE: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:47:11: Ascending bit range vector: left < right of bit range: [0:2]
+                                                                                       : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   47 |     logic [0:'d2] [31:0]  regs_q, regs_n;
+      |           ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:63:20: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   63 |         if (regs_q[2'b01]['d0] && regs_q[2'b00] == 32'hffff_ffff && prescaler_int == cycle_counter_q)
+      |                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:63:42: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   63 |         if (regs_q[2'b01]['d0] && regs_q[2'b00] == 32'hffff_ffff && prescaler_int == cycle_counter_q)
+      |                                          ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:63:83: Operator EQ expects 32 bits on the LHS, but LHS's VARREF 'prescaler_int' generates 3 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   63 |         if (regs_q[2'b01]['d0] && regs_q[2'b00] == 32'hffff_ffff && prescaler_int == cycle_counter_q)
+      |                                                                                   ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:67:20: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   67 |         if (regs_q[2'b01]['d0] && regs_q[2'b10] != 'b0 && regs_q[2'b00] == regs_q[2'b10] && prescaler_int == cycle_counter_q)
+      |                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:67:42: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   67 |         if (regs_q[2'b01]['d0] && regs_q[2'b10] != 'b0 && regs_q[2'b00] == regs_q[2'b10] && prescaler_int == cycle_counter_q)
+      |                                          ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:67:66: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   67 |         if (regs_q[2'b01]['d0] && regs_q[2'b10] != 'b0 && regs_q[2'b00] == regs_q[2'b10] && prescaler_int == cycle_counter_q)
+      |                                                                  ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:67:83: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   67 |         if (regs_q[2'b01]['d0] && regs_q[2'b10] != 'b0 && regs_q[2'b00] == regs_q[2'b10] && prescaler_int == cycle_counter_q)
+      |                                                                                   ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:67:107: Operator EQ expects 32 bits on the LHS, but LHS's VARREF 'prescaler_int' generates 3 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   67 |         if (regs_q[2'b01]['d0] && regs_q[2'b10] != 'b0 && regs_q[2'b00] == regs_q[2'b10] && prescaler_int == cycle_counter_q)
+      |                                                                                                           ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:72:35: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   72 |     assign prescaler_int = regs_q[2'b01]['d5:'d3];
+      |                                   ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:81:20: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   81 |             regs_n[2'b00] = 1'b0;
+      |                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:81:27: Operator ASSIGN expects 32 bits on the Assign RHS, but Assign RHS's CONST '1'h0' generates 1 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   81 |             regs_n[2'b00] = 1'b0;
+      |                           ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:84:20: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   84 |             regs_n[2'b00] = regs_q[2'b00] + 1;  
+      |                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:84:36: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   84 |             regs_n[2'b00] = regs_q[2'b00] + 1;  
+      |                                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:87:20: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   87 |             regs_n[2'b00] = regs_q[2'b00] + 1;
+      |                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:87:36: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   87 |             regs_n[2'b00] = regs_q[2'b00] + 1;
+      |                                    ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:86:25: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   86 |         else if (regs_q[2'b01]['d0] && regs_q[2'b01]['d5:'d3] == 'b0)  
+      |                         ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:86:47: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   86 |         else if (regs_q[2'b01]['d0] && regs_q[2'b01]['d5:'d3] == 'b0)  
+      |                                               ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:82:24: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   82 |         else if(regs_q[2'b01]['d0] && prescaler_int != 'b0 && prescaler_int == cycle_counter_q)  
+      |                        ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:82:77: Operator EQ expects 32 bits on the LHS, but LHS's VARREF 'prescaler_int' generates 3 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   82 |         else if(regs_q[2'b01]['d0] && prescaler_int != 'b0 && prescaler_int == cycle_counter_q)  
+      |                                                                             ^~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:99:28: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                          : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+   99 |                     regs_n[2'b00] = PWDATA;
+      |                            ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:102:28: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+  102 |                     regs_n[2'b01] = PWDATA;
+      |                            ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:106:28: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+  106 |                     regs_n[2'b10] = PWDATA;
+      |                            ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:107:28: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+  107 |                     regs_n[2'b00] = 32'b0;  
+      |                            ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:123:37: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+  123 |                     PRDATA = regs_q[2'b00];
+      |                                     ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:126:37: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+  126 |                     PRDATA = regs_q[2'b01];
+      |                                     ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:129:37: Operator SUB expects 32 or 6 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                                                           : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0.TIMER_GEN[1].timer_i'
+  129 |                     PRDATA = regs_q[2'b10];
+      |                                     ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/apb_timer.sv:38:55: Operator ADD expects 32 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                                                              : ... note: In instance 'soc_benchmark_tb.dut.i_apb_timer0'
+   38 |     assign slave_address_int = PADDR[$clog2(TIMER_CNT)+ 2'd2 + 1:2'd2 + 2];
+      |                                                       ^
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_to_apb/axi_lite_to_apb.sv:305:33: Operator FUNCREF 'aligned_addr' expects 3 bits on the Function Argument, but Function Argument's CLOG2 generates 32 bits.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_to_apb'
+  305 |               paddr:   axi_pkg::aligned_addr(axi_pkg::largest_addr_t'(apb_req.addr), $clog2(DataWidth/8)),
+      |                                 ^~~~~~~~~~~~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_to_apb/axi_lite_to_apb.sv:305:15: Operator PATMEMBER expects 32 bits on the Pattern value, but Pattern value's FUNCREF 'aligned_addr' generates 128 bits.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_to_apb'
+  305 |               paddr:   axi_pkg::aligned_addr(axi_pkg::largest_addr_t'(apb_req.addr), $clog2(DataWidth/8)),
+      |               ^~~~~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_to_apb/axi_lite_to_apb.sv:333:29: Operator FUNCREF 'aligned_addr' expects 3 bits on the Function Argument, but Function Argument's CLOG2 generates 32 bits.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_to_apb'
+  333 |           paddr:   axi_pkg::aligned_addr(axi_pkg::largest_addr_t'(apb_req.addr), $clog2(DataWidth/8)),
+      |                             ^~~~~~~~~~~~
+%Warning-WIDTHTRUNC: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_to_apb/axi_lite_to_apb.sv:333:11: Operator PATMEMBER expects 32 bits on the Pattern value, but Pattern value's FUNCREF 'aligned_addr' generates 128 bits.
+                                                                                               : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_to_apb'
+  333 |           paddr:   axi_pkg::aligned_addr(axi_pkg::largest_addr_t'(apb_req.addr), $clog2(DataWidth/8)),
+      |           ^~~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:86:17: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h0' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+   86 |                 case (s_apb_addr)
+      |                 ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:86:17: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h1' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+   86 |                 case (s_apb_addr)
+      |                 ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:86:17: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h4' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+   86 |                 case (s_apb_addr)
+      |                 ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:86:17: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h5' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+   86 |                 case (s_apb_addr)
+      |                 ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:112:9: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h0' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+  112 |         case (s_apb_addr)
+      |         ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:112:9: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h1' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+  112 |         case (s_apb_addr)
+      |         ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:112:9: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h2' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+  112 |         case (s_apb_addr)
+      |         ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:112:9: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h3' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+  112 |         case (s_apb_addr)
+      |         ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:112:9: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h4' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+  112 |         case (s_apb_addr)
+      |         ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:112:9: Operator CASE expects 4 bits on the Case Item, but Case Item's CONST '3'h5' generates 3 bits.
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_i2c'
+  112 |         case (s_apb_addr)
+      |         ^~~~
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/axi_pkg.sv:203:77: Operator DIV expects 144 bits on the LHS, but LHS's VARREF '_addr' generates 128 bits.
+                                                                                                           : ... note: In instance 'soc_benchmark_tb'
+  203 |     return shortint'(($bits(_addr)  + $bits(strobe_width))'(_addr) - (_addr / largest_addr_t'(strobe_width)) * strobe_width);
+      |                                                                             ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/axi_pkg.sv:203:77: Operator DIV expects 144 bits on the RHS, but RHS's CASTWRAP generates 128 bits.
+                                                                                                           : ... note: In instance 'soc_benchmark_tb'
+  203 |     return shortint'(($bits(_addr)  + $bits(strobe_width))'(_addr) - (_addr / largest_addr_t'(strobe_width)) * strobe_width);
+      |                                                                             ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run/soc_benchmark_tb.sv:103:64: Operator SUB expects 32 bits on the LHS, but LHS's VARREF 'character' generates 8 bits.
+                                                                                                                                                                      : ... note: In instance 'soc_benchmark_tb'
+  103 |     if (character >= "0" && character <= "9") return character - "0";
+      |                                                                ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run/soc_benchmark_tb.sv:104:64: Operator SUB expects 32 bits on the LHS, but LHS's VARREF 'character' generates 8 bits.
+                                                                                                                                                                      : ... note: In instance 'soc_benchmark_tb'
+  104 |     if (character >= "a" && character <= "f") return character - "a" + 10;
+      |                                                                ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run/soc_benchmark_tb.sv:105:64: Operator SUB expects 32 bits on the LHS, but LHS's VARREF 'character' generates 8 bits.
+                                                                                                                                                                      : ... note: In instance 'soc_benchmark_tb'
+  105 |     if (character >= "A" && character <= "F") return character - "A" + 10;
+      |                                                                ^
+%Warning-WIDTHEXPAND: /tmp/rf_sram_p8l2l145/source/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run/soc_benchmark_tb.sv:196:25: Operator ASSIGNDLY expects 32 bits on the Assign RHS, but Assign RHS's VARXREF 'trap_commit_cause' generates 31 bits.
+                                                                                                                                                                      : ... note: In instance 'soc_benchmark_tb'
+  196 |         trap_cause_seen <= dut.i_riscv_core.trap_commit_cause;
+      |                         ^~
+%Warning-ALWCOMBORDER: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:243:5: Always_comb variable driven after use: 'break_d'
+                                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  243 |     break_d       = break_q;  
+      |     ^~~~~~~
+%Warning-ALWCOMBORDER: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:265:14: Always_comb variable driven after use: 'word_len_bits'
+                                                                                                       : ... note: In instance 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx'
+  265 |       2'b00: word_len_bits = 3'b100;  
+      |              ^~~~~~~~~~~~~
+%Warning-UNSIGNED: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/rr_arb_tree.sv:198:37: Comparison is constant due to unsigned arithmetic
+                                                                                                            : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_xbar.gen_mst_port_mux[0].i_axi_lite_mux.gen_mux.i_ar_arbiter'
+  198 |           assign upper_mask[i] = (i >  rr_q) ? req_d[i] : 1'b0;
+      |                                     ^
+%Warning-UNSIGNED: /tmp/rf_sram_p8l2l145/source/ips/axi_lite_xbar/include/common_cells/rr_arb_tree.sv:199:37: Comparison is constant due to unsigned arithmetic
+                                                                                                            : ... note: In instance 'soc_benchmark_tb.dut.i_axi_lite_xbar.gen_mst_port_mux[0].i_axi_lite_mux.gen_mux.i_ar_arbiter'
+  199 |           assign lower_mask[i] = (i <= rr_q) ? req_d[i] : 1'b0;
+      |                                     ^~
+%Warning-UNSIGNED: /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/instr_fetch_demux.sv:73:35: Comparison is constant due to unsigned arithmetic
+                                                                                      : ... note: In instance 'soc_benchmark_tb.dut.i_instr_fetch_demux'
+   73 |   assign sel_rom   = (core_addr_i >= BOOTROM_BASE) && (core_addr_i < BOOTROM_END);
+      |                                   ^~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/apb_i2c-master/apb_i2c.sv:86:17: Case values incompletely covered (example pattern 0x2)
+   86 |                 case (s_apb_addr)
+      |                 ^~~~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:97:13: Case values incompletely covered (example pattern 0x3)
+   97 |             case (register_adr)
+      |             ^~~~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/apb_timer-master/rtl/timer.sv:121:13: Case values incompletely covered (example pattern 0x3)
+  121 |             case (register_adr)
+      |             ^~~~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/apb_spi_master.sv:212:9: Case values incompletely covered (example pattern 0x3)
+  212 |         case(r_state_rx)
+      |         ^~~~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_apb_if.sv:134:19: Case values incompletely covered (example pattern 0x6)
+  134 |                   case(write_address)
+      |                   ^~~~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_controller.sv:156:7: Case values incompletely covered (example pattern 0x5)
+  156 |       case(ctrl_data_mux)
+      |       ^~~~
+%Warning-CASEINCOMPLETE: /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_controller.sv:209:5: Case values incompletely covered (example pattern 0x8)
+  209 |     case(state)
+      |     ^~~~
+%Warning-UNOPTFLAT: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:89:18: Signal unoptimizable: Circular combinational logic: 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx.break_d'
+   89 |   logic break_q, break_d;
+      |                  ^~~~~~~
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:89:18:      Example path: soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx.break_d
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:208:3:      Example path: ALWAYS
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:89:18:      Example path: soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx.break_d
+%Warning-UNOPTFLAT: /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:81:15: Signal unoptimizable: Circular combinational logic: 'soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx.word_len_bits'
+   81 |   logic [2:0] word_len_bits;           
+      |               ^~~~~~~~~~~~~
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:81:15:      Example path: soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx.word_len_bits
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:208:3:      Example path: ALWAYS
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:89:18:      Example path: soc_benchmark_tb.dut.i_apb_uart.i_apb_uart_wrap.i_obi_uart.i_uart_rx.break_d
+                    /tmp/rf_sram_p8l2l145/source/ips/apb_uart-main/include/obi/obi_uart_rx.sv:208:3:      Example path: ALWAYS
+%Warning-UNOPTFLAT: /tmp/rf_sram_p8l2l145/source/ips/bootloader/bootloader.sv:211:21: Signal unoptimizable: Circular combinational logic: 'soc_benchmark_tb.dut.__Vcellinp__i_bootloader__apb_mst_resp_i'
+  211 |   input  apb_resp_t apb_mst_resp_i,
+      |                     ^~~~~~~~~~~~~~
+                    /tmp/rf_sram_p8l2l145/source/ips/bootloader/bootloader.sv:211:21:      Example path: soc_benchmark_tb.dut.__Vcellinp__i_bootloader__apb_mst_resp_i
+                    /tmp/rf_sram_p8l2l145/source/ips/bootloader/bootloader.sv:494:3:      Example path: ALWAYS
+                    /tmp/rf_sram_p8l2l145/source/ips/bootloader/bootloader.sv:210:21:      Example path: soc_benchmark_tb.dut.__Vcellout__i_bootloader__apb_mst_req_o
+                    /tmp/rf_sram_p8l2l145/source/ips/spi_master_ip/spi_master/spi_master_apb_if.sv:198:3:      Example path: ALWAYS
+                    /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:700:16:      Example path: soc_benchmark_tb.dut.spi_prdata
+                    /tmp/rf_sram_p8l2l145/source/ips/RTL_SOC/riscforge_soc_subsystem.sv:702:16:      Example path: ASSIGNW
+                    /tmp/rf_sram_p8l2l145/source/ips/bootloader/bootloader.sv:211:21:      Example path: soc_benchmark_tb.dut.__Vcellinp__i_bootloader__apb_mst_resp_i
+make: Entering directory '/tmp/rf_sram_p8l2l145/run/obj_dir'
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_timing.o /usr/share/verilator/include/verilated_timing.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_threads.o /usr/share/verilator/include/verilated_threads.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vsoc_benchmark_tb__pch.h -o Vsoc_benchmark_tb__pch.h.fast.gch
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vsoc_benchmark_tb__pch.h -o Vsoc_benchmark_tb__pch.h.slow.gch
+echo "" > Vsoc_benchmark_tb__ALL.verilator_deplist.tmp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb.o Vsoc_benchmark_tb.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__0.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__1.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__1.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__2.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__2.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__0.o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__1.o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__1.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h9e41104b__0.o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h9e41104b__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb_REG_BUS__A20_D20__DepSet_h194214cb__0.o Vsoc_benchmark_tb_REG_BUS__A20_D20__DepSet_h194214cb__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.fast -c -o Vsoc_benchmark_tb__main.o Vsoc_benchmark_tb__main.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb__ConstPool_0.o Vsoc_benchmark_tb__ConstPool_0.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb___024root__Slow.o Vsoc_benchmark_tb___024root__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__0__Slow.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__1__Slow.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__1__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__2__Slow.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__2__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__0__Slow.o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb_axi_lite_mux__pi16__Slow.o Vsoc_benchmark_tb_axi_lite_mux__pi16__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h9e41104b__0__Slow.o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h9e41104b__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h164d476e__0__Slow.o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h164d476e__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb_REG_BUS__A20_D20__Slow.o Vsoc_benchmark_tb_REG_BUS__A20_D20__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb_REG_BUS__A20_D20__DepSet_h194214cb__0__Slow.o Vsoc_benchmark_tb_REG_BUS__A20_D20__DepSet_h194214cb__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vsoc_benchmark_tb__pch.h.slow -c -o Vsoc_benchmark_tb__Syms.o Vsoc_benchmark_tb__Syms.cpp
+Archive ar -rcs Vsoc_benchmark_tb__ALL.a Vsoc_benchmark_tb.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__0.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__1.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__2.o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__0.o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__1.o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h9e41104b__0.o Vsoc_benchmark_tb_REG_BUS__A20_D20__DepSet_h194214cb__0.o Vsoc_benchmark_tb__main.o Vsoc_benchmark_tb__ConstPool_0.o Vsoc_benchmark_tb___024root__Slow.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__0__Slow.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__1__Slow.o Vsoc_benchmark_tb___024root__DepSet_h1cdd1bd0__2__Slow.o Vsoc_benchmark_tb___024root__DepSet_h94d93cd5__0__Slow.o Vsoc_benchmark_tb_axi_lite_mux__pi16__Slow.o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h9e41104b__0__Slow.o Vsoc_benchmark_tb_axi_lite_mux__pi16__DepSet_h164d476e__0__Slow.o Vsoc_benchmark_tb_REG_BUS__A20_D20__Slow.o Vsoc_benchmark_tb_REG_BUS__A20_D20__DepSet_h194214cb__0__Slow.o Vsoc_benchmark_tb__Syms.o
+g++     verilated.o verilated_timing.o verilated_threads.o Vsoc_benchmark_tb__ALL.a    -pthread -lpthread -latomic   -o Vsoc_benchmark_tb
+rm Vsoc_benchmark_tb__ALL.verilator_deplist.tmp
+make: Leaving directory '/tmp/rf_sram_p8l2l145/run/obj_dir'

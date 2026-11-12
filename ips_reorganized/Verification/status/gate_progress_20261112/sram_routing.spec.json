@@ -1,0 +1,216 @@
+{
+  "title": "Actual benchmark SRAM routing",
+  "scope": "As-coded selection and indexing, not timing or runtime stack proof",
+  "baseline": {
+    "repo": "raghul7cj/RISCFORGE_1TOPS verification_infra; local ips maps to ips_reorganized",
+    "commit": "d1ec0de4712af37e5bb344697d8d2dd45e255e02 + inspected-source SHA256 f4513ebab808bc53c2de5363e34572729a8b11e482b0feb724c5c6514e93bac5"
+  },
+  "nodes": [
+    {
+      "id": "core",
+      "label": "Core fetch and LSU",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": "i_riscv_core",
+        "line": 762
+      },
+      "box": [
+        20,
+        160,
+        180,
+        65
+      ]
+    },
+    {
+      "id": "fetch",
+      "label": "Fetch range decode",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/instr_fetch_demux.sv",
+        "symbol": "sel_isram",
+        "line": 71
+      },
+      "box": [
+        260,
+        40,
+        220,
+        65
+      ]
+    },
+    {
+      "id": "imem",
+      "label": "ISRAM / 8192 x 32 bits",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": "ISRAM_NUM_WORDS  = 8192",
+        "line": 489
+      },
+      "box": [
+        560,
+        40,
+        250,
+        65
+      ]
+    },
+    {
+      "id": "router",
+      "label": "Data range decode",
+      "status": "present",
+      "source": {
+        "path": "ips/riscv_core/rtl/hybrid_mem_interface.sv",
+        "symbol": "addr_in_sram_range",
+        "line": 70
+      },
+      "box": [
+        260,
+        290,
+        220,
+        65
+      ]
+    },
+    {
+      "id": "dmem",
+      "label": "DSRAM / 8192 x 32 bits",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": "DSRAM_NUM_WORDS  = 8192",
+        "line": 490
+      },
+      "box": [
+        560,
+        290,
+        250,
+        65
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "core",
+      "to": "fetch",
+      "label": "byte address",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": "assign core_instr_addr",
+        "line": 1301
+      },
+      "route": [
+        [
+          200,
+          180
+        ],
+        [
+          230,
+          180
+        ],
+        [
+          230,
+          72
+        ],
+        [
+          260,
+          72
+        ]
+      ],
+      "label_at": [
+        205,
+        135
+      ]
+    },
+    {
+      "from": "fetch",
+      "to": "imem",
+      "label": "word bits [14:2]",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": "demux_isram_addr[BYTE_OFFSET +: SRAM_ADDR_WIDTH]",
+        "line": 847
+      },
+      "route": [
+        [
+          480,
+          72
+        ],
+        [
+          560,
+          72
+        ]
+      ],
+      "label_at": [
+        480,
+        58
+      ]
+    },
+    {
+      "from": "core",
+      "to": "router",
+      "label": "LSU address",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": ".mem_addr    ( core_lsu_addr",
+        "line": 1320
+      },
+      "route": [
+        [
+          200,
+          205
+        ],
+        [
+          230,
+          205
+        ],
+        [
+          230,
+          322
+        ],
+        [
+          260,
+          322
+        ]
+      ],
+      "label_at": [
+        205,
+        260
+      ]
+    },
+    {
+      "from": "router",
+      "to": "dmem",
+      "label": "word bits [12:0]",
+      "status": "present",
+      "source": {
+        "path": "ips/RTL_SOC/riscforge_soc_subsystem.sv",
+        "symbol": "core_data_addr[SRAM_ADDR_WIDTH-1:0]",
+        "line": 932
+      },
+      "route": [
+        [
+          480,
+          322
+        ],
+        [
+          560,
+          322
+        ]
+      ],
+      "label_at": [
+        480,
+        307
+      ]
+    }
+  ],
+  "unknowns": [
+    "Runtime SP minimum and load/store envelopes were not measured.",
+    "No directed boundary, straddling-access, alias or overflow experiment was performed."
+  ],
+  "layout": {
+    "width": 850,
+    "height": 400
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "verilator_run": "ips\\benchmarks\\docs\\evidence\\sram_capacity_review_20261111\\portable_20261111T113445Z\\run",
+  "xsim_record": "ips\\benchmarks\\docs\\evidence\\coremark_report_fix\\coremark_20261111T111230Z_dc575342",
+  "result_json_exactly_equal": true,
+  "instruction_and_data_images_match": true,
+  "timed_cycles": 534940,
+  "error_code": "0x00003001",
+  "validation_errors": 1,
+  "trap_seen": 0,
+  "crc": {
+    "list": "0xe3c1",
+    "matrix": "0x747",
+    "state": "0x8d84",
+    "final": "0xe3c1"
+  },
+  "sram": {
+    "instruction_capacity": 32768,
+    "instruction_used": 11792,
+    "instruction_free": 20976,
+    "data_capacity": 32768,
+    "data_static": 4352,
+    "data_static_end": "0x21100",
+    "initial_stack_top": "0x28000",
+    "observed_min_sp": "0x00027e60",
+    "observed_sp_depth_bytes": 416,
+    "gap_static_end_to_min_sp": 28000,
+    "observed_data_byte_min": "0x00020000",
+    "observed_data_byte_max": "0x00027fff",
+    "observed_data_outside": 0
+  },
+  "startup_sp_transient": {
+    "max_sp": "0x00028004",
+    "samples_above_stack_top": 1,
+    "explanation": "At startup PC0x10004, auipc sp,0x18 produces0x28004; addi sp,sp,-4 at0x10008 restores0x28000. No accepted memory bytes were out of DSRAM."
+  },
+  "runtime_wall_seconds": 2.6785758360000003,
+  "runtime_exit_code": -6,
+  "exit_explanation": "Expected TB $fatal for duration FAIL causes Verilator abort; raw result JSON was written first. Not an unexpected native crash.",
+  "limits": [
+    "One short scenario; no universal stack-safety proof",
+    "Verilator two-state behavior and assertion-guard differences remain",
+    "No Icarus runtime; original compile blocker retained",
+    "No production RTL/TB/firmware or memory size changes",
+    "No valid CoreMark score; long run not executed"
+  ],
+  "long_run_estimate": {
+    "iterations": 2500,
+    "timed_cycles_linear_estimate": 1337350000,
+    "target_seconds_estimate": 13.3735,
+    "verilator_wall_hours_proportional_estimate": 1.7209745562578405,
+    "note": "Planning estimate from one short run only; steady-state pilot required, not qualification."
+  }
+}

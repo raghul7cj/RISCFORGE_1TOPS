@@ -1,0 +1,109 @@
+{
+  "created_utc": "2026-11-11T11:27:02.450574+00:00",
+  "method": "independent stdlib ELF32 decoding; no simulation rerun",
+  "elf_sha256": "76dfccf482f19bf63eae92a41e6c01e7600ba99978e4e0c51816a2585163b529",
+  "entry": "0x10000",
+  "allocated_sections": [
+    {
+      "name": ".text",
+      "address": "0x10000",
+      "end_exclusive": "0x12e10",
+      "size": 11792,
+      "noload": false
+    },
+    {
+      "name": ".benchmark_result",
+      "address": "0x20000",
+      "end_exclusive": "0x20100",
+      "size": 256,
+      "noload": true
+    },
+    {
+      "name": ".rodata",
+      "address": "0x20100",
+      "end_exclusive": "0x20910",
+      "size": 2064,
+      "noload": false
+    },
+    {
+      "name": ".data",
+      "address": "0x20910",
+      "end_exclusive": "0x20928",
+      "size": 24,
+      "noload": false
+    },
+    {
+      "name": ".bss",
+      "address": "0x20928",
+      "end_exclusive": "0x21100",
+      "size": 2008,
+      "noload": true
+    }
+  ],
+  "pt_load": [
+    {
+      "offset": "0x1000",
+      "vaddr": "0x10000",
+      "paddr": "0x10000",
+      "filesz": 11792,
+      "memsz": 11792,
+      "flags": 5,
+      "align": 4096
+    },
+    {
+      "offset": "0x4000",
+      "vaddr": "0x20000",
+      "paddr": "0x20000",
+      "filesz": 2344,
+      "memsz": 4352,
+      "flags": 6,
+      "align": 4096
+    }
+  ],
+  "artifact_hash_checks": {
+    "program.elf": true,
+    "program.map": true,
+    "program.dis": true,
+    "imem.hex": true,
+    "dmem.hex": true
+  },
+  "hex_images": {
+    "imem.hex": {
+      "ascii_file_bytes": 73728,
+      "word_tokens": 8192,
+      "represented_bytes": 32768,
+      "padding_included": true
+    },
+    "dmem.hex": {
+      "ascii_file_bytes": 73728,
+      "word_tokens": 8192,
+      "represented_bytes": 32768,
+      "padding_included": true
+    }
+  },
+  "imem_used": 11792,
+  "imem_free": 20976,
+  "dmem_static_including_mailbox": 4352,
+  "dmem_initialized_payload": 2088,
+  "mailbox_reserved": 256,
+  "stack_top": "0x28000",
+  "static_end": "0x21100",
+  "stack_available_after_static": 28416,
+  "linker_required_margin": 4096,
+  "runtime_stack_high_water": null,
+  "runtime_address_envelopes": null,
+  "observed": {
+    "error_code": "0x00003001",
+    "validation_errors": 1,
+    "crc": {
+      "list": "0xe3c1",
+      "matrix": "0x0747",
+      "state": "0x8d84",
+      "final": "0xe3c1"
+    },
+    "cycle_delta": 534940,
+    "modeled_seconds": 0.0053494,
+    "trap_seen": false
+  },
+  "confidence": "high: this retained failure is duration, not SRAM exhaustion; dynamic memory safety unproven"
+}

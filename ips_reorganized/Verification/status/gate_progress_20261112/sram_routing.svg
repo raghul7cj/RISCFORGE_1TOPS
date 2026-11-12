@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 400" role="img" aria-labelledby="title desc">
+<title id="title">Actual benchmark SRAM routing</title>
+<desc id="desc">As-coded selection and indexing, not timing or runtime stack proof</desc>
+<style>text{font:13px system-ui,sans-serif;fill:#18202c}.box{fill:#eef4fc;stroke:#345e98;stroke-width:1.3}.arrow{stroke:#526879;stroke-width:1.5;fill:none;marker-end:url(#head)}.label{font-size:11px;fill:#475063}</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#526879"/></marker></defs>
+<path class="arrow" d="M200,180 L230,180 L230,72 L260,72"><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: assign core_instr_addr</title></path>
+<text class="label" x="205" y="135">byte address</text>
+<path class="arrow" d="M480,72 L560,72"><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: demux_isram_addr[BYTE_OFFSET +: SRAM_ADDR_WIDTH]</title></path>
+<text class="label" x="480" y="58">word bits [14:2]</text>
+<path class="arrow" d="M200,205 L230,205 L230,322 L260,322"><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: .mem_addr    ( core_lsu_addr</title></path>
+<text class="label" x="205" y="260">LSU address</text>
+<path class="arrow" d="M480,322 L560,322"><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: core_data_addr[SRAM_ADDR_WIDTH-1:0]</title></path>
+<text class="label" x="480" y="307">word bits [12:0]</text>
+<g><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: i_riscv_core</title><rect class="box" x="20" y="160" width="180" height="65" rx="8"/>
+<text x="32" y="183">Core fetch and LSU</text>
+</g>
+<g><title>ips/RTL_SOC/instr_fetch_demux.sv :: sel_isram</title><rect class="box" x="260" y="40" width="220" height="65" rx="8"/>
+<text x="272" y="63">Fetch range decode</text>
+</g>
+<g><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: ISRAM_NUM_WORDS  = 8192</title><rect class="box" x="560" y="40" width="250" height="65" rx="8"/>
+<text x="572" y="63">ISRAM</text>
+<text x="572" y="82">8192 x 32 bits</text>
+</g>
+<g><title>ips/riscv_core/rtl/hybrid_mem_interface.sv :: addr_in_sram_range</title><rect class="box" x="260" y="290" width="220" height="65" rx="8"/>
+<text x="272" y="313">Data range decode</text>
+</g>
+<g><title>ips/RTL_SOC/riscforge_soc_subsystem.sv :: DSRAM_NUM_WORDS  = 8192</title><rect class="box" x="560" y="290" width="250" height="65" rx="8"/>
+<text x="572" y="313">DSRAM</text>
+<text x="572" y="332">8192 x 32 bits</text>
+</g>
+</svg>

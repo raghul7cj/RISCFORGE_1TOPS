@@ -1,0 +1,21 @@
+BENCH_PRELOAD imem=imem.hex dmem=dmem.hex
+BENCH_BOOT_READY timeout_cycles=2000000
+2K validation run parameters for coremark.
+CoreMark Size    : 666
+Total ticks      : 534940
+Total time (secs): 0
+ERROR! Must execute for at least 10 secs for a valid result!
+Iterations       : 1
+Compiler version : GCC 13.2.0
+Compiler flags   : -march=rv32im_zicsr -mabi=ilp32 -O2 -ffreestanding -nostdlib -DVALIDATION_RUN=1 -DTOTAL_DATA_SIZE=2000
+Memory location  : DSRAM static
+seedcrc          : 0x18f2
+[0]crclist       : 0xe3c1
+[0]crcmatrix     : 0x747
+[0]crcstate      : 0x8d84
+[0]crcfinal      : 0xe3c1
+Errors detected
+BENCH_TB_FAIL reason=firmware_status_fail cycles=578192
+[5782440000] %Fatal: soc_benchmark_tb.sv:305: Assertion failed in TOP.soc_benchmark_tb.finish_fail: RISCFORGE benchmark harness failure: firmware_status_fail
+%Error: /tmp/rf_sram_p8l2l145/source/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run/soc_benchmark_tb.sv:305: Verilog $stop
+Aborting...

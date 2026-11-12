@@ -1,0 +1,55 @@
+[
+  {
+    "label": "filelists",
+    "argv": [
+      "python3",
+      "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/tools/generate_filelists.py",
+      "--root",
+      "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl",
+      "--output-dir",
+      "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run"
+    ],
+    "cwd": "/mnt/c/Users/cj/Desktop/1TOPS project/RISCFORGE_1TOPS-main/rtl/ips/benchmarks/docs/evidence/sram_capacity_review_20261111/portable_20261111T113445Z/run",
+    "wall_limit_seconds": 30,
+    "wall_seconds": 3.479574962000001,
+    "return_code": 0
+  },
+  {
+    "label": "verilator_compile",
+    "argv": [
+      "verilator",
+      "--binary",
+      "--timing",
+      "--assert",
+      "-DXSIM",
+      "-Wno-fatal",
+      "--top-module",
+      "soc_benchmark_tb",
+      "-j",
+      "4",
+      "--Mdir",
+      "obj_dir",
+      "-f",
+      "soc_benchmark_vcs_xcelium.f"
+    ],
+    "cwd": "/tmp/rf_sram_p8l2l145/run",
+    "wall_limit_seconds": 300,
+    "wall_seconds": 7.501660058000002,
+    "return_code": 0
+  },
+  {
+    "label": "verilator_run",
+    "argv": [
+      "/tmp/rf_sram_p8l2l145/run/obj_dir/Vsoc_benchmark_tb",
+      "+IMEM_HEX=imem.hex",
+      "+DMEM_HEX=dmem.hex",
+      "+RESULT_JSON=result.json",
+      "+TIMEOUT_CYCLES=2000000",
+      "+BENCHMARK_ID=3"
+    ],
+    "cwd": "/tmp/rf_sram_p8l2l145/run",
+    "wall_limit_seconds": 300,
+    "wall_seconds": 2.6785758360000003,
+    "return_code": -6
+  }
+]
