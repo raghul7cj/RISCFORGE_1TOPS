@@ -1,0 +1,9 @@
+make[1]: Entering directory `/home/iiita/riscv-dv'
+python3 scripts/rtl_no_trap_ref_compare.py --spike_csv out_2026-11-12/spike_trace.csv --rtl_csv out_2026-11-12/rtl_sim/rtl_trace.csv \
+    --out_spike_csv out_2026-11-12/spike_trace.csv.cmp --out_rtl_csv out_2026-11-12/rtl_sim/rtl_trace.csv.cmp
+python3 scripts/instr_trace_compare.py --csv_file_1 "out_2026-11-12/spike_trace.csv.cmp" --csv_file_2 "out_2026-11-12/rtl_sim/rtl_trace.csv.cmp" --csv_name_1 spike --csv_name_2 rtl
+spike : out_2026-11-12/spike_trace.csv.cmp
+rtl : out_2026-11-12/rtl_sim/rtl_trace.csv.cmp
+[PASSED]: 955 matched
+
+make[1]: Leaving directory `/home/iiita/riscv-dv'

@@ -1,0 +1,24 @@
+make[1]: Entering directory `/home/iiita/riscv-dv'
+python3 scripts/rtl_no_trap_ref_compare.py --spike_csv out_2026-11-07/spike_trace.csv --rtl_csv out_2026-11-07/rtl_sim/rtl_trace.csv \
+    --out_spike_csv out_2026-11-07/spike_trace.csv.cmp --out_rtl_csv out_2026-11-07/rtl_sim/rtl_trace.csv.cmp
+python3 scripts/instr_trace_compare.py --csv_file_1 "out_2026-11-07/spike_trace.csv.cmp" --csv_file_2 "out_2026-11-07/rtl_sim/rtl_trace.csv.cmp" --csv_name_1 spike --csv_name_2 rtl
+spike : out_2026-11-07/spike_trace.csv.cmp
+rtl : out_2026-11-07/rtl_sim/rtl_trace.csv.cmp
+Mismatch[1]:
+spike[2914] : pc[80011da0] addi    s6, s6, -4: s6:8002cce0 
+rtl[2914] : pc[80001a6c] and s0,s6,s9: s0:800004c0 
+Mismatch[2]:
+spike[2915] : pc[80011da8] add     a7, s6, zero: a7:8002cce0 
+rtl[2915] : pc[80001a70] csrrsi s3,mscratch,27: s3:0000001a 
+Mismatch[3]:
+spike[2916] : pc[80011dac] addi    a7, a7, -128: a7:8002cc60 
+rtl[2916] : pc[80001a74] sltiu t1,t1,-2000: t1:00000001 
+Mismatch[4]:
+spike[2917] : pc[80011e2c] add     s6, a7, zero: s6:8002cc60 
+rtl[2917] : pc[80001a78] remu a1,s3,a7: a1:0000001a 
+Mismatch[5]:
+spike[2918] : pc[80011e30] csrr    s1, mepc: s1:80001a68 
+rtl[2918] : pc[80001a7c] or tp,s9,s7: tp:800134d2 
+[FAILED]: 1196 matched, 5199 mismatch
+
+make[1]: Leaving directory `/home/iiita/riscv-dv'

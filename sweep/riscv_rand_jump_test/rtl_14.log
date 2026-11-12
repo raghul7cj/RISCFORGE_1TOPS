@@ -1,0 +1,907 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Oct 31, 2026 at 00:44:58 IST
+irun
+	-clean
+	-64bit
+	-sv
+	-access +rwc
+	-timescale 1ns/1ps
+	-coverage all
+	-covoverwrite
+	-covworkdir out_2026-10-31/cov_work
+	-incdir RTL_5STAGE_UPDATED
+	RTL_5STAGE_UPDATED/ALU_Decoder.v
+	RTL_5STAGE_UPDATED/ALU.v
+	RTL_5STAGE_UPDATED/booth_enc.v
+	RTL_5STAGE_UPDATED/Control_Unit_Top.v
+	RTL_5STAGE_UPDATED/csa.v
+	RTL_5STAGE_UPDATED/csr_regfile.v
+	RTL_5STAGE_UPDATED/Data_Memory.v
+	RTL_5STAGE_UPDATED/decode_cycle.v
+	RTL_5STAGE_UPDATED/execute_cycle.v
+	RTL_5STAGE_UPDATED/fetch_cycle.v
+	RTL_5STAGE_UPDATED/hazard_unit.v
+	RTL_5STAGE_UPDATED/imem_controller.v
+	RTL_5STAGE_UPDATED/Instruction_Memory.v
+	RTL_5STAGE_UPDATED/JB_unit.v
+	RTL_5STAGE_UPDATED/ls_unit.v
+	RTL_5STAGE_UPDATED/Main_Decoder.v
+	RTL_5STAGE_UPDATED/memory_cycle.v
+	RTL_5STAGE_UPDATED/Mux2.v
+	RTL_5STAGE_UPDATED/Mux_3_by_1.v
+	RTL_5STAGE_UPDATED/opcode_check.v
+	RTL_5STAGE_UPDATED/PC_Adder.v
+	RTL_5STAGE_UPDATED/PC.v
+	RTL_5STAGE_UPDATED/pp_gen.v
+	RTL_5STAGE_UPDATED/Register_File.v
+	RTL_5STAGE_UPDATED/rv32m_div.v
+	RTL_5STAGE_UPDATED/rv32m_mul.v
+	RTL_5STAGE_UPDATED/rv32m_unit.v
+	RTL_5STAGE_UPDATED/Sign_Extend.v
+	RTL_5STAGE_UPDATED/tb.v
+	RTL_5STAGE_UPDATED/top.v
+	RTL_5STAGE_UPDATED/wb_trap_mret_commit_controller.v
+	RTL_5STAGE_UPDATED/writeback_cycle.v
+	RTL_5STAGE_UPDATED/axi_pkg.sv
+	RTL_5STAGE_UPDATED/hybrid_mem_interface.sv
+	RTL_5STAGE_UPDATED/tb_riscv_dv.sv
+	-top tb_riscv_dv
+	+instr_file=out_2026-10-31/asm_test/test.hex
+	+tohost_addr=0x8000f000
+	-l out_2026-10-31/rtl_sim/rtl.log
+
+   User defined plus("+") options:
+	+instr_file=out_2026-10-31/asm_test/test.hex
+	+tohost_addr=0x8000f000
+
+xrun: *W,NCEXDEP: Executable (irun) is deprecated. Use (xrun) instead.
+xrun: *N,CLEAN: Removing existing directory ./xcelium.d.
+file: RTL_5STAGE_UPDATED/ALU_Decoder.v
+	module worklib.ALU_Decoder:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/ALU.v
+	module worklib.ALU:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/booth_enc.v
+	module worklib.booth_enc:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Control_Unit_Top.v
+	module worklib.Control_Unit_Top:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/csa.v
+	module worklib.csa:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/csr_regfile.v
+	module worklib.csr_regfile:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Data_Memory.v
+	module worklib.Data_Memory:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/decode_cycle.v
+	module worklib.decode_cycle:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/execute_cycle.v
+        else if ($signed(Src_A) == -2147483648 && $signed(Src_B_interim) == -1) begin
+                                             |
+xmvlog: *W,SGNOVF (RTL_5STAGE_UPDATED/execute_cycle.v,307|45): sign overflow during conversion from text [2.5(IEEE)] (32 bits).
+	module worklib.execute_cycle:v
+		errors: 0, warnings: 1
+file: RTL_5STAGE_UPDATED/fetch_cycle.v
+	module worklib.fetch_cycle:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/hazard_unit.v
+	module worklib.hazard_unit:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/imem_controller.v
+	module worklib.imem_controller:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Instruction_Memory.v
+	module worklib.Instruction_Memory:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/JB_unit.v
+	module worklib.JB_unit:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/ls_unit.v
+	module worklib.ls_unit:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Main_Decoder.v
+	module worklib.Main_Decoder:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/memory_cycle.v
+	module worklib.memory_cycle:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Mux2.v
+	module worklib.Mux2:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Mux_3_by_1.v
+	module worklib.Mux_3_by_1:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/opcode_check.v
+	module worklib.opcode_check:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/PC_Adder.v
+	module worklib.PC_Adder:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/PC.v
+	module worklib.PC:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/pp_gen.v
+	module worklib.pp_gen:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Register_File.v
+	module worklib.Register_File:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/rv32m_div.v
+	module worklib.rv32m_div:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/rv32m_mul.v
+	module worklib.rv32m_mul:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/rv32m_unit.v
+	module worklib.rv32m_unit:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/Sign_Extend.v
+	module worklib.Sign_Extend:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/tb.v
+	module worklib.tb:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/top.v
+	module worklib.top:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/wb_trap_mret_commit_controller.v
+	module worklib.wb_trap_mret_commit_controller:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/writeback_cycle.v
+	module worklib.writeback_cycle:v
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/axi_pkg.sv
+	package worklib.axi_pkg:sv
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/hybrid_mem_interface.sv
+	module worklib.hybrid_mem_interface:sv
+		errors: 0, warnings: 0
+file: RTL_5STAGE_UPDATED/tb_riscv_dv.sv
+	module worklib.tb_riscv_dv:sv
+		errors: 0, warnings: 0
+xmvlog: *W,SPDUSD: Include directory RTL_5STAGE_UPDATED given but not used.
+	Total errors/warnings found outside modules and primitives:
+		errors: 0, warnings: 1
+	Elaborating the design hierarchy:
+		Caching library 'worklib' ....... Done
+    ALU alu_inst (
+               |
+xmelab: *W,CUVWSP (./RTL_5STAGE_UPDATED/execute_cycle.v,251|15): 1 output port was not connected:
+xmelab: (./RTL_5STAGE_UPDATED/ALU.v,25): Zero
+
+    csr_regfile #(.XLEN(32)) csr_file (
+                                    |
+xmelab: *W,CUVWSP (./RTL_5STAGE_UPDATED/top.v,551|36): 2 output ports were not connected:
+xmelab: (./RTL_5STAGE_UPDATED/csr_regfile.v,11): csr_valid_o
+xmelab: (./RTL_5STAGE_UPDATED/csr_regfile.v,67): mcause_out_o
+
+	Top level design units:
+		tb_riscv_dv
+
+	Extracting FSMs for coverage:
+		worklib.PC
+		worklib.PC_Adder
+		worklib.imem_controller
+		worklib.fetch_cycle
+		worklib.opcode_check
+		worklib.Main_Decoder
+		worklib.ALU_Decoder
+		worklib.Control_Unit_Top
+		worklib.Register_File
+		worklib.Sign_Extend
+		worklib.decode_cycle
+		worklib.Mux_3_by_1
+		worklib.Mux2
+		worklib.ALU
+		worklib.JB_unit
+		worklib.booth_enc
+		worklib.pp_gen
+		worklib.csa
+		worklib.rv32m_mul
+		worklib.rv32m_div
+			FSM extracted for state register state
+		worklib.rv32m_unit
+		worklib.execute_cycle
+		worklib.ls_unit
+		worklib.memory_cycle
+		worklib.writeback_cycle
+		worklib.wb_trap_mret_commit_controller
+		worklib.csr_regfile
+		worklib.hazard_unit
+		worklib.top
+		worklib.Instruction_Memory
+		worklib.Data_Memory
+		worklib.tb_riscv_dv
+	Total FSMs extracted = 1
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[16]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[15]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[14]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[13]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[12]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[11]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[10]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[9]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[8]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[7]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[6]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[5]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[4]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[3]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[2]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[1]) .
+                .shift ((2*i)),
+                          |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,80|26): port sizes differ in port connection(32/6) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul.gen_booth[0]) .
+    csa u_l1_0(.a(l0[0]), .b(l0[1]),  .c(l0[2]),  .s(l1s0), .co(l1c0));
+                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,174|67): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l1_1(.a(l0[3]), .b(l0[4]),  .c(l0[5]),  .s(l1s1), .co(l1c1));
+                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,175|67): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l1_2(.a(l0[6]), .b(l0[7]),  .c(l0[8]),  .s(l1s2), .co(l1c2));
+                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,176|67): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l1_3(.a(l0[9]), .b(l0[10]), .c(l0[11]), .s(l1s3), .co(l1c3));
+                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,177|67): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l1_4(.a(l0[12]),.b(l0[13]), .c(l0[14]), .s(l1s4), .co(l1c4));
+                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,178|67): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l1_5(.a(l0[15]),.b(l0[16]), .c(l0[17]), .s(l1s5), .co(l1c5));
+                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,179|67): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l2_0(.a(l1s0),        .b(l1s1),        .c({l1c0[64:0],1'b0}), .s(l2s0), .co(l2c0));
+                                                                                         |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,186|89): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l2_1(.a(l1s2),        .b(l1s3),        .c({l1c1[64:0],1'b0}), .s(l2s1), .co(l2c1));
+                                                                                         |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,187|89): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l2_2(.a(l1s4),        .b(l1s5),        .c({l1c2[64:0],1'b0}), .s(l2s2), .co(l2c2));
+                                                                                         |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,188|89): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l2_3(.a({l1c3[64:0],1'b0}),.b({l1c4[64:0],1'b0}),.c({l1c5[64:0],1'b0}), .s(l2s3), .co(l2c3));
+                                                                                                   |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,189|99): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l3_0(.a(l2s0), .b(l2s1), .c({l2c0[64:0],1'b0}), .s(l3s0), .co(l3c0));
+                                                                           |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,195|75): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l3_1(.a(l2s2), .b(l2s3), .c({l2c1[64:0],1'b0}), .s(l3s1), .co(l3c1));
+                                                                           |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,196|75): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l4_0(.a(l3s0), .b(l3s1), .c({l3c0[64:0],1'b0}), .s(l4s0), .co(l4c0));
+                                                                           |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,204|75): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l4_1(.a({l3c1[64:0],1'b0}), .b(l2c2_sh), .c(l2c3_sh), .s(l4s1), .co(l4c1));
+                                                                                 |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,205|81): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l5_0(.a(l4s0), .b(l4s1), .c({l4c0[64:0],1'b0}), .s(l5s0), .co(l5c0));
+                                                                           |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,211|75): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+    csa u_l6(.a(l5s0), .b({l5c0[64:0],1'b0}), .c(l4c1_sh), .s(final_sum), .co(final_cout));
+                                                                                       |
+xmelab: *W,CUVMPW (./RTL_5STAGE_UPDATED/rv32m_mul.v,218|87): port sizes differ in port connection(65/66) for the instance(tb_riscv_dv.uut.Execute.m_unit.u_mul) .
+	Building instance overlay tables: ..................
+xmelab: *W,COVFDP: FSM description matching across instance of a module for "COVFDM" warning has been moved from elaboration to simulation dumping. To restore old matching behavior, use "set_backward_compat -COVFDM_during_elab". Also, it is recommended to use set_parameterized_module_coverage CCF command to avoid coverage loss due to FSM description difference across instances of a module.
+xmelab: *W,COVFHT: FSM hold transitions (transitions to the current state) are not extracted for any FSM in default mode.
+.. Done
+	Enabling instrumentation for coverage types: block expression FSM toggle functional
+xmelab: *W,COVDCL: By default expression coverage is scored only for Verilog logical operators (|| and &&) and VHDL logical operators (OR, AND, NOR, and NAND), and is scored only in condition expressions. To score coverage for other operators and for expressions in other statements, use the "set_expr_coverable_operators" and "set_expr_coverable_statements" coverage configuration file commands with suitable options at elaboration.
+	Generating native compiled code:
+		worklib.Data_Memory:v <0x3270af44>
+			streams:   8, words:  7090
+		worklib.Instruction_Memory:v <0x763265d0>
+			streams:   5, words:  4964
+		worklib.hazard_unit:v <0x2d6e1883>
+			streams:  12, words:  6873
+		worklib.csr_regfile:v <0x2bb7c95f>
+			streams:  31, words: 25830
+		worklib.wb_trap_mret_commit_controller:v <0x01bb6be1>
+			streams:  15, words:  3050
+		worklib.writeback_cycle:v <0x006c725f>
+			streams:   1, words:   553
+		worklib.ls_unit:v <0x02d7368a>
+			streams:   8, words: 15627
+		worklib.rv32m_div:v <0x1a1cee4f>
+			streams:  23, words: 16217
+		worklib.csa:v <0x1ea63113>
+			streams:   1, words:  2182
+		worklib.csa:v <0x7ecb300e>
+			streams:   1, words:  2182
+		worklib.csa:v <0x23430570>
+			streams:   1, words:  3358
+		worklib.csa:v <0x432e046d>
+			streams:   1, words:  2183
+		worklib.csa:v <0x58740477>
+			streams:   1, words:  1613
+		worklib.pp_gen:v <0x132f2dff>
+			streams:   4, words:  2348
+		worklib.booth_enc:v <0x29e621b8>
+			streams:   0, words:     0
+		worklib.rv32m_unit:v <0x66377620>
+			streams:  10, words:  3743
+		worklib.JB_unit:v <0x4efa11df>
+			streams:   6, words:  1712
+		worklib.ALU:v <0x72c38122>
+			streams:   7, words:  6571
+		worklib.Mux2:v <0x3f7873e5>
+			streams:   1, words:   248
+		worklib.Mux_3_by_1:v <0x6f2b1e6e>
+			streams:   2, words:   513
+		worklib.execute_cycle:v <0x05d3827b>
+			streams:  30, words: 45569
+		worklib.Sign_Extend:v <0x513858e2>
+			streams:   1, words:  2090
+		worklib.Register_File:v <0x1b89d650>
+			streams:   6, words:  4330
+		worklib.ALU_Decoder:v <0x578b587f>
+			streams:   1, words:  8552
+		worklib.opcode_check:v <0x6650a6c8>
+			streams:  12, words:  7730
+		worklib.Main_Decoder:v <0x22b0ca22>
+			streams:   1, words: 14047
+		worklib.Control_Unit_Top:v <0x173d0cd2>
+			streams:   3, words:  2720
+		worklib.decode_cycle:v <0x2d20cd93>
+			streams:  14, words: 54176
+		worklib.imem_controller:v <0x2aad044c>
+			streams:   5, words:  2352
+		worklib.PC_Adder:v <0x2ea4f3c5>
+			streams:   1, words:   176
+		worklib.PC:v <0x088e09d3>
+			streams:   2, words:   777
+		worklib.tb_riscv_dv:sv <0x014077fd>
+			streams:  13, words: 16046
+		worklib.rv32m_mul:v <0x230c3713>
+			streams:  61, words: 21796
+		worklib.fetch_cycle:v <0x4b9af3d5>
+			streams:  14, words: 15183
+		worklib.top:v <0x3d5ae389>
+			streams:  12, words:  9866
+		worklib.memory_cycle:v <0x0f56ce59>
+			streams:  14, words: 22430
+  reg [31:0] mem [0:1048575];
+               |
+xmelab: *W,COVMDD (./RTL_5STAGE_UPDATED/Instruction_Memory.v,23|15): Toggle coverage for bit, logic, reg, wire, enum and struct multi-dimensional static arrays and vectors is not supported by default. To enable toggle coverage for enum multi-dimensional static arrays specify 'set_toggle_scoring -sv_enum enable_mda' and for other multi-dimensional static arrays, specify 'set_toggle_scoring -sv_mda [<max_bit_base2_exponent>] [-sv_mda_of_struct]' ccf command in the coverage configuration file.
+  integer i;
+          |
+xmelab: *W,COVUTA (./RTL_5STAGE_UPDATED/Instruction_Memory.v,44|10): Toggle coverage is not supported for SystemVerilog integer, real array, string, dynamic array, sparse memory and reference ports. It is also not supported for VHDL multi-dimensional array and array of record. There may also be other such objects in the design.
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                   Instances  Unique
+		Modules:                  81      32
+		Registers:               162     162
+		Scalar wires:            242       -
+		Expanded wires:        1,129      20
+		Vectored wires:          291       -
+		Always blocks:            39      39
+		Initial blocks:            6       6
+		Cont. assignments:       251     328
+		Pseudo assignments:       31       -
+		Sparse arrays:             2       -
+		Process Clocks:           17       4
+		Simulation timescale:    1ps
+	Writing initial simulation snapshot: worklib.tb_riscv_dv:sv
+Loading snapshot worklib.tb_riscv_dv:sv .................... Done
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+[TB] tohost_addr overridden to 0x8000f000 (parameter was 0x8000c000)
+[IMEM] loading file:out_2026-10-31/asm_test/test.hex
+PCF=80000000 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCF=80000004 PCD=80000000 PCPlus4D=80000004 InstrD=f14022f3
+PCF=80000008 PCD=80000004 PCPlus4D=80000008 InstrD=00000313
+PCF=8000000c PCD=80000008 PCPlus4D=8000000c InstrD=00628263
+PCF=80000010 PCD=8000000c PCPlus4D=80000010 InstrD=00000f17
+PCW=80000000 InstrW=f14022f3 GPR=x5:00000000
+PCF=8000000c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000004 InstrW=00000313 GPR=x6:00000000
+PCF=8000000c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000008 InstrW=00628263
+PCF=80000010 PCD=8000000c PCPlus4D=80000010 InstrD=00000f17
+PCF=80000014 PCD=80000010 PCPlus4D=80000014 InstrD=00cf0f13
+PCF=80000018 PCD=80000014 PCPlus4D=80000018 InstrD=000f0067
+PCF=8000001c PCD=80000018 PCPlus4D=8000001c InstrD=400019b7
+PCW=8000000c InstrW=00000f17 GPR=x30:8000000c
+PCF=80000018 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000010 InstrW=00cf0f13 GPR=x30:80000018
+PCF=80000018 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000014 InstrW=000f0067
+PCF=8000001c PCD=80000018 PCPlus4D=8000001c InstrD=400019b7
+PCF=80000020 PCD=8000001c PCPlus4D=80000020 InstrD=10098993
+PCF=80000024 PCD=80000020 PCPlus4D=80000024 InstrD=30199073
+PCF=80000028 PCD=80000024 PCPlus4D=80000028 InstrD=00029697
+PCW=80000018 InstrW=400019b7 GPR=x19:40001000
+PCF=8000002c PCD=80000028 PCPlus4D=8000002c InstrD=cc068693
+PCW=8000001c InstrW=10098993 GPR=x19:40001100
+PCF=80000030 PCD=8000002c PCPlus4D=80000030 InstrD=0000e997
+PCW=80000020 InstrW=30199073
+PCF=80000034 PCD=80000030 PCPlus4D=80000034 InstrD=f7498993
+PCW=80000024 InstrW=00029697 GPR=x13:80029024
+PCF=80000038 PCD=80000034 PCPlus4D=80000038 InstrD=0019e993
+PCW=80000028 InstrW=cc068693 GPR=x13:80028ce4
+PCF=8000003c PCD=80000038 PCPlus4D=8000003c InstrD=30599073
+PCW=8000002c InstrW=0000e997 GPR=x19:8000e02c
+PCF=80000040 PCD=8000003c PCPlus4D=80000040 InstrD=00000997
+PCW=80000030 InstrW=f7498993 GPR=x19:8000dfa0
+PCF=80000044 PCD=80000040 PCPlus4D=80000044 InstrD=02898993
+PCW=80000034 InstrW=0019e993 GPR=x19:8000dfa1
+PCF=80000048 PCD=80000044 PCPlus4D=80000048 InstrD=34199073
+PCW=80000038 InstrW=30599073
+PCF=8000004c PCD=80000048 PCPlus4D=8000004c InstrD=00000013
+PCW=8000003c InstrW=00000997 GPR=x19:8000003c
+PCF=80000050 PCD=8000004c PCPlus4D=80000050 InstrD=000029b7
+PCW=80000040 InstrW=02898993 GPR=x19:80000064
+PCF=80000054 PCD=80000050 PCPlus4D=80000054 InstrD=80098993
+PCW=80000044 InstrW=34199073
+PCF=80000058 PCD=80000054 PCPlus4D=80000058 InstrD=30099073
+PCW=80000048 InstrW=00000013
+PCF=8000005c PCD=80000058 PCPlus4D=8000005c InstrD=00000993
+PCW=8000004c InstrW=000029b7 GPR=x19:00002000
+PCF=80000060 PCD=8000005c PCPlus4D=80000060 InstrD=30499073
+PCW=80000050 InstrW=80098993 GPR=x19:00001800
+PCF=80000064 PCD=80000060 PCPlus4D=80000064 InstrD=30200073
+PCW=80000054 InstrW=30099073
+PCF=80000068 PCD=80000064 PCPlus4D=80000068 InstrD=00800013
+PCW=80000058 InstrW=00000993 GPR=x19:00000000
+PCF=8000006c PCD=80000068 PCPlus4D=8000006c InstrD=53df80b7
+PCW=8000005c InstrW=30499073
+PCF=80000070 PCD=8000006c PCPlus4D=80000070 InstrD=68b08093
+PCW=80000060 InstrW=30200073
+PCF=80000064 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCF=80000064 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCF=80000068 PCD=80000064 PCPlus4D=80000068 InstrD=00800013
+PCF=8000006c PCD=80000068 PCPlus4D=8000006c InstrD=53df80b7
+PCF=80000070 PCD=8000006c PCPlus4D=80000070 InstrD=68b08093
+PCF=80000074 PCD=80000070 PCPlus4D=80000074 InstrD=00b00113
+PCW=80000064 InstrW=00800013
+PCF=80000078 PCD=80000074 PCPlus4D=80000078 InstrD=f28601b7
+PCW=80000068 InstrW=53df80b7 GPR=x1:53df8000
+PCF=8000007c PCD=80000078 PCPlus4D=8000007c InstrD=d8d18193
+PCW=8000006c InstrW=68b08093 GPR=x1:53df868b
+PCF=80000080 PCD=8000007c PCPlus4D=80000080 InstrD=80000237
+PCW=80000070 InstrW=00b00113 GPR=x2:0000000b
+PCF=80000084 PCD=80000080 PCPlus4D=80000084 InstrD=f14292b7
+PCW=80000074 InstrW=f28601b7 GPR=x3:f2860000
+PCF=80000088 PCD=80000084 PCPlus4D=80000088 InstrD=05128293
+PCW=80000078 InstrW=d8d18193 GPR=x3:f285fd8d
+PCF=8000008c PCD=80000088 PCPlus4D=8000008c InstrD=f73e3337
+PCW=8000007c InstrW=80000237 GPR=x4:80000000
+PCF=80000090 PCD=8000008c PCPlus4D=80000090 InstrD=3b830313
+PCW=80000080 InstrW=f14292b7 GPR=x5:f1429000
+PCF=80000094 PCD=80000090 PCPlus4D=80000094 InstrD=00000393
+PCW=80000084 InstrW=05128293 GPR=x5:f1429051
+PCF=80000098 PCD=80000094 PCPlus4D=80000098 InstrD=80000437
+PCW=80000088 InstrW=f73e3337 GPR=x6:f73e3000
+PCF=8000009c PCD=80000098 PCPlus4D=8000009c InstrD=800004b7
+PCW=8000008c InstrW=3b830313 GPR=x6:f73e33b8
+PCF=800000a0 PCD=8000009c PCPlus4D=800000a0 InstrD=00200513
+PCW=80000090 InstrW=00000393 GPR=x7:00000000
+PCF=800000a4 PCD=800000a0 PCPlus4D=800000a4 InstrD=f605b5b7
+PCW=80000094 InstrW=80000437 GPR=x8:80000000
+PCF=800000a8 PCD=800000a4 PCPlus4D=800000a8 InstrD=23958593
+PCW=80000098 InstrW=800004b7 GPR=x9:80000000
+PCF=800000ac PCD=800000a8 PCPlus4D=800000ac InstrD=7f1df737
+PCW=8000009c InstrW=00200513 GPR=x10:00000002
+PCF=800000b0 PCD=800000ac PCPlus4D=800000b0 InstrD=f2670713
+PCW=800000a0 InstrW=f605b5b7 GPR=x11:f605b000
+PCF=800000b4 PCD=800000b0 PCPlus4D=800000b4 InstrD=ff3777b7
+PCW=800000a4 InstrW=23958593 GPR=x11:f605b239
+PCF=800000b8 PCD=800000b4 PCPlus4D=800000b8 InstrD=a7678793
+PCW=800000a8 InstrW=7f1df737 GPR=x14:7f1df000
+PCF=800000bc PCD=800000b8 PCPlus4D=800000bc InstrD=00a00813
+PCW=800000ac InstrW=f2670713 GPR=x14:7f1def26
+PCF=800000c0 PCD=800000bc PCPlus4D=800000c0 InstrD=800008b7
+PCW=800000b0 InstrW=ff3777b7 GPR=x15:ff377000
+PCF=800000c4 PCD=800000c0 PCPlus4D=800000c4 InstrD=00d00913
+PCW=800000b4 InstrW=a7678793 GPR=x15:ff376a76
+PCF=800000c8 PCD=800000c4 PCPlus4D=800000c8 InstrD=00000993
+PCW=800000b8 InstrW=00a00813 GPR=x16:0000000a
+PCF=800000cc PCD=800000c8 PCPlus4D=800000cc InstrD=b889ba37
+PCW=800000bc InstrW=800008b7 GPR=x17:80000000
+PCF=800000d0 PCD=800000cc PCPlus4D=800000d0 InstrD=441a0a13
+PCW=800000c0 InstrW=00d00913 GPR=x18:0000000d
+PCF=800000d4 PCD=800000d0 PCPlus4D=800000d4 InstrD=00000a93
+PCW=800000c4 InstrW=00000993 GPR=x19:00000000
+PCF=800000d8 PCD=800000d4 PCPlus4D=800000d8 InstrD=00700b13
+PCW=800000c8 InstrW=b889ba37 GPR=x20:b889b000
+PCF=800000dc PCD=800000d8 PCPlus4D=800000dc InstrD=80000bb7
+PCW=800000cc InstrW=441a0a13 GPR=x20:b889b441
+PCF=800000e0 PCD=800000dc PCPlus4D=800000e0 InstrD=71855c37
+PCW=800000d0 InstrW=00000a93 GPR=x21:00000000
+PCF=800000e4 PCD=800000e0 PCPlus4D=800000e4 InstrD=4e0c0c13
+PCW=800000d4 InstrW=00700b13 GPR=x22:00000007
+PCF=800000e8 PCD=800000e4 PCPlus4D=800000e8 InstrD=00800c93
+PCW=800000d8 InstrW=80000bb7 GPR=x23:80000000
+PCF=800000ec PCD=800000e8 PCPlus4D=800000ec InstrD=00000d13
+PCW=800000dc InstrW=71855c37 GPR=x24:71855000
+PCF=800000f0 PCD=800000ec PCPlus4D=800000f0 InstrD=00000d93
+PCW=800000e0 InstrW=4e0c0c13 GPR=x24:718554e0
+PCF=800000f4 PCD=800000f0 PCPlus4D=800000f4 InstrD=746d5e37
+PCW=800000e4 InstrW=00800c93 GPR=x25:00000008
+PCF=800000f8 PCD=800000f4 PCPlus4D=800000f8 InstrD=263e0e13
+PCW=800000e8 InstrW=00000d13 GPR=x26:00000000
+PCF=800000fc PCD=800000f8 PCPlus4D=800000fc InstrD=00e00e93
+PCW=800000ec InstrW=00000d93 GPR=x27:00000000
+PCF=80000100 PCD=800000fc PCPlus4D=80000100 InstrD=00900f13
+PCW=800000f0 InstrW=746d5e37 GPR=x28:746d5000
+PCF=80000104 PCD=80000100 PCPlus4D=80000104 InstrD=1eb72fb7
+PCW=800000f4 InstrW=263e0e13 GPR=x28:746d5263
+PCF=80000108 PCD=80000104 PCPlus4D=80000108 InstrD=e2ef8f93
+PCW=800000f8 InstrW=00e00e93 GPR=x29:0000000e
+PCF=8000010c PCD=80000108 PCPlus4D=8000010c InstrD=00025617
+PCW=800000fc InstrW=00900f13 GPR=x30:00000009
+PCF=80000110 PCD=8000010c PCPlus4D=80000110 InstrD=d5c60613
+PCW=80000100 InstrW=1eb72fb7 GPR=x31:1eb72000
+PCF=80000114 PCD=80000110 PCPlus4D=80000114 InstrD=00010117
+PCW=80000104 InstrW=e2ef8f93 GPR=x31:1eb71e2e
+PCF=80000118 PCD=80000114 PCPlus4D=80000118 InstrD=b4010113
+PCW=80000108 InstrW=00025617 GPR=x12:80025108
+PCF=8000011c PCD=80000118 PCPlus4D=8000011c InstrD=00114a03
+PCW=8000010c InstrW=d5c60613 GPR=x12:80024e64
+PCF=80000120 PCD=8000011c PCPlus4D=80000120 InstrD=00714a03
+PCW=80000110 InstrW=00010117 GPR=x2:80010110
+PCF=80000124 PCD=80000120 PCPlus4D=80000124 InstrD=00000013
+PCW=80000114 InstrW=b4010113 GPR=x2:8000fc50
+PCF=80000128 PCD=80000124 PCPlus4D=80000128 InstrD=033d9c33
+PCW=80000118 InstrW=00114a03 GPR=x20:0000000a
+PCF=8000012c PCD=80000128 PCPlus4D=8000012c InstrD=00611c83
+PCW=8000011c InstrW=00714a03 GPR=x20:0000000c
+PCF=80000130 PCD=8000012c PCPlus4D=80000130 InstrD=fea12823
+PCW=80000120 InstrW=00000013
+PCF=80000134 PCD=80000130 PCPlus4D=80000134 InstrD=00ac4ab3
+PCW=80000124 InstrW=033d9c33 GPR=x24:00000000
+PCF=80000138 PCD=80000134 PCPlus4D=80000138 InstrD=00011203
+PCW=80000128 InstrW=00611c83 GPR=x25:00000c0d
+PCF=8000013c PCD=80000138 PCPlus4D=8000013c InstrD=fec10aa3
+PCW=8000012c InstrW=fea12823
+PCF=80000140 PCD=8000013c PCPlus4D=80000140 InstrD=00014a83
+PCW=80000130 InstrW=00ac4ab3 GPR=x21:00000002
+PCF=80000144 PCD=80000140 PCPlus4D=80000144 InstrD=001d8d33
+PCW=80000134 InstrW=00011203 GPR=x4:00000a0b
+PCF=80000148 PCD=80000144 PCPlus4D=80000148 InstrD=ff314a83
+PCW=80000138 InstrW=fec10aa3
+PCF=8000014c PCD=80000148 PCPlus4D=8000014c InstrD=3404edf3
+PCW=8000013c InstrW=00014a83 GPR=x21:0000000b
+PCF=80000150 PCD=8000014c PCPlus4D=80000150 InstrD=ff710183
+PCW=80000140 InstrW=001d8d33 GPR=x26:53df868b
+PCF=80000154 PCD=80000150 PCPlus4D=80000154 InstrD=ff310ca3
+PCW=80000144 InstrW=ff314a83 GPR=x21:00000000
+PCF=80000158 PCD=80000154 PCPlus4D=80000158 InstrD=34003a73
+PCW=80000148 InstrW=3404edf3 GPR=x27:00000000
+PCF=80000158 PCD=80000154 PCPlus4D=80000158 InstrD=34003a73
+PCW=8000014c InstrW=ff710183 GPR=x3:fffffffc
+PCF=8000015c PCD=80000158 PCPlus4D=8000015c InstrD=00000013
+PCW=80000150 InstrW=ff310ca3
+PCF=80000160 PCD=8000015c PCPlus4D=80000160 InstrD=ff214183
+PCF=80000164 PCD=80000160 PCPlus4D=80000164 InstrD=70477493
+PCW=80000154 InstrW=34003a73 GPR=x20:00000009
+PCF=80000168 PCD=80000164 PCPlus4D=80000168 InstrD=005100a3
+PCW=80000158 InstrW=00000013
+PCF=8000016c PCD=80000168 PCPlus4D=8000016c InstrD=ffa15c83
+PCW=8000015c InstrW=ff214183 GPR=x3:00000000
+PCF=80000170 PCD=8000016c PCPlus4D=80000170 InstrD=fea10aa3
+PCW=80000160 InstrW=70477493 GPR=x9:00000704
+PCF=80000174 PCD=80000170 PCPlus4D=80000174 InstrD=ffa10c03
+PCW=80000164 InstrW=005100a3
+PCF=80000178 PCD=80000174 PCPlus4D=80000178 InstrD=be673d13
+PCW=80000168 InstrW=ffa15c83 GPR=x25:00000001
+PCF=8000017c PCD=80000178 PCPlus4D=8000017c InstrD=01177c33
+PCW=8000016c InstrW=fea10aa3
+PCF=80000180 PCD=8000017c PCPlus4D=80000180 InstrD=028532b3
+PCW=80000170 InstrW=ffa10c03 GPR=x24:00000001
+PCF=80000184 PCD=80000180 PCPlus4D=80000184 InstrD=4e784e93
+PCW=80000174 InstrW=be673d13 GPR=x26:00000001
+PCF=80000188 PCD=80000184 PCPlus4D=80000188 InstrD=3af53e97
+PCW=80000178 InstrW=01177c33 GPR=x24:00000000
+PCF=8000018c PCD=80000188 PCPlus4D=8000018c InstrD=00b10c83
+PCW=8000017c InstrW=028532b3 GPR=x5:00000001
+PCF=80000190 PCD=8000018c PCPlus4D=80000190 InstrD=02870333
+PCW=80000180 InstrW=4e784e93 GPR=x29:000004ed
+PCF=80000194 PCD=80000190 PCPlus4D=80000194 InstrD=00810b03
+PCW=80000184 InstrW=3af53e97 GPR=x29:baf53184
+PCF=80000198 PCD=80000194 PCPlus4D=80000198 InstrD=15fc8013
+PCW=80000188 InstrW=00b10c83 GPR=x25:00000010
+PCF=8000019c PCD=80000198 PCPlus4D=8000019c InstrD=03df3333
+PCW=8000018c InstrW=02870333 GPR=x6:00000000
+PCF=800001a0 PCD=8000019c PCPlus4D=800001a0 InstrD=032aae33
+PCW=80000190 InstrW=00810b03 GPR=x22:00000013
+PCF=800001a4 PCD=800001a0 PCPlus4D=800001a4 InstrD=34035473
+PCW=80000194 InstrW=15fc8013
+PCF=800001a8 PCD=800001a4 PCPlus4D=800001a8 InstrD=00411903
+PCW=80000198 InstrW=03df3333 GPR=x6:00000006
+PCF=800001ac PCD=800001a8 PCPlus4D=800001ac InstrD=ffa10da3
+PCW=8000019c InstrW=032aae33 GPR=x28:00000000
+PCF=800001b0 PCD=800001ac PCPlus4D=800001b0 InstrD=c710bf93
+PCW=800001a0 InstrW=34035473 GPR=x8:00000009
+PCF=800001b4 PCD=800001b0 PCPlus4D=800001b4 InstrD=00310e03
+PCW=800001a4 InstrW=00411903 GPR=x18:00000e0f
+PCF=800001b8 PCD=800001b4 PCPlus4D=800001b8 InstrD=015100a3
+PCW=800001a8 InstrW=ffa10da3
+PCF=800001bc PCD=800001b8 PCPlus4D=800001bc InstrD=00110a03
+PCW=800001ac InstrW=c710bf93 GPR=x31:00000001
+PCF=800001c0 PCD=800001bc PCPlus4D=800001c0 InstrD=02cdb733
+PCW=800001b0 InstrW=00310e03 GPR=x28:00000008
+PCF=800001c4 PCD=800001c0 PCPlus4D=800001c4 InstrD=00110303
+PCW=800001b4 InstrW=015100a3
+PCF=800001c8 PCD=800001c4 PCPlus4D=800001c8 InstrD=01fd08b3
+PCW=800001b8 InstrW=00110a03 GPR=x20:00000000
+PCF=800001cc PCD=800001c8 PCPlus4D=800001cc InstrD=ff514f83
+PCW=800001bc InstrW=02cdb733 GPR=x14:00000000
+PCF=800001d0 PCD=800001cc PCPlus4D=800001d0 InstrD=ff910c83
+PCW=800001c0 InstrW=00110303 GPR=x6:00000000
+PCF=800001d4 PCD=800001d0 PCPlus4D=800001d4 InstrD=014105a3
+PCW=800001c4 InstrW=01fd08b3 GPR=x17:00000002
+PCF=800001d8 PCD=800001d4 PCPlus4D=800001d8 InstrD=02d73233
+PCW=800001c8 InstrW=ff514f83 GPR=x31:00000002
+PCF=800001dc PCD=800001d8 PCPlus4D=800001dc InstrD=00411083
+PCW=800001cc InstrW=ff910c83 GPR=x25:00000000
+PCF=800001e0 PCD=800001dc PCPlus4D=800001e0 InstrD=07db4063
+PCW=800001d0 InstrW=014105a3
+PCF=800001e4 PCD=800001e0 PCPlus4D=800001e4 InstrD=340d2ef3
+PCW=800001d4 InstrW=02d73233 GPR=x4:00000000
+PCF=800001e8 PCD=800001e4 PCPlus4D=800001e8 InstrD=02ac0d33
+PCW=800001d8 InstrW=00411083 GPR=x1:00000e0f
+PCF=800001ec PCD=800001e8 PCPlus4D=800001ec InstrD=b1e12593
+PCW=800001dc InstrW=07db4063
+PCF=800001f0 PCD=800001ec PCPlus4D=800001f0 InstrD=04fe5863
+PCW=800001e0 InstrW=340d2ef3 GPR=x29:00000006
+PCF=800001f4 PCD=800001f0 PCPlus4D=800001f4 InstrD=04e24063
+PCW=800001e4 InstrW=02ac0d33 GPR=x26:00000000
+PCF=8000023c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=800001e8 InstrW=b1e12593 GPR=x11:00000001
+PCF=8000023c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=800001ec InstrW=04fe5863
+PCF=80000240 PCD=8000023c PCPlus4D=80000240 InstrD=017b1c33
+PCF=80000244 PCD=80000240 PCPlus4D=80000244 InstrD=00000f17
+PCF=80000248 PCD=80000244 PCPlus4D=80000248 InstrD=00cf0f13
+PCF=8000024c PCD=80000248 PCPlus4D=8000024c InstrD=000f0067
+PCW=8000023c InstrW=017b1c33 GPR=x24:00000013
+PCF=80000250 PCD=8000024c PCPlus4D=80000250 InstrD=00100193
+PCW=80000240 InstrW=00000f17 GPR=x30:80000240
+PCF=8000024c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000244 InstrW=00cf0f13 GPR=x30:8000024c
+PCF=8000024c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000248 InstrW=000f0067
+PCF=80000250 PCD=8000024c PCPlus4D=80000250 InstrD=00100193
+PCF=80000254 PCD=80000250 PCPlus4D=80000254 InstrD=00000073
+PCF=80000258 PCD=80000254 PCPlus4D=80000258 InstrD=0073e463
+PCF=8000025c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=8000024c InstrW=00100193 GPR=x3:00000001
+PCF=80000260 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=80000250 InstrW=00000073
+PCF=8000dfa0 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCF=8000dfa0 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCF=8000dfa4 PCD=8000dfa0 PCPlus4D=8000dfa4 InstrD=0400006f
+PCF=8000dfa8 PCD=8000dfa4 PCPlus4D=8000dfa8 InstrD=de8ff06f
+PCF=8000dfe0 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCF=8000dfe0 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=8000dfa0 InstrW=0400006f
+PCF=8000dfe4 PCD=8000dfe0 PCPlus4D=8000dfe4 InstrD=ffc68693
+PCF=8000dfe8 PCD=8000dfe4 PCPlus4D=8000dfe8 InstrD=00c6a023
+PCF=8000dfec PCD=8000dfe8 PCPlus4D=8000dfec InstrD=00068633
+PCF=8000dff0 PCD=8000dfec PCPlus4D=8000dff0 InstrD=f8060613
+PCW=8000dfe0 InstrW=ffc68693 GPR=x13:80028ce0
+PCF=8000dff4 PCD=8000dff0 PCPlus4D=8000dff4 InstrD=00162223
+PCW=8000dfe4 InstrW=00c6a023
+PCF=8000dff8 PCD=8000dff4 PCPlus4D=8000dff8 InstrD=00262423
+PCW=8000dfe8 InstrW=00068633 GPR=x12:80028ce0
+PCF=8000dffc PCD=8000dff8 PCPlus4D=8000dffc InstrD=00362623
+PCW=8000dfec InstrW=f8060613 GPR=x12:80028c60
+PCF=8000e000 PCD=8000dffc PCPlus4D=8000e000 InstrD=00462823
+PCW=8000dff0 InstrW=00162223
+PCF=8000e004 PCD=8000e000 PCPlus4D=8000e004 InstrD=00562a23
+PCW=8000dff4 InstrW=00262423
+PCF=8000e008 PCD=8000e004 PCPlus4D=8000e008 InstrD=00662c23
+PCW=8000dff8 InstrW=00362623
+PCF=8000e00c PCD=8000e008 PCPlus4D=8000e00c InstrD=00762e23
+PCW=8000dffc InstrW=00462823
+PCF=8000e010 PCD=8000e00c PCPlus4D=8000e010 InstrD=02862023
+PCW=8000e000 InstrW=00562a23
+PCF=8000e014 PCD=8000e010 PCPlus4D=8000e014 InstrD=02962223
+PCW=8000e004 InstrW=00662c23
+PCF=8000e018 PCD=8000e014 PCPlus4D=8000e018 InstrD=02a62423
+PCW=8000e008 InstrW=00762e23
+PCF=8000e01c PCD=8000e018 PCPlus4D=8000e01c InstrD=02b62623
+PCW=8000e00c InstrW=02862023
+PCF=8000e020 PCD=8000e01c PCPlus4D=8000e020 InstrD=02c62823
+PCW=8000e010 InstrW=02962223
+PCF=8000e024 PCD=8000e020 PCPlus4D=8000e024 InstrD=02d62a23
+PCW=8000e014 InstrW=02a62423
+PCF=8000e028 PCD=8000e024 PCPlus4D=8000e028 InstrD=02e62c23
+PCW=8000e018 InstrW=02b62623
+PCF=8000e02c PCD=8000e028 PCPlus4D=8000e02c InstrD=02f62e23
+PCW=8000e01c InstrW=02c62823
+PCF=8000e030 PCD=8000e02c PCPlus4D=8000e030 InstrD=05062023
+PCW=8000e020 InstrW=02d62a23
+PCF=8000e034 PCD=8000e030 PCPlus4D=8000e034 InstrD=05162223
+PCW=8000e024 InstrW=02e62c23
+PCF=8000e038 PCD=8000e034 PCPlus4D=8000e038 InstrD=05262423
+PCW=8000e028 InstrW=02f62e23
+PCF=8000e03c PCD=8000e038 PCPlus4D=8000e03c InstrD=05362623
+PCW=8000e02c InstrW=05062023
+PCF=8000e040 PCD=8000e03c PCPlus4D=8000e040 InstrD=05462823
+PCW=8000e030 InstrW=05162223
+PCF=8000e044 PCD=8000e040 PCPlus4D=8000e044 InstrD=05562a23
+PCW=8000e034 InstrW=05262423
+PCF=8000e048 PCD=8000e044 PCPlus4D=8000e048 InstrD=05662c23
+PCW=8000e038 InstrW=05362623
+PCF=8000e04c PCD=8000e048 PCPlus4D=8000e04c InstrD=05762e23
+PCW=8000e03c InstrW=05462823
+PCF=8000e050 PCD=8000e04c PCPlus4D=8000e050 InstrD=07862023
+PCW=8000e040 InstrW=05562a23
+PCF=8000e054 PCD=8000e050 PCPlus4D=8000e054 InstrD=07962223
+PCW=8000e044 InstrW=05662c23
+PCF=8000e058 PCD=8000e054 PCPlus4D=8000e058 InstrD=07a62423
+PCW=8000e048 InstrW=05762e23
+PCF=8000e05c PCD=8000e058 PCPlus4D=8000e05c InstrD=07b62623
+PCW=8000e04c InstrW=07862023
+PCF=8000e060 PCD=8000e05c PCPlus4D=8000e060 InstrD=07c62823
+PCW=8000e050 InstrW=07962223
+PCF=8000e064 PCD=8000e060 PCPlus4D=8000e064 InstrD=07d62a23
+PCW=8000e054 InstrW=07a62423
+PCF=8000e068 PCD=8000e064 PCPlus4D=8000e068 InstrD=07e62c23
+PCW=8000e058 InstrW=07b62623
+PCF=8000e06c PCD=8000e068 PCPlus4D=8000e06c InstrD=07f62e23
+PCW=8000e05c InstrW=07c62823
+PCF=8000e070 PCD=8000e06c PCPlus4D=8000e070 InstrD=000606b3
+PCW=8000e060 InstrW=07d62a23
+PCF=8000e074 PCD=8000e070 PCPlus4D=8000e074 InstrD=341029f3
+PCW=8000e064 InstrW=07e62c23
+PCF=8000e078 PCD=8000e074 PCPlus4D=8000e078 InstrD=342029f3
+PCW=8000e068 InstrW=07f62e23
+PCF=8000e07c PCD=8000e078 PCPlus4D=8000e07c InstrD=00300513
+PCW=8000e06c InstrW=000606b3 GPR=x13:80028c60
+PCF=8000e080 PCD=8000e07c PCPlus4D=8000e080 InstrD=2aa98a63
+PCW=8000e070 InstrW=341029f3 GPR=x19:80000250
+PCF=8000e084 PCD=8000e080 PCPlus4D=8000e084 InstrD=00800513
+PCW=8000e074 InstrW=342029f3 GPR=x19:0000000b
+PCF=8000e088 PCD=8000e084 PCPlus4D=8000e088 InstrD=04a98e63
+PCW=8000e078 InstrW=00300513 GPR=x10:00000003
+PCF=8000e08c PCD=8000e088 PCPlus4D=8000e08c InstrD=00900513
+PCW=8000e07c InstrW=2aa98a63
+PCF=8000e090 PCD=8000e08c PCPlus4D=8000e090 InstrD=04a98a63
+PCW=8000e080 InstrW=00800513 GPR=x10:00000008
+PCF=8000e094 PCD=8000e090 PCPlus4D=8000e094 InstrD=00b00513
+PCW=8000e084 InstrW=04a98e63
+PCF=8000e098 PCD=8000e094 PCPlus4D=8000e098 InstrD=04a98663
+PCW=8000e088 InstrW=00900513 GPR=x10:00000009
+PCF=8000e09c PCD=8000e098 PCPlus4D=8000e09c InstrD=00100513
+PCW=8000e08c InstrW=04a98a63
+PCF=8000e0e0 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=8000e090 InstrW=00b00513 GPR=x10:0000000b
+PCF=8000e0e0 PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=8000e094 InstrW=04a98663
+PCF=8000e0e4 PCD=8000e0e0 PCPlus4D=8000e0e4 InstrD=ffff2997
+PCF=8000e0e8 PCD=8000e0e4 PCPlus4D=8000e0e8 InstrD=f2098993
+PCF=8000e0ec PCD=8000e0e8 PCPlus4D=8000e0ec InstrD=0009a023
+PCF=8000e0f0 PCD=8000e0ec PCPlus4D=8000e0f0 InstrD=0019a223
+PCW=8000e0e0 InstrW=ffff2997 GPR=x19:800000e0
+PCF=8000e0f4 PCD=8000e0f0 PCPlus4D=8000e0f4 InstrD=0029a423
+PCW=8000e0e4 InstrW=f2098993 GPR=x19:80000000
+PCF=8000e0f8 PCD=8000e0f4 PCPlus4D=8000e0f8 InstrD=0039a623
+PCW=8000e0e8 InstrW=0009a023
+PCF=8000e0fc PCD=8000e0f8 PCPlus4D=8000e0fc InstrD=0049a823
+PCW=8000e0ec InstrW=0019a223
+PCF=8000e100 PCD=8000e0fc PCPlus4D=8000e100 InstrD=0059aa23
+PCW=8000e0f0 InstrW=0029a423
+PCF=8000e104 PCD=8000e100 PCPlus4D=8000e104 InstrD=0069ac23
+PCW=8000e0f4 InstrW=0039a623
+PCF=8000e108 PCD=8000e104 PCPlus4D=8000e108 InstrD=0079ae23
+PCW=8000e0f8 InstrW=0049a823
+PCF=8000e10c PCD=8000e108 PCPlus4D=8000e10c InstrD=0289a023
+PCW=8000e0fc InstrW=0059aa23
+PCF=8000e110 PCD=8000e10c PCPlus4D=8000e110 InstrD=0299a223
+PCW=8000e100 InstrW=0069ac23
+PCF=8000e114 PCD=8000e110 PCPlus4D=8000e114 InstrD=02a9a423
+PCW=8000e104 InstrW=0079ae23
+PCF=8000e118 PCD=8000e114 PCPlus4D=8000e118 InstrD=02b9a623
+PCW=8000e108 InstrW=0289a023
+PCF=8000e11c PCD=8000e118 PCPlus4D=8000e11c InstrD=02c9a823
+PCW=8000e10c InstrW=0299a223
+PCF=8000e120 PCD=8000e11c PCPlus4D=8000e120 InstrD=02d9aa23
+PCW=8000e110 InstrW=02a9a423
+PCF=8000e124 PCD=8000e120 PCPlus4D=8000e124 InstrD=02e9ac23
+PCW=8000e114 InstrW=02b9a623
+PCF=8000e128 PCD=8000e124 PCPlus4D=8000e128 InstrD=02f9ae23
+PCW=8000e118 InstrW=02c9a823
+PCF=8000e12c PCD=8000e128 PCPlus4D=8000e12c InstrD=0509a023
+PCW=8000e11c InstrW=02d9aa23
+PCF=8000e130 PCD=8000e12c PCPlus4D=8000e130 InstrD=0519a223
+PCW=8000e120 InstrW=02e9ac23
+PCF=8000e134 PCD=8000e130 PCPlus4D=8000e134 InstrD=0529a423
+PCW=8000e124 InstrW=02f9ae23
+PCF=8000e138 PCD=8000e134 PCPlus4D=8000e138 InstrD=0539a623
+PCW=8000e128 InstrW=0509a023
+PCF=8000e13c PCD=8000e138 PCPlus4D=8000e13c InstrD=0549a823
+PCW=8000e12c InstrW=0519a223
+PCF=8000e140 PCD=8000e13c PCPlus4D=8000e140 InstrD=0559aa23
+PCW=8000e130 InstrW=0529a423
+PCF=8000e144 PCD=8000e140 PCPlus4D=8000e144 InstrD=0569ac23
+PCW=8000e134 InstrW=0539a623
+PCF=8000e148 PCD=8000e144 PCPlus4D=8000e148 InstrD=0579ae23
+PCW=8000e138 InstrW=0549a823
+PCF=8000e14c PCD=8000e148 PCPlus4D=8000e14c InstrD=0789a023
+PCW=8000e13c InstrW=0559aa23
+PCF=8000e150 PCD=8000e14c PCPlus4D=8000e150 InstrD=0799a223
+PCW=8000e140 InstrW=0569ac23
+PCF=8000e154 PCD=8000e150 PCPlus4D=8000e154 InstrD=07a9a423
+PCW=8000e144 InstrW=0579ae23
+PCF=8000e158 PCD=8000e154 PCPlus4D=8000e158 InstrD=07b9a623
+PCW=8000e148 InstrW=0789a023
+PCF=8000e15c PCD=8000e158 PCPlus4D=8000e15c InstrD=07c9a823
+PCW=8000e14c InstrW=0799a223
+PCF=8000e160 PCD=8000e15c PCPlus4D=8000e160 InstrD=07d9aa23
+PCW=8000e150 InstrW=07a9a423
+PCF=8000e164 PCD=8000e160 PCPlus4D=8000e164 InstrD=07e9ac23
+PCW=8000e154 InstrW=07b9a623
+PCF=8000e168 PCD=8000e164 PCPlus4D=8000e168 InstrD=07f9ae23
+PCW=8000e158 InstrW=07c9a823
+PCF=8000e16c PCD=8000e168 PCPlus4D=8000e16c InstrD=ffffff17
+PCW=8000e15c InstrW=07d9aa23
+PCF=8000e170 PCD=8000e16c PCPlus4D=8000e170 InstrD=414f0f13
+PCW=8000e160 InstrW=07e9ac23
+PCF=8000e174 PCD=8000e170 PCPlus4D=8000e174 InstrD=000f0067
+PCW=8000e164 InstrW=07f9ae23
+PCF=8000e178 PCD=8000e174 PCPlus4D=8000e178 InstrD=00068633
+PCW=8000e168 InstrW=ffffff17 GPR=x30:8000d168
+PCF=8000d57c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=8000e16c InstrW=414f0f13 GPR=x30:8000d57c
+PCF=8000d57c PCD=00000000 PCPlus4D=00000000 InstrD=00000013
+PCW=8000e170 InstrW=000f0067
+PCF=8000d580 PCD=8000d57c PCPlus4D=8000d580 InstrD=00002f17
+PCF=8000d584 PCD=8000d580 PCPlus4D=8000d584 InstrD=a83f2223
+PCF=8000d588 PCD=8000d584 PCPlus4D=8000d588 InstrD=ff9ff06f
+PCF=8000d58c PCD=8000d588 PCPlus4D=8000d58c InstrD=00000013
+PCW=8000d57c InstrW=00002f17 GPR=x30:8000f57c
+[TB] tohost write detected at 0x8000f000! Test PASSED.
+Simulation complete via $finish(1) at time 2525 NS + 0
+./RTL_5STAGE_UPDATED/tb_riscv_dv.sv:204                 $finish;
+xcelium> exit
+
+coverage setup:
+  workdir  :  out_2026-10-31/cov_work
+  dutinst  :  tb_riscv_dv(tb_riscv_dv)
+  scope    :  scope
+  testname :  test
+
+coverage files:
+  model(design data) :  out_2026-10-31/cov_work/scope/icc_679d3b3a_00000000.ucm (reused)
+  data               :  out_2026-10-31/cov_work/scope/test/icc_679d3b3a_00000000.ucd
+TOOL:	xrun(64)	24.09-s001: Exiting on Oct 31, 2026 at 00:45:02 IST  (total: 00:00:04)

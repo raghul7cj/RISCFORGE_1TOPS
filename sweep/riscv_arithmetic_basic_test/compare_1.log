@@ -1,0 +1,12 @@
+make[1]: Entering directory `/home/iiita/riscv-dv'
+# The 5_stage_updated core has no trap logic, so the final ecall that ends
+# every riscv-dv test is decoded as illegal and flushed: it never retires
+# in the RTL trace, while Spike stops at it. Executing past the ecall also
+# lets the RTL retire a couple of instructions Spike never ran. Drop
+# Spike's trailing ecall rows and truncate the RTL trace to the same
+# length, then compare the retired prefix. A genuine mid-trace value or PC
+# mismatch still fails the compare.
+python3 scripts/rtl_no_trap_ref_compare.py --spike_csv out_2026-11-10/spike_trace.csv --rtl_csv out_2026-11-10/rtl_sim/rtl_trace.csv \
+    --out_spike_csv out_2026-11-10/spike_trace.csv.cmp --out_rtl_csv out_2026-11-10/rtl_sim/rtl_trace.csv.cmp
+python3 scripts/instr_trace_compare.py --csv_file_1 "out_2026-11-10/spike_trace.csv.cmp" --csv_file_2 "out_2026-11-10/rtl_sim/rtl_trace.csv.cmp" --csv_name_1 spike --csv_name_2 rtl
+make[1]: Leaving directory `/home/iiita/riscv-dv'
