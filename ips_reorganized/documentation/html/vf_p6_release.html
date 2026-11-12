@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P6 Release</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / P6 Release</span></div>
+<div class="wrap">
+
+<h1>P6 Release</h1>
+<p class="lead">P6 is the last phase. It stamps the release gate G5 once on the frozen candidate manifest, runs the release partition, and issues the sign-off statement under three distinct signatories. This page states the conditions, the decision flow and what the engineering-baseline handoff of the stage 8 brief is not.</p>
+<p class="meta">Scope: P6 | Sources: Rev B sections 6, 19, 20, 21; stage 8 brief; <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Status in one line.</b> <span class="tag open">OPEN</span> P6 has not started and no release claim of any kind can be made. P0 is IN PROGRESS (13 of 20 criteria met; P0 exit not met), and the core fix DEF-001 is FIXED-UNVERIFIED. Related: <a href="vf_phases_overview.html">overview</a>, <a href="vf_signoff.html">sign-off</a>, <a href="vf_regression_gates.html">gates</a>, <a href="vf_p4_closure.html">P4</a>, <a href="vf_p5_soak.html">P5</a>, <a href="vf_track_f.html">track F</a>, <a href="tracker_status.html">tracker</a>.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective and release decision flow</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">Exit criteria and gates</a></li>
+<li><a href="#s4">Work breakdown</a></li>
+<li><a href="#s5">Gate G5 and the sign-off statement</a></li>
+<li><a href="#s6">Inputs, outputs, dependencies</a></li>
+<li><a href="#s7">Effort and risks</a></li>
+<li><a href="#s8">Current status</a></li>
+<li><a href="#s9">Execution proposal</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective and release decision flow</h2>
+<p>Sign-off is the conjunction of the release-level gate set, evaluated once per release on the frozen candidate manifest. There is no partial sign-off: a design with six of seven gates satisfied has six satisfied and one unknown. G5 requires G4 and G6 on the frozen manifest, the compliance report at the candidate identity, and the closed formal register (decision D-023). Figure 1 shows how P6 reaches or refuses a verdict.</p>
+
+<figure>
+<svg viewBox="0 0 960 408" role="img" aria-label="Release decision flow: P5 exit met, P6 entry checks, release partition, G5 inputs, G5 stamped once, sign-off statement, three signatures, release record; failed entry checks, failed or untested gates, and a failed G5 each end in no release">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx" x="256" y="16" width="200" height="48" rx="6"/>
+<text class="tb mid" x="356" y="36">Entry blocked</text>
+<text class="ts mid" x="356" y="52">release does not start</text>
+<rect class="bx" x="512" y="16" width="200" height="48" rx="6"/>
+<text class="tb mid" x="612" y="36">Gate fail or untested</text>
+<text class="ts mid" x="612" y="52">no stamp, no statement</text>
+<rect class="bx-ext" x="24" y="104" width="176" height="56" rx="6"/>
+<text class="tb mid" x="112" y="128">P5 exit met</text>
+<text class="ts mid" x="112" y="146">converged; F closed</text>
+<rect class="bx-ctrl" x="256" y="104" width="200" height="56" rx="6"/>
+<text class="tb mid" x="356" y="128">P6 entry checks</text>
+<text class="ts mid" x="356" y="146">hash, waivers, severity, SD-8</text>
+<rect class="bx-ver" x="512" y="104" width="200" height="56" rx="6"/>
+<text class="tb mid" x="612" y="128">Release partition</text>
+<text class="ts mid" x="612" y="146">seven gates, soak, cold boot</text>
+<rect class="bx-ver" x="768" y="104" width="176" height="56" rx="6"/>
+<text class="tb mid" x="856" y="128">G5 inputs</text>
+<text class="ts mid" x="856" y="146">compliance 69/69, proof log</text>
+<rect class="bx-ctrl" x="768" y="232" width="176" height="56" rx="6"/>
+<text class="tb mid" x="856" y="256">G5 stamped once</text>
+<text class="ts mid" x="856" y="274">frozen manifest, P6 only</text>
+<rect class="bx-ver" x="512" y="232" width="200" height="56" rx="6"/>
+<text class="tb mid" x="612" y="256">Sign-off statement</text>
+<text class="ts mid" x="612" y="274">Table 20.2 fields</text>
+<rect class="bx-ver" x="256" y="232" width="200" height="56" rx="6"/>
+<text class="tb mid" x="356" y="256">Three signatures</text>
+<text class="ts mid" x="356" y="274">design, verification, project</text>
+<rect class="bx-ver" x="24" y="232" width="176" height="56" rx="6"/>
+<text class="tb mid" x="112" y="256">Release record</text>
+<text class="ts mid" x="112" y="274">evidence bundle indexed</text>
+<rect class="bx" x="768" y="344" width="176" height="48" rx="6"/>
+<text class="tb mid" x="856" y="364">No sign-off</text>
+<text class="ts mid" x="856" y="380">G5 fail or untested</text>
+<path class="ar" d="M200 132 H256"/>
+<path class="ar" d="M456 132 H512"/>
+<path class="ar" d="M712 132 H768"/>
+<path class="ar" d="M856 160 V232"/>
+<path class="ar" d="M768 260 H712"/>
+<path class="ar" d="M512 260 H456"/>
+<path class="ar" d="M256 260 H200"/>
+<path class="ar-bad" d="M356 104 V64"/>
+<path class="ar-bad" d="M612 104 V64"/>
+<path class="ar-bad" d="M856 288 V344"/>
+</svg>
+<figcaption><b>Figure 1.</b> Release decision flow. Entry checks, including the three-signatory join, are computed before the statement is drafted. Any entry failure, any failed or untested gate in the partition, or a failed G5 ends the flow without a release (red). Untested is never treated as passed or waived.</figcaption>
+</figure>
+
+<h2 id="s2">2. Entry criteria</h2>
+<p>Rev B Table 21.4 sets P6 entry as a conjunction. None is met today.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Condition</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P5 exit met</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Frozen candidate manifest hashed under the identity recipe (Table 21.10)</td><td><span class="tag open">OPEN</span> (P0 has stamped an identity for a run; no candidate manifest exists)</td></tr>
+<tr><td>Waiver register has no entry past its review date</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>No open defect at or above S1 (severity scale in Rev B Table 21.2.7, owned outside this page). Tracker S1 items today: DEF-004 FIXED-CONVERGED, DEF-005 OPEN</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Three release signatories named on the statement, pairwise distinct, and none the fixer of any defect closed in the candidate: <code>release_signatories_distinct == 3</code> and <code>release_signatories_fixing_in_candidate == 0</code> (SD-8)</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Standing predicates SD-1, SD-2, SD-5, SD-6, SD-7 at zero</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+</tbody></table></div>
+<p>The SD-8 join is computed by the project lead before the statement is drafted, because a statement found afterwards to have non-distinct signatories cannot be un-signed. The release approver names the three signatories.</p>
+
+<h2 id="s3">3. Exit criteria and gates</h2>
+<p>Rev B Table 20.1: G5 stamped on the frozen manifest; the release partition green; the soak and cold-boot campaign converged per Table 6.5; no open defect at or above a release-blocking severity. The gate stamped is G5 only (release tier). Roles: the compliance owner and the formal owner.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Gate</th><th>Predicate (Table 6.1)</th></tr></thead>
+<tbody>
+<tr><td>G5 Compliance and formal closed</td><td>(a) all applicable compliance tests pass at the candidate identity and out-of-scope tests are recorded with a reason; (b) every formal goal is proved, waived with owner and date, or converted to a directed test. <code>applicable_failed + applicable_not_run == 0</code> and <code>open_unowned_formal_goals == 0</code>.</td></tr>
+</tbody></table></div>
+<p>The compliance denominator is 69 applicable tests of 162 present, with 93 out of scope and recorded (27 C, 1 Zifencei, 65 K). It is never 162. G5 is never stamped outside P6, and CT-1 to CT-5 are not G5 verdicts.</p>
+
+<h2 id="s4">4. Work breakdown</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Step</th><th>Content</th></tr></thead>
+<tbody>
+<tr><td>6.1 Entry join</td><td>Name three signatories; join against the candidate's fix history; check waivers, S1 defects, manifest hash.</td></tr>
+<tr><td>6.2 Release partition</td><td>Run everything with all seven gates evaluated, plus soak and cold-boot cycling; planning budget under 48 hours (assumed). A budget overrun is a capacity observation.</td></tr>
+<tr><td>6.3 G5 evaluation</td><td>Confirm compliance report and proof log refer to the same frozen identity; evaluate (a) and (b); stamp once.</td></tr>
+<tr><td>6.4 Statement</td><td>Fill the Table 20.2 fields (section 5); attach verdict-record identifiers.</td></tr>
+<tr><td>6.5 Signatures and record</td><td>Three signatures; index the evidence bundle.</td></tr>
+</tbody></table></div>
+
+<h2 id="s5">5. Gate G5 and the sign-off statement</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Statement item (Rev B Table 20.2)</th><th>Value required</th></tr></thead>
+<tbody>
+<tr><td>Design state</td><td>RTL identity: SHA-256 over the canonical filelist manifest with the four anchor files (<code>soc_subsystem.f</code>, <code>riscforge_soc_subsystem.sv</code>, <code>bootloader.sv</code>, <code>csr_regfile.v</code>). No commit id is cited: none exists.</td></tr>
+<tr><td>Regression state</td><td>Verdict-record identifiers for every partition with per-run gate verdicts.</td></tr>
+<tr><td>Candidate gate state</td><td>G2, G4, G6 verdicts on the frozen manifest, merged coverage database, viability ledger.</td></tr>
+<tr><td>Coverage state</td><td>Bin closure count against declared bins; open waivers with owners and review dates.</td></tr>
+<tr><td>Compliance state</td><td>Report identifier; suite snapshot version and date (not a commit id); RTL identity at compile; 69 applicable, 93 out of scope with reasons.</td></tr>
+<tr><td>Formal state</td><td>Proved, waived and open counts by module.</td></tr>
+<tr><td>Open defects and waivers</td><td>Counts by severity and owner; none open at or above release-blocking severity.</td></tr>
+<tr><td>Approver</td><td>Design, verification and project sign-off per the role definitions.</td></tr>
+</tbody></table></div>
+<div class="warn"><b>OPEN, wording gap.</b> The Rev B statement template asks for one approver, while SD-8 requires three distinct signatories. A statement naming a single person would satisfy the template and bypass SD-8. Rev B records this as request R-409 to the owner of section 20; until it lands, SD-8 is unenforced at the point that matters. The three signatures proposed in Figure 1 follow SD-8, not the literal template.</div>
+
+<h2 id="s6">6. Inputs, outputs, dependencies</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Kind</th><th>Artefact</th></tr></thead>
+<tbody>
+<tr><td>Inputs</td><td>P5 campaign report and converged evidence; frozen manifest; G2/G4/G6 verdicts; compliance report; track F proof log; waiver and defect registers; authorship and role registers.</td></tr>
+<tr><td>Outputs</td><td>G5 verdict; release partition verdict records; signed statement; indexed evidence bundle.</td></tr>
+<tr><td>Predecessor</td><td>P5 only. There is no path to G5 that bypasses P5.</td></tr>
+<tr><td>Successor</td><td>None.</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Effort and risks</h2>
+<p>5 to 10 engineer-days (Rev B Table 21.3, <code>ASSUMED(D-GR01)</code>). Unmeasured; excludes soak wall-clock time.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>Mitigation (proposed)</th></tr></thead>
+<tbody>
+<tr><td>Late RTL change</td><td>No verdict transfers; G5 must be re-stamped at the new identity.</td><td>Class map and re-run matrix; freeze before P5.</td></tr>
+<tr><td>Signatory is a fixer of a closed defect</td><td>Violates SD-8; statement refused.</td><td>Compute the join early, at P5 exit.</td></tr>
+<tr><td>Compliance report from a different identity than the manifest</td><td>G5(a) untested.</td><td>Re-run at P4.5 and compare identities.</td></tr>
+<tr><td>Open waivers past review date</td><td>Entry refused.</td><td>Review at each phase entry.</td></tr>
+<tr><td>Template allows a single approver</td><td>Governance bypass.</td><td>Use three signatories; raise R-409.</td></tr>
+<tr><td>Confusing the stage 8 baseline with release</td><td>Overclaim.</td><td>Label baseline as engineering status only (section 9).</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Current status</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P6</td><td>NOT STARTED, entry met NO, gate G5 (release), effort 5 to 10 engineer-days (assumed)</td></tr>
+<tr><td>Upstream</td><td>P0 IN PROGRESS (MET 13, PARTIAL 5, NOT MET 2 of 20); P1a to P5 and track F NOT STARTED. P0 exit is not met.</td></tr>
+<tr><td>Known fixes</td><td>DEF-001 (core load-use flush) FIXED-UNVERIFIED in the current <code>hazard_unit.v</code>; its regression ACT-010 is not done. The UART fix is staged but not applied to canonical RTL.</td></tr>
+<tr><td>Compliance</td><td>No compliance result claimed. Re-run at the final identity is ACT-011.</td></tr>
+</tbody></table></div>
+<p>Source: <code>Verification/status/PHASE_STATUS.md</code> (2026-10-31) and the tracker built by <code>build_tracker.py</code>.</p>
+
+<h2 id="s9">9. Execution proposal</h2>
+<p>Proposal, not Rev B text. The stage 8 brief is an engineering-baseline handoff and is deliberately smaller than Rev B P6. It is not tapeout authorisation and not a G5 declaration.</p>
+<ol>
+<li><b>Freeze and identify.</b> Record RTL and filelist hashes, tool versions, firmware images, commands and the Stage 6 and 7 manifests. Label each result core-only, SoC or selected APB device.</li>
+<li><b>Clean replay.</b> Re-run the core applicable-test inventory and the SoC regression on that identity. Report PASS, FAIL, NOT RUN, NOT APPLICABLE and BLOCKED separately; never copy green results across RTL changes.</li>
+<li><b>Summarise evidence.</b> Demonstrated functionality, checker-negative cases, executed coverage, stress stability, independent oracles; state which Rev B obligations (six-device models, ISS lock-step, formal, full coverage) remain open.</li>
+<li><b>Defect and risk ledger.</b> For each open defect: observed, expected, reproducer, suspected area, impact, owner or next experiment; separate design bugs from unimplemented or unintegrated features.</li>
+<li><b>Handoff.</b> Write <code>verification_baseline.md</code> and <code>next_actions.md</code> with the next three engineering actions (highest-risk RTL failures first, missing independent checker second, training-value experiment third).</li>
+<li><b>Full release, later.</b> Only when P5 exit is met and the entry join passes, stamp G5 once and issue the Table 20.2 statement under three distinct signatories.</li>
+</ol>
+<p><b>Not claimed.</b> No tapeout readiness, no zero-defect statement, no invented coverage, no automatic pass for waived tests.</p>
+
+<div class="sources"><b>Sources read:</b> <code>_src/AUTHORING_GUIDE.md</code>, <code>_src/RevB_plan.txt</code> (Tables 6.1, 6.3, 6.4, 20.1, 20.2, 21.3, 21.4; SD-8 in the roles section; D-023), <code>Verification/doc/briefs/stages/stage_8_brief.md</code>, <code>Verification/status/PHASE_STATUS.md</code>.</div>
+</div>
+</body>
+</html>

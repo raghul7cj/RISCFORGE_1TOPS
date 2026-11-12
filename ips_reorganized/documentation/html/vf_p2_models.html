@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P2 Model Completion</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / P2 Model completion</span></div>
+<div class="wrap">
+
+<h1>P2 Model completion</h1>
+<p class="lead">P2 turns the SoC bus-path result of P1b into device-level evidence: a register model for each of the six APB peripherals, an independent second oracle per device, and a cross-check of the firmware's own report. This page states what P2 must achieve under Rev B, what blocks it, and a concrete order of work.</p>
+<p class="meta">Scope: verification phase P2 only | Sources: Rev B sections 15, 20, 21; stage 4 brief; <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Status in one line.</b> <span class="tag open">OPEN</span> P2 has not started. Entry is not met, and no model, VIP or cross-check described below exists as a verified artefact. Everything in sections 2 to 7 is <span class="tag specified">SPECIFIED</span> by Rev B; section 9 is a proposal, not part of Rev B. Related pages: <a href="vf_phases_overview.html">phases overview</a>, <a href="vf_p1b_soc_structural.html">P1b</a>, <a href="vf_p3_architectural.html">P3</a>, <a href="vf_regression_gates.html">regression gates</a>, <a href="tracker_status.html">tracker status</a>.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective and position</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">Exit criteria and gates</a></li>
+<li><a href="#s4">Work breakdown by device</a></li>
+<li><a href="#s5">Check families</a></li>
+<li><a href="#s6">Inputs, outputs, dependencies</a></li>
+<li><a href="#s7">Effort and risks</a></li>
+<li><a href="#s8">Current status</a></li>
+<li><a href="#s9">Execution proposal</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective and position</h2>
+<p>P1b proves that a software access reaches the right APB window and that every finding goes through one reporter. It does not prove that the peripheral returns the right value. P2 closes that gap. Rev B 21.3 gives the content as: a full register model for all 6 APB instances, device VIPs reachable from every harness, and an attestation cross-check.</p>
+<p>The design contains six integrated APB instances (<code>NUM_APB_SLAVES = 6</code>, Rev B 15) and 55 declared register identities, 54 of them reachable (UART SCR at offset 0x1C is declared but not implemented). Rev B counts 275 register-model clauses (55 identities x 5 access modes). The AON watchdog is real RTL but is not integrated and is excluded from P2.</p>
+<p>Rev B 15.1 draws a scope line that shapes P2. The SoC-level plan verifies connectivity and end-to-end flows. Device internals (state machines, framing, bit timing) are <em>inherited</em> from each IP's own regression and are not rebuilt. The "device VIP" of Rev B 21.3 therefore means the observation points needed for the second oracle (pin or timing), not a new full device simulation. Figure 1 shows the three oracles and the attestation cross-check around one harness shape.</p>
+
+<figure>
+<svg viewBox="0 0 960 384" role="img" aria-label="P2 architecture: firmware drives the fabric and six APB instances; a register model, device VIP and coverage bins observe passively; an attestation cross-check compares the firmware mailbox word count with monitor evidence">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-core" x="24" y="168" width="136" height="56" rx="6"/>
+<text class="tb mid" x="92" y="192">Core + firmware</text>
+<text class="ts mid" x="92" y="210">MMIO sequences</text>
+<rect class="bx-bus" x="200" y="168" width="160" height="56" rx="6"/>
+<text class="tb mid" x="280" y="192">AXI-Lite + APB bridge</text>
+<text class="ts mid" x="280" y="210">path checked in P1b</text>
+<rect class="bx-per" x="400" y="96" width="160" height="208" rx="6"/>
+<text class="tb mid" x="480" y="120">6 APB instances</text>
+<text class="ts mid" x="480" y="148">slot 0  I2C  (6 regs)</text>
+<text class="ts mid" x="480" y="172">slot 1  Timer 0  (6)</text>
+<text class="ts mid" x="480" y="196">slot 2  UART  (8 / 7)</text>
+<text class="ts mid" x="480" y="220">slot 3  GPIO  (19)</text>
+<text class="ts mid" x="480" y="244">slot 4  SPI master  (10)</text>
+<text class="ts mid" x="480" y="268">slot 5  Timer 1  (6)</text>
+<rect class="bx-ver" x="640" y="96" width="168" height="56" rx="6"/>
+<text class="tb mid" x="724" y="120">Device VIP</text>
+<text class="ts mid" x="724" y="138">oracle 2: pin or timing</text>
+<rect class="bx-ver" x="640" y="176" width="168" height="56" rx="6"/>
+<text class="tb mid" x="724" y="200">Register model</text>
+<text class="ts mid" x="724" y="218">oracle 1: three masks</text>
+<rect class="bx-ver" x="640" y="256" width="168" height="56" rx="6"/>
+<text class="tb mid" x="724" y="280">Attestation check</text>
+<text class="ts mid" x="724" y="298">word count vs monitors</text>
+<rect class="bx-ver" x="832" y="176" width="112" height="56" rx="6"/>
+<text class="tb mid" x="888" y="200">Coverage bins</text>
+<text class="ts mid" x="888" y="218">oracle 3</text>
+<path class="ar" d="M160 196 H200"/>
+<path class="ar" d="M360 196 H400"/>
+<path class="ar-ver" d="M560 124 H640"/>
+<text class="ts mid" x="600" y="116">pins</text>
+<path class="ar-ver" d="M560 204 H640"/>
+<text class="ts mid" x="600" y="196">APB monitor</text>
+<path class="ar-ver" d="M92 224 V352 H724 V312"/>
+<text class="ts" x="248" y="344">mailbox word count reported by firmware</text>
+<path class="ar-ver" d="M808 124 H888 V176"/>
+<path class="ar-ver" d="M808 204 H832"/>
+<path class="ar-ver" d="M808 284 H888 V232"/>
+</svg>
+<figcaption><b>Figure 1.</b> P2 architecture. Firmware drives the six APB instances through the fabric. Three oracles observe passively (register model, pin or timing device observation, coverage bins). The attestation check compares the firmware-reported mailbox word count with what the monitors saw, so the firmware's PASS is never its own proof. Teal dashed arrows are verification flows.</figcaption>
+</figure>
+
+<h2 id="s2">2. Entry criteria</h2>
+<p>Rev B Table 21.4 sets the P2 entry as one conjunction, evaluated at a single recorded RTL identity.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Condition</th><th>Status</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>P1b exit met, which includes CT-1 to CT-5 on the core (Rev B Table 21.2)</td><td><span class="tag open">OPEN</span></td><td>P1a and P1b are NOT STARTED (<code>PHASE_STATUS.md</code>). See <a href="vf_p1a_core_trust.html">P1a</a> and <a href="vf_p1b_soc_structural.html">P1b</a>.</td></tr>
+<tr><td>Register identity count per APB instance fixed by the generated header</td><td><span class="tag open">OPEN</span></td><td>Rev B states the header does not exist (<code>soc_regs_h: ABSENT</code>, D-08). The count is not restated by the entry row.</td></tr>
+<tr><td>Standing separation-of-duty predicates SD-1, SD-2, SD-5, SD-6, SD-7 each zero</td><td><span class="tag specified">SPECIFIED</span></td><td>Re-evaluated at every phase entry by the project lead.</td></tr>
+<tr><td>P0 decision DC-1 recorded (CLIC and AON watchdog scope)</td><td><span class="tag open">OPEN</span></td><td>Tracker row P0-X1 is NOT MET; the default is out of scope.</td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. Exit criteria and gates</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Statement</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Phase exit</td><td>All three peripheral oracles green for all 6 APB instances; the PC-1 to PC-6 check family met.</td><td>Rev B Table 20.1</td></tr>
+<tr><td>Gate stamped at exit</td><td>G3 (checkers all pass). Per-run tier: <code>open_findings == 0</code>, <code>unexplained_ring_drops == 0</code>, <code>scoreboard_drain_satisfied</code>.</td><td>Rev B Tables 6.1, 21.3</td></tr>
+<tr><td>Decision cutoff</td><td>DC-2 (behaviour of settled blocks) is taken at P2 exit. If it is not taken, the default applies: today's RTL behaviour becomes the specification, written as a pin oracle, and the decision is logged as <em>defaulted</em>.</td><td>Rev B Table 21.9</td></tr>
+<tr><td>Unmet means</td><td>An unmet criterion is reported <em>untested</em> and named by its missing mechanism. Untested is not a pass.</td><td>Rev B Table 15.10</td></tr>
+</tbody></table></div>
+<p>The DC-2 live cases are the intended behaviour of the 4 interrupt lines wired at <code>soc:1238-1241</code> and dropped at <code>top.v:207,548</code>, SPI mode support, and boot-image integrity (the RTL has none). The arbitrator is the design owner, or the project lead when the design owner authored an affected check (SD-9). With neither available within 5 working days the default applies.</p>
+
+<h2 id="s4">4. Work breakdown by device</h2>
+<p>Rev B does not split P2 into sub-phases; it gives one effort range for the phase. The breakdown below is derived from the Rev B device tables and is <span class="tag open">OPEN</span> as a plan: it is a proposed decomposition, and the per-device effort has not been estimated. Figure 2 shows where the register-model volume sits. GPIO alone carries 95 of 275 clauses, so a plan of one equal suite per peripheral understates the register workload (Rev B 15.7).</p>
+
+<figure>
+<svg viewBox="0 0 960 384" role="img" aria-label="Register-model clauses per APB instance as horizontal bars: GPIO 95, SPI 50, UART 40, I2C 30, Timer 0 30, Timer 1 30, total 275">
+<text class="ts" x="184" y="32">0</text>
+<text class="ts mid" x="284" y="32">25</text>
+<text class="ts mid" x="384" y="32">50</text>
+<text class="ts mid" x="484" y="32">75</text>
+<text class="ts mid" x="584" y="32">100 clauses</text>
+<path class="ln" d="M184 40 V344"/>
+<path class="ln" d="M284 40 V344"/>
+<path class="ln" d="M384 40 V344"/>
+<path class="ln" d="M484 40 V344"/>
+<path class="ln" d="M584 40 V344"/>
+<text class="tb end" x="168" y="76">I2C</text>
+<rect class="bx-per" x="184" y="56" width="120" height="32" rx="4"/>
+<text class="t" x="312" y="77">30  (6 identities)  pin oracle</text>
+<text class="tb end" x="168" y="124">Timer 0</text>
+<rect class="bx-per" x="184" y="104" width="120" height="32" rx="4"/>
+<text class="t" x="312" y="125">30  (6)  timing oracle, 0-cycle tolerance</text>
+<text class="tb end" x="168" y="172">UART</text>
+<rect class="bx-per" x="184" y="152" width="160" height="32" rx="4"/>
+<text class="t" x="352" y="173">40  (8 declared, 7 reachable)  pin oracle</text>
+<text class="tb end" x="168" y="220">GPIO</text>
+<rect class="bx-per" x="184" y="200" width="380" height="32" rx="4"/>
+<text class="t" x="572" y="221">95  (19)  pin oracle</text>
+<text class="tb end" x="168" y="268">SPI master</text>
+<rect class="bx-per" x="184" y="248" width="200" height="32" rx="4"/>
+<text class="t" x="392" y="269">50  (10)  pin oracle</text>
+<text class="tb end" x="168" y="316">Timer 1</text>
+<rect class="bx-per" x="184" y="296" width="120" height="32" rx="4"/>
+<text class="t" x="312" y="317">30  (6)  timing oracle</text>
+<text class="th" x="184" y="368">Total 275 clauses = 55 declared identities x 5 access modes</text>
+</svg>
+<figcaption><b>Figure 2.</b> Register-model clauses per instance (identities x 5 access modes), in slot order, from Rev B Tables 15.2 and 15.9. Bar length is clauses only. It is not effort: no per-device effort figure exists in Rev B. The device-mode clause layer (L4) is not shown because its count is TBD(D-27).</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Work item (proposed)</th><th>Content</th><th>Facts that shape it (Rev B 15, locators as cited there)</th></tr></thead>
+<tbody>
+<tr><td>W1 Descriptor and harness shape</td><td>One harness instantiated six times; per-identity descriptor with three masks (<code>wmask</code>, <code>rmask</code>, <code>rmask_raz</code>); declared, reachable and access-mode fields; decode descriptor generated, not typed (PATH-0101).</td><td><code>rmask_raz</code> is never folded into <code>rmask</code>. Empty classes are reported as empty, not as passes.</td></tr>
+<tr><td>W2 GPIO</td><td>19 identities, 95 clauses; pin oracle with loopback and injection.</td><td>W1C registers are 0x600, 0x680, 0x700, 0x780. Six identities have no storage (0x000, 0x100, 0x200, 0x280, 0x300, 0x580). GPIO_INFO resets to 0x0000_0820. All 493 unimplemented offsets return PSLVERR.</td></tr>
+<tr><td>W3 Timer 0 and Timer 1</td><td>6 identities each, 30 clauses each; cycle-accurate timing oracle, tolerance 0 cycles.</td><td>Alias period 32 bytes; PATH-0112 covers 256 offsets per instance. Timer 1's four lines and Timer 0's three non-MTIP lines are programmable but unrouted (PC-4).</td></tr>
+<tr><td>W4 SPI master</td><td>10 identities, 50 clauses; pin oracle on <code>spi_clk_o</code>, <code>spi_csn0_o</code>, <code>spi_sdo0_o</code>.</td><td>STATUS is the only control register and resets to 0x0000_0001. Offset 0x1C is a hole between implemented offsets (PATH-0108). Slot 4 sits behind the bootloader passthrough.</td></tr>
+<tr><td>W5 UART</td><td>8 declared, 7 reachable, 40 clauses; pin oracle with loopback.</td><td>LSR resets to 0x60 and DLL to 0x01. The window has no RAZ space. The design filelist omits the apb_uart_wrap to obi_uart chain (D-15). MCR[4] gives a self-contained end-to-end flow for PC-6.</td></tr>
+<tr><td>W6 I2C</td><td>6 identities, 30 clauses; SCL and SDA pin observation.</td><td>All six reset to 0. RXR and SR read hardware state; CTR[5:0] is stored and drives nothing.</td></tr>
+<tr><td>W7 Cross-device checks</td><td>Full-window offset sweep (PATH-0110: 3603 + 2029 + 512 = 6144 offsets); error-policy rows X1 to X13 (PC-3); header-versus-driver build check (PC-5); inheritance artefacts (PC-8).</td><td>The executable minimum for PC-3 is 11 of 13 rows. A green X3, X4, X5 or X8 can record a defect, not a pass.</td></tr>
+<tr><td>W8 Attestation cross-check</td><td>Compare the mailbox word count the firmware reports against passive monitor and model evidence.</td><td>The oracle reads a word count, not a register (Rev B Table 9.2, layer L7). Without the device models there is nothing independent to compare against.</td></tr>
+<tr><td>W9 DC-2 record</td><td>Decision record at P2 exit.</td><td>SD-9: the arbitrator must not be the author of a check the decision would invalidate.</td></tr>
+</tbody></table></div>
+
+<h2 id="s5">5. Check families</h2>
+<p>The P2 exit names PC-1 to PC-6 (Rev B Table 20.1). The peripheral sign-off sentence of Rev B 15.8 is wider: PC-1 to PC-9 and PC-9a for all six instances. This page lists PC-1 to PC-6 as the exit family and shows PC-7 to PC-9a only as related work. <span class="tag open">OPEN</span> Whether the P2 exit must include PC-7 to PC-9a is not settled by the two Rev B passages; the broader reading is the safer one.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Criterion (summary)</th><th>Measurement</th><th>Known blocker at Rev B</th></tr></thead>
+<tbody>
+<tr><td>PC-1</td><td>Register, second and coverage oracles all populated and green per instance.</td><td>Reachable identities read back: 6, 6, 7, 19, 10, 6 (54 total); timer timing checks PATH-0301 to PATH-0307; every coverage bin hit.</td><td>Device coverage models do not exist yet.</td></tr>
+<tr><td>PC-2</td><td>Every documented device mode exercised and its bin hit.</td><td>Bin count against the mode list each device section publishes.</td><td>Population is TBD(D-93). Timer 1 has two AMBIGUOUS modes.</td></tr>
+<tr><td>PC-3</td><td>Every error-policy row provoked; response checked against its spec basis.</td><td>One executed case per row X1 to X13; count of executed rows reported.</td><td>X13 needs the AON watchdog (SPECIFIED, not integrated). X6 is an empty class.</td></tr>
+<tr><td>PC-4</td><td>Every implemented interrupt line provoked end to end, including clear and re-assert; reached mip bit recorded.</td><td>Causes taken and mip bit observed, per line.</td><td>Unrouted lines are untested until an RTL change is named. This ties to DC-2.</td></tr>
+<tr><td>PC-5</td><td>Driver register map matches the generated header, checked by build.</td><td>Build failure on mismatch.</td><td>The header does not exist (D-08). Not evaluable today.</td></tr>
+<tr><td>PC-6</td><td>One named end-to-end flow per instance passes through the fabric.</td><td>Side effect counted at device pins, or at <code>TIMER_VAL</code> for a timer.</td><td>UART flow uses MCR[4] loopback; the UART filelist gap (D-15) must be closed first.</td></tr>
+</tbody></table></div>
+<p>Related supporting checks minted in Rev B 15.3: PATH-0101 to PATH-0110 and PATH-0112 (PATH-0111 is void). PC-7 (sweep reconciles, reserved bits checked), PC-8 (inherited claims have artefacts) and PC-9 (unreachable offsets proved) are not in the P2 exit range quoted above.</p>
+
+<h2 id="s6">6. Inputs, outputs, dependencies</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Kind</th><th>Artefact</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>Input</td><td>P1b exit evidence: CT-1 to CT-5 report, MMIO path scoreboard, authorship register, single finding reporter</td><td>Authorship register first exists at P1b, which makes SD-9 computable at P2 exit.</td></tr>
+<tr><td>Input</td><td>Generated register header (D-08), decode descriptors from the RTL decode sites</td><td>Absent today.</td></tr>
+<tr><td>Input</td><td>Inherited IP evidence (M-A, M-B, M-C per Rev B 15.1) with IP source hash</td><td>If no last-green artefact exists, criteria that depend on the inherited half are untested.</td></tr>
+<tr><td>Output</td><td>Register model and descriptors for 6 instances; per-instance second oracle; coverage bins; attestation cross-check; DC-2 record; G3 verdict records</td><td>All carry the eight-field run identity (Rev B Table 21.10, step 8).</td></tr>
+<tr><td>Feeds</td><td>P3.4 (needs P2 exit and the DC-2 record), P4.1 (bins need an owning family), track F device goals</td><td>Rev B Table 21.7.</td></tr>
+<tr><td>Parallel with</td><td>P3.1 (independent of P2), P3.2, P3.3</td><td>Rev B Table 21.4. See <a href="vf_p3_architectural.html">P3</a> and <a href="vf_track_f.html">track F</a>.</td></tr>
+</tbody></table></div>
+<p>P2 sits on the longest chain of the dependency graph: P0, P1a, P1b, P2, P4.1, P4.2, P4.4, P5, P6 (Rev B 21.5). Shortening the P3 branches does not shorten the plan; shortening P2 does.</p>
+
+<h2 id="s7">7. Effort and risks</h2>
+<p><b>Effort.</b> 25 to 45 engineer-days, <span class="tag specified">SPECIFIED</span> as <code>ASSUMED(D-GR01)</code> in Rev B Table 21.3. This is the widest phase in the register. No throughput has been measured: the per-check and per-scenario costs are TBD(D-GR01) and will be recomputed at the exits of P0 and P1a. Because the register volume depends on TBD(D-025), the widest uncertainty band (plus or minus 70 percent) applies. The range is effort, not elapsed time.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>Mitigation (proposed)</th></tr></thead>
+<tbody>
+<tr><td>P2 dominates the critical path</td><td>Any slip moves P4 and P5.</td><td>Start W1 and the GPIO model the day P1b exits; keep P3.1 to P3.3 on separate engineers.</td></tr>
+<tr><td>Generated header absent (D-08)</td><td>Entry unmet; PC-5 not evaluable.</td><td>Make header generation the first P2 task and treat it as the P2 entry artefact.</td></tr>
+<tr><td>Device-mode lists missing (TBD D-93)</td><td>PC-2 and the L4 layer cannot be counted.</td><td>Publish each device's mode list as it is modelled.</td></tr>
+<tr><td>Model copied from the RTL</td><td>A model that mirrors the DUT cannot fail.</td><td>Derive expectations from specification and Rev B tables; record spec gaps instead of copying (stage 4 brief).</td></tr>
+<tr><td>Inheritance has no artefact (PC-8)</td><td>Five of six instances have no recorded last-green IP regression by default (TBD D-87).</td><td>Locate or re-run the IP testbench regressions, record IP source hash.</td></tr>
+<tr><td>UART filelist incomplete (D-15)</td><td>The UART chain may not elaborate.</td><td>Resolve through the P0 and P1a filelist work (ID-2).</td></tr>
+<tr><td>DC-2 arbitrated by a check author</td><td>Violates SD-9.</td><td>Project lead arbitrates; default applies after 5 working days.</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Current status</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>P2 status</td><td>NOT STARTED</td><td><code>Verification/status/PHASE_STATUS.md</code> (generated 2026-10-31)</td></tr>
+<tr><td>Entry met</td><td>NO</td><td>same</td></tr>
+<tr><td>Gate at exit</td><td>G3</td><td>same</td></tr>
+<tr><td>Effort</td><td>25 to 45 engineer-days (assumed)</td><td>same; Rev B Table 21.3</td></tr>
+<tr><td>Predecessor state</td><td>P0 IN PROGRESS (MET 13, PARTIAL 5, NOT MET 2 of 20); P1a and P1b NOT STARTED</td><td>same; see <a href="vf_p0_bringup.html">P0</a>, <a href="vf_p1a_core_trust.html">P1a</a></td></tr>
+</tbody></table></div>
+<p>This page does not claim any register, device or attestation result. Stage numbering in the briefs is offset by one: the stage 4 brief is P2.</p>
+
+<h2 id="s9">9. Execution proposal</h2>
+<p>This section is a proposal, not Rev B text. The stage 4 brief defines a reduced learning milestone that is a strict subset of full P2. The proposal runs the reduced milestone first, then widens.</p>
+<ol>
+<li><b>Gate the start.</b> Confirm P1b exit and CT-1 to CT-5 at a recorded identity; generate or hand-build the register header; record DC-1.</li>
+<li><b>Reduced milestone (stage 4 brief), GPIO first.</b> Reuse the P1b monitor transactions. Build W1 and the GPIO model with an independent expected-state table. Run a directed table: reset read, write and read-back, byte strobe, reserved or invalid address, one W1C case. State the PSLVERR expectation per row from Rev B Table 15.5, not from the DUT.</li>
+<li><b>Prove the oracle can fail.</b> Corrupt one model expectation, observe an attributed FAIL, and retain the log. Label every unfinished device NOT TESTED. Write <code>p2_findings.md</code>.</li>
+<li><b>Add the second oracle type.</b> Timer 0 with the cycle-accurate timing oracle (tolerance 0), so both oracle kinds are shown working before widening.</li>
+<li><b>Widen in volume order.</b> SPI, UART, I2C, Timer 1; then W7 sweep and error-policy rows; then W8 attestation; then W9 DC-2 record.</li>
+<li><b>Close the loop.</b> Evaluate PC-1 to PC-6 per instance, list every untested item with its missing mechanism, and stamp G3 on the P2 partition.</li>
+</ol>
+<p><b>Not claimed.</b> Completing the reduced milestone does not satisfy P2. Full P2 stays open until all six instances have all three oracles green.</p>
+
+<div class="sources"><b>Sources read:</b> <code>documentation/html/_src/AUTHORING_GUIDE.md</code>, <code>_src/RevB_plan.txt</code> (sections 6.1, 9.1, 15.1 to 15.8, 20.1, 21.1 to 21.7, Tables 21.3, 21.4, 21.7, 21.8, 21.9), <code>Verification/doc/briefs/stages/stage_4_brief.md</code>, <code>Verification/status/PHASE_STATUS.md</code>. RTL locators are quoted as Rev B cites them and were not re-read here.</div>
+</div>
+</body>
+</html>

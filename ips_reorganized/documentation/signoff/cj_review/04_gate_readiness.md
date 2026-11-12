@@ -132,7 +132,7 @@ The current [core](01_core_architecture.md), [verification](02_verification_arch
 [gpio-package]: ../../../gpio-master/gpio_reg_pkg.sv
 [legacy-tb]: ../../../Verification/tb1_interrupts.sv
 [legacy-asm]: ../../../Verification/asm/test5_hazard.S
-[csr-plan]: ../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md
+[csr-plan]: ../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md
 [csr-skeleton]: ../../../Verification/infrastructure/tb/csr_trap/README.md
 [hazard-validation]: ../../../Verification/hazard_tb/docs/validation.md
 [event-plan]: ../irq_event_commit_plan_20261104/PLAN.md
@@ -162,7 +162,7 @@ Every link below is a source, bench, retained record or gap; no row assigns comp
 
 | Criterion IDs | Source / interface | Actual bench / check | Retained evidence identity | Assessment / remaining gap |
 |---|---|---|---|---|
-| 1.1 / 1.3 / 1.4 / 1.5 / 1.9 / 2.10 | A1/A2: ISA, CSR and source map; [Core top](../../../riscv_core/rtl/top.v) · [CSR](../../../riscv_core/rtl/csr_regfile.v) | [CSR plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md) | [Source identity](../../../OFFLINE_SOURCE_STATUS.md) | Static implementation; freeze, privilege/WARL, no-C applicability and ordering decisions pending. |
+| 1.1 / 1.3 / 1.4 / 1.5 / 1.9 / 2.10 | A1/A2: ISA, CSR and source map; [Core top](../../../riscv_core/rtl/top.v) · [CSR](../../../riscv_core/rtl/csr_regfile.v) | [CSR plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md) | [Source identity](../../../OFFLINE_SOURCE_STATUS.md) | Static implementation; freeze, privilege/WARL, no-C applicability and ordering decisions pending. |
 | 2.7 | A1/S1: LSU / direct DSRAM / MMIO; [Memory](../../../riscv_core/rtl/memory_cycle.v) · [Router](../../../riscv_core/rtl/hybrid_mem_interface.sv) | [Core-port TB](../../../Verification/core_port_20261109/tb_core_port.sv) | [10-Nov core results](../../../../artifacts/verification_infra_sync_20261110/validation/core/results.json) · [Retained baseline failure](../../../../artifacts/core_port_20261109/logs/base_load_mdu_w4.log) | Selected wait/load checks; complete size/error/effect matrix and original DEF-001 closure pending. |
 | 2.9 / 4.12 / 5.3 / 6.13 | A2/V1/V2: CSR, trap and load interactions; [WB controller](../../../riscv_core/rtl/wb_trap_mret_commit_controller.v) | [CSR top](../../../Verification/infrastructure/tb/tb_core_csr_trap.sv) · [Pipeline top](../../../Verification/hazard_tb/pipeline/pipeline_tb.sv) | [Historical compile](../../../../artifacts/hazard_tb_skeleton_20261104/slang_pipeline_final.log) · [Focused trap results](../../../../artifacts/verification_infra_sync_20261110/validation/core/results.json) | Compile is historical; hooks incomplete; current reset/IRQ/precise effects/under-load qualification pending. |
 | 3.4 / 3.6 / 6.5 | A2/S1: custom controller, real peripheral events; [SoC wiring](../../../RTL_SOC/riscforge_soc_subsystem.sv) | [IRQ unit](../../../Verification/tb_irq_restructure.sv) · [Real-event plan](../irq_event_commit_plan_20261104/PLAN.md) | [30-Oct unit functional summary](../../../Verification/artifacts/xcelium_irq_20261030_004317/functional_summary.txt) | Unit scope only; controller alternative disposition and real source/subevent→input, masks and priority pending. Handler/MRET is extra scope. |

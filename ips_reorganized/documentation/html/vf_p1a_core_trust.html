@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase P1a Core Trust</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan Rev B / P1a Core trust</span></div>
+<div class="wrap">
+
+<h1>Phase P1a: Core trust</h1>
+<p class="lead">P1a establishes that the RV32IM_Zicsr core itself can be trusted, before any SoC, peripheral or firmware result is built on it. It produces five pieces of evidence, CT-1 to CT-5, that later phases take as entry conditions. This page explains each one, what exists today, and a proposed order of execution.</p>
+<p class="meta">Scope: Rev B phase P1a (stage brief "Stage 2") | Sources: Rev B 21.2 to 21.5, 21.10 to 21.12, Table 6.1; <code>Verification/doc/briefs/stages/stage_2_brief.md</code>; <code>Verification/status/PHASE_STATUS.md</code>, <code>build_tracker.py</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="warn"><b>Status.</b> P1a is NOT STARTED and its entry is not met (P0 exit not met, DC-1 record absent). None of CT-1 to CT-5 has evidence at a recorded RTL identity. The core fix DEF-001 is in the current file but unverified, and it voids any earlier core evidence.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">CT-1 to CT-5 in detail</a></li>
+<li><a href="#s4">Exit and what it unblocks</a></li>
+<li><a href="#s5">Current status</a></li>
+<li><a href="#s6">Open question: CT-4 and track F</a></li>
+<li><a href="#s7">Proposal: how to execute P1a</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective</h2>
+<p>Every firmware-observable result in the plan is produced by software running on the core: the compliance suite is core-only, the six APB device suites are bare-metal programs, and the attestation oracle is firmware writing a word to DSRAM. A core defect would shift all of them in the same direction, and no peripheral checker could notice, because each compares the DUT against models that also run on that core (Rev B 21.2). P1a makes the core's trustworthiness measurable first. The core is a five-stage pipeline (IF, ID, EX, MEM, WB) with traps, a two-deep shadow stack and a class-based interrupt arbiter.</p>
+<p>The stage brief gives a reduced execution milestone: it asks for an honest baseline and says explicitly that a smoke test is not core sign-off, and that CT-2, CT-4 and CT-5 must not be silently marked complete.</p>
+
+<h2 id="s2">2. Entry criteria</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Condition</th><th>Meaning</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P0 exit met</td><td>One run package passes G0 and G1 with identity recorded</td><td>NOT MET (13 of 20 criteria)</td></tr>
+<tr><td>ID-2: <code>unresolved_entries == 0</code></td><td>Canonical filelist resolves fully. Measured on the tree, so P0 cannot just declare it green</td><td>0 on the golden <code>soc_subsystem.f</code>; DEF-005 still OPEN for other filelists</td></tr>
+<tr><td>ID-1: <code>duplicate_divergent_reachable == 0</code></td><td>No two differing files declare one module name where a testbench filelist reaches either. A reachable divergent copy makes a core claim untested, not failed (R-83)</td><td>0 after <code>timer.sv</code> and <code>apb_to_obi.sv</code> were converged (DEF-004 FIXED-CONVERGED)</td></tr>
+<tr><td>DC-1 record (SD-9)</td><td>Scope decision taken at P0 exit, naming an arbitrator who did not author a check it would invalidate. If the authorship register does not exist the decision is recorded as defaulted and SD-9 is reported untested</td><td>NOT MET (P0-X1, ACT-008)</td></tr>
+<tr><td>Standing SD predicates</td><td>SD-1, SD-2, SD-5, SD-6, SD-7 are zero at every phase entry</td><td>Not evaluated; no authorship register exists yet</td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. CT-1 to CT-5 in detail</h2>
+<p>Figure 1 shows how the five pieces of evidence reach a single bundle at one RTL identity. Figure 2 gives the status of each today. The table that follows states, for every item, the predicate, the evidence artefact, the owner role and how it would be produced. The "how" column is a proposal (<span class="tag specified">SPECIFIED</span>) assembled from Rev B and the stage brief; no step is claimed as done.</p>
+
+<figure>
+<svg viewBox="0 0 960 420" role="img" aria-label="Evidence flow: entry conditions feed CT-1 to CT-5, each producing an artefact; the artefacts form a bundle that unblocks later phases">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-ctrl" x="24" y="170" width="152" height="96" rx="6"/>
+<text class="tb mid" x="100" y="192">Entry</text><text class="ts mid" x="100" y="210">P0 exit met</text><text class="ts mid" x="100" y="226">ID-1 = 0, ID-2 = 0</text><text class="ts mid" x="100" y="242">DC-1 recorded (SD-9)</text>
+<path class="ln" d="M176 218 H204"/><path class="ln" d="M204 48 V336"/>
+
+<path class="ar" d="M204 48 H232"/><rect class="bx-core" x="232" y="24" width="228" height="48" rx="6"/>
+<text class="tb" x="244" y="43">CT-1 Compliance</text><text class="ts" x="244" y="60">69 applicable: 0 failed, 0 not run</text>
+<path class="ar" d="M204 120 H232"/><rect class="bx-core" x="232" y="96" width="228" height="48" rx="6"/>
+<text class="tb" x="244" y="115">CT-2 Core lock-step</text><text class="ts" x="244" y="132">retire trace equals ISS, 0 mismatches</text>
+<path class="ar" d="M204 192 H232"/><rect class="bx-core" x="232" y="168" width="228" height="48" rx="6"/>
+<text class="tb" x="244" y="187">CT-3 Core assertions</text><text class="ts" x="244" y="204">each bound check can report</text>
+<path class="ar" d="M204 264 H232"/><rect class="bx-core" x="232" y="240" width="228" height="48" rx="6"/>
+<text class="tb" x="244" y="259">CT-4 Core formal goals</text><text class="ts" x="244" y="276">critical goals closed, 0 open</text>
+<path class="ar" d="M204 336 H232"/><rect class="bx-core" x="232" y="312" width="228" height="48" rx="6"/>
+<text class="tb" x="244" y="331">CT-5 Boot entry</text><text class="ts" x="244" y="348">cold and warm boot reach S_DONE</text>
+
+<path class="ar" d="M460 48 H500"/><rect class="bx-mem" x="500" y="24" width="200" height="48" rx="6"/>
+<text class="tb" x="512" y="43">Compliance report</text><text class="ts" x="512" y="60">snapshot version and date</text>
+<path class="ar" d="M460 120 H500"/><rect class="bx-mem" x="500" y="96" width="200" height="48" rx="6"/>
+<text class="tb" x="512" y="115">Lock-step report</text><text class="ts" x="512" y="132">Sail-derived C ISS</text>
+<path class="ar" d="M460 192 H500"/><rect class="bx-mem" x="500" y="168" width="200" height="48" rx="6"/>
+<text class="tb" x="512" y="187">Viability ledger</text><text class="ts" x="512" y="204">plus coverage database</text>
+<path class="ar" d="M460 264 H500"/><rect class="bx-mem" x="500" y="240" width="200" height="48" rx="6"/>
+<text class="tb" x="512" y="259">Proof log</text><text class="ts" x="512" y="276">plus property register</text>
+<path class="ar" d="M460 336 H500"/><rect class="bx-mem" x="500" y="312" width="200" height="48" rx="6"/>
+<text class="tb" x="512" y="331">Verdict record</text><text class="ts" x="512" y="348">cold and warm scenario</text>
+
+<path class="ln" d="M700 48 H724"/><path class="ln" d="M700 120 H724"/><path class="ln" d="M700 192 H724"/><path class="ln" d="M700 264 H724"/><path class="ln" d="M700 336 H724"/><path class="ln" d="M724 48 V336"/>
+<path class="ar" d="M724 192 H752"/>
+<rect class="bx-ver" x="752" y="140" width="184" height="104" rx="6"/>
+<text class="tb mid" x="844" y="164">CT bundle</text><text class="ts mid" x="844" y="182">CT-1 to CT-5 hold at</text><text class="ts mid" x="844" y="196">one recorded H_rtl</text><text class="ts mid" x="844" y="210">entry condition, not a</text><text class="ts mid" x="844" y="224">gate; never stamped G5</text>
+<path class="ar" d="M844 244 V292"/>
+<rect class="bx-core" x="752" y="292" width="184" height="104" rx="6"/>
+<text class="tb mid" x="844" y="316">Unblocks</text><text class="ts mid" x="844" y="334">P1b, P2, P3.1-3.4</text><text class="ts mid" x="844" y="348">P4.1-4.5, track F</text><text class="ts mid" x="844" y="362">P6; re-met at P5</text>
+</svg>
+<figcaption><b>Figure 1.</b> Evidence flow for P1a. Each of the five predicates has its own artefact; none can stand in for another. The bundle is a phase-entry condition (Rev B D-GR04). G5 is stamped once, in P6, and CT-1 is only the predicate G5 later consumes.</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Predicate</th><th>Evidence artefact</th><th>Owner role</th><th>How to produce it (proposal)</th></tr></thead>
+<tbody>
+<tr><td><b>CT-1</b> Compliance</td><td><code>applicable_failed + applicable_not_run == 0</code> at the stated identity; all 93 out-of-scope tests recorded with a reason. The denominator is 69, never 162. The DUT ISA is I and M only.</td><td>Compliance report, tied to the snapshot version and date (every curated entry carries no commit id)</td><td>Compliance owner</td><td>Run the core-only RISCOF flow (core as DUT, core RTL filelist) on the current identity. Confirm the 69 applicable count against the repository rather than assuming it. Report PASS, FAIL, NOT-RUN and OUT-OF-SCOPE counts; do not change an expected result to make a test pass. First re-run after the DEF-001 fix (ACT-011). Not stamped as G5.</td></tr>
+<tr><td><b>CT-2</b> Core lock-step</td><td><code>mismatched_retire_events == 0</code> and <code>instruction_count_retired == instruction_count_iss</code> over the applicable compliance image set; ISS is the Sail-derived C model at its declared version</td><td>Lock-step comparison report</td><td>Block checker owner (core)</td><td>Use an existing ISS to produce a retirement trace for the same images; compare PC, instruction and register effect per retire against the DUT retire stream. The harness already keeps a retire flight recorder (PC, instruction, destination register and value). Brief rule: if no ISS is available, label lock-step PENDING; do not write a new ISS.</td></tr>
+<tr><td><b>CT-3</b> Core structural assertions</td><td>Every bound core check ID has <code>negative_case_pass</code> or <code>vacuity_proved</code>, and <code>antecedent_satisfied_count &gt;= 1</code></td><td>Checker-viability ledger; coverage database</td><td>Block checker owner (core)</td><td>Bind two or three targeted checks (reset, retire validity, trap and return invariants). For each, inject a fault that the check must report, and record the result. Evaluating antecedent counts needs a tool that supports cover property; XSim cannot (tracker), so the coverage tool decision DEC-A governs the counting half.</td></tr>
+<tr><td><b>CT-4</b> Core formal goals</td><td>Every core critical-path goal in Table 21.5 is proved, waived with owner and date, or converted to a directed simulation test; <code>open_critical_formal_goals == 0</code></td><td>Proof log; property register</td><td>Formal owner</td><td>Critical groups per Table 21.6: core pipeline and trap; shadow stack push/pop and MRET; interrupt gateway and arbiter. Where no formal engine is available, convert goals to directed tests naming the replacing check ID. See section 6 for an unresolved timing question.</td></tr>
+<tr><td><b>CT-5</b> Boot entry</td><td>One cold-boot and one warm-boot scenario each reach <code>S_DONE</code> with <code>attestation_words_written &gt; 0</code> and <code>axi_beats &gt; 0</code>, on the 16-state FSM from <code>S_RESET</code></td><td>Verdict record</td><td>Partition owner (boot)</td><td>Run both boot modes through the P0 run-package script. Needed because the bootloader holds the core in reset and releases it at <code>S_CLEAN_RELEASE</code> (Rev B cites <code>bootloader.sv:722-740</code>), so a core result is unattributable without a boot result.</td></tr>
+</tbody></table></div>
+<p class="meta">Sources: Rev B Table 21.2 and 21.6; <code>stage_2_brief.md</code>. Role definitions are in Rev B 21.2 (roles and RACI); separation of duty requires that no check bound in P1a be graded by its author (<code>authorship_conflicts == 0</code> before P1b).</p>
+
+<h2 id="s4">4. Exit and what it unblocks</h2>
+<p>P1a exits when CT-1 to CT-5 all hold at one recorded RTL identity. The tracker lists G0 and G1 for the P1 exit; Rev B Table 20.1 does not split P1 and lists G0, G1 and G3 on the MMIO-path partition for the combined phase (a known erratum, DEF-011). Compliance is produced as an input artefact and no gate is stamped for it at this point.</p>
+<p>The exit evidence is the entry condition of <a href="vf_p1b_soc_structural.html">P1b</a> and, with P1b, of <a href="vf_p2_models.html">P2</a>, <a href="vf_p3_architectural.html">P3</a>, <a href="vf_p4_closure.html">P4</a>, <a href="vf_track_f.html">track F</a> (core goals) and <a href="vf_p6_release.html">P6</a>. CT-1 to CT-5 are re-satisfied at the candidate identity before <a href="vf_p5_soak.html">P5</a>. Any later Class A (core) change re-opens CT-1 to CT-3 in full (Rev B Table 21.12).</p>
+
+<h2 id="s5">5. Current status</h2>
+<figure>
+<svg viewBox="0 0 960 316" role="img" aria-label="CT-1 to CT-5 status grid: predicate, evidence today and state">
+<rect class="bx-core" x="12" y="8" width="88" height="28" rx="4"/><text class="tb mid" x="56" y="26">ID</text>
+<rect class="bx-core" x="100" y="8" width="300" height="28" rx="4"/><text class="tb mid" x="250" y="26">Predicate</text>
+<rect class="bx-core" x="400" y="8" width="420" height="28" rx="4"/><text class="tb mid" x="610" y="26">Evidence today (support only)</text>
+<rect class="bx-core" x="820" y="8" width="128" height="28" rx="4"/><text class="tb mid" x="884" y="26">State</text>
+
+<rect class="bx" x="12" y="44" width="88" height="48" rx="4"/><text class="tb mid" x="56" y="73">CT-1</text>
+<rect class="bx" x="100" y="44" width="300" height="48" rx="4"/><text class="ts" x="110" y="73">applicable_failed + applicable_not_run == 0</text>
+<rect class="bx" x="400" y="44" width="420" height="48" rx="4"/><text class="ts" x="410" y="73">RISCOF harness exists; no report at a recorded identity</text>
+<rect class="bx-ext" x="820" y="44" width="128" height="48" rx="4"/><text class="tb mid" x="884" y="73">NOT STARTED</text>
+
+<rect class="bx" x="12" y="96" width="88" height="48" rx="4"/><text class="tb mid" x="56" y="125">CT-2</text>
+<rect class="bx" x="100" y="96" width="300" height="48" rx="4"/><text class="ts" x="110" y="125">mismatched_retire_events == 0</text>
+<rect class="bx" x="400" y="96" width="420" height="48" rx="4"/><text class="ts" x="410" y="125">No ISS lock-step; brief says label PENDING</text>
+<rect class="bx-ext" x="820" y="96" width="128" height="48" rx="4"/><text class="tb mid" x="884" y="125">NOT STARTED</text>
+
+<rect class="bx" x="12" y="148" width="88" height="48" rx="4"/><text class="tb mid" x="56" y="177">CT-3</text>
+<rect class="bx" x="100" y="148" width="300" height="48" rx="4"/><text class="ts" x="110" y="177">every bound core check viable, antecedent hit</text>
+<rect class="bx" x="400" y="148" width="420" height="48" rx="4"/><text class="ts" x="410" y="177">Step4 fault injection 11/11 was on a bridge model, not the core</text>
+<rect class="bx-ext" x="820" y="148" width="128" height="48" rx="4"/><text class="tb mid" x="884" y="177">NOT STARTED</text>
+
+<rect class="bx" x="12" y="200" width="88" height="48" rx="4"/><text class="tb mid" x="56" y="229">CT-4</text>
+<rect class="bx" x="100" y="200" width="300" height="48" rx="4"/><text class="ts" x="110" y="229">open_critical_formal_goals == 0</text>
+<rect class="bx" x="400" y="200" width="420" height="48" rx="4"/><text class="ts" x="410" y="229">A JasperGold superlint run only; no core property register</text>
+<rect class="bx-ext" x="820" y="200" width="128" height="48" rx="4"/><text class="tb mid" x="884" y="229">NOT STARTED</text>
+
+<rect class="bx" x="12" y="252" width="88" height="48" rx="4"/><text class="tb mid" x="56" y="281">CT-5</text>
+<rect class="bx" x="100" y="252" width="300" height="48" rx="4"/><text class="ts" x="110" y="281">cold and warm boot reach S_DONE, counts &gt; 0</text>
+<rect class="bx" x="400" y="252" width="420" height="48" rx="4"/><text class="ts" x="410" y="281">WARM-boot proofs reached firmware; no cold boot, no S_DONE verdict</text>
+<rect class="bx-ext" x="820" y="252" width="128" height="48" rx="4"/><text class="tb mid" x="884" y="281">NOT STARTED</text>
+</svg>
+<figcaption><b>Figure 2.</b> CT status grid. No row is met. The middle column lists only support evidence that exists in the repository; none of it was produced at a recorded identity for the purpose of CT.</figcaption>
+</figure>
+<ul>
+<li><b>Phase:</b> NOT STARTED, entry not met, planning effort 15 to 30 engineer-days (ASSUMED, Rev B D-GR01).</li>
+<li><b>DEF-001</b> (core load-use flush dropped loads during an MMIO stall): fixed in <code>riscv_core/rtl/hazard_unit.v:192</code> by gating the load-use term with <code>~mem_stall_i</code>; status FIXED-UNVERIFIED. It is a Class A change, so earlier core evidence is void.</li>
+<li><b>Actions:</b> ACT-007 (hash <code>hazard_unit.v</code> against the stage 3 proof timestamp), ACT-010 (directed regression that fails without the fix, second-person review), ACT-011 (re-run RISCOF at the final identity and plan lock-step), all OPEN.</li>
+<li><b>Tool constraint:</b> the pinned local simulator is XSim 2022.2; it cannot evaluate <code>cover property</code>. The coverage tool is undecided (DEC-A).</li>
+</ul>
+
+<h2 id="s6">6. Open question: CT-4 and track F</h2>
+<p class="open"><b><span class="tag open">OPEN</span> Circularity in Rev B.</b> Track F is entered at the exit of P1a (Table 21.5, edge P1a to F). CT-4 requires core critical formal goals to be closed, and CT-1 to CT-5 are the entry condition of P1b (Table 21.4). Read literally, the proofs cannot start until P1a exits, yet P1a cannot exit until the proofs are closed. Rev B also calls track F exit "the leg of CT-4 that must close early", and requires it only before P5.</p>
+<p>Rev B does not say how the two statements reconcile. A reading consistent with both is that at P1a exit each core critical goal must be registered and either proved, waived, or converted to a directed test, while proofs that need the engine run in track F and must close before P5. That reading is a proposal, not a Rev B statement, and it should go into the Rev C errata (DEF-011). The stage 2 brief's instruction not to mark CT-4 complete silently remains the safe default.</p>
+
+<h2 id="s7">7. Proposal: how to execute P1a</h2>
+<p><span class="tag specified">SPECIFIED</span> as a proposal. The order puts cheap, decisive items first and keeps each result attributable to one identity.</p>
+<ol>
+<li><b>Freeze the identity.</b> Close P0 (run package, DC-1). Record H_rtl for the tree; every P1a artefact carries it. Do ACT-007 now: hash <code>hazard_unit.v</code> and note whether the stage 3 pass used the current file.</li>
+<li><b>Lock the DEF-001 fix with a test.</b> Write the directed regression (an MMIO access followed by a DSRAM load-use) and show it fails on the old line and passes on the fixed one (ACT-010). A different person closes it, as separation of duty requires.</li>
+<li><b>CT-1.</b> Re-run RISCOF on the final identity and publish the four counts. Investigate every failure to a minimal reproducer and a suspected layer (core RTL, testbench, tool, specification) before touching an expectation.</li>
+<li><b>CT-5 in parallel.</b> Add a cold-boot scenario beside the existing warm one in the P0 run package and record both verdicts.</li>
+<li><b>CT-3.</b> Bind the first two or three checks with deliberate negative cases. Settle DEC-A so that antecedent counts can be collected.</li>
+<li><b>CT-2.</b> Identify an available ISS. If present, compare a short trace first, then the applicable image set. If not, record PENDING with the blocker; do not build a new ISS.</li>
+<li><b>CT-4.</b> Write the core property register with covers (Track F milestone FAB-1) for the critical groups; prove, waive or convert each (see section 6).</li>
+<li><b>Bundle and record.</b> One report at the recorded H_rtl states each CT as met, not met or untested, with the artefact path. Check that no check bound in P1a has its author as grader (<code>authorship_conflicts == 0</code>), then declare P1a exit.</li>
+</ol>
+<p>This page claims no result. It does not assert that the core passes compliance, and no percentage of requirements is implied.</p>
+<p class="meta">Overview: <a href="vf_phases_overview.html">phases overview</a>. Previous: <a href="vf_p0_bringup.html">P0 Bring-up</a>. Next: <a href="vf_p1b_soc_structural.html">P1b SoC structural</a>. See also <a href="vf_signoff.html">sign-off</a>, <a href="vf_regression_gates.html">gates</a>, <a href="tracker_status.html">tracker status</a>, <a href="glossary.html">glossary</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B 6.1, 20.1, 21.2 to 21.5, 21.10 to 21.12 (<code>documentation/html/_src/RevB_plan.txt</code>); <code>Verification/doc/briefs/stages/stage_2_brief.md</code>, <code>formal_track_brief.md</code>; <code>Verification/status/PHASE_STATUS.md</code>, <code>build_tracker.py</code>; <code>Verification/artifacts/stage_proofs/20261024_stage2_watchdog/README.md</code>, <code>20261024_stage3_monitor_count/README.md</code>; <code>riscv_core/rtl/hazard_unit.v:192</code>.</div>
+</div>
+</body>
+</html>

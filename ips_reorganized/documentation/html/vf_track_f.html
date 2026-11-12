@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formal Track F</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / Track F</span></div>
+<div class="wrap">
+
+<h1>Formal track F</h1>
+<p class="lead">Track F is the formal-verification work, run in parallel with the phases rather than as one of them. It has its own entry, four milestones (FAB-1 to FAB-4) and an exit that must be reached before P5 begins. It stamps no gate; its proof log is an input to G5.</p>
+<p class="meta">Scope: track F | Sources: Rev B sections 18, 20, 21.4 to 21.5; formal track brief; <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Status in one line.</b> <span class="tag open">OPEN</span> Track F has not started and its entry is not met. P0 is IN PROGRESS (13 of 20 criteria met) and P1a, which opens the track, is NOT STARTED. No property has been proved, and no formal tool is recorded as available. Related: <a href="vf_phases_overview.html">overview</a>, <a href="vf_p1a_core_trust.html">P1a</a>, <a href="vf_p1b_soc_structural.html">P1b</a>, <a href="vf_p4_closure.html">P4</a>, <a href="vf_p5_soak.html">P5</a>, <a href="vf_p6_release.html">P6</a>, <a href="tracker_status.html">tracker</a>.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective and position</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">Exit criteria and gates</a></li>
+<li><a href="#s4">Work breakdown: milestones</a></li>
+<li><a href="#s5">Check families and properties</a></li>
+<li><a href="#s6">Inputs, outputs, dependencies</a></li>
+<li><a href="#s7">Effort and risks</a></li>
+<li><a href="#s8">Current status</a></li>
+<li><a href="#s9">Execution proposal</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective and position</h2>
+<p>Rev A made formal a phase after closure, which produced an unsatisfiable graph (decision D-23). Rev B removes formal from the phase scale: it is a track entered at the exit of P1a and required to close before P5 starts. If it were numbered as a phase it would acquire a predecessor and a successor by construction, which is the defect being removed. Figure 2 shows where the track sits against the phases; Figure 1 shows its internal milestones.</p>
+<p>The track is on the critical path for exactly one edge: track F exit to P5. Starting it at P1a gives it the whole of P1b, P2, P3 and P4 as slack; starting it later removes that slack (Rev B 21.5).</p>
+
+<figure>
+<svg viewBox="0 0 960 320" role="img" aria-label="Track F milestone flow: entry at P1a exit, FAB-1 register encoded, FAB-2 first proof pass, FAB-3 vacuity recorded, FAB-4 triage and conversion, exit with critical goals closed, leading to P5 entry and the proof log for G5">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ext" x="152" y="16" width="176" height="56" rx="6"/>
+<text class="tb mid" x="240" y="40">P1b and P2 exits</text>
+<text class="ts mid" x="240" y="58">fabric and device goals</text>
+<rect class="bx-ext" x="16" y="120" width="128" height="72" rx="6"/>
+<text class="tb mid" x="80" y="146">Entry</text>
+<text class="ts mid" x="80" y="164">P1a exit,</text>
+<text class="ts mid" x="80" y="178">core goals</text>
+<rect class="bx-ctrl" x="176" y="120" width="128" height="72" rx="6"/>
+<text class="tb mid" x="240" y="146">FAB-1</text>
+<text class="ts mid" x="240" y="164">register encoded</text>
+<text class="ts mid" x="240" y="178">cover per property</text>
+<rect class="bx-ctrl" x="336" y="120" width="128" height="72" rx="6"/>
+<text class="tb mid" x="400" y="146">FAB-2</text>
+<text class="ts mid" x="400" y="164">first proof pass</text>
+<text class="ts mid" x="400" y="178">critical-path set</text>
+<rect class="bx-ctrl" x="496" y="120" width="128" height="72" rx="6"/>
+<text class="tb mid" x="560" y="146">FAB-3</text>
+<text class="ts mid" x="560" y="164">vacuity recorded</text>
+<text class="ts mid" x="560" y="178">every property</text>
+<rect class="bx-ctrl" x="656" y="120" width="128" height="72" rx="6"/>
+<text class="tb mid" x="720" y="146">FAB-4</text>
+<text class="ts mid" x="720" y="164">triage, conversion</text>
+<text class="ts mid" x="720" y="178">proved/waived/test</text>
+<rect class="bx-ver" x="816" y="120" width="128" height="72" rx="6"/>
+<text class="tb mid" x="880" y="146">Exit</text>
+<text class="ts mid" x="880" y="164">critical goals = 0</text>
+<text class="ts mid" x="880" y="178">register frozen</text>
+<rect class="bx-ext" x="616" y="248" width="152" height="56" rx="6"/>
+<text class="tb mid" x="692" y="272">P5 may start</text>
+<text class="ts mid" x="692" y="290">not before F exit</text>
+<rect class="bx-ver" x="808" y="248" width="136" height="56" rx="6"/>
+<text class="tb mid" x="876" y="272">Proof log</text>
+<text class="ts mid" x="876" y="290">input to G5</text>
+<path class="ar" d="M144 156 H176"/>
+<path class="ar" d="M304 156 H336"/>
+<path class="ar" d="M464 156 H496"/>
+<path class="ar" d="M624 156 H656"/>
+<path class="ar" d="M784 156 H816"/>
+<path class="ar-d" d="M240 72 V120"/>
+<path class="ar" d="M840 192 V220 H692 V248"/>
+<path class="ar-d" d="M900 192 V248"/>
+</svg>
+<figcaption><b>Figure 1.</b> Track F milestone flow (Rev B Table 21.5). Core goals enter at the P1a exit; fabric and device goals join at the P1b and P2 exits (dashed). FAB-1 admits only properties with a cover, FAB-2 runs the critical-path set, FAB-3 records vacuity, FAB-4 triages every goal. The exit blocks P5 and delivers the proof log that G5 consumes in P6.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 960 320" role="img" aria-label="Track F lane above the phase spine P0 to P6: entry arrows from P1a, P1b and P2, exit arrow into P5, proof log arrow to P6">
+<rect class="lane" x="16" y="40" width="928" height="120" rx="6"/>
+<text class="th" x="28" y="62">Track F (parallel, stamps no gate)</text>
+<rect class="bx-ctrl" x="244" y="96" width="492" height="48" rx="6"/>
+<text class="tb mid" x="490" y="116">FAB-1 to FAB-4 and exit</text>
+<text class="ts mid" x="490" y="132">critical goals closed before P5</text>
+<rect class="bx-ver" x="16" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="64" y="256">P0</text>
+<text class="ts mid" x="64" y="272">bring-up</text>
+<rect class="bx-ver" x="136" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="184" y="256">P1a</text>
+<text class="ts mid" x="184" y="272">core trust</text>
+<rect class="bx-ver" x="256" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="304" y="256">P1b</text>
+<text class="ts mid" x="304" y="272">freeze F</text>
+<rect class="bx-ver" x="376" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="424" y="256">P2</text>
+<text class="ts mid" x="424" y="272">models</text>
+<rect class="bx-ver" x="496" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="544" y="256">P3</text>
+<text class="ts mid" x="544" y="272">architectural</text>
+<rect class="bx-ver" x="616" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="664" y="256">P4</text>
+<text class="ts mid" x="664" y="272">closure</text>
+<rect class="bx-ver" x="736" y="232" width="96" height="56" rx="6"/>
+<text class="tb mid" x="784" y="256">P5</text>
+<text class="ts mid" x="784" y="272">soak</text>
+<rect class="bx-ver" x="856" y="232" width="88" height="56" rx="6"/>
+<text class="tb mid" x="900" y="256">P6</text>
+<text class="ts mid" x="900" y="272">release</text>
+<path class="ar" d="M112 260 H136"/>
+<path class="ar" d="M232 260 H256"/>
+<path class="ar" d="M352 260 H376"/>
+<path class="ar" d="M472 260 H496"/>
+<path class="ar" d="M592 260 H616"/>
+<path class="ar" d="M712 260 H736"/>
+<path class="ar" d="M832 260 H856"/>
+<path class="ar-ver" d="M184 232 V120 H244"/>
+<text class="ts" x="192" y="200">core goals</text>
+<path class="ar-ver" d="M304 232 V144"/>
+<text class="ts" x="312" y="200">fabric goals</text>
+<path class="ar-ver" d="M424 232 V144"/>
+<text class="ts" x="432" y="200">device goals</text>
+<path class="ar-ver" d="M736 120 H784 V232"/>
+<text class="ts" x="792" y="200">F exit gates P5</text>
+<path class="ar-d" d="M720 96 V72 H900 V232"/>
+<text class="ts mid" x="810" y="64">proof log to G5 (P6)</text>
+</svg>
+<figcaption><b>Figure 2.</b> Track F against the phase spine. The track opens at the P1a exit and takes later inputs at the P1b and P2 exits. Its single critical edge runs into P5. Its proof log reaches G5 only in P6. P3 and P4 are drawn as single boxes; their sub-phases are on their own pages.</figcaption>
+</figure>
+
+<h2 id="s2">2. Entry criteria</h2>
+<p>Rev B Table 21.4: the P1a exit for the core goals. Peripheral and fabric goals enter incrementally at the P1b and P2 exits. The track does not wait for P3 or P4 and neither waits for it. The core property register may be encoded only against a core whose compliance and lock-step results are in hand, so a failing property is unambiguous.</p>
+<p><span class="tag open">OPEN</span> Rev B is not consistent on the device entry point: Table 21.4 and the intro of 18 say P1b and P2 exits, decision D-GR05 says the P2 exit for device goals, and the tracker records "F entry points disagree" as erratum DEF-011. This page follows Table 21.4.</p>
+
+<h2 id="s3">3. Exit criteria and gates</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Statement</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Exit</td><td><code>open_critical_formal_goals == 0</code>, <code>open_unowned_formal_goals == 0</code> and the property register frozen. Required before P5 begins.</td><td>Rev B Table 21.5</td></tr>
+<tr><td>Family</td><td>FE-1 to FE-4 met: every goal proved, waived with owner and date, or converted into a directed test (Table 20.1).</td><td>Rev B Tables 18.2, 20.1</td></tr>
+<tr><td>Gate</td><td>None stamped. The proof log is an input artefact to G5, stamped once in P6. G5(b) predicate: every goal proved, waived or converted; <code>open_unowned_formal_goals == 0</code>.</td><td>Rev B Table 6.1</td></tr>
+<tr><td>Converted goals</td><td>A converted goal names the replacing check ID, which is then subject to G2.</td><td>Rev B Table 21.5</td></tr>
+</tbody></table></div>
+<p>The two names for the same four steps are different things. FAB-1 to FAB-4 (Table 21.5) are the <em>milestones</em> of the work; FE-1 to FE-4 (Table 18.2) are the <em>exit criteria</em> evaluated at the track exit. "Left running" is reported untested, never as an outcome; an undecided result within bound is untested, not proved.</p>
+
+<h2 id="s4">4. Work breakdown: milestones</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Milestone</th><th>Statement (Rev B Table 21.5)</th><th>Reported measure</th></tr></thead>
+<tbody>
+<tr><td>FAB-1 register encoded</td><td>Every property carries antecedent, claim, a bound where it is a liveness claim, and a cover. A property with no cover is not admitted.</td><td><code>open_properties_without_cover</code></td></tr>
+<tr><td>FAB-2 first proof pass</td><td>All critical-path properties run once. Outcome is proved, counterexample, or undecided within bound (untested).</td><td>per-property outcome</td></tr>
+<tr><td>FAB-3 vacuity recorded</td><td>Every admitted property has a vacuity result; without one it is reported vacuous, not proved.</td><td>vacuity record per property</td></tr>
+<tr><td>FAB-4 triage and conversion</td><td>Every goal is proved, waived, or converted to a directed simulation test naming the replacing check ID.</td><td>open critical and unowned goal counts</td></tr>
+</tbody></table></div>
+
+<h2 id="s5">5. Check families and properties</h2>
+<p>Critical-path rule (decision D-GR06, binding): a property is critical if, and only if, its failure would make a later phase's result uninterpretable rather than merely failing. On the current grouping five of nine groups are critical; the split is provisional because the generated register does not yet exist.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Property group</th><th>Critical</th><th>Latest closure</th></tr></thead>
+<tbody>
+<tr><td>Core pipeline and trap</td><td>Yes</td><td>Track F exit, before P5</td></tr>
+<tr><td>Shadow stack push/pop and MRET</td><td>Yes</td><td>Track F exit</td></tr>
+<tr><td>Interrupt gateway and arbiter</td><td>Yes</td><td>Track F exit</td></tr>
+<tr><td>AXI-Lite crossbar and APB bridge protocol</td><td>Yes</td><td>Track F exit</td></tr>
+<tr><td>Timeout monitors (7 instances)</td><td>Yes</td><td>Track F exit</td></tr>
+<tr><td>Register decode and reserved fields</td><td>No</td><td>May close during P5</td></tr>
+<tr><td>Peripheral datapath timing</td><td>No</td><td>May close during P5</td></tr>
+<tr><td>Reset-domain crossing</td><td>Conditional (two existing chains: deferrable; a third makes it critical)</td><td>Decision at P3.1 exit</td></tr>
+<tr><td>Coverage closure of the register itself</td><td>No</td><td>May close during P5</td></tr>
+</tbody></table></div>
+<p>The only populated register in the passages read is Rev B Table 18.1 (fabric and interrupt interface): FRM-0001 to FRM-0003 (APB bridge: no transfer without request, exactly one transfer per request, no orphan write data), FRM-0004 to FRM-0009 (gateway edge/level/clear semantics, arbiter priority, bounded grant, pointer advance on commit only) and FRM-0010 to FRM-0011 (sram_mux rvalid history, conditional grant under assumption A-FRM-11). All 11 are "open: proof pending in track F". Gateway, arbiter and bridge rows are critical; the sram_mux rows are deferrable within the track. <span class="tag open">OPEN</span> No register rows exist in the passages read for core pipeline and trap, shadow stack or timeout monitors, which Rev B marks critical.</p>
+
+<h2 id="s6">6. Inputs, outputs, dependencies</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Kind</th><th>Artefact</th></tr></thead>
+<tbody>
+<tr><td>Inputs</td><td>P1a core trust evidence (CT-1 to CT-4 context); RTL locators; later device and fabric inputs from P1b and P2; check-ID registry (P4.3) for converted goals; a supported formal engine (not recorded).</td></tr>
+<tr><td>Outputs</td><td>Frozen property register; proof log; vacuity records; logged assumptions (FE-3); converted directed tests with check IDs; counts of proved, waived and open goals per module.</td></tr>
+<tr><td>Edges</td><td>P1a to F; P1b to F; P2 to F; P4.4 to F exit; F exit to P5 (critical). See <a href="vf_p4_closure.html">P4</a> and <a href="vf_p5_soak.html">P5</a>.</td></tr>
+<tr><td>Consumer</td><td>G5 in <a href="vf_p6_release.html">P6</a>; no other gate consumes the proof log.</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Effort and risks</h2>
+<p>30 to 60 engineer-days, overlapped with P1b, P2 and P3 (Rev B Table 21.3, <code>ASSUMED(D-GR01)</code>). Unmeasured. Summing with the phase ranges gives total effort, not elapsed time.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>Mitigation (proposed)</th></tr></thead>
+<tbody>
+<tr><td>No formal engine available</td><td>Cannot prove anything.</td><td>Record BLOCKED, demonstrate the property as a simulation assertion, do not invent outcomes (formal brief).</td></tr>
+<tr><td>Vacuous proofs</td><td>False confidence.</td><td>No property admitted without a cover (FE-2).</td></tr>
+<tr><td>Assumptions forced to make proofs pass</td><td>Hides defects.</td><td>Log every assumption with scope and rows touched (FE-3); never constrain away a level source or the losing port.</td></tr>
+<tr><td>Late closure of critical goals</td><td>Blocks P5.</td><td>Start at P1a; track slack against P5 entry.</td></tr>
+<tr><td>Core and shadow-stack depth interplay</td><td>If the depth cap or the silent drop changes, the other obligation changes.</td><td>Keep both properties in the same critical group.</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Current status</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>Track F</td><td>NOT STARTED, entry met NO, no gate, input to G5, effort 30 to 60 engineer-days (assumed)</td></tr>
+<tr><td>Opening phase</td><td>P1a NOT STARTED; P0 IN PROGRESS (13 of 20 met), P0 exit not met</td></tr>
+<tr><td>Formal tool</td><td>OPEN: not recorded in the files read. The decision on the simulator and coverage tool of record is ACT-006.</td></tr>
+</tbody></table></div>
+<p>Source: <code>Verification/status/PHASE_STATUS.md</code> (2026-10-31). Table 18.2 notes 11 goals pending; no result exists.</p>
+
+<h2 id="s9">9. Execution proposal</h2>
+<p>Proposal, not Rev B text. The formal track brief selects a narrow subset and is independent of the simulation phases.</p>
+<ol>
+<li><b>Discover the tool.</b> Identify the formal engine, language subset and simplest synthesizable target. If none, record BLOCKED and move the properties into simulation as assertions.</li>
+<li><b>Pick two or three local invariants.</b> Suggested by the brief and by Rev B criticality: sram_mux grant and rvalid history (FRM-0010, FRM-0011), a gateway/arbiter gating claim (FRM-0004 to FRM-0007), or a reset/trap transition invariant. State assumptions and bounds explicitly.</li>
+<li><b>Cover first.</b> Add an antecedent cover or negative control per property before any proof run (FAB-1).</li>
+<li><b>Run and classify.</b> Report PROVED, FAILED, INCONCLUSIVE or BLOCKED from logs. Classify each counterexample as RTL defect, bad assumption, wrong property or inconclusive; keep the minimal waveform.</li>
+<li><b>Relate to simulation.</b> Add a directed reproducer for one counterexample, or use one assertion in the P3 regression. This is how a result changes the test plan.</li>
+<li><b>Widen to the register.</b> Encode the critical groups from the core outward, record vacuity, triage, freeze, and publish counts per module in <code>formal_findings.md</code>.</li>
+</ol>
+<p><b>Not claimed.</b> A small proved subset is not track F closure. Compilation of an assertion is not a proof.</p>
+
+<div class="sources"><b>Sources read:</b> <code>_src/AUTHORING_GUIDE.md</code>, <code>_src/RevB_plan.txt</code> (Tables 6.1, 18.1, 18.2, 20.1, 21.3 to 21.7; D-GR05, D-GR06), <code>Verification/doc/briefs/tracks/formal_track_brief.md</code>, <code>Verification/status/PHASE_STATUS.md</code>.</div>
+</div>
+</body>
+</html>

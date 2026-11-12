@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RISCFORGE · CSR and Trap Testbench Architecture</title>
+<style>
+:root{--sans:"IBM Plex Sans",system-ui,-apple-system,sans-serif;--display:"Archivo","IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",monospace;--ink:#18202c;--ink-2:#475063;--ink-3:#626d7f;--rule:#e2e8f0;--tint:#f8fafc;--core:#2d56c8;--core-f:#edf2ff;--mem:#0c8577;--mem-f:#edf8f5;--bus:#7445bd;--bus-f:#f4effb;--warn:#a34b06;--warn-f:#fff6e9;--radius:10px}
+*{box-sizing:border-box}html,body{margin:0;background:transparent;color:var(--ink);font:15px/1.62 var(--sans)}.sheet{width:100%;max-width:1060px;margin:0 auto;padding:0}h1,h2,h3{font-family:var(--display);letter-spacing:-.025em;line-height:1.2;text-wrap:balance}h1{font-size:clamp(29px,5.5vw,48px);margin:10px 0 14px;max-width:800px}h2{font-size:25px;margin:0 0 14px}h3{font-size:17px;margin:0 0 7px}p{margin:8px 0 12px}code,pre,.mono{font-family:var(--mono)}code{font-size:.86em;overflow-wrap:anywhere}a{color:var(--core);text-underline-offset:3px;overflow-wrap:anywhere}section{margin-top:36px;padding-top:25px;border-top:1px solid var(--rule)}.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--core);text-transform:uppercase}.lede{color:var(--ink-2);font-size:17px;max-width:850px}.meta{font-size:12px;color:var(--ink-3)}.status{display:inline-flex;border:1px solid #e9c89f;background:var(--warn-f);color:var(--warn);border-radius:5px;padding:3px 9px;font:600 11px var(--mono);letter-spacing:.02em}.goal{background:var(--core-f);border-left:4px solid var(--core);padding:20px 22px;border-radius:0 var(--radius) var(--radius) 0;margin-top:24px}.goal p{font-size:18px;line-height:1.5;margin:6px 0}.goal small{color:var(--ink-2)}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{padding:20px;border:1px solid var(--rule);border-radius:var(--radius);background:#fff}.card .label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}.card p{font-size:14px;color:var(--ink-2)}.note{border:1px solid #ecd7b9;background:var(--warn-f);border-radius:var(--radius);padding:17px 20px;margin-top:18px}.note p{margin:0;font-size:14px}.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin:10px 0}.key:before{content:"";display:inline-block;width:21px;border-top:2px solid var(--core);vertical-align:middle;margin-right:7px}.key.future:before{border-top:2px dashed var(--warn)}figure{margin:20px 0}.figurebox{padding:16px;background:#fff;border:1px solid var(--rule);border-radius:var(--radius)}.dg{display:block;width:100%;height:auto;max-width:100%}figcaption{font-size:12px;line-height:1.5;color:var(--ink-2);margin-top:10px}.dg text{font-family:var(--sans);fill:var(--ink)}.dg .t{font-size:15px;font-weight:600}.dg .s{font-size:12px;fill:var(--ink-2)}.dg .tiny{font-size:11px;fill:var(--ink-2)}.dg .n{font-size:11px;font-weight:700;letter-spacing:1px;fill:var(--ink-3)}.dg .m{font-family:var(--mono);font-size:12px}.dg .box{fill:#fff;stroke:#cbd5e1;stroke-width:1.3}.dg .blue{fill:var(--core-f);stroke:var(--core)}.dg .green{fill:var(--mem-f);stroke:var(--mem)}.dg .purple{fill:var(--bus-f);stroke:var(--bus)}.dg .future{fill:var(--warn-f);stroke:var(--warn);stroke-dasharray:5 4}.dg .wire{fill:none;stroke:var(--core);stroke-width:1.8;marker-end:url(#arrow)}.dg .planned{fill:none;stroke:var(--warn);stroke-width:1.8;stroke-dasharray:5 4;marker-end:url(#futureArrow)}.tbl{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-top:16px}table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px;vertical-align:top;border-bottom:1px solid var(--rule);overflow-wrap:anywhere}th{background:var(--tint);font-size:11px;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase}tr:last-child td{border-bottom:0}.steps{list-style:none;padding:0;margin:14px 0;counter-reset:step}.steps li{position:relative;padding:0 0 16px 39px;counter-increment:step}.steps li:before{content:counter(step);position:absolute;left:0;top:0;display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--core-f);color:var(--core);font-size:12px;font-weight:700}.steps li strong{display:block}.steps li span{color:var(--ink-2);font-size:14px}.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.fact{padding:16px;border-top:2px solid var(--core);background:var(--tint)}.fact b{display:block;font:600 26px var(--display)}.fact span{font-size:12px;color:var(--ink-2)}.pathlist{padding-left:20px}.pathlist li{margin:9px 0}.footer{margin-top:36px;border-top:1px solid var(--rule);padding:15px 0;color:var(--ink-3);font-size:12px}.pending{color:var(--warn);font-weight:600}.nav{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin:22px 0}.printbtn{font:inherit;font-size:12px;color:var(--ink-2);background:transparent;border:1px solid var(--rule);border-radius:5px;padding:4px 9px;cursor:pointer}pre{padding:16px;background:var(--tint);border:1px solid var(--rule);border-radius:8px;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:600px){.split{grid-template-columns:1fr}.facts{grid-template-columns:1fr 1fr}.card{padding:16px}.goal{padding:17px}.figurebox{padding:7px}th,td{padding:8px;font-size:12px}.lede{font-size:15px}section{margin-top:27px;padding-top:22px}}
+@page{size:A4 portrait;margin:14mm 12mm 16mm 12mm}
+@media print{html,body{width:100%!important;margin:0!important;padding:0!important;background:#fff!important;color:var(--ink)!important;font-size:12px!important;line-height:1.5!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.sheet{border:0!important;box-shadow:none!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important}section{margin-top:24px!important;padding-top:16px!important;break-inside:auto!important;page-break-inside:auto!important}h1,h2,h3,h4{break-after:avoid!important;page-break-after:avoid!important}h1{font-size:32px}h2{font-size:22px}figure,.tbl,.note,pre,tr,.facts,.goal,.card,.nav{break-inside:avoid!important;page-break-inside:avoid!important}.split{grid-template-columns:1fr 1fr!important;gap:12px!important}.dg{min-width:0!important;width:100%!important;max-width:100%!important;height:auto!important}.figurebox{padding:8px;border-radius:4px}figcaption{margin-top:8px}th,td{font-size:10.5px;padding:6px 7px}table{table-layout:fixed!important}.nav,.printbtn{display:none}pre{background:#f8fafc;color:#0f172a;border:1px solid #cbd5e1;font-size:10px;white-space:pre-wrap;word-break:break-all}a{color:inherit!important;text-decoration:none!important}.goal p{font-size:16px}.facts .fact{padding:10px}.fact b{font-size:23px}}
+</style>
+</head>
+<body>
+<aside id="cj-current-review-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #9a5309;background:#fff8eb;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Maintained CJ review — 10 November 2026:</strong> <a style="color:#244ba7" href="../../../documentation/signoff/cj_review/index.html">open the unified architecture, verification, evidence and gate package</a>. This guide describes a connected incomplete skeleton. The maintained review distinguishes user hooks, compilation, execution and closure. Original content below is retained with its original scope; this notice creates no new verification result or waiver.</aside>
+<aside id="results-notice" role="note" style="margin:16px;padding:14px 18px;border:2px solid #2b6cb0;background:#eef5ff;color:#18202c;font:14px/1.55 system-ui,sans-serif"><strong>Results update — 11 November 2026:</strong> the CSR unit bench is now implemented and simulated in local Vivado XSim 2022.2: 552 checks, 0 failures, 56 specification-pending cases, 236 of 236 observed bins sampled. The core bench still compiles, elaborates and runs reset-held with no stimulus. <a style="color:#244ba7" href="../status/CSR_TRAP_VERIFICATION_STATUS.md">Open the status, evidence and integrity record</a>. Sections below that describe an unexecuted skeleton remain the 4 November record.</aside>
+<main class="sheet">
+<header>
+<div class="eyebrow">RISCFORGE · Verification architecture · 04 November 2026</div>
+<h1>CSR, exception &amp; interrupt<br>corner-case testbenches</h1>
+<p class="lede">A connected foundation for reviewing precise traps, CSR dependencies and interrupt ordering in the current RV32IM core.</p>
+<span class="status">UNIT BENCH IMPLEMENTED · CORE SKELETON</span>
+<p class="meta">Architecture documented 4 November 2026 from the connected skeleton. Unit suites, bins and an XSim run were added on 11 November 2026; the core harness still has no stimulus. Results, limits and integrity checks: <a href="../status/CSR_TRAP_VERIFICATION_STATUS.md">status and evidence record</a>.</p>
+<nav class="nav" aria-label="Document sections"><a href="#goal">Goal</a><a href="#architecture">Architecture</a><a href="#flow">Observation flow</a><a href="#ownership">Engineer hooks</a><a href="#evidence">Evidence</a><a href="#review">Review files</a><button class="printbtn" onclick="window.print()">Print / Save PDF</button></nav>
+</header>
+
+<section id="goal">
+<div class="eyebrow">01 / Goal</div><h2>Establish checked coverage of the difficult interactions.</h2>
+<div class="goal"><strong>Verification goal</strong><p>Verify that exceptions and interrupts produce the correct trap state and redirect, preserve instruction order, suppress forbidden side effects, and return or replay correctly when CSR dependencies, memory waits and multi-cycle operations overlap.</p><small>As of 11 November 2026 the unit bench carries suites and checks for this scope; the core harness still waits for its reference model, bins and stimulus. No closure is claimed.</small></div>
+<div class="split" style="margin-top:18px">
+<div class="card"><div class="label">Target behavior</div><p>Exception metadata and priority; older versus younger effects; CSR read/write dependencies; gating-CSR updates; IRQ arrival during memory or M operations; MRET state and replay.</p></div>
+<div class="card"><div class="label">Scope allocation</div><p>Ordinary CSR instruction semantics are assigned to RISCOF in the plan. This environment targets corner cases and hazards. Existing IRQ arbitration and gateway coverage remains with its unit bench.</p></div>
+</div>
+<p class="meta">RISCOF is an evidence dependency: its current qualifying result was not established by this skeleton task. The proposed suite supports G2.9 review and relevant core verification; it does not itself close a signoff gate.</p>
+</section>
+
+<section id="architecture">
+<div class="eyebrow">02 / Architecture</div><h2>Two new tops, with one shared core harness.</h2>
+<p>The CSR fixture uses module-based SystemVerilog. The core harness uses lightweight OOP SystemVerilog for shared configuration, scheduling and observation plumbing. UVM is not introduced in this skeleton; the separate SoC UVM/VIP requirement remains an independent obligation.</p>
+<figure><div class="figurebox">
+<svg class="dg" viewBox="0 0 720 490" role="img" aria-labelledby="archTitle archDesc">
+<title id="archTitle">CSR unit and core testbench architecture</title><desc id="archDesc">The CSR unit connects its interface directly to csr_regfile and has engineer-owned empty hooks. The core testbench connects input controls and memory shells to the actual core, then observes it through a passive probe and passes records to an OOP environment. Existing IRQ unit coverage is retained separately.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2d56c8"/></marker></defs>
+<rect x="8" y="28" width="290" height="354" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="25" y="53" class="n">MODULE SV · CSR UNIT</text><text x="25" y="75" class="m">tb_csr_corner_unit</text>
+<rect x="36" y="99" width="234" height="61" rx="7" class="box purple"/><text x="153" y="125" text-anchor="middle" class="t">csr_corner_if</text><text x="153" y="146" text-anchor="middle" class="s">Normal / trap / MRET ports</text>
+<path d="M153 160V190" class="wire"/>
+<rect x="36" y="191" width="234" height="62" rx="7" class="box blue"/><text x="153" y="216" text-anchor="middle" class="t">csr_regfile</text><text x="153" y="238" text-anchor="middle" class="s">31 named DUT ports connected</text>
+<rect x="36" y="285" width="234" height="71" rx="7" class="box future"/><text x="153" y="311" text-anchor="middle" class="t">Engineer extension hooks</text><text x="153" y="334" text-anchor="middle" class="s">Model · coverage · stimulus</text>
+
+<rect x="314" y="28" width="398" height="354" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="332" y="53" class="n">OOP SV + STATIC HARNESS · CORE</text><text x="332" y="75" class="m">tb_core_csr_trap</text>
+<rect x="332" y="99" width="160" height="59" rx="7" class="box purple"/><text x="412" y="123" text-anchor="middle" class="t">core_corner_if</text><text x="412" y="145" text-anchor="middle" class="s">Reset / IRQ / sampling</text>
+<rect x="520" y="99" width="174" height="59" rx="7" class="box green"/><text x="607" y="123" text-anchor="middle" class="t">Memory shells</text><text x="607" y="145" text-anchor="middle" class="s">IMEM NOP · DMEM zero</text>
+<path d="M412 158V183H470V200" class="wire"/><path d="M607 158V183H554V200" class="wire"/>
+<rect x="389" y="201" width="248" height="59" rx="7" class="box blue"/><text x="513" y="226" text-anchor="middle" class="t">Actual core DUT: top</text><text x="513" y="248" text-anchor="middle" class="s">21 ports · reset PC 0x80000000</text>
+<path d="M513 260V282" class="wire"/>
+<rect x="353" y="283" width="321" height="33" rx="5" class="box"/><text x="513" y="305" text-anchor="middle" class="m">Passive probe + sampled interface</text>
+<path d="M513 316V333" class="wire"/>
+<rect x="389" y="334" width="248" height="33" rx="5" class="box purple"/><text x="513" y="356" text-anchor="middle" class="m">corner_env · event fanout</text>
+<rect x="8" y="408" width="704" height="65" rx="8" class="box"/><text x="25" y="433" class="t">Existing tb_irq_restructure</text><text x="25" y="455" class="s">Retained separately: arbitration, source eligibility, gateway and commit-feedback unit coverage.</text>
+</svg></div><figcaption>Figure 1. Current structural boundaries. The core's controller and CSR file are the real instances inside <code>top</code>. Dashed boxes identify empty engineer hooks. Memory shells are deterministic placeholders, with functional memory behavior deferred.</figcaption></figure>
+<div class="legend"><span class="key">Structural connection in source</span><span class="key future">Deferred implementation</span></div>
+</section>
+
+<section id="flow">
+<div class="eyebrow">03 / Observation flow</div><h2>One snapshot, two independent recipients.</h2>
+<p>Pipeline activity and settled CSR state are sampled at separate phases. Each record is copied into separate queues, so the scheduler and scoreboard do not compete for a single mailbox entry.</p>
+<figure><div class="figurebox">
+<svg class="dg" viewBox="0 0 720 570" role="img" aria-labelledby="flowTitle flowDesc">
+<title id="flowTitle">Core event and coverage flow</title><desc id="flowDesc">A rising-edge pre-edge activity sample and a falling-edge CSR-state sample produce tagged records. The environment copies each record to separate scheduler and scoreboard mailboxes. The scheduler calls an empty attempt-coverage hook. The scoreboard consumes records but has no model or checks. Checked-result coverage is a deferred connection.</desc>
+<defs><marker id="futureArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#a34b06"/></marker></defs>
+<rect x="16" y="16" width="325" height="88" rx="8" class="box blue"/><text x="34" y="43" class="t">observe_cb · rising clock</text><text x="34" y="65" class="s">Pre-edge pipeline / request snapshot</text><text x="34" y="86" class="m">phase = PIPELINE_SAMPLE</text>
+<rect x="379" y="16" width="325" height="88" rx="8" class="box green"/><text x="397" y="43" class="t">state_cb · falling clock</text><text x="397" y="65" class="s">Settled CSR state after the prior rising edge</text><text x="397" y="86" class="m">phase = CSR_STATE_SAMPLE</text>
+<path d="M178 104V128H360V149" class="wire"/><path d="M542 104V128H360" fill="none" stroke="#2d56c8" stroke-width="1.8"/>
+<rect x="150" y="150" width="420" height="81" rx="8" class="box purple"/><text x="360" y="177" text-anchor="middle" class="t">corner_env.publish(record)</text><text x="360" y="199" text-anchor="middle" class="s">Preserve simultaneous activity flags and metadata</text><text x="360" y="220" text-anchor="middle" class="s">Allocate one independent object per recipient</text>
+<path d="M270 231V257H178V280" class="wire"/><path d="M450 231V257H542V280" class="wire"/>
+<rect x="16" y="281" width="325" height="47" rx="7" class="box"/><text x="178" y="310" text-anchor="middle" class="m">scheduler_observations mailbox</text>
+<rect x="379" y="281" width="325" height="47" rx="7" class="box"/><text x="542" y="310" text-anchor="middle" class="m">scoreboard_observations mailbox</text>
+<path d="M178 328V351" class="wire"/><path d="M542 328V351" class="wire"/>
+<rect x="16" y="352" width="325" height="75" rx="7" class="box purple"/><text x="34" y="379" class="t">event_scheduler.run()</text><text x="34" y="401" class="s">Consume → sample_attempt() empty hook</text><text x="34" y="418" class="tiny">Window scheduling and stimulus deferred</text>
+<rect x="379" y="352" width="325" height="75" rx="7" class="box purple"/><text x="397" y="379" class="t">trap_scoreboard.consume()</text><text x="397" y="401" class="s">Passive consumption; no checks performed</text><text x="397" y="418" class="tiny">Reference model and effects ledger deferred</text>
+<path d="M178 427V457" class="wire"/><path d="M542 427V457" class="planned"/>
+<rect x="16" y="458" width="325" height="82" rx="7" class="box future"/><text x="34" y="486" class="t">Attempt coverage hook</text><text x="34" y="508" class="s">No bins and no closure credit</text><text x="34" y="529" class="m">TODO(USER_COVERAGE)</text>
+<rect x="379" y="458" width="325" height="82" rx="7" class="box future"/><text x="397" y="486" class="t">Checked-result coverage hook</text><text x="397" y="508" class="s">Not called by the current skeleton</text><text x="397" y="529" class="m">TODO(USER_REF_MODEL / COVERAGE)</text>
+</svg></div><figcaption>Figure 2. Source-level event plumbing. Raw <code>valid_W</code>, non-exception retirement classification, trap/MRET flags, memory request, GPR/CSR write gates and metadata are retained separately. CSR-state records carry <code>mtvec</code>, <code>mepc</code>, <code>mip</code> and <code>mstatus</code>. These observations do not constitute an independent correctness check.</figcaption></figure>
+<div class="note"><p><strong>Reset-held behavior:</strong> the current lifecycle keeps reset asserted. The event publishers are gated by reset release, so they emit no functional records in the skeleton-only run. Starting the consumers and stopping them with sentinels establishes source plumbing; it does not exercise the functional event path.</p></div>
+</section>
+
+<section id="lifecycle">
+<div class="eyebrow">04 / Lifecycle</div><h2>A bounded incomplete run, ready for extension.</h2>
+<ol class="steps">
+<li><strong>Initialize deterministic inputs.</strong><span>Assert active-low reset and keep IRQ pins low. Construct the configuration and environment.</span></li>
+<li><strong>Start the empty test hook and passive consumers.</strong><span><code>corner_env.run()</code> calls configuration, then forks the scheduler, scoreboard consumer and selected test hook.</span></li>
+<li><strong>Keep reset asserted for three clock cycles.</strong><span>The memory shells remain placeholders. No program or architectural scenario runs.</span></li>
+<li><strong>Stop both mailbox consumers.</strong><span><code>stop()</code> sends a null sentinel to each queue and waits for both consumers to finish.</span></li>
+<li><strong>Report SKELETON/INCOMPLETE.</strong><span>No reference checks or coverage results exist. This lifecycle is described from code; simulation has not established its execution.</span></li>
+</ol>
+</section>
+
+<section id="ownership">
+<div class="eyebrow">05 / Engineer ownership</div><h2>The behavioral work remains yours.</h2>
+<div class="tbl"><table><colgroup><col style="width:24%"><col style="width:38%"><col style="width:38%"></colgroup><thead><tr><th>Extension point</th><th>Current source</th><th>Engineer contribution</th></tr></thead><tbody>
+<tr><td><code>USER_REF_MODEL</code></td><td>Scoreboard consumer and unit extension tasks exist; no reference behavior is encoded.</td><td>Design and sign off expected state, trap metadata, instruction order, side effects, replay and comparisons.</td></tr>
+<tr><td><code>USER_COVERAGE</code></td><td>Unit: five covergroups of 236 index bins, all sampled. Core: attempt/checked-result hooks exist, bins empty.</td><td>Review the unit bins, then define value/priority crosses, legal combinations, exclusions and the checked-result sampling contract for the core.</td></tr>
+<tr><td><code>USER_STIMULUS</code></td><td>Unit: five directed suites implemented. Core: no scenario, program or response schedule.</td><td>Supply core programs and IRQ/hazard schedules after the oracle and coverage design are reviewed; convert unit observation cases into checks.</td></tr>
+</tbody></table></div>
+<p>Once implemented, closure coverage should be credited only when the intended scenario occurred and its independent checks passed. Attempt coverage remains separate. Unit, core and existing IRQ coverage retain their own denominators.</p>
+<div class="note"><p><strong>Expected results still need decisions:</strong> interrupt handling during busy MUL/DIV; gating-CSR writes versus IRQ acceptance; invalid CSR/encoding behavior; <code>mtval</code> policy; direct versus vectored mode; software/external IRQ scope; instruction access faults; and per-register port priority, especially MSIP. The skeleton chooses none of these policies.</p></div>
+</section>
+
+<section id="evidence">
+<div class="eyebrow">06 / Evidence boundary</div><h2>What is established, and what remains open.</h2>
+<div class="facts"><div class="fact"><b>31 / 31</b><span>CSR named ports matched</span></div><div class="fact"><b>21 / 21</b><span>Core named ports matched</span></div><div class="fact"><b>3 + 39</b><span>Filelist source paths exist</span></div><div class="fact"><b>552 / 0</b><span>Unit checks / failures (11 Nov)</span></div></div>
+<p>Static inspection compared named port connections, checked source paths and hierarchical probe references, and reviewed lifecycle, mailbox fanout and clocking declarations. The 11 November run added compilation, elaboration and execution evidence for both tops. Those checks establish structure and bench execution; they do not establish an approved contract or core-level behaviour.</p>
+<div class="tbl"><table><colgroup><col style="width:31%"><col style="width:21%"><col style="width:48%"></colgroup><thead><tr><th>Claim</th><th>Status</th><th>Evidence / remaining work</th></tr></thead><tbody>
+<tr><td>Skeleton implementation</td><td>Present</td><td>Two tops, interfaces, classes, probe, shells, assertion stub and independent filelists.</td></tr>
+<tr><td>Compilation / elaboration</td><td>Present (11 Nov)</td><td>Both filelists compile and elaborate in XSim 2022.2. Unit logs are warning-free; the core build keeps pre-existing RTL width warnings.</td></tr>
+<tr><td>Simulation / checking</td><td>Unit: checked · Core: none</td><td>Unit: 552 checks, 0 failures, 56 specification-pending cases, 8936 ns. Core: 30 ns reset-held, 0 checks, <code>SKELETON/INCOMPLETE</code>.</td></tr>
+<tr><td>Coverage closure</td><td>Observed bins only</td><td>236 of 236 unit index bins sampled; no value/priority crosses, no <code>c_*</code> bins, no coverage-database report (XCRG crashes locally).</td></tr>
+<tr><td>System validation / signoff</td><td class="pending">Not established</td><td>Requires additional evidence beyond this core/unit bench and the relevant approvals.</td></tr>
+</tbody></table></div>
+<p class="meta">The instruction shell's asynchronous NOP and the data shell's zero-data/no-stall/no-error ties are placeholders. They establish neither SRAM timing nor access completion, error handling or memory side effects. The assertion extension module contains no checking properties.</p>
+</section>
+
+<section id="review">
+<div class="eyebrow">07 / Review route</div><h2>Read the connections before defining behavior.</h2>
+<ol class="pathlist">
+<li><a href="../status/CSR_TRAP_VERIFICATION_STATUS.md">Status and evidence record</a> — current results, bin and stimulus contents, integrity checks and open decisions.</li>
+<li><a href="../plans/CSR_TRAP_CORNER_TESTPLAN.md">Test plan</a> — architecture in section 9; current skeleton scope and ownership in section 10.</li>
+<li><a href="../../infrastructure/tb/tb_csr_corner_unit.sv">CSR unit top</a> and <a href="../../infrastructure/tb/csr_trap/csr_corner_if.sv">CSR interface</a> — raw ports, sample phases and the five directed suites.</li>
+<li><a href="../../infrastructure/tb/tb_core_csr_trap.sv">Core top</a> and <a href="../../infrastructure/tb/csr_trap/core_corner_if.sv">core interface</a> — DUT wiring, probe, publishers and lifecycle.</li>
+<li><a href="../../infrastructure/tb/csr_trap/csr_trap_types_pkg.sv">Types package</a> and <a href="../../infrastructure/tb/csr_trap/csr_trap_env_pkg.sv">environment package</a> — record format, class handles, queues and extension methods.</li>
+<li><a href="../../infrastructure/tb/csr_trap/README.md">Skeleton README</a> — run commands, results and remaining limitations.</li>
+</ol>
+<p><strong>Next reviewed milestone:</strong> decide the trap/MRET-versus-write priorities, convert the 56 observation cases into checks, then build the core ECALL/younger-store scenario. That milestone remains planned.</p>
+</section>
+<footer class="footer">RISCFORGE 1TOPS · CSR / trap verification architecture · Source documentation 2026-11-04; results update 2026-11-11.<br>Use the browser's Print / Save PDF function for A4 output. Diagram arrows show connections and intended observation flow, not measured execution.</footer>
+</main>
+<script>
+window.addEventListener('load',()=>{
+  const root=document.documentElement;
+  const overflow=root.scrollWidth>root.clientWidth+1;
+  console.log(JSON.stringify({document:'CSR_TRAP_TESTBENCH_ARCHITECTURE',width:root.clientWidth,horizontalOverflow:overflow,figures:document.querySelectorAll('figure').length,goal:!!document.querySelector('#goal'),status:'UNIT_BENCH_IMPLEMENTED_CORE_SKELETON'}));
+});
+</script>
+</body>
+</html>

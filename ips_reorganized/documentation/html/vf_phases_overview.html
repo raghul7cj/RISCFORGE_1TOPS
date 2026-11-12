@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification Phases Overview</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+svg .cp{fill:none;stroke:var(--accent);stroke-width:3.4;marker-end:url(#arr-cp)}
+svg .arrowhead-cp{fill:var(--accent)}
+svg .crit{stroke:var(--accent);stroke-width:2.8}
+svg .bdg{font-size:10px;fill:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan Rev B / Phases overview</span></div>
+<div class="wrap">
+
+<h1>Verification phases overview</h1>
+<p class="lead">How Rev B section 21 organises the SoC verification effort: two kinds of obligation, the core-trust condition, the phase register P0 to P6, the parallel formal track F, the dependency graph with its critical path, the decision cutoffs and the RTL freeze policy. Read this page first; the stage pages elaborate each phase.</p>
+<p class="meta">Scope: plan structure plus current status as of the tracker snapshot of 2026-10-31. Does not restate gate predicates (see <a href="vf_regression_gates.html">regression and gates</a>). | Sources: Rev B sections 6.1, 20.1, 21; <code>Verification/status/PHASE_STATUS.md</code>; <code>Verification/status/build_tracker.py</code>; stage briefs | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Reading rule.</b> Everything in the phase register is <span class="tag specified">SPECIFIED</span>: Rev B states the intended structure and no phase has completed. Only P0 has started. Effort figures are planning estimates, <code>ASSUMED(D-GR01)</code>, not measurements, and no calendar date exists because start date and team size are TBD (D-GR02, D-GR03).</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Two obligation classes</a></li>
+<li><a href="#s2">Core trust CT-1 to CT-5</a></li>
+<li><a href="#s3">Phase register</a></li>
+<li><a href="#s4">Dependency graph and critical path</a></li>
+<li><a href="#s5">Phase lanes</a></li>
+<li><a href="#s6">Entry criteria by phase</a></li>
+<li><a href="#s7">Decision cutoffs DC-1 and DC-2</a></li>
+<li><a href="#s8">Effort derivation and uncertainty</a></li>
+<li><a href="#s9">RTL freeze point F and re-run policy</a></li>
+<li><a href="#s10">Naming crosswalk</a></li>
+<li><a href="#s11">Current status</a></li>
+</ol></div>
+
+<h2 id="s1">1. Two obligation classes</h2>
+<p>Rev A used one word for two different things. Rev B separates them (Rev B 21.1). A <b>gate verdict</b> is stamped against one candidate RTL identity and is defined only in the gate register, Table 6.1. A <b>phase-entry condition</b> is a predicate over evidence that must hold before a named phase may start. It is never stamped, never appears in a gate verdict, and has one effect: it blocks entry.</p>
+<p>The split exists because decision D-23 forbids any per-run gate from depending on formal or compliance. Core trust has to precede many phases, so it is expressed as an entry condition, not as a gate.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Class</th><th>Unit</th><th>Registered in</th><th>Effect of failure</th><th>Can block entry to another phase?</th></tr></thead>
+<tbody>
+<tr><td>Gate verdict</td><td>One gate at one candidate RTL identity</td><td>Table 6.1 (canonical)</td><td>Gate is fail, or untested if it cannot be evaluated</td><td>No</td></tr>
+<tr><td>Phase-entry condition</td><td>One named condition on one named phase</td><td>Table 21.4</td><td>The phase does not start; completed work is unaffected</td><td>Yes, this is its only function</td></tr>
+<tr><td>Change-control condition</td><td>One RTL change after freeze</td><td>Table 21.12</td><td>Change refused, or accepted with a change note and the mandated re-run</td><td>Yes, for the phases the re-run touches</td></tr>
+</tbody></table></div>
+<p class="meta">Source: Rev B Table 21.1. Gate tiers (Rev B Table 6.1): per-run G0, G1, G3; per-candidate G2, G4, G6; release G5, stamped once in P6.</p>
+
+<h2 id="s2">2. Core trust CT-1 to CT-5</h2>
+<p>Every firmware-observable result runs on the core, and every peripheral checker compares the DUT with models that also execute on that core. A core defect would therefore corrupt all results in the same direction without any checker noticing. Rev B makes core trust a precondition of the later phases instead of a deliverable of one (Rev B 21.2). Details and execution proposals are on <a href="vf_p1a_core_trust.html">P1a Core trust</a>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Component</th><th>Measurable predicate (summary)</th><th>Owner role</th></tr></thead>
+<tbody>
+<tr><td>CT-1</td><td>Compliance</td><td><code>applicable_failed + applicable_not_run == 0</code> over the 69 applicable tests (of 162 present); 93 out-of-scope tests recorded with a reason</td><td>Compliance owner</td></tr>
+<tr><td>CT-2</td><td>Core lock-step</td><td><code>mismatched_retire_events == 0</code> and retired count equals the ISS count over the applicable image set</td><td>Block checker owner (core)</td></tr>
+<tr><td>CT-3</td><td>Core structural assertions</td><td>Every bound core check ID has <code>negative_case_pass</code> or <code>vacuity_proved</code>, and <code>antecedent_satisfied_count &gt;= 1</code></td><td>Block checker owner (core)</td></tr>
+<tr><td>CT-4</td><td>Core formal goals</td><td>Every core critical-path goal proved, waived, or converted; <code>open_critical_formal_goals == 0</code></td><td>Formal owner</td></tr>
+<tr><td>CT-5</td><td>Boot entry</td><td>One cold-boot and one warm-boot scenario each reach <code>S_DONE</code> with attestation words and AXI beats greater than zero</td><td>Partition owner (boot)</td></tr>
+</tbody></table></div>
+<p>CT-1 to CT-5 are the exit evidence of P1a and the entry condition of P2, P3.1 to P3.4, P4.1 to P4.5, track F and P6 (Rev B 21.2). They are not stamped as G5; G5 is stamped once, in P6. The stated cost is that core work comes first, so peripheral teams wait longer in exchange for no peripheral result being invalidated by a late core defect.</p>
+
+<h2 id="s3">3. Phase register</h2>
+<p>P0 to P6 keep their identifiers. P1 splits into P1a and P1b; P3 and P4 decompose into four and five sub-phases. A sub-phase identifier is never written without its parent, and a parent's gate is the conjunction of its sub-phase exits (Rev B 21.3). Track F is deliberately outside the P0 to P6 scale: numbering it as a phase would give it a predecessor and a successor, which is the defect Rev B removes.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Phase</th><th>Name and content</th><th>Gates stamped at exit</th><th>Planning effort, ED (ASSUMED)</th><th>Status 2026-10-31</th><th>Page</th></tr></thead>
+<tbody>
+<tr><td>P0</td><td>Bring-up: one reproducible run end to end, identity recorded, nothing else claimed</td><td>G0, G1</td><td>8 to 14</td><td>IN PROGRESS; 13 of 20 exit criteria met</td><td><a href="vf_p0_bringup.html">P0</a></td></tr>
+<tr><td>P1a</td><td>Core trust: CT-1 to CT-5</td><td>G0, G1 (at P1 exit)</td><td>15 to 30</td><td>NOT STARTED</td><td><a href="vf_p1a_core_trust.html">P1a</a></td></tr>
+<tr><td>P1b</td><td>SoC structural: MMIO path bound, per-slot tap, single reporter</td><td>G0, G1, G3 on MMIO-path partition</td><td>10 to 20</td><td>NOT STARTED</td><td><a href="vf_p1b_soc_structural.html">P1b</a></td></tr>
+<tr><td>P2</td><td>Model completion: register model for 6 APB instances, device VIPs, attestation cross-check</td><td>G3</td><td>25 to 45</td><td>NOT STARTED</td><td><a href="vf_p2_models.html">P2</a></td></tr>
+<tr><td>P3.1 / 3.2 / 3.3 / 3.4</td><td>Reset and clock; interrupts; fabric and bridge; firmware-oracle integration</td><td>G3 (at P3 exit)</td><td>12 to 22; 15 to 28; 10 to 18; 8 to 15</td><td>NOT STARTED</td><td><a href="vf_p3_architectural.html">P3</a></td></tr>
+<tr><td>P4.1 to P4.5</td><td>Coverage model; checker viability; generated traceability; candidate-scale regression; compliance re-run at candidate</td><td>G2, G4, G6 (at P4 exit)</td><td>12 to 24; 10 to 20; 5 to 10; 8 to 16; 3 to 6</td><td>NOT STARTED</td><td><a href="vf_p4_closure.html">P4</a></td></tr>
+<tr><td>F</td><td>Formal track (parallel): property register, covers, proofs, vacuity, triage</td><td>none; input to G5</td><td>30 to 60, overlapped</td><td>NOT STARTED (a JasperGold superlint run exists)</td><td><a href="vf_track_f.html">Track F</a></td></tr>
+<tr><td>P5</td><td>Campaign convergence and soak</td><td>none; feeds G4 and G5</td><td>10 to 20</td><td>NOT STARTED</td><td><a href="vf_p5_soak.html">P5</a></td></tr>
+<tr><td>P6</td><td>Release: G5 stamped once on the frozen manifest; sign-off statement</td><td>G5 (release)</td><td>5 to 10</td><td>NOT STARTED</td><td><a href="vf_p6_release.html">P6</a></td></tr>
+</tbody></table></div>
+<p class="meta">Source: Rev B Table 21.3; status column from <code>PHASE_STATUS.md</code>. Summing the effort column gives total effort, not elapsed time, because track F overlaps P1b, P2 and P3. Sign-off context: <a href="vf_signoff.html">sign-off</a>.</p>
+
+<h2 id="s4">4. Dependency graph and critical path</h2>
+<p>Figure 1 draws Rev B Table 21.7. Each numbered edge carries the evidence that justifies it; the numbers match the edge table at the end of this section. Heavy blue edges are the critical path Rev B names; thin edges are the others. Track F is a swimlane above the spine because it is not a phase.</p>
+
+<figure>
+<svg viewBox="0 0 1040 600" role="img" aria-label="Phase dependency graph: spine P0, P1a, P1b, P2, P3 group, P4.1 to P4.4, P5, P6, with track F as a swimlane above and the critical path in heavy blue">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+  <marker id="arr-cp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-cp"/></marker>
+</defs>
+<rect class="lane" x="8" y="16" width="1024" height="112" rx="8"/>
+<text class="tb" x="24" y="36">Track F (parallel swimlane, not a phase)</text>
+<rect class="bx-ver" x="104" y="56" width="400" height="48" rx="6"/>
+<text class="tb mid" x="304" y="76">Track F: property register, proofs, vacuity, triage</text>
+<text class="ts mid" x="304" y="94">FAB-1 to FAB-4; core goals enter at P1a exit</text>
+<rect class="bx-ver" x="908" y="56" width="80" height="48" rx="6"/>
+<text class="tb mid" x="948" y="76">F exit</text>
+<text class="ts mid" x="948" y="94">goals closed</text>
+<path class="ar-d" d="M504 80 H908"/>
+<text class="ts mid" x="706" y="72">proof runs, triage, register frozen</text>
+
+<rect class="bx-core crit" x="16" y="216" width="64" height="40" rx="6"/>
+<text class="tb mid" x="48" y="233">P0</text><text class="ts mid" x="48" y="248">Bring-up</text>
+<rect class="bx-core crit" x="104" y="216" width="64" height="40" rx="6"/>
+<text class="tb mid" x="136" y="233">P1a</text><text class="ts mid" x="136" y="248">Core trust</text>
+<rect class="bx-core crit" x="192" y="216" width="64" height="40" rx="6"/>
+<text class="tb mid" x="224" y="233">P1b</text><text class="ts mid" x="224" y="248">Structural</text>
+<rect class="bx-core crit" x="320" y="216" width="64" height="40" rx="6"/>
+<text class="tb mid" x="352" y="233">P2</text><text class="ts mid" x="352" y="248">Models</text>
+
+<rect class="grp" x="420" y="264" width="112" height="268" rx="8"/>
+<text class="ts mid" x="476" y="280">P3 architectural</text>
+<rect class="bx-bus" x="432" y="292" width="88" height="40" rx="6"/>
+<text class="tb mid" x="476" y="309">P3.4</text><text class="ts mid" x="476" y="324">FW oracle</text>
+<rect class="bx-bus" x="432" y="364" width="88" height="40" rx="6"/>
+<text class="tb mid" x="476" y="381">P3.1</text><text class="ts mid" x="476" y="396">Reset, clock</text>
+<rect class="bx-bus" x="432" y="420" width="88" height="40" rx="6"/>
+<text class="tb mid" x="476" y="437">P3.2</text><text class="ts mid" x="476" y="452">Interrupts</text>
+<rect class="bx-bus" x="432" y="476" width="88" height="40" rx="6"/>
+<text class="tb mid" x="476" y="493">P3.3</text><text class="ts mid" x="476" y="508">Fabric, bridge</text>
+
+<rect class="bx-mem crit" x="572" y="216" width="80" height="40" rx="6"/>
+<text class="tb mid" x="612" y="233">P4.1</text><text class="ts mid" x="612" y="248">Coverage</text>
+<rect class="bx-mem crit" x="684" y="216" width="80" height="40" rx="6"/>
+<text class="tb mid" x="724" y="233">P4.2</text><text class="ts mid" x="724" y="248">Viability</text>
+<rect class="bx-mem" x="796" y="216" width="80" height="40" rx="6"/>
+<text class="tb mid" x="836" y="233">P4.3</text><text class="ts mid" x="836" y="248">Traceability</text>
+<rect class="bx-mem crit" x="908" y="216" width="80" height="40" rx="6"/>
+<text class="tb mid" x="948" y="233">P4.4</text><text class="ts mid" x="948" y="248">Candidate</text>
+<rect class="bx-ext" x="780" y="336" width="96" height="40" rx="6"/>
+<text class="tb mid" x="828" y="353">P4.5</text><text class="ts mid" x="828" y="368">no edge listed</text>
+<rect class="bx-ctrl crit" x="908" y="336" width="80" height="40" rx="6"/>
+<text class="tb mid" x="948" y="353">P5</text><text class="ts mid" x="948" y="368">Soak</text>
+<rect class="bx-ctrl crit" x="908" y="424" width="80" height="40" rx="6"/>
+<text class="tb mid" x="948" y="441">P6</text><text class="ts mid" x="948" y="456">Release</text>
+
+<path class="cp" d="M80 236 H104"/>
+<path class="cp" d="M168 236 H192"/>
+<path class="cp" d="M256 236 H320"/>
+<path class="cp" d="M384 236 H572"/>
+<path class="cp" d="M652 236 H684"/>
+<path class="ar" d="M764 236 H796"/>
+<path class="ar" d="M876 236 H908"/>
+<path class="cp" d="M724 216 V188 H932 V216"/>
+<path class="cp" d="M948 256 V336"/>
+<path class="cp" d="M988 80 H1016 V356 H988"/>
+<path class="cp" d="M948 376 V424"/>
+<path class="ar" d="M136 216 V104"/>
+<path class="ar" d="M224 216 V104"/>
+<path class="ar" d="M352 216 V104"/>
+<path class="ar" d="M964 216 V104"/>
+<path class="ar" d="M352 256 V312 H432"/>
+<path class="ar" d="M224 256 V384 H432"/>
+<path class="ln" d="M400 384 V496"/>
+<path class="ar" d="M400 440 H432"/>
+<path class="ar" d="M400 496 H432"/>
+<path class="ln" d="M520 312 H556"/>
+<path class="ln" d="M520 384 H556"/>
+<path class="ln" d="M520 440 H556"/>
+<path class="ln" d="M520 496 H556"/>
+<path class="ln" d="M556 496 V236"/>
+
+<text class="ts mid" x="48" y="276">1: no predecessor</text>
+<text class="bdg mid" x="92" y="228">2</text>
+<text class="bdg mid" x="180" y="228">3</text>
+<text class="bdg mid" x="288" y="228">5</text>
+<text class="bdg mid" x="470" y="228">12</text>
+<text class="bdg mid" x="668" y="228">14</text>
+<text class="bdg mid" x="780" y="228">15</text>
+<text class="bdg mid" x="892" y="228">16</text>
+<text class="bdg mid" x="828" y="182">16</text>
+<text class="bdg" x="142" y="170">4</text>
+<text class="bdg" x="230" y="170">9</text>
+<text class="bdg" x="358" y="170">11</text>
+<text class="bdg" x="970" y="170">17</text>
+<text class="bdg" x="954" y="300">18</text>
+<text class="bdg mid" x="1002" y="230">19</text>
+<text class="bdg" x="954" y="404">20</text>
+<text class="bdg" x="372" y="306">10</text>
+<text class="bdg" x="408" y="378">6</text>
+<text class="bdg" x="410" y="434">7</text>
+<text class="bdg" x="410" y="490">8</text>
+<text class="bdg" x="530" y="306">13</text>
+
+<path class="ln crit" d="M24 566 H64"/>
+<text class="ts" x="72" y="570">critical-path edge (Rev B 21.5)</text>
+<path class="ln" d="M312 566 H352"/>
+<text class="ts" x="360" y="570">other edge; number = row in the edge table</text>
+<rect class="bx-ext" x="700" y="558" width="24" height="16" rx="3"/>
+<text class="ts" x="732" y="570">vertex with no edge in Table 21.7</text>
+</svg>
+<figcaption><b>Figure 1.</b> Phase dependency graph (Rev B Table 21.7). The heavy path is P0, P1a, P1b, P2, P4.1, P4.2, P4.4, P5, P6, plus the single track-F edge F exit to P5. P3.1 to P3.3 hang off P1b, P3.4 off P2, and all four rejoin at P4.1, so only P2 shortens the plan. P4.5 appears in the phase register but has no row in Table 21.7 (a Rev B gap, DEF-011). The thin P4.3 branch is parallel to the direct P4.2 to P4.4 edge Rev B names; edge 16 covers both.</figcaption>
+</figure>
+
+<h3>Critical path, as Rev B states it</h3>
+<ul>
+<li>The longest chain runs through the register model P2, not the architectural checks: P3.1 to P3.3 rejoin at P4.1, so shortening one does not shorten the plan. P2 is also the widest phase (25 to 45 ED).</li>
+<li>Track F is on the critical path for exactly one edge, F exit to P5. Entering F at P1a gives it slack equal to all of P1b, P2, P3 and P4; entering later removes that slack.</li>
+<li>P6 has no alternative predecessor. P5 can only be compressed by running more campaign partitions in parallel, a capacity decision.</li>
+</ul>
+<p class="warn"><b>Observation, <span class="tag open">OPEN</span>.</b> Rev B's text names P4.2 to P4.4 directly, but edge 16 also lists P4.3 as a predecessor of P4.4 and edge 15 puts P4.3 after P4.2. The chain through P4.3 is therefore at least as long as the direct one. Figure 1 follows Rev B's wording; the discrepancy does not change the conclusions above.</p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>From</th><th>To</th><th>Successor may not do before predecessor</th><th>Evidence justifying the edge</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>(none)</td><td>P0</td><td>nothing precedes P0</td><td>G1 is decidable only from a run's own artefacts, so one run must exist first</td></tr>
+<tr><td>2</td><td>P0</td><td>P1a</td><td>elaborate and grade the core</td><td>ID-1 and ID-2 are properties of the tree, measured before elaboration</td></tr>
+<tr><td>3</td><td>P1a</td><td>P1b</td><td>bind SoC-level checkers</td><td>CT-1 to CT-5; a SoC checker graded against a failing core cannot separate core from fabric defects (finding 50)</td></tr>
+<tr><td>4</td><td>P1a</td><td>F</td><td>encode core property register</td><td>CT-4; a counterexample must be separable from a compliance failure</td></tr>
+<tr><td>5</td><td>P1b</td><td>P2</td><td>build the register model</td><td>model identities decode from the filelist RTL; ID-1/ID-3</td></tr>
+<tr><td>6</td><td>P1b</td><td>P3.1</td><td>build reset and clock checks</td><td>reset chains cross the boundary the fabric checks observe</td></tr>
+<tr><td>7</td><td>P1b</td><td>P3.2</td><td>build the interrupt model</td><td>as 6, plus <code>irq_arbiter.v:150</code> caps nesting at 2</td></tr>
+<tr><td>8</td><td>P1b</td><td>P3.3</td><td>build fabric checks</td><td>as edge 5</td></tr>
+<tr><td>9</td><td>P1b</td><td>F</td><td>encode peripheral and fabric goals</td><td>as edge 4</td></tr>
+<tr><td>10</td><td>P2</td><td>P3.4</td><td>integrate the firmware oracle</td><td>without device models the attestation word is an unfalsifiable self-report</td></tr>
+<tr><td>11</td><td>P2</td><td>F</td><td>encode device-model properties</td><td>as edge 4</td></tr>
+<tr><td>12</td><td>P2</td><td>P4.1</td><td>declare coverage bins</td><td>Table 10.2: every bin has an owning family; for a device that is the device model</td></tr>
+<tr><td>13</td><td>P3.1 to P3.4</td><td>P4.1</td><td>declare coverage bins</td><td>as edge 12 (four edges)</td></tr>
+<tr><td>14</td><td>P4.1</td><td>P4.2</td><td>open the viability ledger</td><td>G2 is stated over check IDs, which must be bound first</td></tr>
+<tr><td>15</td><td>P4.2</td><td>P4.3</td><td>generate the traceability matrix</td><td>G6 counts orphans; a matrix before the ledger counts every check as orphan</td></tr>
+<tr><td>16</td><td>P4.2, P4.3</td><td>P4.4</td><td>declare a candidate</td><td>a manifest frozen before G2 and G6 are decidable freezes an unknown (two edges)</td></tr>
+<tr><td>17</td><td>P4.4</td><td>F exit</td><td>formal may not close</td><td>converted goals are check IDs; the registry is complete at P4.3</td></tr>
+<tr><td>18</td><td>P4.4</td><td>P5</td><td>start the campaign</td><td>Table 6.5 is evaluated over the candidate's own seeds</td></tr>
+<tr><td>19</td><td>F exit</td><td>P5</td><td>start the campaign</td><td><code>open_critical_formal_goals == 0</code>; deferring to P6 reintroduces Rev A's edge</td></tr>
+<tr><td>20</td><td>P5</td><td>P6</td><td>stamp G5</td><td>Table 6.5 must be converged; G5 is stamped once on the frozen manifest</td></tr>
+</tbody></table></div>
+<p class="meta">Source: Rev B Table 21.7. Rev B says 21 vertices and 20 edges; the table has 20 rows that expand to 24 individual arrows because rows 13 and 16 group several predecessors.</p>
+
+<h2 id="s5">5. Phase lanes</h2>
+<p>Figure 2 arranges the same phases in precedence waves. A wave is the earliest slot a phase can start once its predecessors have finished; the columns carry no duration and no date. Bars show the ASSUMED effort range. Pills at the bottom mark where gates are stamped and where decisions fall due.</p>
+<figure>
+<svg viewBox="0 0 1040 440" role="img" aria-label="Phase lanes in precedence waves w0 to w10 with spine, P3 branch, track F, gate stamps and decision cutoffs">
+<text class="ts mid" x="168" y="26">w0</text><text class="ts mid" x="248" y="26">w1</text><text class="ts mid" x="328" y="26">w2</text><text class="ts mid" x="408" y="26">w3</text><text class="ts mid" x="488" y="26">w4</text><text class="ts mid" x="568" y="26">w5</text><text class="ts mid" x="648" y="26">w6</text><text class="ts mid" x="728" y="26">w7</text><text class="ts mid" x="808" y="26">w8</text><text class="ts mid" x="888" y="26">w9</text><text class="ts mid" x="968" y="26">w10</text>
+<rect class="lane" x="8" y="36" width="1024" height="96" rx="6"/>
+<rect class="lane" x="8" y="140" width="1024" height="128" rx="6"/>
+<rect class="lane" x="8" y="276" width="1024" height="56" rx="6"/>
+<rect class="lane" x="8" y="340" width="1024" height="88" rx="6"/>
+<path class="grp" d="M128 34 V428"/><path class="grp" d="M208 34 V428"/><path class="grp" d="M288 34 V428"/><path class="grp" d="M368 34 V428"/><path class="grp" d="M448 34 V428"/><path class="grp" d="M528 34 V428"/><path class="grp" d="M608 34 V428"/><path class="grp" d="M688 34 V428"/><path class="grp" d="M768 34 V428"/><path class="grp" d="M848 34 V428"/><path class="grp" d="M928 34 V428"/><path class="grp" d="M1008 34 V428"/>
+<text class="tb" x="16" y="60">Spine</text>
+<text class="tb" x="16" y="164">P3 branch</text>
+<text class="tb" x="16" y="300">Track F</text>
+<text class="tb" x="16" y="368">Gates</text>
+<text class="tb" x="16" y="404">Decisions</text>
+
+<rect class="bx-core" x="132" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="168" y="58">P0</text><text class="ts mid" x="168" y="72">8 to 14 ED</text>
+<rect class="bx-core" x="212" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="248" y="58">P1a</text><text class="ts mid" x="248" y="72">15 to 30 ED</text>
+<rect class="bx-core" x="292" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="328" y="58">P1b</text><text class="ts mid" x="328" y="72">10 to 20 ED</text>
+<rect class="bx-core" x="372" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="408" y="58">P2</text><text class="ts mid" x="408" y="72">25 to 45 ED</text>
+<rect class="bx-mem" x="532" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="568" y="58">P4.1</text><text class="ts mid" x="568" y="72">12 to 24 ED</text>
+<rect class="bx-mem" x="612" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="648" y="58">P4.2</text><text class="ts mid" x="648" y="72">10 to 20 ED</text>
+<rect class="bx-mem" x="692" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="728" y="58">P4.3</text><text class="ts mid" x="728" y="72">5 to 10 ED</text>
+<rect class="bx-mem" x="772" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="808" y="58">P4.4</text><text class="ts mid" x="808" y="72">8 to 16 ED</text>
+<rect class="bx-ext" x="772" y="88" width="72" height="34" rx="5"/><text class="tb mid" x="808" y="102">P4.5</text><text class="ts mid" x="808" y="116">3 to 6 ED</text>
+<rect class="bx-ctrl" x="852" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="888" y="58">P5</text><text class="ts mid" x="888" y="72">10 to 20 ED</text>
+<rect class="bx-ctrl" x="932" y="44" width="72" height="34" rx="5"/><text class="tb mid" x="968" y="58">P6</text><text class="ts mid" x="968" y="72">5 to 10 ED</text>
+
+<rect class="bx-bus" x="372" y="148" width="72" height="34" rx="5"/><text class="tb mid" x="408" y="162">P3.1</text><text class="ts mid" x="408" y="176">12 to 22 ED</text>
+<rect class="bx-bus" x="372" y="188" width="72" height="34" rx="5"/><text class="tb mid" x="408" y="202">P3.2</text><text class="ts mid" x="408" y="216">15 to 28 ED</text>
+<rect class="bx-bus" x="372" y="228" width="72" height="34" rx="5"/><text class="tb mid" x="408" y="242">P3.3</text><text class="ts mid" x="408" y="256">10 to 18 ED</text>
+<rect class="bx-bus" x="452" y="148" width="72" height="34" rx="5"/><text class="tb mid" x="488" y="162">P3.4</text><text class="ts mid" x="488" y="176">8 to 15 ED</text>
+
+<rect class="bx-ver" x="292" y="286" width="556" height="36" rx="5"/>
+<text class="tb mid" x="570" y="300">Track F: 30 to 60 ED, overlapped (ASSUMED)</text>
+<text class="ts mid" x="570" y="314">enters at P1a exit; exit required before P5 starts</text>
+
+<rect class="pill" x="180" y="348" width="56" height="24" rx="12"/><text class="t mid" x="208" y="364">G0, G1</text>
+<rect class="pill" x="326" y="348" width="84" height="24" rx="12"/><text class="t mid" x="368" y="364">G0, G1, G3</text>
+<rect class="pill" x="430" y="348" width="36" height="24" rx="12"/><text class="t mid" x="448" y="364">G3</text>
+<rect class="pill" x="510" y="348" width="36" height="24" rx="12"/><text class="t mid" x="528" y="364">G3</text>
+<rect class="pill" x="804" y="348" width="88" height="24" rx="12"/><text class="t mid" x="848" y="364">G2, G4, G6</text>
+<rect class="pill" x="990" y="348" width="36" height="24" rx="12"/><text class="t mid" x="1008" y="364">G5</text>
+<rect class="pill" x="186" y="384" width="44" height="24" rx="12"/><text class="t mid" x="208" y="400">DC-1</text>
+<rect class="pill" x="326" y="384" width="84" height="24" rx="12"/><text class="t mid" x="368" y="400">F declared</text>
+<rect class="pill" x="426" y="384" width="44" height="24" rx="12"/><text class="t mid" x="448" y="400">DC-2</text>
+</svg>
+<figcaption><b>Figure 2.</b> Phases in precedence waves (not calendar time). P3.1 to P3.3 run beside P2 in wave 3; P3.4 needs P2 so it falls in wave 4, and P4.1 waits for it in wave 5. Track F spans waves 2 to 8. Each gate pill sits on the boundary where its phase exits; P4.5 is shown beside P4.4 by assumption, because Rev B gives it no dependency row.</figcaption>
+</figure>
+
+<h2 id="s6">6. Entry criteria by phase</h2>
+<p>Each row of Rev B Table 21.4 is a conjunction evaluated at one named RTL identity, recorded in the phase record. Figure 3 shows what blocks each entry. Two kinds of condition appear: phase-specific ones, and five standing separation-of-duty predicates (SD-1, SD-2, SD-5, SD-6, SD-7) that are re-evaluated at every entry.</p>
+<figure>
+<svg viewBox="0 0 1040 324" role="img" aria-label="Entry gating: standing separation-of-duty checks over every phase, and the specific conditions that must hold before each phase starts">
+<defs>
+  <marker id="g-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-ctrl" x="8" y="16" width="1024" height="36" rx="6"/>
+<text class="tb mid" x="520" y="38">Standing at every entry: SD-1, SD-2, SD-5, SD-6, SD-7 re-evaluated; a non-zero count blocks that entry</text>
+
+<rect class="bx-core" x="22" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="72" y="93">P0</text><text class="ts mid" x="72" y="108">Bring-up</text>
+<rect class="bx-core" x="150" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="200" y="93">P1a</text><text class="ts mid" x="200" y="108">Core trust</text>
+<rect class="bx-core" x="278" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="328" y="93">P1b</text><text class="ts mid" x="328" y="108">SoC structural</text>
+<rect class="bx-core" x="406" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="456" y="93">P2</text><text class="ts mid" x="456" y="108">Models</text>
+<rect class="bx-bus" x="534" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="584" y="93">P3</text><text class="ts mid" x="584" y="108">Architectural</text>
+<rect class="bx-mem" x="662" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="712" y="93">P4</text><text class="ts mid" x="712" y="108">Closure</text>
+<rect class="bx-ctrl" x="790" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="840" y="93">P5</text><text class="ts mid" x="840" y="108">Soak</text>
+<rect class="bx-ctrl" x="918" y="76" width="100" height="40" rx="6"/><text class="tb mid" x="968" y="93">P6</text><text class="ts mid" x="968" y="108">Release</text>
+<path class="ar" d="M122 96 H150"/><path class="ar" d="M250 96 H278"/><path class="ar" d="M378 96 H406"/><path class="ar" d="M506 96 H534"/><path class="ar" d="M634 96 H662"/><path class="ar" d="M762 96 H790"/><path class="ar" d="M890 96 H918"/>
+
+<rect class="bx" x="20" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="72" y="158">none</text><text class="ts mid" x="72" y="172">record H_rtl and</text><text class="ts mid" x="72" y="186">ID-1/2/3 before</text><text class="ts mid" x="72" y="200">the first run</text>
+<rect class="bx" x="148" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="200" y="158">P0 exit met</text><text class="ts mid" x="200" y="172">ID-1 = 0</text><text class="ts mid" x="200" y="186">ID-2 = 0</text><text class="ts mid" x="200" y="200">DC-1 recorded</text><text class="ts mid" x="200" y="214">arbitrator: SD-9</text>
+<rect class="bx" x="276" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="328" y="158">CT-1 to CT-5 met</text><text class="ts mid" x="328" y="172">at the recorded</text><text class="ts mid" x="328" y="186">identity</text><text class="ts mid" x="328" y="200">authorship = 0</text><text class="ts mid" x="328" y="214">(core checks)</text>
+<rect class="bx" x="404" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="456" y="158">P1b exit met</text><text class="ts mid" x="456" y="172">register identity</text><text class="ts mid" x="456" y="186">count fixed by</text><text class="ts mid" x="456" y="200">generated header</text>
+<rect class="bx" x="532" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="584" y="158">P1b exit met</text><text class="ts mid" x="584" y="172">(3.1 to 3.3)</text><text class="ts mid" x="584" y="186">P3.4: P2 exit</text><text class="ts mid" x="584" y="200">and DC-2 (SD-9)</text><text class="ts mid" x="584" y="214">3.3: slot-4 rule</text>
+<rect class="bx" x="660" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="712" y="158">P2, P3.1-3.4 exits</text><text class="ts mid" x="712" y="172">4.2: SD-10 = 0</text><text class="ts mid" x="712" y="186">4.3: SD-3 = 0</text><text class="ts mid" x="712" y="200">4.4: F declared</text><text class="ts mid" x="712" y="214">4.5: no row (gap)</text>
+<rect class="bx" x="788" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="840" y="158">P4.1-4.5 exits</text><text class="ts mid" x="840" y="172">CT-1..5 re-met</text><text class="ts mid" x="840" y="186">F exit met</text><text class="ts mid" x="840" y="200">SD-2 = 0</text>
+<rect class="bx" x="916" y="140" width="104" height="96" rx="6"/>
+<text class="ts mid" x="968" y="158">P5 exit met</text><text class="ts mid" x="968" y="172">manifest hashed</text><text class="ts mid" x="968" y="186">waivers in date</text><text class="ts mid" x="968" y="200">no open S1</text><text class="ts mid" x="968" y="214">SD-8: 3 distinct</text>
+<path class="ar" d="M72 140 V116"/><path class="ar" d="M200 140 V116"/><path class="ar" d="M328 140 V116"/><path class="ar" d="M456 140 V116"/><path class="ar" d="M584 140 V116"/><path class="ar" d="M712 140 V116"/><path class="ar" d="M840 140 V116"/><path class="ar" d="M968 140 V116"/>
+
+<rect class="bx-ver" x="8" y="268" width="620" height="40" rx="6"/>
+<text class="tb mid" x="318" y="286">Track F entry</text>
+<text class="ts mid" x="318" y="300">P1a exit met for core goals; P1b and P2 exits for the rest (Rev B tables disagree)</text>
+<text class="ts" x="650" y="284">Entry conditions block a start. They are not gates</text>
+<text class="ts" x="650" y="300">and are never stamped or carried in a gate verdict.</text>
+</svg>
+<figcaption><b>Figure 3.</b> Phase-entry gating. The arrow from each condition card points up to the phase it blocks. The standing band applies to every card. Where Rev B Table 21.4 and Table 21.5 differ on when track F's non-core goals enter, both are shown (tracker item DEF-011).</figcaption>
+</figure>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Phase</th><th>Entry criteria (summary of Rev B Table 21.4)</th><th>Entry met today</th></tr></thead>
+<tbody>
+<tr><td>P0</td><td>None. Identity of the tree recorded before any run (Table 21.10).</td><td>YES</td></tr>
+<tr><td>P1a</td><td>P0 exit met; <code>unresolved_entries == 0</code> (ID-2); <code>duplicate_divergent_reachable == 0</code> (ID-1); DC-1 record naming an arbitrator who authored no affected check (SD-9; reported untested if the authorship register is absent).</td><td>NO</td></tr>
+<tr><td>P1b</td><td>CT-1 to CT-5 at the recorded identity; <code>authorship_conflicts == 0</code> for every core check bound in P1a. First phase where the authorship register exists.</td><td>NO</td></tr>
+<tr><td>P2</td><td>P1b exit met; register identity count fixed by the generated header (the header does not exist yet, D-08).</td><td>NO</td></tr>
+<tr><td>P3.1 to P3.4</td><td>P1b exit (P3.1 independent of P2). P3.2 also needs Table 13.1's six software-visible sources. P3.3 needs the slot-4 rule reflecting bootloader interposition. P3.4 needs P2 exit and a DC-2 record with an independent arbitrator.</td><td>NO</td></tr>
+<tr><td>P4.1 to P4.5</td><td>P4.1: P2 and P3.1 to P3.4 exits. P4.2: P4.1 exit and SD-10. P4.3: registries exist and SD-3. P4.4: P4.2, P4.3 exits and freeze point F declared. P4.5: <b>no row</b> in Table 21.4.</td><td>NO</td></tr>
+<tr><td>Track F</td><td>P1a exit for core goals; peripheral and fabric goals enter at P1b and P2 exits.</td><td>NO</td></tr>
+<tr><td>P5</td><td>P4.1 to P4.5 exits; CT-1 to CT-5 re-satisfied at the candidate; F exit; <code>waivers_with_requester_eq_approver == 0</code> (SD-2).</td><td>NO</td></tr>
+<tr><td>P6</td><td>P5 exit; manifest hashed; waivers in date; no open defect at S1 or above; three distinct signatories who fixed nothing in the candidate (SD-8).</td><td>NO</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Decision cutoffs DC-1 and DC-2</h2>
+<p>Design decisions need a deadline. One cutoff cannot be both late enough to be informed and early enough to be cheap, so Rev B sets two (Rev B Table 21.9). Silence is never recorded as agreement.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Aspect</th><th>DC-1, scope</th><th>DC-2, behaviour</th></tr></thead>
+<tbody>
+<tr><td>Decides</td><td>Which blocks are in the DUT for sign-off. Live cases: the CLIC (real RTL, instantiated nowhere) and the AON watchdog (not instantiated in the SoC).</td><td>Intended behaviour of blocks already in scope. Live cases: the 4 interrupt lines wired at the SoC but dropped at the core, SPI mode support, boot-image integrity (RTL has none).</td></tr>
+<tr><td>Cutoff</td><td>Exit of P0</td><td>Exit of P2</td></tr>
+<tr><td>Default if not taken</td><td>Block is out of scope; excluded from the sign-off denominator, with the reason in the sign-off statement and the risk register.</td><td>Today's RTL behaviour is the specification and the check is a pin oracle predicting it exactly.</td></tr>
+<tr><td>Arbiter</td><td colspan="2">Design owner. If the design owner authored an affected check, the project lead arbitrates. If neither is available within 5 working days, the default applies and is logged as <code>defaulted</code>.</td></tr>
+<tr><td>Status today</td><td><span class="tag open">OPEN</span> no decision record; <code>handoff.md</code> waives the AON block for FPGA only (P0-X1, ACT-008)</td><td><span class="tag open">OPEN</span> not yet due</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Effort derivation and uncertainty</h2>
+<p>The binding rule (Rev B Table 21.8) is <code>E(phase) = N_check x tau_check + N_scen x tau_scen + E_fixed</code>. The throughput constants tau_check and tau_scen are <code>TBD(D-GR01)</code>: the repository holds no measured verification throughput. The ranges in the phase register are therefore planning values built from three bases, in descending reliability: a direct count of checks, a ratio to a neighbouring phase, or an analogy.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Basis</th><th>Uncertainty band</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>Direct count</td><td>plus or minus 40%</td><td>Phase checks enumerated in a section the plan owns</td></tr>
+<tr><td>Ratio</td><td>plus or minus 55%</td><td>Scaled from a neighbouring phase's count</td></tr>
+<tr><td>Analogy</td><td>plus or minus 70%</td><td>Order of magnitude only; also used where volume depends on TBD(D-25)</td></tr>
+</tbody></table></div>
+<ul>
+<li>Phase band and volume band are united, not multiplied.</li>
+<li>tau_scen becomes a measurement at P0 exit (P0 runs and times scenarios); tau_check at P1a exit. Table 21.3 is then reissued. Tracker item P0-X2 is <b>NOT MET</b> today.</li>
+<li>Elapsed time equals the critical path length, which is <code>TBD(D-GR02)</code> pending a start date and a team size (<code>TBD(D-GR03)</code>). The only scheduling statement that needs no unknown is the sum rule: concurrent commitment never exceeds team size, checked by the project lead at each phase entry.</li>
+</ul>
+
+<h2 id="s9">9. RTL freeze point F and re-run policy</h2>
+<p>The freeze point F is declared at the exit of P1b (D-GR09). After F, RTL still changes, but every edit carries a change note naming files, change classes and the phases the re-run touches, and no gate verdict transfers across an identity change. There is no judgement about "significant" changes, which is what makes the rule enforceable. The identity is a SHA-256 over a manifest built from the non-comment entries of <code>RTL_SOC/soc_subsystem.f</code> (Table 21.10), because no git history exists to cite; the recipe and its use are on <a href="vf_p0_bringup.html">P0 Bring-up</a>.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Class</th><th>Files</th><th>Must be re-run</th><th>Not re-run</th></tr></thead>
+<tbody>
+<tr><td>A, core</td><td><code>riscv_core/rtl/</code> and the core filelist</td><td>CT-1, CT-2, CT-3 in full; critical formal goals; G0, G1, G3 on smoke; G2, G4, G6 re-derived on a fresh campaign</td><td>Peripheral suites whose devices and expected values did not change</td></tr>
+<tr><td>B, fabric, reset, boot</td><td>crossbar, APB bridge, bus monitors, SRAM mux, boot ROM, instruction demux, bootloader</td><td>P3.1 and P3.3 in full, 39 path-scoreboard rules, 7 timeout monitors, CT-5; candidate campaign restarts</td><td>CT-1 to CT-3 unless <code>core_rst_n</code> release timing changes</td></tr>
+<tr><td>C, peripheral</td><td>I2C, timer, UART, GPIO, SPI, AON</td><td>That device's suite and bins; ID-1 for its module namespace</td><td>CT-1 to CT-3 unless the interrupt path into <code>mip</code> changes</td></tr>
+<tr><td>D, harness</td><td>testbenches, VIPs, monitors, models, registry, filelists, generators</td><td>G0 only; re-review authorship</td><td>Every other gate, since H_rtl is unchanged</td></tr>
+<tr><td>X, hygiene</td><td>any filelist or file move</td><td>ID-1, ID-2, ID-3</td><td>Everything else</td></tr>
+</tbody></table></div>
+<p>Three precedence rules resolve overlaps: any change to <code>core_rst_n</code> release timing, to the <code>fast_irq_i</code> or <code>fast_intr_core</code> widths, or to <code>mip_w</code> is Class A whatever file carries it; Class X is additive; and the class map is generated from the traceability matrix once that exists (Rev B Table 21.12, D-GR10). A per-run gate is re-run whenever its run is re-run, a per-candidate gate is re-derived whenever the manifest changes, and G5 is re-stamped only in P6 (Rev B Table 21.13). See <a href="vf_regression_gates.html">regression and gates</a>.</p>
+
+<h2 id="s10">10. Naming crosswalk</h2>
+<p>Six numbering schemes are in use in the repository. Rev B phase names are authoritative (decision DEC-E); the stage briefs use Stage N = P(N-1). Suite names in <code>tests/suites</code> follow yet other numbers (defect DEF-010).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Rev B phase</th><th>Stage brief</th><th>Brief file</th></tr></thead>
+<tbody>
+<tr><td>P0 Bring-up</td><td>Stage 1</td><td><code>Verification/doc/briefs/stages/stage_1_brief.md</code></td></tr>
+<tr><td>P1a Core trust</td><td>Stage 2</td><td><code>stage_2_brief.md</code></td></tr>
+<tr><td>P1b SoC structural</td><td>Stage 3</td><td><code>stage_3_brief.md</code></td></tr>
+<tr><td>P2 Model completion</td><td>Stage 4</td><td>(stage_4_brief)</td></tr>
+<tr><td>P3 Architectural</td><td>Stage 5</td><td>(stage_5_brief)</td></tr>
+<tr><td>P4 Closure</td><td>Stage 6</td><td>(stage_6_brief)</td></tr>
+<tr><td>P5 Soak</td><td>Stage 7</td><td>(stage_7_brief)</td></tr>
+<tr><td>P6 Release</td><td>Stage 8</td><td>(stage_8_brief)</td></tr>
+<tr><td>Track F</td><td>formal_track_brief</td><td><code>formal_track_brief.md</code>, not a numbered stage</td></tr>
+</tbody></table></div>
+<p class="meta">Stage 4 to 8 briefs are named in the tracker; only the stage 1 to 3 and formal briefs were read for this page. Example collision: the suite <code>stage2_watchdog</code> is a P0-level negative proof, not brief Stage 2 (P1a).</p>
+
+<h2 id="s11">11. Current status</h2>
+<p>As of the tracker snapshot of 2026-10-31 (<code>PHASE_STATUS.md</code>): P0 is <b>IN PROGRESS</b>, entry met; the P0 exit checklist reads MET 13, PARTIAL 5, NOT MET 2 of 20. All other phases are NOT STARTED and none has its entry met. All seven gates are UNTESTED: no gate has a stamped verdict, because the first needs the P0 run package.</p>
+<ul>
+<li><b>Open defects:</b> DEF-001 (core load-use flush during MMIO stall; fixed in <code>hazard_unit.v</code> at line 192, unverified), DEF-005 (filelist hygiene), DEF-008, DEF-010, DEF-011 (Rev B errata, including the missing P4.5 entry row), DEF-012. DEF-004 (divergent <code>timer.sv</code>) is fixed and converged.</li>
+<li><b>Class A consequence:</b> the DEF-001 fix is a core change, so earlier core evidence is void and CT-1 to CT-3 must be produced at the final identity (see <a href="vf_p1a_core_trust.html">P1a</a>).</li>
+<li><b>Evidence limits:</b> verification evidence on this project is "PASS for a stated boundary", never a percentage of requirements. Tracker detail: <a href="tracker_status.html">tracker status</a>; terms: <a href="glossary.html">glossary</a>; index: <a href="index.html">home</a>.</li>
+</ul>
+<p>Related stage pages: <a href="vf_p2_models.html">P2</a>, <a href="vf_p3_architectural.html">P3</a>, <a href="vf_p4_closure.html">P4</a>, <a href="vf_track_f.html">track F</a>, <a href="vf_p5_soak.html">P5</a>, <a href="vf_p6_release.html">P6</a>, <a href="vf_signoff.html">sign-off</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B sections 6.1, 20.1, 21.1 to 21.8 (<code>documentation/html/_src/RevB_plan.txt</code>); <code>Verification/status/PHASE_STATUS.md</code>; <code>Verification/status/build_tracker.py</code>; <code>Verification/status/P0_EXECUTION_CONTRACT.md</code>; <code>Verification/doc/briefs/stages/stage_1_brief.md</code>, <code>stage_2_brief.md</code>, <code>stage_3_brief.md</code>, <code>formal_track_brief.md</code>; <code>goals/P0_bringup.md</code>; <code>riscv_core/rtl/hazard_unit.v:192</code>.</div>
+</div>
+</body>
+</html>

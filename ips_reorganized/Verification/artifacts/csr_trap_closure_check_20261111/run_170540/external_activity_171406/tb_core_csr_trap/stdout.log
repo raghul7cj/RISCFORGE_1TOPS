@@ -1,0 +1,62 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/tb_core_csr_trap_snapshot/xsim_script.tcl
+# xsim {tb_core_csr_trap_snapshot} -cov_db_dir C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/functional_db -cov_db_name tb_core_csr_trap -autoloadwcfg -tclbatch {C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/collect.tcl} -onfinish stop -onerror quit -sv_seed 1
+Time resolution is 1 ps
+source C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/collect.tcl
+## open_vcd {C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/external_activity_171406/activity.vcd}
+## set signal [get_objects {/tb_core_csr_trap/clk}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/clk"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/rst}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/rst"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/trap_commit_valid}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/trap_commit_valid"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/mret_commit}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/mret_commit"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/valid_W}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/valid_W"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/exc_valid_W}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/exc_valid_W"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/RegWriteW_gated}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/RegWriteW_gated"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/csr_write_en_W_gated}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/csr_write_en_W_gated"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/lsu_mem_req}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/lsu_mem_req"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/lsu_mem_we}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/lsu_mem_we"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/fast_irq_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/fast_irq_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/timer_irq_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/timer_irq_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/ext_irq_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/ext_irq_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_core_csr_trap/core/sw_irq_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_core_csr_trap/core/sw_irq_i"}
+## log_vcd $signal
+## run all
+Core corner environment: SKELETON/INCOMPLETE; checks=0; failures=0
+WARNING: The Functional Coverage Database has not been updated during simulation. Please recheck testbench to confirm that covergroups are being instantiated correctly and rerun simulation.
+$finish called at time : 30 ns : File "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/source_snapshot/ips/Verification/infrastructure/tb/tb_core_csr_trap.sv" Line 122
+## close_vcd
+## puts "ACTIVITY_CAPTURE_COMPLETE"
+ACTIVITY_CAPTURE_COMPLETE
+## quit
+INFO: [Common 17-206] Exiting xsim at Wed Nov 11 17:14:12 2026...

@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P4 Closure</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / P4 Closure</span></div>
+<div class="wrap">
+
+<h1>P4 Closure</h1>
+<p class="lead">P4 turns the checks built in P2 and P3 into candidate-level evidence: a coverage model, proof that each checker can report, a generated traceability matrix, a frozen candidate regression and a compliance re-run. Its exit stamps the three per-candidate gates G2, G4 and G6.</p>
+<p class="meta">Scope: P4.1 to P4.5 | Sources: Rev B sections 6, 10, 19, 20, 21; stage 6 brief; <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Status in one line.</b> <span class="tag open">OPEN</span> No P4 sub-phase has started and entry is not met. P0 is IN PROGRESS (13 of 20 criteria met; P0 exit not met). Related: <a href="vf_phases_overview.html">overview</a>, <a href="vf_p3_architectural.html">P3</a>, <a href="vf_track_f.html">track F</a>, <a href="vf_p5_soak.html">P5</a>, <a href="vf_regression_gates.html">regression gates</a>, <a href="vf_signoff.html">sign-off</a>, <a href="tracker_status.html">tracker</a>.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective and sub-phase flow</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">Exit criteria and gates</a></li>
+<li><a href="#s4">Work breakdown</a></li>
+<li><a href="#s5">Check families and rules</a></li>
+<li><a href="#s6">Inputs, outputs, dependencies</a></li>
+<li><a href="#s7">Effort and risks</a></li>
+<li><a href="#s8">Current status</a></li>
+<li><a href="#s9">Execution proposal</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective and sub-phase flow</h2>
+<p>The three per-candidate gates cannot be decided per commit; they consume artefacts that accumulate across a candidate's runs (Rev B Table 6.1). P4 builds those artefacts in a fixed order. Bins need checks to exist (P4.1). A viability record belongs to a bound check (P4.2). The traceability matrix would count every check as an orphan if it were generated before the ledger is populated (P4.3). A candidate cannot be frozen before G2 and G6 are decidable (P4.4). Compliance is re-run at the frozen identity (P4.5). Figure 1 shows the flow.</p>
+
+<figure>
+<svg viewBox="0 0 960 328" role="img" aria-label="P4 sub-phase flow: P4.1 coverage model to P4.2 checker viability to P4.3 traceability to P4.4 candidate regression to P4.5 compliance re-run, with gate labels and onward links to track F exit and P5">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<text class="ts" x="24" y="80">entry: P2 and P3.1 to P3.4 exits</text>
+<rect class="bx-ver" x="24" y="96" width="152" height="72" rx="6"/>
+<text class="tb mid" x="100" y="122">P4.1</text>
+<text class="ts mid" x="100" y="140">Coverage model</text>
+<text class="ts mid" x="100" y="154">12 to 24 ED</text>
+<rect class="bx-ver" x="216" y="96" width="152" height="72" rx="6"/>
+<text class="tb mid" x="292" y="122">P4.2</text>
+<text class="ts mid" x="292" y="140">Checker viability</text>
+<text class="ts mid" x="292" y="154">10 to 20 ED</text>
+<rect class="bx-ver" x="408" y="96" width="152" height="72" rx="6"/>
+<text class="tb mid" x="484" y="122">P4.3</text>
+<text class="ts mid" x="484" y="140">Generated traceability</text>
+<text class="ts mid" x="484" y="154">5 to 10 ED</text>
+<rect class="bx-ver" x="600" y="96" width="152" height="72" rx="6"/>
+<text class="tb mid" x="676" y="122">P4.4</text>
+<text class="ts mid" x="676" y="140">Candidate regression</text>
+<text class="ts mid" x="676" y="154">8 to 16 ED</text>
+<rect class="bx-ver" x="792" y="96" width="152" height="72" rx="6"/>
+<text class="tb mid" x="868" y="122">P4.5</text>
+<text class="ts mid" x="868" y="140">Compliance re-run</text>
+<text class="ts mid" x="868" y="154">3 to 6 ED</text>
+<path class="ar" d="M176 132 H216"/>
+<path class="ar" d="M368 132 H408"/>
+<path class="ar" d="M560 132 H600"/>
+<path class="ar" d="M752 132 H792"/>
+<path class="ar" d="M292 96 V64 H676 V96"/>
+<text class="ts mid" x="484" y="56">P4.4 needs both P4.2 and P4.3</text>
+<rect class="pill" x="36" y="184" width="128" height="24" rx="12"/>
+<text class="ts mid" x="100" y="200">G4 coverage bins</text>
+<rect class="pill" x="228" y="184" width="128" height="24" rx="12"/>
+<text class="ts mid" x="292" y="200">G2 viability</text>
+<rect class="pill" x="420" y="184" width="128" height="24" rx="12"/>
+<text class="ts mid" x="484" y="200">G6 orphans = 0</text>
+<rect class="bx-ext" x="600" y="248" width="152" height="56" rx="6"/>
+<text class="tb mid" x="676" y="272">Track F exit</text>
+<text class="ts mid" x="676" y="290">needs check-ID registry</text>
+<rect class="bx-ext" x="792" y="248" width="152" height="56" rx="6"/>
+<text class="tb mid" x="868" y="272">P5</text>
+<text class="ts mid" x="868" y="290">after P4.1 to P4.5</text>
+<path class="ar-d" d="M676 168 V248"/>
+<path class="ar" d="M868 168 V248"/>
+</svg>
+<figcaption><b>Figure 1.</b> P4 sub-phase flow (Rev B Tables 21.4 and 21.7). The pills show which per-candidate gate each early sub-phase mainly feeds; all three gates are stamped together at P4 exit. P4.4 needs both P4.2 and P4.3. Formal exit needs the check-ID registry completed at P4.3. P4.5 has no entry row in Rev B; its position after P4.4 is a proposal (see section 2).</figcaption>
+</figure>
+
+<h2 id="s2">2. Entry criteria</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Sub-phase</th><th>Entry (Rev B Table 21.4)</th></tr></thead>
+<tbody>
+<tr><td>P4.1</td><td>P2 and P3.1 to P3.4 exits met. Bins cannot be enumerated before the checks exist.</td></tr>
+<tr><td>P4.2</td><td>P4.1 exit met. No check in the ledger has the closure owner as author (SD-10), filtered before consolidation.</td></tr>
+<tr><td>P4.3</td><td>Requirement register and check-ID registry both exist (generated; Annex B owns the catalogue). Every closed defect has a closer different from its fixer (SD-3).</td></tr>
+<tr><td>P4.4</td><td>P4.2 and P4.3 exits met, and RTL freeze point F has been declared (at P1b exit).</td></tr>
+<tr><td>P4.5</td><td><span class="tag open">OPEN</span> No entry row exists in Rev B (recorded as DEF-011 in the tracker). Natural reading: P4.4 candidate frozen.</td></tr>
+</tbody></table></div>
+<p>All entries also need CT-1 to CT-5 satisfied and the standing separation-of-duty predicates at zero. Note "F" here is the RTL freeze point, not the formal track F.</p>
+
+<h2 id="s3">3. Exit criteria and gates</h2>
+<p>Rev B Table 20.1: G2, G4 and G6 satisfied on the merged campaign; the CR-1 to CR-5 coverage rules met; 69 of 69 applicable compliance tests passing. G5 is not stamped at P4. Per-candidate gates require G0, G1 and G3 on every run in the manifest (decision D-023).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Gate</th><th>Predicate (Table 6.1, quoted by identifier)</th><th>Owner role</th></tr></thead>
+<tbody>
+<tr><td>G2 Checker viability</td><td><code>bound_check_ids_without_current_viability_record == 0</code>, each record being <code>negative_case_pass</code> or <code>vacuity_proved</code> for the candidate RTL identity</td><td>Block checker owner; consolidated by closure owner</td></tr>
+<tr><td>G4 Coverage closed</td><td><code>bins_declared - bins_hit - bins_waived - bins_excluded == 0</code>; an assertion bin counts only with <code>antecedent_satisfied_count &gt;= 1</code></td><td>Closure owner</td></tr>
+<tr><td>G6 Traceability complete</td><td><code>orphans == 0</code> in both directions, no defect without a linked regression test</td><td>Traceability owner</td></tr>
+</tbody></table></div>
+<p>G2 and G4 are separate: G2 asks whether a checker can report, G4 whether the behaviour was observed. Neither substitutes for the other (Rev B Table 6.2). A gate that cannot be evaluated is untested, never passed.</p>
+
+<h2 id="s4">4. Work breakdown</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Sub-phase</th><th>Work</th><th>Output</th></tr></thead>
+<tbody>
+<tr><td>P4.1 Coverage model</td><td>Declare bins per owning family (Table 10.2); code-coverage scope and exclusions (Table 10.1); dimensions and cross points (Table 10.4); waiver and exclusion records with owner, reason, review date.</td><td>Declared bin set; coverage database at one RTL identity</td></tr>
+<tr><td>P4.2 Checker viability</td><td>For each bound check ID, obtain a negative case (fault injected, unique-ID finding) or a formal vacuity result; reconcile the ledger (Figure 2).</td><td>Viability ledger, current for the candidate identity</td></tr>
+<tr><td>P4.3 Generated traceability</td><td>Generate the matrix from the requirement register, the check-ID registry, the regression manifest and an RTL extraction over the same filelist.</td><td>Matrix with six links; orphan counts</td></tr>
+<tr><td>P4.4 Candidate-scale regression</td><td>Declare and freeze the candidate manifest (Figure 3); run nightly and weekly partitions; merge coverage.</td><td>Frozen manifest, merged database, per-run verdicts</td></tr>
+<tr><td>P4.5 Compliance re-run</td><td>Run the 69 applicable tests at the candidate identity; record the 93 out-of-scope tests with reasons; re-satisfy CT-1 to CT-3.</td><td>Compliance report (an input to G5)</td></tr>
+</tbody></table></div>
+
+<figure>
+<svg viewBox="0 0 960 336" role="img" aria-label="Viability ledger flow: a bound check ID obtains a negative-case pass or a vacuity proof, which writes a ledger record that G2 checks; a check evaluated with no record is vacuous and fails G2">
+<rect class="bx-ver" x="24" y="120" width="144" height="56" rx="6"/>
+<text class="tb mid" x="96" y="144">Bound check ID</text>
+<text class="ts mid" x="96" y="162">from P4.1 registry</text>
+<rect class="bx-ver" x="232" y="48" width="200" height="56" rx="6"/>
+<text class="tb mid" x="332" y="72">negative_case_pass</text>
+<text class="ts mid" x="332" y="90">injected fault raises its finding</text>
+<rect class="bx-ver" x="232" y="192" width="200" height="56" rx="6"/>
+<text class="tb mid" x="332" y="216">vacuity_proved</text>
+<text class="ts mid" x="332" y="234">antecedent satisfiable (formal)</text>
+<rect class="bx-ver" x="496" y="120" width="160" height="56" rx="6"/>
+<text class="tb mid" x="576" y="144">Viability ledger</text>
+<text class="ts mid" x="576" y="162">one record per check ID</text>
+<rect class="bx-ctrl" x="744" y="120" width="184" height="56" rx="6"/>
+<text class="tb mid" x="836" y="144">G2 predicate</text>
+<text class="ts mid" x="836" y="162">records missing == 0</text>
+<rect class="bx" x="496" y="256" width="160" height="56" rx="6"/>
+<text class="tb mid" x="576" y="280">Vacuous check</text>
+<text class="ts mid" x="576" y="298">evaluated, no record</text>
+<path class="ar" d="M168 136 H200 V76 H232"/>
+<path class="ar" d="M168 160 H200 V220 H232"/>
+<path class="ar-ver" d="M432 76 H464 V136 H496"/>
+<path class="ar-ver" d="M432 220 H464 V160 H496"/>
+<path class="ar" d="M656 148 H744"/>
+<path class="ar-bad" d="M96 176 V288 H496"/>
+<text class="ts mid" x="300" y="280">no record</text>
+<path class="ar-bad" d="M656 288 H836 V176"/>
+<text class="ts mid" x="746" y="280">G2 fails</text>
+</svg>
+<figcaption><b>Figure 2.</b> Viability ledger flow (Rev B Tables 6.1 and 6.2). A check may be evaluated on every run and still be unable to report. Only a negative case or a formal vacuity result puts a current record in the ledger; a check without one is vacuous and G2 fails (red path).</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 960 312" role="img" aria-label="Candidate manifest freeze: fix the file set, hash files, hash manifest, stamp identity checks, declare the candidate, run partitions, merge; any RTL edit after the freeze creates a new identity">
+<rect class="bx-ver" x="24" y="48" width="176" height="56" rx="6"/>
+<text class="tb mid" x="112" y="72">Fix file set</text>
+<text class="ts mid" x="112" y="90">soc_subsystem.f entries: 105</text>
+<rect class="bx-ver" x="240" y="48" width="176" height="56" rx="6"/>
+<text class="tb mid" x="328" y="72">Hash files</text>
+<text class="ts mid" x="328" y="90">SHA-256 of raw bytes</text>
+<rect class="bx-ver" x="456" y="48" width="176" height="56" rx="6"/>
+<text class="tb mid" x="544" y="72">Manifest hash</text>
+<text class="ts mid" x="544" y="90">H_rtl and H_filelist</text>
+<rect class="bx-ver" x="672" y="48" width="176" height="56" rx="6"/>
+<text class="tb mid" x="760" y="72">Stamp identity checks</text>
+<text class="ts mid" x="760" y="90">ID-1, ID-2, ID-3</text>
+<rect class="bx-ctrl" x="24" y="200" width="176" height="56" rx="6"/>
+<text class="tb mid" x="112" y="224">Declare candidate</text>
+<text class="ts mid" x="112" y="242">manifest frozen at P4.4</text>
+<rect class="bx-ver" x="240" y="200" width="176" height="56" rx="6"/>
+<text class="tb mid" x="328" y="224">Run partitions</text>
+<text class="ts mid" x="328" y="242">G0, G1, G3 per run</text>
+<rect class="bx-ver" x="456" y="200" width="176" height="56" rx="6"/>
+<text class="tb mid" x="544" y="224">Merge campaign</text>
+<text class="ts mid" x="544" y="242">G2, G4, G6 decided</text>
+<rect class="bx-ext" x="672" y="200" width="176" height="56" rx="6"/>
+<text class="tb mid" x="760" y="224">RTL edit after freeze</text>
+<text class="ts mid" x="760" y="242">new identity</text>
+<path class="ar" d="M200 76 H240"/>
+<path class="ar" d="M416 76 H456"/>
+<path class="ar" d="M632 76 H672"/>
+<path class="ar" d="M760 104 V152 H112 V200"/>
+<path class="ar" d="M200 228 H240"/>
+<path class="ar" d="M416 228 H456"/>
+<path class="ar-bad" d="M760 256 V288 H112 V256"/>
+<text class="ts mid" x="436" y="280">no verdict transfers: re-derive by change class</text>
+</svg>
+<figcaption><b>Figure 3.</b> Candidate manifest freeze (Rev B Tables 21.10 to 21.12). The identity is a hash of a 105-line manifest, never a commit id, and is stamped with the three identity checks. An RTL edit after the freeze creates a new identity (red path); the re-run matrix bounds what must be repeated. A run with a non-zero <code>duplicate_divergent_reachable</code> or <code>unresolved_entries</code> is untested.</figcaption>
+</figure>
+
+<h2 id="s5">5. Check families and rules</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>ID</th><th>Rule (Rev B Table 10.5)</th></tr></thead>
+<tbody>
+<tr><td>CR-1</td><td>A bin closes only when its owning family records a hit; an assertion bin additionally needs a non-vacuous check. "Evaluated" alone never closes it.</td></tr>
+<tr><td>CR-2</td><td>A waiver records that a bin is unreachable and why; it never replaces a hit.</td></tr>
+<tr><td>CR-3</td><td>Every waiver has owner, justification, review date; the requester is not the approver.</td></tr>
+<tr><td>CR-4</td><td>Coverage is reported per run and merged per candidate at one RTL identity; a regression in any bin between candidates is a failure.</td></tr>
+<tr><td>CR-5</td><td>"Coverage is high" is not a closure criterion; no combined score is built.</td></tr>
+</tbody></table></div>
+<p>Compliance: 69 applicable tests (38 I, 8 M, 7 Zicsr, 16 privilege) of 162 in the tree; 93 out of scope (27 C, 1 Zifencei, 65 K), each recorded with a reason (Rev B Table 6.4). The denominator is 69, never 162. Traceability: six links (requirement, design element, check ID, test, evidence, result), and Rev B notes that six seed requirements carry no check ID, so G6 fails at Rev B.</p>
+
+<h2 id="s6">6. Inputs, outputs, dependencies</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Kind</th><th>Artefact</th></tr></thead>
+<tbody>
+<tr><td>Inputs</td><td>Checks and models from P2, P3.1 to P3.4; requirement register; check-ID registry; filelist; compliance suite and DUT ISA declaration; waiver and exclusion registers.</td></tr>
+<tr><td>Outputs</td><td>Declared bins and merged coverage database; viability ledger; generated traceability matrix; frozen candidate manifest with H_rtl, H_filelist, ID-1 to ID-3; compliance report; G2, G4, G6 verdicts.</td></tr>
+<tr><td>Predecessors</td><td><a href="vf_p2_models.html">P2</a>, <a href="vf_p3_architectural.html">P3</a>.</td></tr>
+<tr><td>Successors</td><td>P5 (needs P4.1 to P4.5 exits and CT-1 to CT-5 re-satisfied); track F exit (check-ID registry); P6 (compliance report and G4, G6 on the frozen manifest feed G5).</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Effort and risks</h2>
+<p>P4.1 12 to 24, P4.2 10 to 20, P4.3 5 to 10, P4.4 8 to 16, P4.5 3 to 6 engineer-days (total 38 to 76), <code>ASSUMED(D-GR01)</code>, Rev B Table 21.3. Unmeasured; recomputed at the exits of P0 and P1a. Effort is not elapsed time.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>Mitigation (proposed)</th></tr></thead>
+<tbody>
+<tr><td>Vacuous checkers pass G4</td><td>Silent blind spots.</td><td>Build the ledger before declaring coverage closed; keep G2 and G4 separate.</td></tr>
+<tr><td>RTL edit after freeze</td><td>Verdicts do not transfer.</td><td>Change notes, class map, re-run matrix (Table 21.12).</td></tr>
+<tr><td>Divergent duplicate modules or unresolved filelist entries</td><td>Identity ambiguous, runs untested.</td><td>ID-1 to ID-3 before hashing. Tracker: DEF-005 OPEN; DEF-004 (timer.sv copies) FIXED-CONVERGED.</td></tr>
+<tr><td>Orphans from seed requirements</td><td>G6 fails.</td><td>Generate matrix early, treat each orphan as an open defect.</td></tr>
+<tr><td>Self-approved waivers</td><td>Violates CR-3 / SD-2.</td><td>Join requester to approver at P5 entry.</td></tr>
+<tr><td>P4.5 entry undefined</td><td>Ordering ambiguity.</td><td>Resolve Rev B erratum (DEF-011) before P4.4 completes.</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Current status</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P4.1 to P4.5</td><td>All NOT STARTED, entry met NO, gates G2, G4, G6 at P4 exit</td></tr>
+<tr><td>Predecessors</td><td>P0 IN PROGRESS, 13 of 20 criteria met, 5 partial, 2 not met; P0 exit not met. P1a to P3 NOT STARTED.</td></tr>
+<tr><td>Compliance</td><td>No compliance result is claimed. Re-run at final identity is tracked as ACT-011.</td></tr>
+</tbody></table></div>
+<p>Source: <code>Verification/status/PHASE_STATUS.md</code> (2026-10-31). This page reports no coverage, viability or traceability result.</p>
+
+<h2 id="s9">9. Execution proposal</h2>
+<p>Proposal, not Rev B text. The stage 6 brief defines learning-project closure; the steps below start there and keep the full Rev B gates as the stated target.</p>
+<ol>
+<li><b>Manifest first.</b> Enumerate existing smoke, core, MMIO, register/device, reset, interrupt and fabric tests with scenario, configuration, identity, seed, command, verdict and artefact location, using the existing runner.</li>
+<li><b>P4.1.</b> Declare bins per owning family with the functional matrix (address/device, access type, response, reset type, interrupt masked/taken, trap type). Use native simulator coverage if the tool of record supports it (ACT-006); otherwise event counters, with no invented percentages.</li>
+<li><b>P4.2.</b> For each important checker, retain one watched-condition-occurred record and one deliberate negative case, kept distinct from normal DUT regression.</li>
+<li><b>P4.3.</b> Generate requirement to test to result for the selected milestone with UNKNOWN or NOT RUN entries visible; do not hand-maintain.</li>
+<li><b>P4.4.</b> Hash the identity, stamp ID-1 to ID-3, freeze, and run the manifest without RTL change; save failing commands and seeds.</li>
+<li><b>P4.5.</b> Run the 69 applicable tests at the same identity and report separately from the SoC regression.</li>
+<li><b>Report.</b> HIT / NOT HIT / NOT APPLICABLE / UNKNOWN with reasons, plus <code>p4_findings.md</code>. Make no full sign-off claim.</li>
+</ol>
+<p><b>Not claimed.</b> A learning-project baseline is not G2, G4 or G6.</p>
+
+<div class="sources"><b>Sources read:</b> <code>_src/AUTHORING_GUIDE.md</code>, <code>_src/RevB_plan.txt</code> (Tables 6.1 to 6.4, 10.5, 19.1, 19.3, 20.1, 21.3, 21.4, 21.7, 21.10 to 21.13), <code>Verification/doc/briefs/stages/stage_6_brief.md</code>, <code>Verification/status/PHASE_STATUS.md</code>.</div>
+</div>
+</body>
+</html>

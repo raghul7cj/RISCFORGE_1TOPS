@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P5 Convergence and Soak</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan / P5 Convergence and soak</span></div>
+<div class="wrap">
+
+<h1>P5 Campaign convergence and soak</h1>
+<p class="lead">P5 runs the frozen candidate until the convergence rules of Rev B Table 6.5 are met: seeds saturate, reset and boot scenarios are all hit, cold-boot cycling and soak are accumulated, and each of the 7 timeout monitors has been seen to expire. It stamps no gate; it supplies the evidence that G4 and G5 consume.</p>
+<p class="meta">Scope: P5 | Sources: Rev B sections 6.5, 11.7, 14.3, 20, 21; stage 7 brief; <code>Verification/status/PHASE_STATUS.md</code> | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="note"><b>Status in one line.</b> <span class="tag open">OPEN</span> P5 has not started and entry is not met. P0 is IN PROGRESS (13 of 20 criteria met); no candidate exists and no campaign has been run. All numbers on this page are Rev B rules or provisional floors, not results. Related: <a href="vf_phases_overview.html">overview</a>, <a href="vf_p4_closure.html">P4</a>, <a href="vf_track_f.html">track F</a>, <a href="vf_p6_release.html">P6</a>, <a href="vf_regression_gates.html">gates</a>, <a href="tracker_status.html">tracker</a>.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective and convergence</a></li>
+<li><a href="#s2">Entry criteria</a></li>
+<li><a href="#s3">Exit criteria and gates</a></li>
+<li><a href="#s4">Work breakdown: campaign streams</a></li>
+<li><a href="#s5">Check families and timeout monitors</a></li>
+<li><a href="#s6">Inputs, outputs, dependencies</a></li>
+<li><a href="#s7">Effort and risks</a></li>
+<li><a href="#s8">Current status</a></li>
+<li><a href="#s9">Execution proposal</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective and convergence</h2>
+<p>Table 6.5 states rules, not volumes, and a rule cannot be evaluated without a campaign to evaluate it on. Rev B therefore inserts P5, in which those rules are run to convergence on the frozen candidate. A stimulus count with no derivation is an opinion, so each stream carries a derivation rule and a convergence criterion; where the number is not yet derivable it is TBD(D-025), and the rule still binds. Provisional floors are 20 nightly seeds, 1000 cold-boot cycles and a 24-hour soak, tagged <code>ASSUMED(D-024)</code>.</p>
+<p>Seed rule: N_seeds is the smallest N for which (1) saturation holds, meaning the last seed added produced no first-hit on any bin, and (2) stability holds, meaning that over K consecutive partitions the seeds hit every bin in the convergence set with at least H distinct seeds each. Constants: H = 2, K = 3. If either clause fails, N grows by the partition's own seed count and the partition repeats (Figure 1).</p>
+
+<figure>
+<svg viewBox="0 0 960 528" role="img" aria-label="Campaign partition and convergence: a frozen candidate feeds eight campaign streams, whose results go to a convergence evaluator; converged leads to P5 exit, not converged expands the count and repeats">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ext" x="24" y="16" width="232" height="48" rx="6"/>
+<text class="tb mid" x="140" y="36">Frozen candidate</text>
+<text class="ts mid" x="140" y="52">P4.4 manifest; any edit restarts</text>
+<path class="ar" d="M140 64 V88"/>
+<rect class="grp" x="16" y="88" width="248" height="400" rx="8"/>
+<rect class="bx-ver" x="24" y="104" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="120">Register and mode sweeps</text>
+<text class="ts mid" x="140" y="135">all (identity, mode) bins hit</text>
+<rect class="bx-ver" x="24" y="152" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="168">Constrained-random seeds</text>
+<text class="ts mid" x="140" y="183">saturation, stability; &gt;=20 seeds</text>
+<rect class="bx-ver" x="24" y="200" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="216">Reset and boot scenarios</text>
+<text class="ts mid" x="140" y="231">cold + warm reach S_DONE</text>
+<rect class="bx-ver" x="24" y="248" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="264">Cold-boot cycling and soak</text>
+<text class="ts mid" x="140" y="279">3 SRAM classes; 7 monitors expire</text>
+<rect class="bx-ver" x="24" y="296" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="312">Fault-injection classes</text>
+<text class="ts mid" x="140" y="327">each class names its finding</text>
+<rect class="bx-ver" x="24" y="344" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="360">Peripheral software suites</text>
+<text class="ts mid" x="140" y="375">6 suites, all bins hit</text>
+<rect class="bx-ver" x="24" y="392" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="408">Interrupt nesting</text>
+<text class="ts mid" x="140" y="423">(source, class pair) bins hit</text>
+<rect class="bx-ver" x="24" y="440" width="232" height="40" rx="6"/>
+<text class="tb mid" x="140" y="456">ISA compliance</text>
+<text class="ts mid" x="140" y="471">69 applicable, 0 failed or not run</text>
+<path class="ln" d="M256 124 H320"/>
+<path class="ln" d="M256 172 H320"/>
+<path class="ln" d="M256 220 H320"/>
+<path class="ln" d="M256 268 H320"/>
+<path class="ln" d="M256 316 H320"/>
+<path class="ln" d="M256 364 H320"/>
+<path class="ln" d="M256 412 H320"/>
+<path class="ln" d="M256 460 H320"/>
+<path class="ln" d="M320 124 V460"/>
+<rect class="bx-ctrl" x="392" y="244" width="208" height="96" rx="6"/>
+<text class="tb mid" x="496" y="268">Convergence rules</text>
+<text class="ts mid" x="496" y="288">Table 6.5 per stream</text>
+<text class="ts mid" x="496" y="304">saturation: last seed adds no bin</text>
+<text class="ts mid" x="496" y="320">stability: K = 3 partitions, H = 2</text>
+<path class="ar" d="M320 292 H392"/>
+<rect class="bx-ver" x="704" y="260" width="232" height="64" rx="6"/>
+<text class="tb mid" x="820" y="284">Converged on candidate</text>
+<text class="ts mid" x="820" y="302">G2, G4, G6 re-evaluated</text>
+<path class="ar-ver" d="M600 292 H704"/>
+<text class="ts mid" x="652" y="284">yes</text>
+<rect class="bx-ext" x="392" y="400" width="208" height="56" rx="6"/>
+<text class="tb mid" x="496" y="424">Extend and repeat</text>
+<text class="ts mid" x="496" y="442">N += partition seed count</text>
+<path class="ar-bad" d="M496 340 V400"/>
+<text class="ts" x="508" y="376">not converged</text>
+<path class="ar-bad" d="M496 456 V504 H140 V488"/>
+</svg>
+<figcaption><b>Figure 1.</b> Campaign partition and convergence (Rev B Table 6.5). The frozen candidate is exercised by eight streams, each with its own derivation rule. A single evaluator applies the convergence criteria; if any stream has not converged, its count is extended by the partition's own size and the partition repeats (red loop). Counts shown as floors are assumed planning values, not derived.</figcaption>
+</figure>
+
+<h2 id="s2">2. Entry criteria</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Condition (Rev B Table 21.4)</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P4.1 to P4.5 exits met</td><td><span class="tag open">OPEN</span> (<a href="vf_p4_closure.html">P4</a> not started)</td></tr>
+<tr><td>CT-1 to CT-5 re-satisfied at the candidate identity, because a peripheral change after P1 can move the core's observable behaviour through the boot path</td><td><span class="tag open">OPEN</span></td></tr>
+<tr><td>Track F exit: <code>open_critical_formal_goals == 0</code></td><td><span class="tag open">OPEN</span> (<a href="vf_track_f.html">track F</a> not started)</td></tr>
+<tr><td>No waiver whose requester equals its approver (SD-2); this is the last point a self-approved waiver can be refused</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+<tr><td>Standing predicates SD-1, SD-5, SD-6, SD-7 at zero</td><td><span class="tag specified">SPECIFIED</span></td></tr>
+</tbody></table></div>
+
+<h2 id="s3">3. Exit criteria and gates</h2>
+<p>Rev B Table 20.1: G2, G4 and G6 re-evaluated on the soaked manifest; the soak and cold-boot campaign converged per Table 6.5; track F closed as an input to G5. G5 is not stamped. Rev B Table 21.3 lists "none" as the gate verdict stamped at P5 and says it feeds G4 and G5. Read together: P5 produces evidence and re-evaluates the per-candidate gates; it stamps no new gate verdict. P5 is the last phase before P6, and there is no path to G5 that bypasses it, so it can only be compressed by running more partitions in parallel, which is a capacity decision.</p>
+
+<h2 id="s4">4. Work breakdown: campaign streams</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Stream</th><th>Derivation rule (binding)</th><th>Floor</th><th>Convergence criterion</th></tr></thead>
+<tbody>
+<tr><td>Register and mode sweeps</td><td>One directed case per register identity x supported access mode, per APB instance</td><td>TBD(D-025)</td><td>Every (identity, mode) pair is a hit bin</td></tr>
+<tr><td>Constrained-random seeds</td><td>Saturation and stability clauses above</td><td>&gt;= 20 nightly; H = 2; K = 3 (assumed)</td><td>Both clauses for K consecutive partitions</td></tr>
+<tr><td>Reset and boot scenarios</td><td>One per member of the reset-scenario set (5 domains x release points x activity), including the full 16-state boot FSM with non-zero attestation word</td><td>TBD(D-025)</td><td>Every bin hit; cold and warm-with-SRAM-retained both reach S_DONE</td></tr>
+<tr><td>Cold-boot cycling</td><td>Smallest N so every bin is hit at least H times, indexed by SRAM power-up class: uninitialised, retained, garbage-pattern</td><td>N &gt;= 1000; soak &gt;= 24 h (assumed)</td><td>All three classes seen at least H times, and each of the 7 timeout monitors observed to expire at least once</td></tr>
+<tr><td>Fault-injection classes</td><td>One class per error-response path in the error-policy table, each naming a check ID and unique finding</td><td>TBD(D-025)</td><td>Every class has an executed case producing the named finding</td></tr>
+<tr><td>Peripheral software suites</td><td>One suite per APB instance</td><td>6</td><td>Every instance has a suite in which all its bins are hit</td></tr>
+<tr><td>Interrupt nesting</td><td>One scenario per software-visible source x permitted class pair; unrouted sources do not count</td><td>TBD(D-025)</td><td>Every bin hit; maximum observed depth equals the architectural maximum</td></tr>
+<tr><td>ISA compliance</td><td>The applicable set executed whole; no hand-picked subset</td><td>69 (fixed)</td><td><code>applicable_failed + applicable_not_run == 0</code></td></tr>
+</tbody></table></div>
+<p>The release partition runs "everything, plus soak and cold-boot cycling" against a planning budget under 48 hours (ASSUMED(D-024)). A budget is a capacity observation, not a gate.</p>
+
+<h2 id="s5">5. Check families and timeout monitors</h2>
+<p>P5 adds no new check family. It accumulates hits for bins and checks defined earlier (RS, IC, FP, PC, CR). The monitor criterion draws on FP-10 (Rev B Table 14.3): each timeout monitor fires at its configured threshold and recovers, the fired slot is blocked afterwards and the sticky bit sets without raising any interrupt.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Monitor group</th><th>Count</th><th>Threshold, clk_i cycles (FP-10)</th></tr></thead>
+<tbody>
+<tr><td>APB monitors: I2C, Timer 0, UART, GPIO, Timer 1</td><td>5</td><td>16</td></tr>
+<tr><td>APB monitor: SPI</td><td>1</td><td>65536</td></tr>
+<tr><td>AXI-Lite monitor on the core master port</td><td>1</td><td>64 (SRAM region), 131072 (APB region)</td></tr>
+<tr><td>Total</td><td>7 (6 generated APB instances + 1 AXI-Lite)</td><td>Rev A's "8 instances" is wrong (Rev B Table 6.5 note)</td></tr>
+</tbody></table></div>
+<p><span class="tag open">OPEN</span> The AXI-Lite row lists two thresholds against one monitor; the passages read do not say how one instance carries both. Observing the SPI monitor expire needs 65536 idle cycles per event and the AXI-Lite APB-region threshold needs 131072; the cost in simulated time is not estimated in Rev B.</p>
+
+<h2 id="s6">6. Inputs, outputs, dependencies</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Kind</th><th>Artefact</th></tr></thead>
+<tbody>
+<tr><td>Inputs</td><td>Frozen candidate manifest (P4.4); merged coverage database; viability ledger; waiver register; track F proof log status; compliance report; declared convergence sets.</td></tr>
+<tr><td>Outputs</td><td>Campaign report: runs, seeds, iteration counts, new hits per partition, unique failure signatures, remaining gaps; soak and cold-boot evidence; monitor-expiry records; re-evaluated G2, G4, G6 on the soaked manifest.</td></tr>
+<tr><td>Predecessors</td><td>P4.4, P4.5, track F exit.</td></tr>
+<tr><td>Successor</td><td><a href="vf_p6_release.html">P6</a>. No alternative route to G5.</td></tr>
+</tbody></table></div>
+
+<h2 id="s7">7. Effort and risks</h2>
+<p>10 to 20 engineer-days (Rev B Table 21.3, <code>ASSUMED(D-GR01)</code>). Wall-clock soak and licence queue time are excluded from effort by definition; elapsed duration is TBD(D-GR02).</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Risk</th><th>Effect</th><th>Mitigation (proposed)</th></tr></thead>
+<tbody>
+<tr><td>Quoting floors as targets met</td><td>False soak claim.</td><td>Report derived N against floor; label floors ASSUMED.</td></tr>
+<tr><td>"No new coverage" read as correctness</td><td>Premature stop.</td><td>Convergence is a rule on named bins, never proof by itself.</td></tr>
+<tr><td>Intermittent failures masked by longer timeouts</td><td>Hidden defects.</td><td>Minimise to first discriminating test; keep failing seed and log.</td></tr>
+<tr><td>RTL edit during campaign</td><td>Evidence invalid.</td><td>An edit creates a new candidate; apply Table 21.12.</td></tr>
+<tr><td>Monitor expiry scenarios very long</td><td>Capacity.</td><td>Run in parallel partitions; treat budget overruns as capacity observations.</td></tr>
+<tr><td>Volumes TBD(D-025)</td><td>Floors used before derivation.</td><td>Derive after the requirement register exists; rules take precedence.</td></tr>
+</tbody></table></div>
+
+<h2 id="s8">8. Current status</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>State</th></tr></thead>
+<tbody>
+<tr><td>P5</td><td>NOT STARTED, entry met NO, no gate stamped, effort 10 to 20 engineer-days (assumed)</td></tr>
+<tr><td>Upstream</td><td>P0 IN PROGRESS (13 of 20 met; P0 exit not met); all of P1 to P4 and track F NOT STARTED</td></tr>
+<tr><td>Campaign evidence</td><td>None. No candidate manifest exists.</td></tr>
+</tbody></table></div>
+<p>Source: <code>Verification/status/PHASE_STATUS.md</code> (2026-10-31).</p>
+
+<h2 id="s9">9. Execution proposal</h2>
+<p>Proposal, not Rev B text. The stage 7 brief defines a reduced, bounded milestone: Rev B floors are not automatically required for it.</p>
+<ol>
+<li><b>Take the Stage 6 manifest and one frozen identity.</b> Log tool and environment differences; any RTL edit starts a new candidate.</li>
+<li><b>Build one bounded command</b> that repeats representative boot, MMIO, device, interrupt and error scenarios; add a seed sweep only where random stimulus already exists.</li>
+<li><b>Stress observable boundaries.</b> Cold versus warm boot, reset during one transaction, legal bus wait variation, one controlled timeout or error; check progress, response correctness, drain of outstanding transactions and recovery.</li>
+<li><b>Measure convergence per batch.</b> Track new bin hits, repeated failure signatures, timeout counts, non-deterministic outcomes. Expand seeds only where important bins or instability remain.</li>
+<li><b>Triage before changing anything.</b> Reduce each failure to its first discriminating test, keep seed and log, classify as DUT, checker, simulator or unresolved.</li>
+<li><b>Report</b> in <code>convergence_summary.md</code> the exact run counts, coverage progression, failure index and the Rev B floors that were not executed. Then, only for the full plan, scale to the Table 6.5 rules: 20 nightly seeds with H and K, 1000 cold boots, 24 hours, and all 7 monitors expiring.</li>
+</ol>
+<p><b>Not claimed.</b> No soak, cold-boot-cycling or monitor-expiry result exists. A reduced campaign is not P5 exit.</p>
+
+<div class="sources"><b>Sources read:</b> <code>_src/AUTHORING_GUIDE.md</code>, <code>_src/RevB_plan.txt</code> (Tables 6.3, 6.5, 14.3, 20.1, 21.3 to 21.5, 21.7; D-024, D-025), <code>Verification/doc/briefs/stages/stage_7_brief.md</code>, <code>Verification/status/PHASE_STATUS.md</code>.</div>
+</div>
+</body>
+</html>

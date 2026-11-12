@@ -1,0 +1,18 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/tb_core_csr_trap_snapshot/xsim_script.tcl
+# xsim {tb_core_csr_trap_snapshot} -cov_db_dir C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/coverage -cov_db_name tb_core_csr_trap -autoloadwcfg -tclbatch {C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/run.tcl} -onfinish quit -onerror quit -sv_seed 1
+Time resolution is 1 ps
+source C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_core_csr_trap/run.tcl
+## log_wave -r /
+WARNING: [Simtcl 6-197] One or more HDL objects could not be logged because of object type or size limitations.  To see details please rerun the command with -verbose (-v).
+## run all
+Core corner environment: SKELETON/INCOMPLETE; checks=0; failures=0
+WARNING: The Functional Coverage Database has not been updated during simulation. Please recheck testbench to confirm that covergroups are being instantiated correctly and rerun simulation.
+$finish called at time : 30 ns : File "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/source_snapshot/ips/Verification/infrastructure/tb/tb_core_csr_trap.sv" Line 122
+exit 0
+INFO: [Common 17-206] Exiting xsim at Wed Nov 11 17:05:59 2026...

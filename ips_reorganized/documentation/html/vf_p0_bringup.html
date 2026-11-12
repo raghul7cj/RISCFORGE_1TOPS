@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase P0 Bring-up</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="topbar"><a class="brand" href="index.html">RISCFORGE documentation</a><span class="crumb">/ Verification plan Rev B / P0 Bring-up</span></div>
+<div class="wrap">
+
+<h1>Phase P0: Bring-up</h1>
+<p class="lead">P0 proves that the harness can build the intended SoC, push stimulus through it, and keep enough evidence to repeat the run. It claims nothing about functional correctness. This page covers the phase definition, the run package, the two gates it stamps, and where the project stands against the exit criteria.</p>
+<p class="meta">Scope: Rev B phase P0 (stage brief "Stage 1") | Sources: Rev B 20.1, 21.3, 21.4, 21.8 to 21.11; <code>goals/P0_bringup.md</code>; <code>Verification/doc/briefs/stages/stage_1_brief.md</code>; <code>Verification/status/PHASE_STATUS.md</code>, <code>build_tracker.py</code>, <code>P0_EXECUTION_CONTRACT.md</code>; run READMEs | Reviewed 2026-11-03 | Status labels: <span class="tag exists">EXISTS</span> <span class="tag specified">SPECIFIED</span> <span class="tag open">OPEN</span></p>
+
+<div class="warn"><b>Status in one line.</b> P0 exit is <b>NOT MET</b>. The tracker (2026-10-31) shows 13 of 20 exit criteria MET, 5 PARTIAL, 2 NOT MET. No gate has a stamped verdict; G0 and G1 are both UNTESTED.</div>
+
+<div class="toc"><b>Contents</b>
+<ol>
+<li><a href="#s1">Objective</a></li>
+<li><a href="#s2">Entry and exit criteria</a></li>
+<li><a href="#s3">What P0 verifies, and what it does not</a></li>
+<li><a href="#s4">Activities</a></li>
+<li><a href="#s5">Artefacts produced</a></li>
+<li><a href="#s6">The run package</a></li>
+<li><a href="#s7">Gates stamped: G0 and G1</a></li>
+<li><a href="#s8">Use of the identity recipe</a></li>
+<li><a href="#s9">Current status</a></li>
+<li><a href="#s10">Proposal: the run-package script</a></li>
+</ol></div>
+
+<h2 id="s1">1. Objective</h2>
+<p>Produce one reproducible end-to-end SoC run and record its identity (Rev B 21.3, <code>goals/P0_bringup.md</code>). The run starts at bootloader and SRAM load, releases the core, executes firmware that checks an expected outcome, and ends in a recorded verdict. P0 is the only phase with no predecessor, and every other phase depends on it: no gate can be evaluated before one run exists, because G1 is decided from a run's own artefacts.</p>
+
+<h2 id="s2">2. Entry and exit criteria</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Item</th><th>Statement</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Entry</td><td>None. The RTL identity of the tree is recorded before any run, using the recipe in Table 21.10.</td><td>Rev B Table 21.4</td></tr>
+<tr><td>Exit (Rev B)</td><td>G0 satisfied; one boot scenario completes with non-zero retired instructions, AXI beats and APB transfers, so G1 is decidable from the first run.</td><td>Rev B Table 20.1</td></tr>
+<tr><td>Exit (goal file)</td><td>One end-to-end boot run passes G0 and G1; run identity recorded; logs, filelist diff, counters and verdict retained together; no further correctness claim.</td><td><code>goals/P0_bringup.md</code></td></tr>
+<tr><td>Extra exit obligations</td><td>P0-X1: DC-1 scope decision recorded (cutoff is P0 exit). P0-X2: Table 21.3 reissued with measured tau_scen (Rev B Table 21.8).</td><td>Rev B Tables 21.8, 21.9</td></tr>
+</tbody></table></div>
+<p>The goal labels P0-G1, P0-G2 and P0-G3 are phase-local. P0-G1 evidences Rev B G0, P0-G2 evidences Rev B G1, and P0-G3 evidences the run identity. They are not Rev B gate identifiers; Rev B's own G3 is the checkers-pass gate.</p>
+
+<h2 id="s3">3. What P0 verifies, and what it does not</h2>
+<ul>
+<li><b>Verifies:</b> the harness builds the golden filelist with no unresolved and no extra modules; the simulator version is pinned; artefacts can be written; stimulus reaches the DUT (instructions retire, AXI-Lite and APB transfers occur, firmware writes an attestation word); the run is repeatable from its recorded identity; a deliberate negative case fails visibly (stage brief step 5).</li>
+<li><b>Does not verify:</b> core correctness, register behaviour, interrupts, coverage, formal results or compliance. The stage brief explicitly excludes a UVM port, generic agents, scoreboards, ISS lock-step, coverage closure and dashboards.</li>
+</ul>
+
+<h2 id="s4">4. Activities</h2>
+<ol>
+<li>Inspect the repository for the SoC top, resolved filelist, simulator command, firmware build, boot setup and result mechanism; record gaps (brief scope 1).</li>
+<li>Compute the tree identity: H_rtl, H_filelist, ID-1, ID-2, ID-3 (Table 21.10, Table 21.11).</li>
+<li>Build and elaborate; compare compiled modules with the golden module set (G0).</li>
+<li>Run one boot scenario with self-checking firmware; read the counters (G1).</li>
+<li>Run one harmless negative case, for example a wrong expected firmware signature, and confirm FAIL.</li>
+<li>Package identity, logs, filelist diff, counters and verdict together.</li>
+<li>Close out: record DC-1 (default is out of scope), time the scenario to obtain tau_scen, reissue Table 21.3.</li>
+</ol>
+<figure>
+<svg viewBox="0 0 960 300" role="img" aria-label="P0 flow: record identity, build and elaborate, run boot test, read counters, stamp G0 and G1, negative control, package, close-out, P0 exit, with a failure path">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+  <marker id="arr-ver" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-ver"/></marker>
+  <marker id="arr-bad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead-bad"/></marker>
+</defs>
+<rect class="bx-ext" x="408" y="8" width="336" height="44" rx="6"/>
+<text class="tb mid" x="576" y="26">Any failure ends as FAIL, TIMEOUT or BLOCKED</text>
+<text class="ts mid" x="576" y="42">zero activity is a failure, not a pass</text>
+
+<rect class="bx-ver" x="24" y="84" width="144" height="56" rx="6"/>
+<text class="tb mid" x="96" y="107">1 Record identity</text><text class="ts mid" x="96" y="124">hashes, ID-1/2/3</text>
+<rect class="bx-ver" x="216" y="84" width="144" height="56" rx="6"/>
+<text class="tb mid" x="288" y="107">2 Build, elaborate</text><text class="ts mid" x="288" y="124">G0 module diff</text>
+<rect class="bx-core" x="408" y="84" width="144" height="56" rx="6"/>
+<text class="tb mid" x="480" y="107">3 Run boot test</text><text class="ts mid" x="480" y="124">WARM, seed none</text>
+<rect class="bx-core" x="600" y="84" width="144" height="56" rx="6"/>
+<text class="tb mid" x="672" y="107">4 Read counters</text><text class="ts mid" x="672" y="124">retired AXI APB attest</text>
+<rect class="bx-bus" x="792" y="84" width="144" height="56" rx="6"/>
+<text class="tb mid" x="864" y="107">5 Stamp G0, G1</text><text class="ts mid" x="864" y="124">verdict record</text>
+
+<rect class="bx-ver" x="792" y="212" width="144" height="56" rx="6"/>
+<text class="tb mid" x="864" y="235">6 Negative control</text><text class="ts mid" x="864" y="252">wrong expected result</text>
+<rect class="bx-mem" x="600" y="212" width="144" height="56" rx="6"/>
+<text class="tb mid" x="672" y="235">7 Package folder</text><text class="ts mid" x="672" y="252">logs, hashes, verdict</text>
+<rect class="bx-ctrl" x="408" y="212" width="144" height="56" rx="6"/>
+<text class="tb mid" x="480" y="235">8 Close-out</text><text class="ts mid" x="480" y="252">DC-1, tau_scen</text>
+<rect class="bx-bus" x="216" y="212" width="144" height="56" rx="6"/>
+<text class="tb mid" x="288" y="235">P0 exit</text><text class="ts mid" x="288" y="252">all criteria met</text>
+
+<path class="ar" d="M168 112 H216"/><path class="ar" d="M360 112 H408"/><path class="ar" d="M552 112 H600"/><path class="ar" d="M744 112 H792"/>
+<path class="ar" d="M864 140 V212"/>
+<text class="ts" x="872" y="180">if G0 and G1 hold</text>
+<path class="ar" d="M792 240 H744"/><path class="ar" d="M600 240 H552"/><path class="ar" d="M408 240 H360"/>
+<path class="ar-bad" d="M480 84 V52"/><path class="ar-bad" d="M672 84 V52"/>
+</svg>
+<figcaption><b>Figure 1.</b> P0 flow. Identity is recorded first, because a run without it is not evidence. Steps 3 and 4 can fail the run (red arrows). Step 6 proves that failure is visible; step 8 holds the two Rev B close-out obligations, so P0 exit needs steps 1 to 8 together, not just a green simulation.</figcaption>
+</figure>
+
+<h2 id="s5">5. Artefacts produced</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Artefact</th><th>Content</th><th>State</th></tr></thead>
+<tbody>
+<tr><td><code>Verification/status/P0_EXECUTION_CONTRACT.md</code></td><td>Frozen contract: pinned tools, golden filelist, identity predicates, G0 and G1 predicates, thresholds, baseline run</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>Verification/status/P0_MANIFEST.json</code>, <code>manifest_rtl.sha256</code></td><td>H_rtl, H_filelist, ID-1/2/3, seed, plusargs, verdict</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td><code>Verification/status/p0_identity.py</code></td><td>Generates the identity manifests (Table 21.10) and ID checks</td><td><span class="tag exists">EXISTS</span></td></tr>
+<tr><td>Stage proof folders (<code>manifest.json</code>, <code>logs/</code>, <code>stimuli/</code>)</td><td>Simulation log, ELF, hex images, disassembly for stage 1 hello, stage 2 watchdog, stage 3 monitor count</td><td><span class="tag exists">EXISTS</span>; identity fields incomplete (DEF-008)</td></tr>
+<tr><td>P0 run-package script</td><td>One command assembling the package from a fresh run</td><td><span class="tag open">OPEN</span> ACT-002 IN PROGRESS</td></tr>
+<tr><td>Golden module set and diff</td><td>Basis for <code>unresolved_modules</code> and <code>extra_modules</code></td><td><span class="tag open">OPEN</span> ACT-003</td></tr>
+<tr><td>DC-1 record; reissued Table 21.3</td><td>Scope decision; measured tau_scen</td><td><span class="tag open">OPEN</span> ACT-008, ACT-009</td></tr>
+<tr><td><code>p0_findings.md</code></td><td>Stage-brief deliverable: results, blockers, next test</td><td>not found in the files read</td></tr>
+</tbody></table></div>
+
+<h2 id="s6">6. The run package</h2>
+<p>A package is one folder that holds everything needed to re-run and to judge a run. Figure 2 lists its eight parts and shows which ones exist today. The aim of the P0 script is to turn the amber and dashed boxes into green ones.</p>
+<figure>
+<svg viewBox="0 0 960 470" role="img" aria-label="Run package contents: eight parts, showing which exist, which are partial and which are missing">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="arrowhead"/></marker>
+</defs>
+<rect class="bx-bus" x="24" y="198" width="176" height="64" rx="6"/>
+<text class="tb mid" x="112" y="226">Run package</text><text class="ts mid" x="112" y="244">one folder per run</text>
+<text class="ts mid" x="112" y="290">assembly script: ACT-002</text><text class="ts mid" x="112" y="306">IN PROGRESS</text>
+<path class="ln" d="M200 230 H232"/><path class="ln" d="M232 48 V412"/>
+
+<path class="ar" d="M232 48 H264"/><rect class="bx-mem" x="264" y="28" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="44">identity block</text><text class="ts" x="280" y="60">H_rtl, H_filelist, ID-1/2/3, tool, seed, plusargs</text>
+<rect class="bx-mem" x="752" y="28" width="184" height="40" rx="6"/><text class="t mid" x="844" y="53">EXISTS: P0_MANIFEST.json</text>
+
+<path class="ar" d="M232 100 H264"/><rect class="bx-ctrl" x="264" y="80" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="96">exact run command</text><text class="ts" x="280" y="112">compile, elaborate and simulate command lines</text>
+<rect class="bx-ctrl" x="752" y="80" width="184" height="40" rx="6"/><text class="t mid" x="844" y="105">PARTIAL: contract + log</text>
+
+<path class="ar" d="M232 152 H264"/><rect class="bx-ctrl" x="264" y="132" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="148">filelist and filelist diff report</text><text class="ts" x="280" y="164">relativised filelist; diff against the golden module set</text>
+<rect class="bx-ctrl" x="752" y="132" width="184" height="40" rx="6"/><text class="t mid" x="844" y="157">PARTIAL: run 05 only</text>
+
+<path class="ar" d="M232 204 H264"/><rect class="bx-ctrl" x="264" y="184" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="200">build and elaboration logs</text><text class="ts" x="280" y="216">compile log and elaboration log</text>
+<rect class="bx-ctrl" x="752" y="184" width="184" height="40" rx="6"/><text class="t mid" x="844" y="209">PARTIAL: run 05 only</text>
+
+<path class="ar" d="M232 256 H264"/><rect class="bx-mem" x="264" y="236" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="252">simulation log</text><text class="ts" x="280" y="268">raw simulator output with mailbox result</text>
+<rect class="bx-mem" x="752" y="236" width="184" height="40" rx="6"/><text class="t mid" x="844" y="261">EXISTS: logs/ in proofs</text>
+
+<path class="ar" d="M232 308 H264"/><rect class="bx-mem" x="264" y="288" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="304">firmware images</text><text class="ts" x="280" y="320">ELF, instruction and data hex, disassembly</text>
+<rect class="bx-mem" x="752" y="288" width="184" height="40" rx="6"/><text class="t mid" x="844" y="313">EXISTS: stimuli/</text>
+
+<path class="ar" d="M232 360 H264"/><rect class="bx-mem" x="264" y="340" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="356">counter block and verdict record</text><text class="ts" x="280" y="372">retired, AXI, APB, attestation count, PASS or FAIL</text>
+<rect class="bx-mem" x="752" y="340" width="184" height="40" rx="6"/><text class="t mid" x="844" y="365">EXISTS: in manifests</text>
+
+<path class="ar" d="M232 412 H264"/><rect class="bx-ext" x="264" y="392" width="470" height="40" rx="6"/>
+<text class="tb" x="280" y="408">golden module diff (G0)</text><text class="ts" x="280" y="424">unresolved_modules and extra_modules against the golden set</text>
+<rect class="bx-ext" x="752" y="392" width="184" height="40" rx="6"/><text class="t mid" x="844" y="417">MISSING: ACT-003</text>
+</svg>
+<figcaption><b>Figure 2.</b> Run-package contents and their state. Green parts exist in the Oct 24 stage proofs or in the status folder; amber parts exist only for the Oct 18 Xcelium run 05 or only as text in the contract; the dashed part has no implementation. No single folder yet holds all eight parts.</figcaption>
+</figure>
+
+<h2 id="s7">7. Gates stamped: G0 and G1</h2>
+<p>P0 stamps two per-run gates from Rev B Table 6.1. Their predicates are quoted by identifier only; the register is canonical.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Gate</th><th>Name</th><th>Evidence artefact</th><th>Owner role</th><th>Verdict today</th></tr></thead>
+<tbody>
+<tr><td>G0</td><td>Harness integrity: modules vs golden set, pinned tool, artefact write test</td><td>Build and elaboration log; filelist diff report</td><td>Harness-CI owner</td><td>UNTESTED (module diff not implemented)</td></tr>
+<tr><td>G1</td><td>Stimulus reached the DUT: retired, AXI, APB and attestation counts above zero</td><td>Verdict record counter block</td><td>Harness-CI owner</td><td>UNTESTED (stage 3 counters satisfy the predicates; no stamped verdict record)</td></tr>
+</tbody></table></div>
+<p>Figure 3 shows the 20 P0 exit criteria from the tracker grouped by gate. The grouping is the tracker's: it is a checklist of evidence, not a gate verdict.</p>
+<figure>
+<svg viewBox="0 0 960 440" role="img" aria-label="Status of the 20 P0 exit criteria: 13 met, 5 partial, 2 not met">
+<text class="th" x="12" y="22">G0 harness (P0-G1)</text><text class="th" x="252" y="22">G1 activity (P0-G2)</text><text class="th" x="492" y="22">Run identity (P0-G3)</text><text class="th" x="732" y="22">Close-out (X)</text>
+
+<rect class="bx-ctrl" x="12" y="36" width="216" height="40" rx="5"/><text class="tb" x="22" y="52">P0-G1.1</text><text class="ts end" x="218" y="52">PARTIAL</text><text class="ts" x="22" y="68">unresolved_modules = 0</text>
+<rect class="bx-ctrl" x="12" y="84" width="216" height="40" rx="5"/><text class="tb" x="22" y="100">P0-G1.2</text><text class="ts end" x="218" y="100">PARTIAL</text><text class="ts" x="22" y="116">extra_modules = 0</text>
+<rect class="bx-mem" x="12" y="132" width="216" height="40" rx="5"/><text class="tb" x="22" y="148">P0-G1.3</text><text class="ts end" x="218" y="148">MET</text><text class="ts" x="22" y="164">tool version pinned</text>
+<rect class="bx-mem" x="12" y="180" width="216" height="40" rx="5"/><text class="tb" x="22" y="196">P0-G1.4</text><text class="ts end" x="218" y="196">MET</text><text class="ts" x="22" y="212">artifact write test</text>
+<rect class="bx-ctrl" x="12" y="228" width="216" height="40" rx="5"/><text class="tb" x="22" y="244">P0-G1.5</text><text class="ts end" x="218" y="244">PARTIAL</text><text class="ts" x="22" y="260">build, elab logs, diff kept</text>
+
+<rect class="bx-mem" x="252" y="36" width="216" height="40" rx="5"/><text class="tb" x="262" y="52">P0-G2.1</text><text class="ts end" x="458" y="52">MET</text><text class="ts" x="262" y="68">instructions_retired &gt; 0</text>
+<rect class="bx-mem" x="252" y="84" width="216" height="40" rx="5"/><text class="tb" x="262" y="100">P0-G2.2</text><text class="ts end" x="458" y="100">MET</text><text class="ts" x="262" y="116">axi_transfers &gt; 0</text>
+<rect class="bx-mem" x="252" y="132" width="216" height="40" rx="5"/><text class="tb" x="262" y="148">P0-G2.3</text><text class="ts end" x="458" y="148">MET</text><text class="ts" x="262" y="164">apb_transfers &gt; 0</text>
+<rect class="bx-mem" x="252" y="180" width="216" height="40" rx="5"/><text class="tb" x="262" y="196">P0-G2.4</text><text class="ts end" x="458" y="196">MET</text><text class="ts" x="262" y="212">attestation_words_written &gt; 0</text>
+<rect class="bx-mem" x="252" y="228" width="216" height="40" rx="5"/><text class="tb" x="262" y="244">P0-G2.5</text><text class="ts end" x="458" y="244">MET</text><text class="ts" x="262" y="260">counters kept with verdict</text>
+
+<rect class="bx-mem" x="492" y="36" width="216" height="40" rx="5"/><text class="tb" x="502" y="52">P0-G3.1</text><text class="ts end" x="698" y="52">MET</text><text class="ts" x="502" y="68">H_rtl recorded</text>
+<rect class="bx-mem" x="492" y="84" width="216" height="40" rx="5"/><text class="tb" x="502" y="100">P0-G3.2</text><text class="ts end" x="698" y="100">MET</text><text class="ts" x="502" y="116">H_filelist recorded</text>
+<rect class="bx-mem" x="492" y="132" width="216" height="40" rx="5"/><text class="tb" x="502" y="148">P0-G3.3</text><text class="ts end" x="698" y="148">MET</text><text class="ts" x="502" y="164">ID-1, ID-2, ID-3 stamped</text>
+<rect class="bx-mem" x="492" y="180" width="216" height="40" rx="5"/><text class="tb" x="502" y="196">P0-G3.4</text><text class="ts end" x="698" y="196">MET</text><text class="ts" x="502" y="212">seed recorded (none)</text>
+<rect class="bx-mem" x="492" y="228" width="216" height="40" rx="5"/><text class="tb" x="502" y="244">P0-G3.5</text><text class="ts end" x="698" y="244">MET</text><text class="ts" x="502" y="260">plusargs recorded</text>
+<rect class="bx-ctrl" x="492" y="276" width="216" height="40" rx="5"/><text class="tb" x="502" y="292">P0-G3.6</text><text class="ts end" x="698" y="292">PARTIAL</text><text class="ts" x="502" y="308">exact run command</text>
+<rect class="bx-mem" x="492" y="324" width="216" height="40" rx="5"/><text class="tb" x="502" y="340">P0-G3.7</text><text class="ts end" x="698" y="340">MET</text><text class="ts" x="502" y="356">logs, verdict in one package</text>
+
+<rect class="bx-per" x="732" y="36" width="216" height="40" rx="5"/><text class="tb" x="742" y="52">P0-X1</text><text class="ts end" x="938" y="52">NOT MET</text><text class="ts" x="742" y="68">DC-1 scope record</text>
+<rect class="bx-per" x="732" y="84" width="216" height="40" rx="5"/><text class="tb" x="742" y="100">P0-X2</text><text class="ts end" x="938" y="100">NOT MET</text><text class="ts" x="742" y="116">Table 21.3 reissued, tau_scen</text>
+<rect class="bx-ctrl" x="732" y="132" width="216" height="40" rx="5"/><text class="tb" x="742" y="148">P0-X3</text><text class="ts end" x="938" y="148">PARTIAL</text><text class="ts" x="742" y="164">one package passes G0 and G1</text>
+
+<rect class="bx-mem" x="12" y="392" width="24" height="16" rx="3"/><text class="ts" x="44" y="404">MET 13</text>
+<rect class="bx-ctrl" x="132" y="392" width="24" height="16" rx="3"/><text class="ts" x="164" y="404">PARTIAL 5</text>
+<rect class="bx-per" x="272" y="392" width="24" height="16" rx="3"/><text class="ts" x="304" y="404">NOT MET 2</text>
+<text class="ts" x="12" y="430">Source: tracker P0_Checklist, snapshot 2026-10-31. Total 20.</text>
+</svg>
+<figcaption><b>Figure 3.</b> P0 exit checklist. Every activity counter and nearly every identity field is met; the open items are the golden-module comparison (G0), the live build logs and command capture, the DC-1 record, the tau_scen reissue, and the single package that holds it all.</figcaption>
+</figure>
+
+<h2 id="s8">8. Use of the identity recipe</h2>
+<p>P0 is where the Rev B Table 21.10 recipe is first applied. The recipe pins the RTL by hashing, because the plan treats a cited commit id as worse than none. In outline: fix the file set from the non-comment entries of <code>RTL_SOC/soc_subsystem.f</code>; resolve every entry (any failure means no hash and an untested run); relativise paths (absolute paths are an error); SHA-256 the raw bytes of each file with no normalisation; build a sorted manifest of <code>&lt;sha256&gt;  &lt;path&gt;</code> lines; hash the manifest to get H_rtl; hash the relativised filelist for H_filelist; compute ID-1, ID-2 and ID-3 in the same step; stamp all eight identity fields (H_rtl, H_filelist, ID-1, ID-2, ID-3, tool version, seed, plusargs) into every artefact header.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Check</th><th>Predicate</th><th>Measured in this repository</th></tr></thead>
+<tbody>
+<tr><td>ID-1</td><td><code>duplicate_divergent_reachable == 0</code></td><td>Contract: two <code>timer.sv</code> copies converged byte-identical; <code>apb_to_obi.sv</code> golden copies converged. Rev B recorded 14 divergent module names in the tree at writing time; the 13 others were judged mostly dormant.</td></tr>
+<tr><td>ID-2</td><td><code>unresolved_entries == 0</code></td><td>0 on the golden filelist. Rev B: 15 of 40 filelists in <code>rtl/ips</code> carry unresolvable entries (DEF-005 OPEN).</td></tr>
+<tr><td>ID-3</td><td><code>absolute_path_entries == 0</code></td><td>0 on the golden filelist. Rev B: 9 of 40 filelists contain absolute paths.</td></tr>
+</tbody></table></div>
+<p><b>Recorded identity.</b> The contract and tracker record H_rtl beginning <code>d25104a4</code> and H_filelist beginning <code>a931d6b4</code>, generated by <code>p0_identity.py</code> over the golden filelist. H_rtl changes with every edit and must not be quoted as a constant.</p>
+<p class="warn"><b>Discrepancy, <span class="tag open">OPEN</span>.</b> Rev B Table 21.10 states a 105-entry manifest for <code>soc_subsystem.f</code>; the contract and tracker report 90 verified source files. The tracker does not explain the difference. Whichever number is right, the hash is computed over what the filelist names today; the count should be reconciled in the Rev C errata.</p>
+
+<h2 id="s9">9. Current status</h2>
+<h3>Runs so far</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Run</th><th>Tool</th><th>Result</th><th>What it shows</th></tr></thead>
+<tbody>
+<tr><td><code>20261018_stage1_xcelium_05</code> (Oct 18)</td><td>Xcelium 24.09-s001, WARM boot, seed 1</td><td>FAIL, firmware error <code>0x1002</code> at 68,885 ns</td><td>Compile and elaboration passed. The firmware activity gate saw 4 verified MMIO reads against a declared minimum of 6. Monitors reported 7 AXI reads and 4 writes but only 5 APB transfers, all on slot 0. The README records the discrepancy as unresolved. Package contains command arguments, manifests, complete logs, filelists, ELF and images.</td></tr>
+<tr><td><code>20261024_stage1_hello</code> (Oct 24)</td><td>XSim 2022.2</td><td>PASS</td><td>1214 retired, 0 AXI, 0 APB (tracker run register). Weak: no bus activity.</td></tr>
+<tr><td><code>20261024_stage2_watchdog</code></td><td>XSim 2022.2</td><td>PASS (negative proof)</td><td>The watchdog fires at cycle 50000 while 31,735 instructions retire; blame attributed to firmware; four freeze buffers dumped. It proves that a hang is reported, not a bring-up success.</td></tr>
+<tr><td><code>20261024_stage3_monitor_count</code></td><td>XSim 2022.2, WARM, timeout 1,000,000</td><td>PASS</td><td>5551 retired; 14 AXI reads and 4 writes; 18 APB transfers on slots 0, 1 and 5, all with PSLVERR 0; attestation word <code>0x0004000e</code>. This is the baseline run named in the contract.</td></tr>
+</tbody></table></div>
+<h3>The DEF-001 story</h3>
+<p>The Oct 24 stage 3 README traces the earlier counter shortfall (reads 12 instead of 14, a corrupted write counter) to a core defect. During an MMIO access <code>mem_stall_i</code> freezes the pipeline. A DSRAM load in EX followed by a dependent instruction raised <code>lwstall</code>, which flushed EX in <code>FlushE</code> because the flush was not gated by the stall, so the waiting load turned into a NOP and left a stale register value. The fix gates the load-use term with <code>~mem_stall_i</code>; the current <code>riscv_core/rtl/hazard_unit.v:192</code> contains it. The tracker records the defect as DEF-001, C-DUT, S2 proposed, <b>FIXED-UNVERIFIED</b>: there is no directed regression that fails without the fix (ACT-010), and no independent closer.</p>
+<p>The fix is a Class A (core) change under Rev B Table 21.12, so any earlier core evidence is void and compliance and lock-step must be produced at the final identity. Also open: <code>hazard_unit.v</code> was modified after the stage 3 run timestamp; the file must be hashed against the proof (ACT-007). The Oct 18 failure is therefore explained by the core defect only by inference from the later pass, not by a retained before-and-after pair on the same identity.</p>
+<h3>What still blocks exit</h3>
+<ul>
+<li><b>P0-G1.1 and G1.2:</b> no golden module set comparison yet (ACT-003).</li>
+<li><b>P0-G1.5 and G3.6:</b> live compile and elaborate logs and the exact command must be captured during the final attributable run.</li>
+<li><b>P0-X3:</b> the stage 3 pass has to be re-run through an automated package script at the final identity (ACT-002, ACT-009).</li>
+<li><b>P0-X1:</b> write the DC-1 record. Default is out of scope; the AON watchdog is waived for FPGA in <code>handoff.md</code>, which is not a sign-off decision. Decision DEC-A (simulator of record) is also OPEN: XSim 2022.2 is pinned in the contract, while coverage needs Xcelium.</li>
+<li><b>P0-X2:</b> tau_scen needs timing data from the final run.</li>
+<li>Not found in the files read: the deliberate negative harness case from the stage brief, run through the same package.</li>
+</ul>
+
+<h2 id="s10">10. Proposal: the run-package script</h2>
+<p><span class="tag specified">SPECIFIED</span> proposal, not built. ACT-002 asks for one script; this section suggests its shape so that it closes P0-G1.4, G1.5, G2.4, G2.5 and G3.* together.</p>
+<ol>
+<li><b>Preflight.</b> Run <code>p0_identity.py</code> (EXISTS). Refuse to continue, and write verdict UNTESTED, if ID-1, ID-2 or ID-3 is non-zero. Do the artefact write test (empty file write, read back, delete).</li>
+<li><b>Create the folder</b> named by date, scenario and a short H_rtl prefix. Copy in the manifest, the relativised filelist and the contract reference.</li>
+<li><b>Build.</b> Execute compile and elaborate with the pinned XSim 2022.2; tee the logs into the folder; record the commands as run, not as intended.</li>
+<li><b>G0 diff.</b> Extract the elaborated module list and compare it with the golden module set (ACT-003): write <code>unresolved_modules</code> and <code>extra_modules</code> counts and the diff report.</li>
+<li><b>Run</b> the stage 3 scenario with the recorded plusargs and seed <code>none</code>, with a timeout. Time it for tau_scen.</li>
+<li><b>Parse counters</b> from the testbench summary into the verdict record: instructions retired, AXI reads and writes, APB transfers, PSLVERR count, attestation words written and value. Fail on any zero or on a timeout.</li>
+<li><b>Negative control.</b> Re-run with a corrupted expectation and require the verdict FAIL; restore the correct expectation and re-check the file hash.</li>
+<li><b>Seal.</b> Write a single record with all eight identity fields, the G0 and G1 verdicts (PASS, FAIL or UNTESTED), and file hashes of every part in the folder.</li>
+</ol>
+<p>Order matters for honesty: identity before any run; verdicts derived only from retained files; nothing in the verdict that cannot be recomputed from the folder. A first success criterion is simple: running the script twice at an unchanged identity yields the same counters and the same verdict.</p>
+<p class="meta">Next phase: <a href="vf_p1a_core_trust.html">P1a Core trust</a>. Overview: <a href="vf_phases_overview.html">phases overview</a>. Tracker: <a href="tracker_status.html">tracker status</a>. Gates: <a href="vf_regression_gates.html">regression and gates</a>. Terms: <a href="glossary.html">glossary</a>.</p>
+
+<div class="sources"><b>Sources read:</b> Rev B 20.1, 21.3, 21.4, 21.8 to 21.13; <code>goals/P0_bringup.md</code>; <code>Verification/doc/briefs/stages/stage_1_brief.md</code>; <code>Verification/status/PHASE_STATUS.md</code>, <code>build_tracker.py</code>, <code>P0_EXECUTION_CONTRACT.md</code>; <code>Verification/artifacts/P0/20261018_stage1_xcelium_05/README.md</code>; <code>Verification/artifacts/stage_proofs/20261024_stage2_watchdog/README.md</code>, <code>20261024_stage3_monitor_count/README.md</code>; <code>riscv_core/rtl/hazard_unit.v:192</code>.</div>
+</div>
+</body>
+</html>

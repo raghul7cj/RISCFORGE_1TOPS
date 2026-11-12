@@ -1,0 +1,50 @@
+
+****** xsim v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source xsim.dir/tb_csr_corner_unit_snapshot/xsim_script.tcl
+# xsim {tb_csr_corner_unit_snapshot} -cov_db_dir C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/functional_db -cov_db_name tb_csr_corner_unit -autoloadwcfg -tclbatch {C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/collect.tcl} -onfinish stop -onerror quit -sv_seed 1
+Time resolution is 1 ps
+source C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/collect.tcl
+## open_vcd {C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/external_activity_171406/activity.vcd}
+## set signal [get_objects {/tb_csr_corner_unit/clk}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/clk"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/rst_n_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/rst_n_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/csr_write_en_normal_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/csr_write_en_normal_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/trap_valid_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/trap_valid_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/mret_commit_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/mret_commit_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/instr_retired_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/instr_retired_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/fast_intr_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/fast_intr_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/timer_intr_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/timer_intr_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/ext_intr_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/ext_intr_i"}
+## log_vcd $signal
+## set signal [get_objects {/tb_csr_corner_unit/dut/msft_intr_i}]
+## if {[llength $signal] != 1} {error "Missing observation signal: /tb_csr_corner_unit/dut/msft_intr_i"}
+## log_vcd $signal
+## run all
+CSR corner unit: SKELETON/INCOMPLETE; no checks performed
+WARNING: The Functional Coverage Database has not been updated during simulation. Please recheck testbench to confirm that covergroups are being instantiated correctly and rerun simulation.
+$finish called at time : 25 ns : File "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/source_snapshot/ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv" Line 82
+## close_vcd
+## puts "ACTIVITY_CAPTURE_COMPLETE"
+ACTIVITY_CAPTURE_COMPLETE
+## quit
+INFO: [Common 17-206] Exiting xsim at Wed Nov 11 17:14:09 2026...

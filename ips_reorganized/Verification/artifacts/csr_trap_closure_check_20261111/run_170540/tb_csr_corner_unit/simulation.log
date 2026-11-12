@@ -1,0 +1,23 @@
+#-----------------------------------------------------------
+# xsim v2022.2 (64-bit)
+# SW Build 3671981 on Fri Oct 14 05:00:03 MDT 2022
+# IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+# Start of session at: Wed Nov 11 17:05:48 2026
+# Process ID: 27552
+# Current directory: C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit
+# Command line: xsim.exe -log simulation.log -mode tcl -source {xsim.dir/tb_csr_corner_unit_snapshot/xsim_script.tcl}
+# Log file: C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/simulation.log
+# Journal file: C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit\xsim.jou
+# Running On: DESKTOP-BSAEVVC, OS: Windows, CPU Frequency: 3110 MHz, CPU Physical cores: 12, Host memory: 16779 MB
+#-----------------------------------------------------------
+source xsim.dir/tb_csr_corner_unit_snapshot/xsim_script.tcl
+# xsim {tb_csr_corner_unit_snapshot} -cov_db_dir C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/coverage -cov_db_name tb_csr_corner_unit -autoloadwcfg -tclbatch {C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/run.tcl} -onfinish quit -onerror quit -sv_seed 1
+Time resolution is 1 ps
+source C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/tb_csr_corner_unit/run.tcl
+## log_wave -r /
+## run all
+CSR corner unit: SKELETON/INCOMPLETE; no checks performed
+WARNING: The Functional Coverage Database has not been updated during simulation. Please recheck testbench to confirm that covergroups are being instantiated correctly and rerun simulation.
+$finish called at time : 25 ns : File "C:/Users/cj/AppData/Local/Temp/csrcheck_9mi5njrz/source_snapshot/ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv" Line 82
+exit 0
+INFO: [Common 17-206] Exiting xsim at Wed Nov 11 17:05:50 2026...

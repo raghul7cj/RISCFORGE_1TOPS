@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Hazard-unit and pipeline verification gate: what the new benches check, the 11 November 2026 campaign evidence, and open core finding HZ-F001, a store squashed by a trap that still reaches memory.">
+  <title>Hazard and pipeline gate · 11 November 2026</title>
+  <link rel="stylesheet" href="report.css">
+</head>
+<body>
+<main class="sheet">
+<header>
+  <p class="eyebrow">RISCFORGE 1TOPS · CJ documentation review · 05</p>
+  <h1>Hazard unit and pipeline verification gate</h1>
+  <p class="lede">What the hazard-unit and pipeline benches check, the evidence a bounded campaign produced on 11 November 2026, and one open core defect the campaign found: a store that is younger than a taken ECALL is offered to the memory interface although it never retires.</p>
+  <p class="meta">11 November 2026 · core RTL baseline <code>d1ec0de4712af37e5bb344697d8d2dd45e255e02</code> · augmented offline <code>ips/</code> copy · <a href="05_hazard_pipeline_gate.md">Detailed Markdown source</a></p>
+</header>
+
+<nav aria-label="Review documents">
+  <a href="index.html">Review home</a>
+  <a href="01_core_architecture.html">Core architecture</a>
+  <a href="02_verification_architecture.html">Verification architecture</a>
+  <a href="03_benchmark_spi_evidence.html">Benchmark &amp; SPI evidence</a>
+  <a href="04_gate_readiness.html">Gate readiness</a>
+  <a href="05_hazard_pipeline_gate.html" aria-current="page">Hazard &amp; pipeline gate</a>
+  <a href="diagram_index.html">Structural views</a>
+</nav>
+
+<section id="scope">
+  <h2>What this document is, and what it is not</h2>
+  <div class="cards">
+    <div class="card"><h3>What it is</h3><p>A single entry point for the hazard-unit and pipeline benches: what they check, the evidence a bounded development campaign produced, and one core defect that campaign found.</p></div>
+    <div class="card"><h3>What it is not</h3><p>Not a technical sign-off, not a coverage closure, and not a decision on the interrupt and MDU policy. No RTL was changed.</p></div>
+    <div class="card"><h3>How to read a claim</h3><p>Contract, as-coded behavior, independent expectation and observed evidence stay separate. A quiet log is not a pass, and a registered finding is not reported as a pass.</p></div>
+  </div>
+  <div class="note"><strong>Two benches, one new gate.</strong> The unit bench drives the combinational hazard unit with generated vectors against a reference model. The pipeline bench runs the production core with the real multiplier/divider and configurable memory waits, and checks retirement order, retired values, CSR effects and memory effects against an independent interpreter. Both are new in this workspace and are not yet upstreamed.</div>
+  <div class="facts">
+    <div><span>Campaign runs</span>32</div>
+    <div><span>Unexpected failures</span>0</div>
+    <div><span>Open findings</span>2 runs, 1 defect</div>
+    <div><span>Unit vectors</span>2 661 over 3 seeds</div>
+    <div><span>Unit bins checked</span>342 of 366</div>
+    <div><span>Negative controls</span>15 of 15 rejected</div>
+    <div><span>Simulator</span>Verilator 5.054</div>
+    <div><span>Sign-off</span>none</div>
+  </div>
+</section>
+
+<section id="unit-under-test">
+  <h2>The unit and the pipeline under test</h2>
+  <p>The hazard unit is combinational and produces the forwarding selects and the stall and flush strobes for each pipeline register. Its flush outputs are where this gate found a defect: the flush that should remove a trap-squashed instruction does not reach the two pipeline transfers that carry that instruction forward.</p>
+  <table>
+    <colgroup><col style="width:17%"><col style="width:36%"><col style="width:35%"><col style="width:12%"></colgroup>
+    <thead><tr><th>Signal</th><th>As implemented</th><th>Where it is consumed</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">FlushD</td><td><code>PCSrcE | exc_inflight_E | exc_inflight_M | wb_redirect | onehot[0]</code></td><td><code>fetch_cycle.v:252</code>, clears <code>valid_D_reg</code> only</td><td>exists</td></tr>
+      <tr><td class="mono">FlushE</td><td><code>(lwstall | csr_gpr_stall | csr_stall) &amp; ~mem_stall_i | PCSrcE | exc_inflight_M | wb_redirect | onehot[1] | stallMUL</code></td><td><code>decode_cycle.v:276</code>, clears the whole ID/EX register. <code>execute_cycle.v:101</code> declares the input and never references it</td><td>exists</td></tr>
+      <tr><td class="mono">FlushM</td><td><code>wb_redirect | onehot[2] | (stallMUL &amp; ~mem_stall_i)</code></td><td><code>execute_cycle.v:411</code>, clears the EX/MEM registers</td><td>exists</td></tr>
+      <tr><td class="mono">FlushW</td><td><code>wb_redirect | onehot[3]</code></td><td><code>memory_cycle.v:240</code>, clears the MEM/WB registers</td><td>exists</td></tr>
+      <tr><td class="mono">instr_retired_W</td><td><code>valid_W &amp; ~exc_valid_W &amp; (mret_commit | (~mem_stall_out &amp; ~FlushW))</code></td><td><code>top.v:299</code>, feeds <code>minstret</code> and, since this work, the pipeline probe</td><td>exists</td></tr>
+    </tbody>
+  </table>
+  <p>Citations are relative to <code>ips/</code>, so <code>riscv_core/rtl/</code> and <code>Verification/hazard_tb/</code>.</p>
+  <div class="note"><strong>Why the retirement token is read from the core.</strong> A memory wait holds the MEM/WB packet, so an expression derived from <code>valid_W</code> alone reports a new retirement on every cycle of the wait. The pipeline probe therefore reads the core's own token, and the checker keeps an independent repeated-retirement guard. The historical expression is kept as a negative control and must be rejected. This was a testbench contract error that re-created the bug upstream issue #16 fixed in the RTL; no RTL was changed to obtain a pass.</div>
+</section>
+
+<section id="suite">
+  <h2>The verification suite</h2>
+  <figure class="structural-figure" id="fig-5-2">
+    <p class="view-original">Scroll horizontally on small screens, or <a href="figures/fig_5_2_bench_check_architecture.svg" aria-label="Open figure 5.2 as a scalable vector">open scalable original and zoom</a>.</p>
+    <div class="artwork"><img src="figures/fig_5_2_bench_check_architecture.svg" alt="Figure 5.2: check architecture of the hazard and pipeline benches"></div>
+    <figcaption><strong>Figure 5.2 — Check architecture of the two benches.</strong> The scenario drives the control interface of the core, the boundary observer samples it before the rising edge and one picosecond after the non-blocking updates, the interpreter derives the expectation from the program image, the checker compares and the campaign classifies. The negative-control lane runs beside the main flow and must reject every injected fault. The expectation is independent of the RTL; it does not repeat the RTL equations.</figcaption>
+    <div class="interface-key">
+      <p><strong>Reading key.</strong> <em>Scenario and control</em> owns reset, memory wait and interrupt stimulus. <em>Production core</em> is the real <code>top</code> with the real multiplier/divider. <em>Memory models</em> supply the instruction image and the data memory with configurable wait cycles. <em>Boundary observer</em> publishes immutable pre-edge and post-NBA samples. <em>Reference interpreter</em> computes the expected retirement order, retired values, CSR writes and memory effects from the same program image. <em>Checker</em> compares. <em>Campaign classification</em> decides pass, registered open finding, or unexpected failure.</p>
+      <p><strong>Not drawn.</strong> The interrupt and MDU policy, which stays characterized rather than checked, and the named pipeline bin manifest, which does not exist.</p>
+    </div>
+    <p class="interface-key"><strong>Spec:</strong> <a href="../../../Verification/hazard_tb/docs/diagrams/bench_check_architecture.spec.json">bench_check_architecture.spec.json</a> · <strong>Validation:</strong> <a href="../../../Verification/hazard_tb/docs/diagrams/validation.json">validation.json</a>, exit code 0.</p>
+  </figure>
+
+  <h3>Programs and what each one exercises</h3>
+  <table>
+    <colgroup><col style="width:20%"><col style="width:15%"><col style="width:41%"><col style="width:24%"></colgroup>
+    <thead><tr><th>Program</th><th>Runs</th><th>What it exercises</th><th>Outcome</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">forward_load_store</td><td>6 waits: 0, 1, 2, 5, 17, 32</td><td>load-use, store-to-load forwarding, a held WB packet</td><td>pass, 6 of 6</td></tr>
+      <tr><td class="mono">redirect_link</td><td>1</td><td>branch and jump redirect, link value</td><td>pass</td></tr>
+      <tr><td class="mono">csr_dependencies</td><td>1</td><td>CSR read-after-write, CSR result to GPR</td><td>pass</td></tr>
+      <tr><td class="mono">mdu_transport</td><td>1</td><td>divide and multiply result transport</td><td>pass</td></tr>
+      <tr><td class="mono">memory_mdu</td><td>2 waits: 0, 5</td><td>memory access and MDU result in one program</td><td>pass, 2 of 2</td></tr>
+      <tr><td class="mono">trap_no_ghost_store</td><td>2 waits: 0, 5</td><td>ECALL with a store immediately after it</td><td><strong>open finding HZ-F001</strong></td></tr>
+      <tr><td class="mono">irq_characterize</td><td>1</td><td>timer interrupt arriving while the MDU is busy</td><td>characterization only</td></tr>
+    </tbody>
+  </table>
+  <p>Each run checks the retirement order and payload against the reference, the operand values of the executed instructions, the CSR write order and value, and the memory effects. A run must also reach its completion checkpoint, and the environment fails the run if a user hook does not report completion, so a quiet log is never treated as a pass.</p>
+
+  <h3>Negative controls</h3>
+  <p>A checker that cannot fail proves nothing. Fifteen runs inject a fault and must be rejected: twelve mutate one output bit of the hazard unit, one restore the historical retirement probe, one inject a checker observation and one corrupt a retired value. All fifteen were rejected as expected. They are 15 of the 44 self-proof candidates; the rest are not built.</p>
+
+  <h3>Interrupt during a busy MDU: characterized, policy open</h3>
+  <p>The interrupt case is characterization, not a checked requirement, because the expected policy is not decided. Measured behavior: the MDU holds the pipeline for 34 cycles with the EX stage empty, the interrupt request stays pending, and it is accepted in EX only after the MDU releases. The RTL carries an abort path, <code>div_abort_internal = wb_redirect_i | (irq_accept_E &amp; stallMUL)</code> at <code>execute_cycle.v:299</code>, but <code>irq_accept_E</code> requires <code>valid_E</code> and a busy MDU leaves EX empty, so that term is not reachable in this configuration. The run reports <code>irq_accepted_while_busy=0</code> and <code>abort_while_busy=0</code> and stays open. Upstream issue #26 asks for the same defer-versus-abort decision.</p>
+</section>
+
+<section id="finding">
+  <h2>Open defect HZ-F001: a squashed store reaches memory</h2>
+  <p><strong>Contract.</strong> An instruction squashed by a trap must have no architectural side effect. Data memory is architectural state.</p>
+  <p><strong>As coded.</strong> A store younger than a taken ECALL is offered to the memory interface although the instruction never retires. At a memory wait of zero, the write becomes visible in data memory.</p>
+
+  <figure class="structural-figure" id="fig-5-1">
+    <p class="view-original">Scroll horizontally on small screens, or <a href="figures/fig_5_1_squashed_store_reaches_memory.svg" aria-label="Open figure 5.1 as a scalable vector">open scalable original and zoom</a>.</p>
+    <div class="artwork"><img src="figures/fig_5_1_squashed_store_reaches_memory.svg" alt="Figure 5.1: how a squashed store reaches the data memory"></div>
+    <figcaption><strong>Figure 5.1 — The path of the squashed store.</strong> Solid arrows are connections that exist in the source. Dashed arrows and dashed boxes are the two gates that do not exist at this commit. Rendered from a saved, validated ground-truth spec with zero rejected elements.</figcaption>
+    <div class="interface-key">
+      <p><strong>Reading key.</strong> Follow the ECALL exception from decode, through the two flushes that do not gate the decode-to-execute and execute-to-memory transfers, to the memory request that leaves the core and the checker rule that flags the offer.</p>
+      <p><strong>Not drawn.</strong> The data-memory model, the interrupt path, and any trap source other than ECALL.</p>
+    </div>
+    <p class="interface-key"><strong>Spec:</strong> <a href="../../../Verification/hazard_tb/docs/diagrams/hz_f001_ghost_store.spec.json">hz_f001_ghost_store.spec.json</a> · <strong>Validation:</strong> <a href="../../../Verification/hazard_tb/docs/diagrams/validation.json">validation.json</a>, exit code 0.</p>
+  </figure>
+
+  <h3>Mechanism</h3>
+  <p>The ECALL exception is generated in decode (<code>decode_cycle.v:418</code>) and is carried through EX and MEM; the trap commits in WB (<code>wb_trap_mret_commit_controller.v:64</code>). Two transfers are not gated by the flush that should remove the younger instruction.</p>
+  <ol>
+    <li><code>FlushD</code> is applied in the fetch stage only. <code>decode_cycle.v</code> has no <code>FlushD</code> input and latches <code>valid_E_r &lt;= valid_D;</code> at line 367 in its normal branch, so the store in D advances into EX.</li>
+    <li><code>FlushE</code> clears the whole ID/EX register at <code>decode_cycle.v:276</code>, but <code>execute_cycle.v</code> latches <code>valid_M_r &lt;= valid_E1;</code> at line 467 in its normal branch. The EX/MEM transfer is gated by <code>FlushM</code> and <code>StallM</code> only, so the store reaches MEM and issues its request.</li>
+  </ol>
+  <p>The store is never retired: the reference retirement sequence contains no <code>0x8000_001c</code>, and the trap's <code>FlushW</code> clears the MEM/WB packet. The trap itself is correct; retirement order, retired values, trap cause and handler resume all match the reference for all 14 instructions.</p>
+
+  <h3>Cycle trace</h3>
+  <table>
+    <colgroup><col style="width:14%"><col style="width:86%"></colgroup>
+    <thead><tr><th>Cycle</th><th>Observation</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">13</td><td>ECALL in EX, <code>exc_valid_E</code> set, <code>FlushD</code> asserted, reaching only the fetch stage</td></tr>
+      <tr><td class="mono">14</td><td>the younger store is in EX, <code>FlushE</code> asserted, and the store is latched into MEM</td></tr>
+      <tr><td class="mono">15</td><td>the store is offered to the memory interface; the trap commits in WB in the same cycle</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Reproducer and evidence</h3>
+  <pre><code>python ips\Verification\hazard_tb\scripts\run_campaign.py &lt;out&gt; --verilator &lt;path&gt; --only pipeline</code></pre>
+  <p>At <code>MEM_WAIT=0</code> the write is visible:</p>
+  <pre><code>[LSU_OFFER] id=0 addr=80001040 we=1 be=1111 wdata=0000004d wait=0
+[LSU_EFFECT] id=0 store addr=80001040 be=1111 wdata=0000004d
+[GHOST_STORE] pc=8000001c we=1 addr=80001040 value=0000004d cycle=15
+[PIPELINE_MISMATCH] cycle=15 ghost store offer from a squashed instruction pc=8000001c
+[PIPELINE_CHECKS] retire=14/14 operands=14 memory=2/1 effects=2 ghosts=1 errors=3</code></pre>
+  <p>At <code>MEM_WAIT=5</code> the core still offers the store and the model withdraws it before the response:</p>
+  <pre><code>[LSU_OFFER] id=0 addr=80001040 we=1 be=1111 wdata=0000004d wait=5
+[GHOST_STORE] pc=8000001c we=1 addr=80001040 value=0000004d cycle=15
+[LSU_CANCEL_DROP] id=0 addr=80001040 before response; no store effect
+[PIPELINE_CHECKS] retire=14/14 operands=14 memory=1/1 effects=1 ghosts=1 errors=1</code></pre>
+  <p>The check is made on the offer at the core boundary, not on the completed effect, so the finding does not depend on the timing model.</p>
+
+  <h3>Scope, and what the fix must not break</h3>
+  <ul>
+    <li>The vulnerable window is a store that is in MEM in the cycle the trap commits in WB. A store still in EX at that moment is already killed by <code>FlushM</code>.</li>
+    <li>Traps detected inside <code>memory_cycle.v</code>, such as a misaligned access, are raised there and are not visible to the hazard unit's <code>exc_inflight_M</code>. They are not covered by the flushes above and need a separate gate. This path was read but not reproduced.</li>
+    <li>Gating the EX/MEM transfer on <code>FlushE</code> is unsafe: <code>FlushE</code> is also asserted by the load-use and CSR stalls, by <code>PCSrcE</code> and by <code>stallMUL</code>, so clearing EX/MEM on it would drop the load of a load-use stall, the link write of a taken branch, CSR results and the MDU instruction.</li>
+    <li>A trap-specific squash signal, plus a MEM-side gate on the request, is the direction the upstream issue records.</li>
+  </ul>
+
+  <div class="note"><strong>Disposition: open.</strong> Tracked upstream as <a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/30">issue #30</a>, label <code>bug</code>, with a correction comment recording an independent review. The review confirmed the defect and corrected several statements in the first version of the issue: the exception is generated in D rather than detected in EX; <code>FlushE</code> clears the whole ID/EX register; the two detections are checks in one checker, not independent sources; the write is suppressed by the memory model at a non-zero wait while the core still offers the request; and raw <code>FlushE</code> is not a safe gate. The issue body and its addendum hold the corrected record. No RTL was changed.</div>
+</section>
+
+<section id="coverage">
+  <h2>Coverage accounting</h2>
+  <p>Coverage is reported per candidate group against the inventories in the <a href="../../../../artifacts/hazard_verification_plan_20261104/Hazard_Verification_Plan.md">verification plan</a>. That plan retires an earlier merged headline and forbids merging the groups into one number, so no merged percentage is given. No code or structural coverage is collected anywhere; the unit number is checked named functional-witness coverage.</p>
+  <table>
+    <colgroup><col style="width:24%"><col style="width:12%"><col style="width:14%"><col style="width:50%"></colgroup>
+    <thead><tr><th>Group</th><th>Candidates</th><th>Closed</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Unit behavioural bins</td><td>366</td><td>342 checked</td><td>93.44 percent checked, 24 characterized and not closed, 0 unattempted</td></tr>
+      <tr><td>Pipeline candidate bins</td><td>947</td><td>0</td><td>no named-bin manifest exists yet, so no percentage is claimed</td></tr>
+      <tr><td>Named crosses</td><td>61</td><td>0</td><td>not implemented as bins</td></tr>
+      <tr><td>Self-proof controls</td><td>44</td><td>15 executed</td><td>34.09 percent, all 15 rejected as expected</td></tr>
+    </tbody>
+  </table>
+  <p>The 24 open unit bins are policy dependent: sixteen hazard-by-consumer crosses of load, CSR address, CSR result and none against E-exception, M-exception, branch and none, and eight reset-cause bins.</p>
+  <p>The pipeline side has no named-bin manifest, so its denominator cannot be reduced. What it does measure is behavioural reach, which is not closure: 1 007 pre-edge samples over 14 runs, 24 distinct hazard control states, 8 of 9 forwarding route pairs (the pair in which both operands come from WB is never observed), 373 memory-wait edges, 149 MDU-busy edges, 6 redirect edges, 3 trap edges and 1 interrupt-accept edge. The trap, redirect and interrupt space is barely exercised, which is where the one open defect sits.</p>
+</section>
+
+<section id="signoff">
+  <h2>Simulation flow, sign-off matrix and limits</h2>
+  <p>The campaign builds both benches, generates the reference programs and vectors, runs every case, and keeps the command, log, observation stream and classification of each run.</p>
+  <pre><code>py -3.12 ips\Verification\hazard_tb\scripts\run_campaign.py artifacts\hazard_execution_20261111_09\oop \
+  --verilator /home/raghul7cj/.local/share/riscforge-tools/verilator-5.054/bin/verilator --only all
+  <p>The simulator is invoked through WSL on Windows. The campaign writes <code>results_all.json</code>, <code>findings_open.json</code>, <code>coverage_accounting.json</code> and a SHA-256 manifest of every bench and core source file, and it exits nonzero while an open finding remains. The evidence is copied into <a href="../../../Verification/hazard_tb/evidence/">Verification/hazard_tb/evidence/</a>.</p>
+  <table>
+    <colgroup><col style="width:34%"><col style="width:12%"><col style="width:54%"></colgroup>
+    <thead><tr><th>Claim</th><th>State</th><th>Boundary of the claim</th></tr></thead>
+    <tbody>
+      <tr><td>Hazard-unit forwarding and stall decisions match the documented rules</td><td>exists</td><td>342 of 366 named bins on 3 seeds; 24 bins depend on an undecided policy</td></tr>
+      <tr><td>The core retires each instruction once and in order</td><td>exists</td><td>14 bounded runs; the probe reads the core retirement token</td></tr>
+      <tr><td>Memory effects match the reference program</td><td>exists</td><td>only where the run completes; the trap case fails and is registered</td></tr>
+      <tr><td>A store squashed by a trap has no side effect</td><td>open</td><td>reproduced failure, issue #30; no RTL change made</td></tr>
+      <tr><td>Interrupt policy while the MDU is busy</td><td>specified</td><td>characterized as deferral; not a check, policy undecided</td></tr>
+      <tr><td>Pipeline candidate-bin closure</td><td>open</td><td>no named-bin manifest, 0 of 947 closed</td></tr>
+      <tr><td>Sign-off qualification</td><td>open</td><td>development simulator, no VCS run, no coverage database</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Limits</h3>
+  <p>The campaign runs on a development simulator. It does not claim sign-off, does not close the proposed pipeline candidate matrix, and does not close the interrupt and MDU policy item. The pipeline bench observes the core through a hierarchy probe; it does not prove the behaviour of a specific bus protocol or of a memory that commits on write-enable. The defect was found by this bench and not fixed; the RTL at the cited source identity is unchanged. The bench files are local to this workspace and are not part of the upstream repository, so the reproducer is not yet runnable from a fresh clone.</p>
+
+  <h3>Next actions</h3>
+  <ol>
+    <li>Decide and record the interrupt/MDU policy (deferral versus abort/restart), then promote <code>irq_characterize</code> from characterization to a checked requirement.</li>
+    <li>Reproduce the MEM-detected trap path (misaligned or access fault) to test whether it also bypasses the flush, which decides whether the issue #30 fix direction is complete.</li>
+    <li>Fix HZ-F001 with a trap-specific squash signal and a MEM-side request gate, then rerun the campaign to close the finding without weakening any check.</li>
+    <li>Define the named pipeline bin manifest so the 947-candidate inventory becomes a closable denominator.</li>
+    <li>Extend the pipeline programs into the trap, redirect and interrupt space, which is where the observed control-state coverage is thinnest.</li>
+  </ol>
+
+  <h3>Learning checkpoint</h3>
+  <div class="note"><strong>Before the fix, predict the checker.</strong> What does the checker report at <code>MEM_WAIT=5</code> if the EX/MEM transfer is gated on a trap-specific signal? The offer should disappear, <code>ghosts</code> should fall to zero, and <code>effects</code> should fall from 2 to 1, because the checkpoint write at <code>0x8000_13fc</code> is the only remaining memory effect. If the offer still appears, the D-to-E transfer is also carrying the store and the second gate is needed as well. That distinction is what separates a complete fix from a partial one.</div>
+</section>
+
+<footer>Maintained Markdown and HTML pairs · Source-bound diagrams rendered from validated specs · Historical evidence preserved · Open finding retained as an open finding. <a href="README.md">Package guide</a> · <a href="https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/30">Upstream issue #30</a> · <a href="../CJ_FINDING_RECONCILIATION_20261110.md">Corrected finding register</a>.</footer>
+</main>
+</body>
+</html>

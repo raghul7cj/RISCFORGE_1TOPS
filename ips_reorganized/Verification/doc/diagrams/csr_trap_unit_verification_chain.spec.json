@@ -1,0 +1,182 @@
+{
+  "title": "CSR unit bench verification chain",
+  "scope": "How one directed case in tb_csr_corner_unit reaches a checked verdict and an observed-bin hit. Does not show the core bench (no stimulus), IRQ arbitration coverage, or signoff closure.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main rtl/ips (no git metadata in this checkout)",
+    "commit": "worktree-2026-11-11 sha256:9e68edc994f77c9fe1772ab78e835dd1e4e224d6ba75731fe9e632bee3903d3c"
+  },
+  "nodes": [
+    {
+      "id": "PLAN",
+      "label": "Test plan: suites and unit bin allocation",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md",
+        "line": 83,
+        "symbol": "Unit-owned bins"
+      }
+    },
+    {
+      "id": "UNIT_TB",
+      "label": "tb_csr_corner_unit: five directed suites",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 283,
+        "symbol": "initial begin"
+      }
+    },
+    {
+      "id": "CSR_IF",
+      "label": "csr_corner_if: bench-owned drive signals",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/csr_trap/csr_corner_if.sv",
+        "line": 31,
+        "symbol": "clocking drive_cb"
+      }
+    },
+    {
+      "id": "DUT",
+      "label": "csr_regfile (31 ports)",
+      "status": "present",
+      "source": {
+        "path": "ips/riscv_core/rtl/csr_regfile.v",
+        "line": 3,
+        "symbol": "module csr_regfile"
+      }
+    },
+    {
+      "id": "CHECK",
+      "label": "check_word: immediate expected-value compare",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 105,
+        "symbol": "task automatic check_word"
+      }
+    },
+    {
+      "id": "COV",
+      "label": "observed_corner_coverage: u_status..u_reset",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/csr_trap/csr_trap_coverage_pkg.sv",
+        "line": 4,
+        "symbol": "covergroup u_status"
+      }
+    },
+    {
+      "id": "LOG",
+      "label": "simulation.log: UNIT_DONE and OBSERVED_COVERAGE",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/artifacts/csr_trap_units_20261111_175150/csr_corner_unit/simulation.log",
+        "line": 495,
+        "symbol": "UNIT_DONE"
+      }
+    },
+    {
+      "id": "CORE",
+      "label": "core scenarios, reference model and core bins",
+      "status": "absent",
+      "note": "Searched tb_core_csr_trap.sv, csr_trap_env_pkg.sv and csr_trap_coverage_pkg.sv: arena/scoreboard hooks exist but no program, response schedule, expected-value model or c_* bin is implemented; the run ends at 30 ns reset-held."
+    }
+  ],
+  "edges": [
+    {
+      "from": "PLAN",
+      "to": "UNIT_TB",
+      "label": "case list and bin ranges",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md",
+        "line": 83,
+        "symbol": "Unit-owned bins"
+      }
+    },
+    {
+      "from": "UNIT_TB",
+      "to": "CSR_IF",
+      "label": "drive CSR ports at negedge",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 96,
+        "symbol": "csr_if.write_address"
+      }
+    },
+    {
+      "from": "CSR_IF",
+      "to": "DUT",
+      "label": "31 named port connections",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 17,
+        "symbol": "csr_regfile #(.XLEN(32)) dut"
+      }
+    },
+    {
+      "from": "DUT",
+      "to": "CHECK",
+      "label": "read_data, mstatus, mepc, mcause",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 132,
+        "symbol": "check_word(\"status.MIE\""
+      }
+    },
+    {
+      "from": "UNIT_TB",
+      "to": "COV",
+      "label": "sample_bin(group, index)",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 131,
+        "symbol": "coverage_collector.sample_bin(0, index)"
+      }
+    },
+    {
+      "from": "COV",
+      "to": "LOG",
+      "label": "OBSERVED_COVERAGE report",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/csr_trap/csr_trap_coverage_pkg.sv",
+        "line": 109,
+        "symbol": "OBSERVED_COVERAGE|u_status"
+      }
+    },
+    {
+      "from": "CHECK",
+      "to": "LOG",
+      "label": "UNIT_DONE checks/failures/spec_pending",
+      "status": "present",
+      "source": {
+        "path": "ips/Verification/infrastructure/tb/tb_csr_corner_unit.sv",
+        "line": 293,
+        "symbol": "UNIT_DONE|checks="
+      }
+    },
+    {
+      "from": "PLAN",
+      "to": "CORE",
+      "label": "core scenarios and c_* bins planned",
+      "status": "planned",
+      "source": {
+        "path": "ips/Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md",
+        "line": 95,
+        "symbol": "Core-owned bins"
+      }
+    }
+  ],
+  "unknowns": [
+    "Whether the trap/MRET-versus-Port-B write priority in csr_regfile is the approved contract; the plan lists it as spec-pending.",
+    "Core-level behaviour: no program, memory response schedule or reference model has been executed.",
+    "Whether RISCOF Zicsr normal-access closure exists; no qualifying run was located.",
+    "XCRG coverage database reporting crashes locally, so only in-simulation covergroup output is available."
+  ]
+}

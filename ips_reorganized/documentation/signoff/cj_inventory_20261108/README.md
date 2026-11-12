@@ -8,6 +8,8 @@
 
 Assessed 8 November 2026 from the official workbook, eight referenced discussions and targeted local evidence. CJ owns all 18 items below, including the transferred benchmark and external-SPI responsibilities. No new simulation, RTL fix, stimulus, coverage bin or expected-result change was made. The official workbook is unchanged.
 
+**Path rebase, 11 November 2026:** `ips/Verification/doc/` was split into `plans/`, `architecture/`, `status/` and `briefs/`. The three CSR/trap `path` values in `inventory.json` were rebased and marked with `path_rebased`; their recorded `sha256` values remain the 8 November snapshot and the plan and architecture guide have since been edited, so those hashes no longer match the current files.
+
 ## What is actually done
 
 **Formal status: 0/18 marked Done in the official workbook; 13 In Progress and 5 blank.** This is the recorded checklist state, not a claim that no engineering work exists. None is newly promoted to closed by this inventory.
@@ -65,13 +67,13 @@ Official criteria are copied verbatim into inventory.json. The assessment below 
 
 - **Exists:** CSR addresses, reset values and access masks are tabulated as coded.
 - **Pending:** Agree intended WARL/read-only/unimplemented-CSR behavior, resolve observations, then freeze the table.
-- **Documents:** [CSR and trap model](../../../documentation/signoff/CSR_and_Trap_Model.md); [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md).
+- **Documents:** [CSR and trap model](../../../documentation/signoff/CSR_and_Trap_Model.md); [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md).
 
 ### 1.5 — Trap and interrupt model defined
 
 - **Exists:** Trap/MRET boundary, direct mtvec and IRQ ordering are documented as coded.
 - **Pending:** Approve the intended trap priority, resume PC, nesting and CSR-write race rules; verify independently.
-- **Documents:** [CSR and trap model](../../../documentation/signoff/CSR_and_Trap_Model.md); [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md).
+- **Documents:** [CSR and trap model](../../../documentation/signoff/CSR_and_Trap_Model.md); [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md).
 
 ### 1.9 — Interrupt map frozen
 
@@ -83,13 +85,13 @@ Official criteria are copied verbatim into inventory.json. The assessment below 
 
 - **Exists:** LSU/interface RTL exists; older LSU infrastructure can be reused.
 - **Pending:** Audit current byte-enable/size/offset/sign/zero-extension/alignment/one-outstanding behavior; adapt legacy checks and run current source, including stalls/errors.
-- **Documents:** [Core architecture](../../../documentation/signoff/Core_Microarchitecture.md); [Hazard and pipeline skeleton entry point](../../../Verification/hazard_tb/README.md); [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md).
+- **Documents:** [Core architecture](../../../documentation/signoff/Core_Microarchitecture.md); [Hazard and pipeline skeleton entry point](../../../Verification/hazard_tb/README.md); [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md).
 
 ### 2.9 — CSR block and trap logic coded
 
 - **Exists:** CSR/trap RTL and reset-held skeleton exist.
 - **Pending:** Resolve approved contract versus implementation; implement independent checking and scenarios for WARL, CSR operations/races, trap/MRET and precise effects. No current corner-suite pass.
-- **Documents:** [CSR and trap model](../../../documentation/signoff/CSR_and_Trap_Model.md); [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md); [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md); [Saved RISC-DV failures and proposed closure checks](../../../documentation/core/RISCV_DV_FAILURE_AUDIT.md); [Waveform-based RTL failure isolation](../../../benchmarks/docs/RTL_FAILURE_ISOLATION.md).
+- **Documents:** [CSR and trap model](../../../documentation/signoff/CSR_and_Trap_Model.md); [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md); [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md); [Saved RISC-DV failures and proposed closure checks](../../../documentation/core/RISCV_DV_FAILURE_AUDIT.md); [Waveform-based RTL failure isolation](../../../benchmarks/docs/RTL_FAILURE_ISOLATION.md).
 
 ### 2.10 — Compressed decoder coded (if C extension)
 
@@ -113,7 +115,7 @@ Official criteria are copied verbatim into inventory.json. The assessment below 
 
 - **Exists:** Reset/entry rules and CSR/trap and pipeline harnesses exist. Hazard semantic compilation is recorded.
 - **Pending:** Execute RESET_PC, clean acceptance, mtvec redirect, mepc save, MRET/resume and IRQ/CSR-race checks on current core. Compilation and arbiter-unit coverage do not close this.
-- **Documents:** [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md); [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md); [Hazard skeleton compilation and runtime limits](../../../Verification/hazard_tb/docs/validation.md); [IRQ unit scope and coverage plan](../../../Verification/IRQ_UNIT_COVERAGE_PLAN.md).
+- **Documents:** [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md); [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md); [Hazard skeleton compilation and runtime limits](../../../Verification/hazard_tb/docs/validation.md); [IRQ unit scope and coverage plan](../../../Verification/IRQ_UNIT_COVERAGE_PLAN.md).
 
 ### 5.2 — Official RISC-V ISA tests pass
 
@@ -125,7 +127,7 @@ Official criteria are copied verbatim into inventory.json. The assessment below 
 
 - **Exists:** Engineer reports privilege/trap testing in RISCOF; no current qualifying pipeline/IRQ corner run established.
 - **Pending:** Map actual tests to machine trap and asynchronous IRQ obligations; execute uncovered causes, ordering, MRET and CSR races. CSR tests alone do not prove interrupt entry.
-- **Documents:** [Historical local RISCOF report](../../../../verification/riscof/report.html); [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md); [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md); [Peripheral-event and interrupt-commit scenario plan](../../../documentation/signoff/irq_event_commit_plan_20261104/PLAN.md).
+- **Documents:** [Historical local RISCOF report](../../../../verification/riscof/report.html); [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md); [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md); [Peripheral-event and interrupt-commit scenario plan](../../../documentation/signoff/irq_event_commit_plan_20261104/PLAN.md).
 
 ### 5.7 — Benchmarks run
 
@@ -155,7 +157,7 @@ Official criteria are copied verbatim into inventory.json. The assessment below 
 
 - **Exists:** CSR/trap plan and IRQ event plan include memory/branch/M-operation overlap and ordering cases.
 - **Pending:** Finish scenarios/reference checks and legal latency model; demonstrate precise effects, bounded progress, correct return and declared nesting policy under load.
-- **Documents:** [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md); [Peripheral-event and interrupt-commit scenario plan](../../../documentation/signoff/irq_event_commit_plan_20261104/PLAN.md); [Hazard and pipeline skeleton entry point](../../../Verification/hazard_tb/README.md); [Saved RISC-DV failures and proposed closure checks](../../../documentation/core/RISCV_DV_FAILURE_AUDIT.md); [Waveform-based RTL failure isolation](../../../benchmarks/docs/RTL_FAILURE_ISOLATION.md).
+- **Documents:** [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md); [Peripheral-event and interrupt-commit scenario plan](../../../documentation/signoff/irq_event_commit_plan_20261104/PLAN.md); [Hazard and pipeline skeleton entry point](../../../Verification/hazard_tb/README.md); [Saved RISC-DV failures and proposed closure checks](../../../documentation/core/RISCV_DV_FAILURE_AUDIT.md); [Waveform-based RTL failure isolation](../../../benchmarks/docs/RTL_FAILURE_ISOLATION.md).
 
 ## What still needs a concrete plan
 
@@ -219,9 +221,9 @@ No Git clean-state claim is made: git was unavailable on this shell PATH. invent
 - **SOC:** [SoC architecture, interrupt map and boot](../../../documentation/signoff/SoC_Architecture_Map_Boot.md)
 - **DECISIONS:** [Original verbal-decision record](../../../documentation/signoff/evidence_review_20261102/VERBAL_DECISIONS.md)
 - **OLDPLAN:** [Earlier overall action plan; dates superseded](../../../documentation/signoff/SIGNOFF_ACTION_PLAN.md)
-- **CSRPLAN:** [CSR/trap scenario plan](../../../Verification/doc/CSR_TRAP_CORNER_TESTPLAN.md)
-- **CSRBRIEF:** [CSR/trap skeleton brief](../../../Verification/doc/CSR_TRAP_SKELETON_BRIEF.md)
-- **CSRHTML:** [CSR/trap architecture guide](../../../Verification/doc/CSR_TRAP_TESTBENCH_ARCHITECTURE.html)
+- **CSRPLAN:** [CSR/trap scenario plan](../../../Verification/doc/plans/CSR_TRAP_CORNER_TESTPLAN.md)
+- **CSRBRIEF:** [CSR/trap skeleton brief](../../../Verification/doc/briefs/csr_trap/CSR_TRAP_SKELETON_BRIEF.md)
+- **CSRHTML:** [CSR/trap architecture guide](../../../Verification/doc/architecture/CSR_TRAP_TESTBENCH_ARCHITECTURE.html)
 - **CSRREADY:** [CSR/trap skeleton state and extension points](../../../Verification/infrastructure/tb/csr_trap/README.md)
 - **HAZARD:** [Hazard and pipeline skeleton entry point](../../../Verification/hazard_tb/README.md)
 - **HAZHTML:** [Hazard and pipeline architecture](../../../Verification/hazard_tb/docs/architecture.html)

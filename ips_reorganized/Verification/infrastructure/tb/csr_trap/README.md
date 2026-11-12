@@ -1,6 +1,7 @@
 # CSR and trap skeleton
 
-[Architecture, diagrams and verification goal](../../../doc/CSR_TRAP_TESTBENCH_ARCHITECTURE.html)
+[Architecture, diagrams and verification goal](../../../doc/architecture/CSR_TRAP_TESTBENCH_ARCHITECTURE.html) ·
+[Documentation index and filing rule](../../../doc/README.md)
 
 Invocation root for both filelists is `rtl/ips`. Compile each filelist
 independently and select the top named in its header comment. Example
@@ -12,13 +13,15 @@ vcs -full64 -f Verification/filelists/tier1_unit/tb_csr_corner_unit.f -o simv_cs
 vcs -full64 -f Verification/filelists/tier1_unit/tb_core_csr_trap.f -o simv_core_csr_trap
 ```
 
-Equivalent simulator command syntax may differ. These are templates only;
-they have not been run in this environment.
+Equivalent simulator command syntax may differ. The VCS templates themselves
+have not been run here; the local XSim path is scripted under
+[Running the benches](#running-the-benches).
 
 ## Tops and wiring
 
 - `tb_csr_corner_unit` connects every `csr_regfile` port through
-  `csr_corner_if`. Reset is active low and remains asserted.
+  `csr_corner_if` and runs five directed suites: `status_cases`,
+  `metadata_cases`, `collision_cases`, `counter_cases` and `reset_cases`.
 - `tb_core_csr_trap` instantiates the actual `riscv_core/rtl/top.v` with
   `RESET_PC=0x80000000`, a `core_corner_imem` read shell, and a
   `core_corner_dmem` responder shell. The data base convention is
@@ -54,17 +57,77 @@ program/data-response configuration hooks; it implements no latency, error,
 storage, or memory effects. `DATA_BASE` is intentionally omitted until an
 address map is reviewed. The unit top has typed no-op model and coverage hooks.
 
-No reference model, coverage bins, or stimulus were implemented. No PASS,
-functional correctness, or coverage closure is claimed. The environment is
-strictly `SKELETON/INCOMPLETE`.
+The unit bench now has five directed suites and five observed-bin groups
+(details below). The core bench still has no stimulus, reference model or bins.
+No PASS, functional correctness, or coverage closure is claimed for either.
 
-Validation: source paths, explicit DUT port names and hierarchical probe names
-were inspected statically. No compiler/elaboration or simulation result is
-available. The interface drive blocks contain only bench-owned inputs; reset
-remains asserted throughout the bounded skeleton lifecycle.
+Initial handback (2026-11-04): source paths, explicit DUT port names and
+hierarchical probe names were inspected statically; no compiler/elaboration
+or simulation result had been established at that point. The interface drive
+blocks contain only bench-owned inputs; reset remains asserted throughout
+the bounded skeleton lifecycle.
 
 Parent static review confirmed 31/31 named CSR DUT ports and 21/21 named core
 DUT ports connected, with no missing, unknown or duplicate port names. All 3
 unit-filelist and 39 core-filelist source paths exist. Clocking/modport names
 are unique in both interfaces. These checks do not establish SV syntax,
 elaboration, event scheduling correctness or functional behavior.
+
+## Running the benches
+
+From `rtl/ips/Verification` with Vivado XSim 2022.2 on `PATH`:
+
+```powershell
+pwsh -NoProfile -File .\run_csr_trap_units.ps1                          # both benches
+pwsh -NoProfile -File .\run_csr_trap_units.ps1 -Bench csr_corner_unit   # unit only
+```
+
+Each invocation compiles the bench's filelist, elaborates and simulates into a
+dated `artifacts/csr_trap_units_<timestamp>/` directory holding `compile.log`,
+`elaborate.log`, `simulation.log` and `source_sha256.txt`.
+
+## Execution check — 2026-11-11
+
+[Unit run logs and source hashes](../../../artifacts/csr_trap_units_20261111_175150/)
+
+| Unit suite | Cases | Checked result |
+|---|---|---|
+| `u_status` trap/MRET status transitions | 8 | 24 checks, 0 failures |
+| `u_metadata` cause, `mepc`, `mtval` | 168 | 504 checks, 0 failures |
+| `u_reset` | 4 | 24 checks, 0 failures |
+| `u_collision` | 40 | spec-pending, observation only |
+| `u_counter` | 16 | spec-pending, observation only |
+
+The unit bench ends with `UNIT_DONE|checks=552|failures=0|spec_pending=56` at
+8936 ns. Each of the five unit covergroups reports `100.000`, but those bins
+are one bin per planned case, sampled when the case executes: this is
+observed-attempt coverage, not closure of value, priority or cross bins.
+
+The 56 spec-pending cases print the observed register value and assert no
+expected result, so they cannot fail and do not establish write-priority or
+counter-collision behavior.
+
+`tb_core_csr_trap` compiles (39 sources), elaborates and runs to 30 ns with the
+core reset-held: `checks=0`, `SKELETON/INCOMPLETE`. It has no stimulus,
+reference model or core coverage bins yet.
+
+Both benches were also compiled, elaborated and run with the older
+[closure check](../../../artifacts/csr_trap_closure_check_20261111/run_170540/CLOSURE_STATUS.md)
+before the unit suites were implemented; that record describes the
+reset-held skeleton only.
+
+XCRG report generation still crashes with process status `0xC0000374`, so
+coverage numbers above come from the in-simulation covergroup report, not from
+a coverage database report.
+
+## Integrity and open decisions
+
+`py ..\..\..\tools\check_csr_trap_docs.py` re-derives the claims above from
+source and logs: port connections, filelist paths, evidence hashes, result
+markers and bin coverage. It currently reports `10/10 checks passed`.
+
+Full point-wise record, RTL behaviour, stimulus inventory, bin meaning and the
+six open specification decisions: [status and evidence record](../../../doc/status/CSR_TRAP_VERIFICATION_STATUS.md).
+
+Documentation backup taken before the results update:
+`../../../doc/backup/20261111_1807/MANIFEST.md`.
