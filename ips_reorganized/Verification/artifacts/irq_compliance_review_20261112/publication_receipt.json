@@ -1,0 +1,38 @@
+{
+  "published_utc": "2026-11-12",
+  "repository": "raghul7cj/RISCFORGE_1TOPS",
+  "branch": "verification_infra",
+  "evidence_commit": "c8b264fda23c35d891d77e0c583959fe9b6aa24a",
+  "remote_bundle": "ips_reorganized/Verification/artifacts/irq_compliance_review_20261112",
+  "files_published": [
+    "tb_irq_compliance.sv",
+    "run.ps1",
+    "run_portable.sh",
+    "compile.log",
+    "simulation.log",
+    "result.json",
+    "source_identity.json",
+    "output_hashes.json",
+    "github_issues.json",
+    "compliance_review.md",
+    "compliance_review.spec.json",
+    "RESULTS.md",
+    "REPRODUCIBILITY.md"
+  ],
+  "excluded": [
+    "sim.vvp (generated binary; not published)"
+  ],
+  "comment_urls": {
+    "20": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/20#issuecomment-6818092430",
+    "33": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/33#issuecomment-6818088503",
+    "34": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/34#issuecomment-6818089132",
+    "35": "https://github.com/raghul7cj/RISCFORGE_1TOPS/issues/35#issuecomment-6818089687"
+  },
+  "gates": {
+    "33": "Primary G4.12 (partially complete, not ready); shared G5.3; follow-up G6.5",
+    "34": "Primary G4.12 (partially complete, not ready); shared G5.3; follow-up G6.13",
+    "35": "Primary G3.6; execution G6.5; dependency G4.12 (partially complete)",
+    "20": "Primary G5.3; shared G4.12; follow-up G6.13"
+  },
+  "scope_note": "Block-level evidence only; #35 is static source/wiring inspection with no runtime SoC timer-to-handler reproducer; #21 ordering not reproduced."
+}
