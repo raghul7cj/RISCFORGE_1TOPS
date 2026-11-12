@@ -247,22 +247,8 @@ make cov_rtl_report COV_NAME=cov_rtl_mixed
 
 ---
 
-## 9. Retained Artifacts & Evidence in This Directory
 
-| Path | Contents |
-| :--- | :--- |
-| [`RANDOM_INSTR_STREAM_FLOW.txt`](RANDOM_INSTR_STREAM_FLOW.txt) | Original plain-text flow reference |
-| [`setup_commands.txt`](setup_commands.txt) | Historical environment setup and command notes |
-| [`requirements.txt`](requirements.txt) | Python package dependencies for `riscv-dv` scripts |
-| [`out_2026-11-12/`](out_2026-11-12/) | Sample 10-seed `riscv_arithmetic_basic_test` generation (`asm_test/`), `test.hex`, `disasm.txt`, `spike_trace.csv`, Xcelium RTL run (`rtl_sim/rtl.log`, `rtl_trace.csv`, `rtl_trace.csv.cmp`), and `cov_work/` |
-| [`sweep/`](sweep/) | Multi-seed `compare_<seed>.log` and trace files across 10 `riscv-dv` test suites (e.g., `riscv_rand_instr_test`: 25/25 passed; `riscv_rand_jump_test`: 20/20 passed; `riscv_jump_stress_test`: 20/20 passed; `riscv_loop_test`: 20/20 passed; `riscv_mmu_stress_test`: 20/20 passed; `riscv_ebreak_test`: 19/20 passed, 1 failed; `riscv_illegal_instr_test`: 3/25 passed, 22 failed; `riscv_misaligned_instr_test`: 1/1 passed; `riscv_unaligned_ld_store_test`: 1/1 passed) |
-| [`html_12-11-2026_01~27~40/index.html`](html_12-11-2026_01~27~40/index.html) | Cadence IMC HTML functional coverage report (`4275 / 4384 (97.51%)` overall covered, `96.71%` overall average grade across `riscv_instr_cover_group`) |
-| [`core-spike-lockstep-comparision/readme.md`](core-spike-lockstep-comparision/readme.md) | Companion bare-metal C/assembly lockstep co-simulation environment |
-| [`riscv-mdu-uvm/`](riscv-mdu-uvm/) & [`riscv-lsu-uvm/`](riscv-lsu-uvm/) | Standalone unit-level UVM 1.2 verification environments for the MDU and LSU |
-
----
-
-## 10. Quick Reference Card
+## 9. Quick Reference Card
 
 ```tcsh
 source env_setup.csh                                   # 0. Setup environment (required)
