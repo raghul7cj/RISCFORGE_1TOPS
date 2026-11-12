@@ -1,0 +1,93 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Nov 12, 2026 at 16:51:25 IST
+xrun
+	-64bit
+	-sv
+	-access +rwc
+	-timescale 1ns/1ps
+	-coverage all
+	-covoverwrite
+	+define+SHM
+	-covtest branch_unit
+	-xmlibdirname build/xcelium_branch.d
+	-l build/xrun_branch.log
+	../JB_unit.v
+	../ALU.v
+	tb_branch_unit.sv
+file: ../JB_unit.v
+	module worklib.JB_unit:v
+		errors: 0, warnings: 0
+file: ../ALU.v
+	module worklib.ALU:v
+		errors: 0, warnings: 0
+file: tb_branch_unit.sv
+	module worklib.tb_branch_unit:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		tb_branch_unit
+
+	Extracting FSMs for coverage:
+		worklib.JB_unit
+		worklib.ALU
+		worklib.tb_branch_unit
+	Total FSMs extracted = 0
+	Building instance overlay tables: .................... Done
+	Enabling instrumentation for coverage types: block expression FSM toggle functional
+xmelab: *W,COVDCL: By default expression coverage is scored only for Verilog logical operators (|| and &&) and VHDL logical operators (OR, AND, NOR, and NAND), and is scored only in condition expressions. To score coverage for other operators and for expressions in other statements, use the "set_expr_coverable_operators" and "set_expr_coverable_statements" coverage configuration file commands with suitable options at elaboration.
+	Generating native compiled code:
+		worklib.JB_unit:v <0x399b5225>
+			streams:   6, words:  1712
+		worklib.ALU:v <0x4c3de39a>
+			streams:   7, words:  6571
+		worklib.JB_unit:v <0x1df3fa1a>
+			streams:   6, words:  1731
+		worklib.tb_branch_unit:sv <0x6ac705aa>
+			streams:  25, words: 37047
+    integer pass_cnt = 0;
+                   |
+xmelab: *W,COVUTA (./tb_branch_unit.sv,58|19): Toggle coverage is not supported for SystemVerilog integer, real array, string, dynamic array, sparse memory and reference ports. It is also not supported for VHDL multi-dimensional array and array of record. There may also be other such objects in the design.
+xmelab: *W,COVNOEN: By default, toggle coverage is not supported for systemverilog enumerated nets and variables. To enable toggle coverage of these objects, specify the 'set_toggle_scoring -sv_enum' command in the coverage configuration file.
+	Building instance specific data structures.
+xmelab: *W,CGPIDF: Covergroup "per_instance" option , by default, is set as 0.
+xmelab: *N,COVCGN: Coverage configuration file command "set_covergroup -new_instance_reporting" can be specified to improve the scoping and naming of covergroup instances. It may be noted that subsequent merging of a coverage database saved with this command and a coverage database saved without this command is not allowed.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                 Instances  Unique
+		Modules:                 4       3
+		Registers:              50      50
+		Scalar wires:           12       -
+		Vectored wires:         14       -
+		Always blocks:           1       1
+		Initial blocks:         11      11
+		Cont. assignments:      14      12
+		Pseudo assignments:      8       -
+		Covergroup Instances:    0       1
+		Simulation timescale:  1ps
+	Writing initial simulation snapshot: worklib.tb_branch_unit:sv
+Loading snapshot worklib.tb_branch_unit:sv .................... Done
+SVSEED default: 1
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+============================================================
+Signed   coverage counts: rs1<rs2=1494, rs1==rs2=321, rs1>rs2=1516
+Unsigned coverage counts: rs1<rs2=1500, rs1==rs2=321, rs1>rs2=1510
+tb_branch_unit SUMMARY: PASS=3843, FAIL=0
+============================================================
+Simulation complete via $finish(1) at time 7174 NS + 0
+./tb_branch_unit.sv:319         $finish;
+xcelium> exit
+xmsim: *N,COVCGN: Coverage configuration file command "set_covergroup -new_instance_reporting" can be specified to improve the scoping and naming of covergroup instances. It may be noted that subsequent merging of a coverage database saved with this command and a coverage database saved without this command is not allowed.
+xmsim: *W,CGPIZE: Instance coverage for covergroup instance "cg_inst" will not be dumped to database as per_instance option value is set to 0:./tb_branch_unit.sv, 100.
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb_branch_unit(tb_branch_unit)
+  scope    :  scope
+  testname :  branch_unit
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_35466bc8_52873ad3.ucm
+  data               :  ./cov_work/scope/branch_unit/icc_35466bc8_52873ad3.ucd
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 12, 2026 at 16:51:28 IST  (total: 00:00:03)

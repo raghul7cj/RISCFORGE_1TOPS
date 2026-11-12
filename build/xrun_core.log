@@ -1,0 +1,67 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Nov 12, 2026 at 16:55:08 IST
+xrun
+	-64bit
+	-sv
+	-access +rwc
+	-timescale 1ns/1ps
+	-coverage all
+	-covoverwrite
+	+define+SHM
+	-covtest core_sanity
+	-xmlibdirname build/xcelium_core.d
+	-l build/xrun_core.log
+	../ALU.v
+	../Control_Unit_Top.v
+	../csa.v
+	../writeback_cycle.v
+	../wb_trap_mret_commit_controller.v
+	../fetch_cycle.v
+	../top.v
+	../rv32m_unit.v
+	../Mux2.v
+	../memory_cycle.v
+	../csr_regfile.v
+	../imem_controller.v
+	../decode_cycle.v
+	../pp_gen.v
+	../Mux_3_by_1.v
+	../ls_unit.v
+	../hazard_unit.v
+	../execute_cycle.v
+	../Sign_Extend.v
+	../PC.v
+	../Main_Decoder.v
+	../opcode_check.v
+	../rv32m_div.v
+	../PC_Adder.v
+	../rv32m_mul.v
+	../ALU_Decoder.v
+	../JB_unit.v
+	../booth_enc.v
+	../Register_File.v
+	tb_core_sanity.sv
+Loading snapshot worklib.tb_core_sanity:sv .................... Done
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+[INFO] 3535000 | IRQ Stimulus: asserted ext_irq_i (MEIP, cause 11)
+[INFO] 3565000 | IRQ Checker: interrupt committed cause=11 mepc=0x80000264 -> mtvec=0x80000400
+[INFO] 3905000 | IRQ Stimulus: asserted timer_irq_i (MTIP, cause 7)
+[INFO] 3935000 | IRQ Checker: interrupt committed cause=7 mepc=0x8000028c -> mtvec=0x80000400
+============================================================
+tb_core_sanity SUMMARY: PASS=42, FAIL=0
+============================================================
+Simulation complete via $finish(1) at time 4325 NS + 0
+./tb_core_sanity.sv:778         $finish;
+xcelium> exit
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb_core_sanity(tb_core_sanity)
+  scope    :  scope
+  testname :  core_sanity
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_66353673_00000000.ucm (reused)
+  data               :  ./cov_work/scope/core_sanity/icc_66353673_00000000.ucd
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 12, 2026 at 16:55:11 IST  (total: 00:00:03)

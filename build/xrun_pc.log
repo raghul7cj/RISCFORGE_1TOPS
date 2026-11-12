@@ -1,0 +1,91 @@
+xrun(64): 24.09-s001: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	24.09-s001: Started on Nov 12, 2026 at 16:51:14 IST
+xrun
+	-64bit
+	-sv
+	-access +rwc
+	-timescale 1ns/1ps
+	-coverage all
+	-covoverwrite
+	+define+SHM
+	-covtest pc_unit
+	-xmlibdirname build/xcelium_pc.d
+	-l build/xrun_pc.log
+	../PC.v
+	../PC_Adder.v
+	tb_pc_unit.sv
+file: ../PC.v
+	module worklib.PC:v
+		errors: 0, warnings: 0
+file: ../PC_Adder.v
+	module worklib.PC_Adder:v
+		errors: 0, warnings: 0
+file: tb_pc_unit.sv
+	module worklib.tb_pc_unit:sv
+		errors: 0, warnings: 0
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		tb_pc_unit
+
+	Extracting FSMs for coverage:
+		worklib.PC
+		worklib.PC_Adder
+		worklib.tb_pc_unit
+	Total FSMs extracted = 0
+	Building instance overlay tables: .................... Done
+	Enabling instrumentation for coverage types: block expression FSM toggle functional
+xmelab: *W,COVDCL: By default expression coverage is scored only for Verilog logical operators (|| and &&) and VHDL logical operators (OR, AND, NOR, and NAND), and is scored only in condition expressions. To score coverage for other operators and for expressions in other statements, use the "set_expr_coverable_operators" and "set_expr_coverable_statements" coverage configuration file commands with suitable options at elaboration.
+	Generating native compiled code:
+		worklib.PC_Adder:v <0x3c09020d>
+			streams:   1, words:   176
+		worklib.PC:v <0x3a9e7cd9>
+			streams:   2, words:   784
+		worklib.PC:v <0x2e3ddc97>
+			streams:   2, words:   777
+		worklib.tb_pc_unit:sv <0x371edd84>
+			streams:  18, words: 58588
+    integer pass_cnt = 0;
+                   |
+xmelab: *W,COVUTA (./tb_pc_unit.sv,25|19): Toggle coverage is not supported for SystemVerilog integer, real array, string, dynamic array, sparse memory and reference ports. It is also not supported for VHDL multi-dimensional array and array of record. There may also be other such objects in the design.
+	Building instance specific data structures.
+xmelab: *W,CGPIDF: Covergroup "per_instance" option , by default, is set as 0.
+xmelab: *N,COVCGN: Coverage configuration file command "set_covergroup -new_instance_reporting" can be specified to improve the scoping and naming of covergroup instances. It may be noted that subsequent merging of a coverage database saved with this command and a coverage database saved without this command is not allowed.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                 Instances  Unique
+		Modules:                 5       3
+		Registers:              26      25
+		Scalar wires:            6       -
+		Vectored wires:          9       -
+		Always blocks:           3       2
+		Initial blocks:          5       5
+		Cont. assignments:       2       1
+		Pseudo assignments:      7       -
+		Covergroup Instances:    0       1
+		Process Clocks:          2       2
+		Simulation timescale:  1ps
+	Writing initial simulation snapshot: worklib.tb_pc_unit:sv
+Loading snapshot worklib.tb_pc_unit:sv .................... Done
+SVSEED default: 1
+xcelium> source /home/install/XCELIUM2409/tools/xcelium/files/xmsimrc
+xcelium> run
+============================================================
+tb_pc_unit SUMMARY: PASS=487, FAIL=0
+============================================================
+Simulation complete via $finish(1) at time 2597 NS + 0
+./tb_pc_unit.sv:324         $finish;
+xcelium> exit
+xmsim: *N,COVCGN: Coverage configuration file command "set_covergroup -new_instance_reporting" can be specified to improve the scoping and naming of covergroup instances. It may be noted that subsequent merging of a coverage database saved with this command and a coverage database saved without this command is not allowed.
+xmsim: *W,CGPIZE: Instance coverage for covergroup instance "cg_inst" will not be dumped to database as per_instance option value is set to 0:./tb_pc_unit.sv, 74.
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb_pc_unit(tb_pc_unit)
+  scope    :  scope
+  testname :  pc_unit
+
+coverage files:
+  model(design data) :  ./cov_work/scope/icc_064e9ded_07e2ccbc.ucm
+  data               :  ./cov_work/scope/pc_unit/icc_064e9ded_07e2ccbc.ucd
+TOOL:	xrun(64)	24.09-s001: Exiting on Nov 12, 2026 at 16:51:22 IST  (total: 00:00:08)
