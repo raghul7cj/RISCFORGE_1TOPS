@@ -1,0 +1,91 @@
+{
+  "title": "F3 interrupt verification handoff",
+  "scope": "Independent expected PC and ordered effects; simplified verification path, not full RTL routing or coverage closure.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main/rtl/ips; modified input SHA256 set in Verification/tb_core_trap_lean/F3_MATRIX.json",
+    "commit": "cd0660db866654e5a8bc687d2b8b9280e10b9ad2"
+  },
+  "nodes": [
+    {
+      "id": "F",
+      "label": "F3 fixture and frontier",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "initial begin : f3_drive_sources"
+      }
+    },
+    {
+      "id": "M",
+      "label": "Independent machine reference",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/rv32/rv32_machine_reference_pkg.sv",
+        "symbol": "task automatic enter_interrupt"
+      }
+    },
+    {
+      "id": "S",
+      "label": "Ordered effect scoreboard",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/core_scoreboard_pkg.sv",
+        "symbol": "class core_scoreboard"
+      }
+    },
+    {
+      "id": "D",
+      "label": "Core DUT",
+      "status": "present",
+      "source": {
+        "path": "riscv_core/rtl/top.v",
+        "symbol": "module top #("
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "F",
+      "to": "D",
+      "label": "Timer source stimulus",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "timer_irq = f3_pending_mask[7];"
+      }
+    },
+    {
+      "from": "F",
+      "to": "M",
+      "label": "Independent next unretired PC",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "enter_interrupt(expected_fault_pc, expected_cause, machine_state);"
+      }
+    },
+    {
+      "from": "F",
+      "to": "S",
+      "label": "Replace only unchecked predictions",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "scoreboard.revise_unconsumed(slot, f3_snapshot_gpr_count[slot], f3_snapshot_store_count[slot]);"
+      }
+    },
+    {
+      "from": "D",
+      "to": "S",
+      "label": "Observed ordinary retirement",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "scoreboard.observe_retirement(obs_pc_w);"
+      }
+    }
+  ],
+  "unknowns": [
+    "Full nested ISR and SoC interrupt routing are outside this milestone."
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "title": "Core trap and interrupt verification through F3",
+  "scope": "Directed synchronous recovery and four passing IRQ cases; independent PC/effect prediction, shared SVA and coverage. Requested external/software service and priority fail; general squash and IRQ closure remain open.",
+  "baseline": {
+    "repo": "RISCFORGE_1TOPS-main/rtl/ips; modified HDL/header SHA256 set in F3_MATRIX.json; runs in RESULTS.md",
+    "commit": "cd0660db866654e5a8bc687d2b8b9280e10b9ad2"
+  },
+  "nodes": [
+    {
+      "id": "TB",
+      "label": "Program, run-ahead and event sampling",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "module tb_core_trap_lean"
+      }
+    },
+    {
+      "id": "DUT",
+      "label": "Core module top",
+      "status": "present",
+      "source": {
+        "path": "riscv_core/rtl/top.v",
+        "symbol": "module top #("
+      }
+    },
+    {
+      "id": "OBS",
+      "label": "DUT observation adapter",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/core_trap_observe.sv",
+        "symbol": "module core_trap_observe"
+      }
+    },
+    {
+      "id": "MODEL",
+      "label": "RV32 step and reference memory",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/rv32/rv32_reference_pkg.sv",
+        "symbol": "task automatic execute("
+      }
+    },
+    {
+      "id": "SB",
+      "label": "Common ordered scoreboard",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/core_scoreboard_pkg.sv",
+        "symbol": "class core_scoreboard"
+      }
+    },
+    {
+      "id": "IMEM",
+      "label": "Instruction SRAM",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/memory/sync_imem_sram.sv",
+        "symbol": "module sync_imem_sram"
+      }
+    },
+    {
+      "id": "DMEM",
+      "label": "LSU SRAM responder",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/memory/lsu_dmem_responder.sv",
+        "symbol": "module lsu_dmem_responder"
+      }
+    },
+    {
+      "id": "PIPE",
+      "label": "Common core observation interface",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/core_pipeline_if.sv",
+        "symbol": "interface core_pipeline_if"
+      }
+    },
+    {
+      "id": "SVA",
+      "label": "Common pipeline and stage SVA",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/sva/core_pipeline_sva.sv",
+        "symbol": "module core_pipeline_sva"
+      }
+    },
+    {
+      "id": "MACHINE",
+      "label": "Independent machine trap state and fault classification",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/rv32/rv32_machine_reference_pkg.sv",
+        "symbol": "task automatic step_machine"
+      }
+    },
+    {
+      "id": "TRAP_SVA",
+      "label": "Shared trap packet, state and return SVA",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/sva/core_sync_trap_sva.sv",
+        "symbol": "module core_sync_trap_sva"
+      }
+    },
+    {
+      "id": "COV",
+      "label": "Actual cause, mode and MIE/MPIE coverage",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/trap_functional_cov.sv",
+        "symbol": "module trap_functional_cov"
+      }
+    },
+    {
+      "id": "IRQ_FIX",
+      "label": "Local IRQ phases and reference snapshots",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "task automatic update_f3_frontier()"
+      }
+    },
+    {
+      "id": "IRQ_SVA",
+      "label": "Common mask, pending and service SVA",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/sva/core_irq_mask_sva.sv",
+        "symbol": "module core_irq_mask_sva"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "TB",
+      "to": "MODEL",
+      "label": "Independent program execution",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "execute(image_pc"
+      }
+    },
+    {
+      "from": "TB",
+      "to": "SB",
+      "label": "Predicted records",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "scoreboard.expect_instruction"
+      }
+    },
+    {
+      "from": "DUT",
+      "to": "OBS",
+      "label": "Read-only taps",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/core_trap_observe.sv",
+        "symbol": "assign retired_w = tb_core_trap_lean.dut.instr_retired_W;"
+      }
+    },
+    {
+      "from": "OBS",
+      "to": "TB",
+      "label": "Sampled event signals",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "core_trap_observe observe_core"
+      }
+    },
+    {
+      "from": "TB",
+      "to": "SB",
+      "label": "Observed physical effects",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "scoreboard.observe_store"
+      }
+    },
+    {
+      "from": "TB",
+      "to": "IMEM",
+      "label": "Clock, reset and preload",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "sync_imem_sram #"
+      }
+    },
+    {
+      "from": "IMEM",
+      "to": "DUT",
+      "label": "Instruction data",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": ".imem_sram_rdata(imem_rdata)"
+      }
+    },
+    {
+      "from": "DUT",
+      "to": "DMEM",
+      "label": "LSU request and response",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": ".lsu_mem_req(mem_req)"
+      }
+    },
+    {
+      "from": "TB",
+      "to": "DMEM",
+      "label": "Independent final-state comparison",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "dmem.mem[word_index] !== reference_memory.read_word"
+      }
+    },
+    {
+      "from": "OBS",
+      "to": "PIPE",
+      "label": "Registered stages and physical controls",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/core_trap_observe.sv",
+        "symbol": "assign pipeline.hold_stage"
+      }
+    },
+    {
+      "from": "PIPE",
+      "to": "SVA",
+      "label": "Read-only temporal observations",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": ".pipe(pipeline)"
+      }
+    },
+    {
+      "from": "TB",
+      "to": "MACHINE",
+      "label": "Independent software execution and state",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": "step_machine(image_pc"
+      }
+    },
+    {
+      "from": "TB",
+      "to": "TRAP_SVA",
+      "label": "Independent predicted fault/return PCs and status",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/tb_core_trap_lean.sv",
+        "symbol": ".expected_fault_pc(checked_trap_pc)"
+      }
+    },
+    {
+      "from": "PIPE",
+      "to": "TRAP_SVA",
+      "label": "Actual commitment and CSR observations",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/sva/core_sync_trap_sva.sv",
+        "symbol": "core_pipeline_if.monitor pipe"
+      }
+    },
+    {
+      "from": "PIPE",
+      "to": "COV",
+      "label": "Hardware-qualified trap commits",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/trap_functional_cov.sv",
+        "symbol": "covergroup cg_traps @(posedge pipe.clk)"
+      }
+    },
+    {
+      "from": "IRQ_FIX",
+      "to": "DUT",
+      "label": "Driven IRQ pins",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "timer_irq = f3_pending_mask[7];"
+      }
+    },
+    {
+      "from": "IRQ_FIX",
+      "to": "MACHINE",
+      "label": "Independent next-unretired PC",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "enter_interrupt(expected_fault_pc, expected_cause, machine_state);"
+      }
+    },
+    {
+      "from": "IRQ_FIX",
+      "to": "SB",
+      "label": "Validate prefix and revise future predictions",
+      "status": "present",
+      "source": {
+        "path": "Verification/tb_core_trap_lean/f3_scenario.svh",
+        "symbol": "scoreboard.revise_unconsumed("
+      }
+    },
+    {
+      "from": "PIPE",
+      "to": "IRQ_SVA",
+      "label": "Observed mask, pending and acceptance",
+      "status": "present",
+      "source": {
+        "path": "Verification/lib/core/sva/core_irq_mask_sva.sv",
+        "symbol": "core_pipeline_if.monitor pipe"
+      }
+    }
+  ],
+  "unknowns": [
+    "F1-EXC-01 and F02-WB-01 remain open; directed smoke passes do not waive them",
+    "F3-IRQ-01 and F3-ARB-01 are real requested-policy failures",
+    "Vectored mode unhit; nested ISR, multi-source drain, wait overlap, full fast sweep and SoC loop not closed"
+  ]
+}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>tb_core_trap_lean Internal Architecture</title>
+<style>
+  :root { --font-sans: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  body { font-family: var(--font-sans); margin: 0 auto; }
+  h2 { font-size: 1.05rem; margin: 0 0 8px; font-weight: 700; }
+  .wrap { width: 100%; }
+  svg { width: 100%; height: auto; display: block; }
+  .grp { fill: none; stroke: var(--border, #cbd5e0); stroke-dasharray: 6 4; rx: 10; }
+  .box { rx: 6; stroke-width: 1.4; }
+  .tb   { fill: #e8f1ff; stroke: #2b6cb0; }
+  .dut  { fill: #eef0ff; stroke: #6b46c1; }
+  .mem  { fill: #e6fffa; stroke: #2c7a7b; }
+  .obs  { fill: #f0fff4; stroke: #2f855a; }
+  .sva  { fill: #fffaf0; stroke: #b7791f; }
+  .cov  { fill: #faf5ff; stroke: #805ad5; }
+  .title { font-size: 11.5px; font-weight: 700; fill: #1a202c; }
+  .txt { font-size: 10px; fill: #1a202c; }
+  .sub { font-size: 8.5px; fill: #4a5568; }
+  .lbl { font-size: 8.5px; fill: #2d3748; font-style: italic; }
+  .flow { stroke: #4a5568; stroke-width: 1.3; fill: none; }
+  .legend { font-size: 9px; fill: #2d3748; }
+</style>
+</head>
+<body>
+<h2>tb_core_trap_lean — Internal Architecture</h2>
+<div class="wrap">
+<svg viewBox="0 0 1000 800" role="img" aria-label="Internal testbench architecture">
+
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a5568"/>
+    </marker>
+  </defs>
+
+  <!-- ================= GROUP A : TESTBENCH ================= -->
+  <rect class="grp" x="10" y="20" width="260" height="340"/>
+  <text class="title" x="24" y="42">Testbench · tb_core_trap_lean.sv</text>
+
+  <rect class="box tb" x="30" y="60" width="105" height="44"/>
+  <text class="txt" x="82" y="80" text-anchor="middle">Clock</text>
+  <text class="sub" x="82" y="94" text-anchor="middle">clk</text>
+
+  <rect class="box tb" x="145" y="60" width="105" height="44"/>
+  <text class="txt" x="197" y="80" text-anchor="middle">Reset</text>
+  <text class="sub" x="197" y="94" text-anchor="middle">rst_n</text>
+
+  <rect class="box tb" x="30" y="114" width="220" height="40"/>
+  <text class="txt" x="140" y="132" text-anchor="middle">IMEM Preload + RESET_PC</text>
+  <text class="sub" x="140" y="145" text-anchor="middle">parameterized program image</text>
+
+  <rect class="box tb" x="30" y="164" width="220" height="50"/>
+  <text class="txt" x="140" y="185" text-anchor="middle">Independent RV32 Predictor</text>
+  <text class="sub" x="140" y="200" text-anchor="middle">rv32_reference_pkg · x0-only</text>
+
+  <rect class="box tb" x="30" y="224" width="220" height="60"/>
+  <text class="txt" x="140" y="245" text-anchor="middle">core_scoreboard</text>
+  <text class="sub" x="140" y="259" text-anchor="middle">freeze pre-reset · retire / GPR / store</text>
+  <text class="sub" x="140" y="272" text-anchor="middle">pass / fail</text>
+
+  <rect class="box tb" x="30" y="294" width="220" height="40"/>
+  <text class="txt" x="140" y="312" text-anchor="middle">Watchdog + completion policy</text>
+  <text class="sub" x="140" y="325" text-anchor="middle">terminal self-loop / step bound</text>
+
+  <!-- ================= GROUP B : DUT ================= -->
+  <rect class="grp" x="300" y="20" width="400" height="340"/>
+  <text class="title" x="314" y="42">DUT · top (riscv_core/rtl/top.v)</text>
+
+  <rect class="box dut" x="320" y="64" width="200" height="44"/>
+  <text class="txt" x="420" y="82" text-anchor="middle">IRQ inputs</text>
+  <text class="sub" x="420" y="96" text-anchor="middle">software / timer / external / fast[14:0]</text>
+
+  <rect class="box dut" x="320" y="150" width="64" height="54"/>
+  <text class="txt" x="352" y="181" text-anchor="middle">IF</text>
+  <rect class="box dut" x="396" y="150" width="64" height="54"/>
+  <text class="txt" x="428" y="181" text-anchor="middle">ID</text>
+  <rect class="box dut" x="472" y="150" width="64" height="54"/>
+  <text class="txt" x="504" y="181" text-anchor="middle">EX</text>
+  <rect class="box dut" x="548" y="150" width="64" height="54"/>
+  <text class="txt" x="580" y="181" text-anchor="middle">MEM</text>
+  <rect class="box dut" x="624" y="150" width="64" height="54"/>
+  <text class="txt" x="656" y="181" text-anchor="middle">WB</text>
+
+  <path class="flow" d="M384,177 H396" marker-end="url(#ar)"/>
+  <path class="flow" d="M460,177 H472" marker-end="url(#ar)"/>
+  <path class="flow" d="M536,177 H548" marker-end="url(#ar)"/>
+  <path class="flow" d="M612,177 H624" marker-end="url(#ar)"/>
+
+  <rect class="box dut" x="320" y="240" width="120" height="44"/>
+  <text class="txt" x="380" y="258" text-anchor="middle">hazard_unit</text>
+  <text class="sub" x="380" y="272" text-anchor="middle">stall / flush / redirect</text>
+
+  <rect class="box dut" x="455" y="240" width="110" height="44"/>
+  <text class="txt" x="510" y="258" text-anchor="middle">csr_regfile</text>
+  <text class="sub" x="510" y="272" text-anchor="middle">mepc/mcause/mstatus</text>
+
+  <rect class="box dut" x="580" y="240" width="110" height="44"/>
+  <text class="txt" x="635" y="256" text-anchor="middle">wb_trap_mret</text>
+  <text class="txt" x="635" y="270" text-anchor="middle">commit ctrl</text>
+
+  <path class="flow" d="M380,240 V204" marker-end="url(#ar)"/>
+  <path class="flow" d="M656,204 V240" marker-end="url(#ar)"/>
+  <path class="flow" d="M510,240 V226" marker-end="url(#ar)"/>
+  <path class="flow" d="M635,240 V226" marker-end="url(#ar)"/>
+
+  <!-- ================= GROUP C : MEMORY ================= -->
+  <rect class="grp" x="720" y="20" width="270" height="340"/>
+  <text class="title" x="734" y="42">Memory Models · lib/memory</text>
+
+  <rect class="box mem" x="740" y="90" width="230" height="64"/>
+  <text class="txt" x="855" y="114" text-anchor="middle">sync_imem_sram</text>
+  <text class="sub" x="855" y="128" text-anchor="middle">config check · reset offset</text>
+  <text class="sub" x="855" y="141" text-anchor="middle">out-of-range → fail</text>
+
+  <rect class="box mem" x="740" y="180" width="230" height="64"/>
+  <text class="txt" x="855" y="204" text-anchor="middle">lsu_dmem_responder</text>
+  <text class="sub" x="855" y="218" text-anchor="middle">bounded WAIT_CYCLES · byte lanes</text>
+  <text class="sub" x="855" y="231" text-anchor="middle">completion = req &amp;&amp; !stall</text>
+
+  <rect class="box mem" x="740" y="264" width="230" height="56"/>
+  <text class="sub" x="855" y="286" text-anchor="middle">writes depend only on physical</text>
+  <text class="sub" x="855" y="299" text-anchor="middle">completion, never flush/scoreboard</text>
+
+  <!-- ================= GROUP D : OBS / SVA / COV ================= -->
+  <rect class="grp" x="10" y="390" width="980" height="350"/>
+  <text class="title" x="24" y="412">Observation → SVA → Coverage</text>
+
+  <rect class="box obs" x="30" y="430" width="260" height="110"/>
+  <text class="txt" x="160" y="452" text-anchor="middle">core_trap_observe.sv</text>
+  <text class="sub" x="160" y="468" text-anchor="middle">read-only DUT taps (centralized)</text>
+  <text class="sub" x="160" y="481" text-anchor="middle">adapter → core_pipeline_if</text>
+  <text class="sub" x="160" y="494" text-anchor="middle">D/E/M/W registered payloads</text>
+  <text class="sub" x="160" y="507" text-anchor="middle">effective hold/flush incl. irq_flush_frontend</text>
+  <text class="sub" x="160" y="520" text-anchor="middle">opt-in monitor-copy self-tests</text>
+
+  <rect class="box obs" x="320" y="455" width="150" height="70"/>
+  <text class="txt" x="395" y="480" text-anchor="middle">core_pipeline_if</text>
+  <text class="sub" x="395" y="495" text-anchor="middle">common observation</text>
+  <text class="sub" x="395" y="508" text-anchor="middle">shape (reusable)</text>
+
+  <rect class="box sva" x="510" y="420" width="200" height="85"/>
+  <text class="txt" x="610" y="440" text-anchor="middle">core_stage_sva ×4</text>
+  <text class="sub" x="610" y="456" text-anchor="middle">reset → valid cleared</text>
+  <text class="sub" x="610" y="469" text-anchor="middle">flush → valid cleared</text>
+  <text class="sub" x="610" y="482" text-anchor="middle">hold → valid + payload kept</text>
+  <text class="sub" x="610" y="495" text-anchor="middle">D / E / M / W</text>
+
+  <rect class="box sva" x="510" y="515" width="200" height="95"/>
+  <text class="txt" x="610" y="535" text-anchor="middle">core_pipeline_sva</text>
+  <text class="sub" x="610" y="551" text-anchor="middle">pc_hold · branch_redirect</text>
+  <text class="sub" x="610" y="564" text-anchor="middle">wb_redirect · wb_flush</text>
+  <text class="sub" x="610" y="577" text-anchor="middle">wb_kills_memory · request_hold</text>
+  <text class="sub" x="610" y="590" text-anchor="middle">memory_stall_controls</text>
+  <text class="sub" x="610" y="603" text-anchor="middle">commit eligibility · controls_known</text>
+
+  <rect class="box cov" x="750" y="440" width="210" height="90"/>
+  <text class="txt" x="855" y="462" text-anchor="middle">Functional Coverage</text>
+  <text class="sub" x="855" y="478" text-anchor="middle">mcause · preemption</text>
+  <text class="sub" x="855" y="491" text-anchor="middle">vectored vs direct mtvec</text>
+  <text class="sub" x="855" y="504" text-anchor="middle">(F1 bins — future)</text>
+
+  <!-- ================= ARROWS ================= -->
+  <!-- clk/rst into DUT -->
+  <path class="flow" d="M250,82 H300" marker-end="url(#ar)"/>
+  <text class="lbl" x="262" y="74">clk/rst</text>
+
+  <!-- preload program into IMEM (top channel) -->
+  <path class="flow" d="M250,134 H285 V10 H855 V88" marker-end="url(#ar)"/>
+  <text class="lbl" x="360" y="22">preload program image</text>
+
+  <!-- predictor -> scoreboard -->
+  <path class="flow" d="M140,214 V224" marker-end="url(#ar)"/>
+  <text class="lbl" x="146" y="221">predicted events</text>
+
+  <!-- IMEM -> DUT (instruction data) -->
+  <path class="flow" d="M740,122 H700" marker-end="url(#ar)"/>
+  <text class="lbl" x="704" y="114">instr data</text>
+
+  <!-- DUT <-> DMEM (LSU) -->
+  <path class="flow" d="M700,212 H740" marker-end="url(#ar)"/>
+  <text class="lbl" x="704" y="204">LSU req/resp</text>
+
+  <!-- DUT -> OBS (read-only taps) -->
+  <path class="flow" d="M450,360 V405 H160 V430" marker-end="url(#ar)"/>
+  <text class="lbl" x="300" y="398">read-only DUT taps</text>
+
+  <!-- DUT -> Coverage -->
+  <path class="flow" d="M600,360 V415 H855 V440" marker-end="url(#ar)"/>
+  <text class="lbl" x="690" y="412">coverage hits</text>
+
+  <!-- OBS -> scoreboard (observed effects) -->
+  <path class="flow" d="M280,430 V254 H250" marker-end="url(#ar)"/>
+  <text class="lbl" x="286" y="340">observed effects</text>
+
+  <!-- OBS -> pipeline_if -->
+  <path class="flow" d="M290,485 H320" marker-end="url(#ar)"/>
+  <text class="lbl" x="296" y="478">packed payloads</text>
+
+  <!-- pipeline_if -> stage sva -->
+  <path class="flow" d="M470,475 L510,462" marker-end="url(#ar)"/>
+  <!-- pipeline_if -> pipeline sva -->
+  <path class="flow" d="M470,505 L510,562" marker-end="url(#ar)"/>
+
+  <!-- Legend -->
+  <line x1="30" y1="720" x2="980" y2="720" stroke="#cbd5e0" stroke-width="1"/>
+  <rect class="box tb" x="30" y="730" width="14" height="14"/><text class="legend" x="50" y="741">Testbench</text>
+  <rect class="box dut" x="140" y="730" width="14" height="14"/><text class="legend" x="160" y="741">DUT</text>
+  <rect class="box mem" x="220" y="730" width="14" height="14"/><text class="legend" x="240" y="741">Memory models</text>
+  <rect class="box obs" x="360" y="730" width="14" height="14"/><text class="legend" x="380" y="741">Observation</text>
+  <rect class="box sva" x="500" y="730" width="14" height="14"/><text class="legend" x="520" y="741">SVA</text>
+  <rect class="box cov" x="580" y="730" width="14" height="14"/><text class="legend" x="600" y="741">Coverage</text>
+  <text class="legend" x="700" y="741">All expected ISA results come from the independent predictor — never from observation taps.</text>
+
+</svg>
+</div>
+</body>
+</html>

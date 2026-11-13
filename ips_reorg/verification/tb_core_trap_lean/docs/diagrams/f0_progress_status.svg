@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%" style="background:#0f172a; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <defs>
+    <linearGradient id="gradPass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="gradActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="gradPending" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="40" y="42" fill="#f8fafc" font-size="22" font-weight="700">RISC-V Core Trap &amp; CSR Verification — Progress Status</text>
+  <text x="40" y="66" fill="#94a3b8" font-size="13">Target DUT: module top (riscv_core/rtl/top.v) | Simulator: Cadence Xcelium 24.09 &amp; IMC</text>
+
+  <!-- Section 1: Milestone Pipeline Tracker -->
+  <g transform="translate(40, 95)">
+    <!-- F0 Box (PASS) -->
+    <rect x="0" y="0" width="160" height="90" rx="8" fill="url(#gradPass)" filter="url(#shadow)"/>
+    <text x="14" y="26" fill="#ecfdf5" font-size="15" font-weight="700">F0: Bring-up</text>
+    <rect x="14" y="34" width="55" height="18" rx="4" fill="#064e3b"/>
+    <text x="21" y="47" fill="#34d399" font-size="11" font-weight="700">PASSED</text>
+    <text x="14" y="68" fill="#d1fae5" font-size="11">Reset, IMEM/DMEM</text>
+    <text x="14" y="81" fill="#a7f3d0" font-size="10">4 GPR commits, 1 store</text>
+
+    <!-- Arrow 1 -->
+    <path d="M 165 45 L 180 45" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- F1 Box (NEXT UP) -->
+    <rect x="185" y="0" width="160" height="90" rx="8" fill="url(#gradActive)" filter="url(#shadow)"/>
+    <text x="199" y="26" fill="#eff6ff" font-size="15" font-weight="700">F1: ECALL &amp; MRET</text>
+    <rect x="199" y="34" width="62" height="18" rx="4" fill="#1e3a8a"/>
+    <text x="206" y="47" fill="#60a5fa" font-size="11" font-weight="700">NEXT UP</text>
+    <text x="199" y="68" fill="#dbeafe" font-size="11">Trap &amp; Return Handlers</text>
+    <text x="199" y="81" fill="#bfdbfe" font-size="10">Zero ghost RF/stores</text>
+
+    <!-- Arrow 2 -->
+    <path d="M 350 45 L 365 45" stroke="#475569" stroke-width="2" stroke-dasharray="4"/>
+
+    <!-- F2 Box (PLANNED) -->
+    <rect x="370" y="0" width="160" height="90" rx="8" fill="url(#gradPending)" stroke="#475569" stroke-width="1"/>
+    <text x="384" y="26" fill="#cbd5e1" font-size="15" font-weight="600">F2: Exceptions</text>
+    <text x="384" y="47" fill="#94a3b8" font-size="11">Illegal inst, Misalign</text>
+    <text x="384" y="68" fill="#64748b" font-size="11">Faulting stores abort</text>
+    <text x="384" y="81" fill="#64748b" font-size="10">Status: Planned</text>
+
+    <!-- Arrow 3 -->
+    <path d="M 535 45 L 550 45" stroke="#475569" stroke-width="2" stroke-dasharray="4"/>
+
+    <!-- F3/F4 Box (PLANNED) -->
+    <rect x="555" y="0" width="160" height="90" rx="8" fill="url(#gradPending)" stroke="#475569" stroke-width="1"/>
+    <text x="569" y="26" fill="#cbd5e1" font-size="15" font-weight="600">F3/F4: IRQ &amp; Vector</text>
+    <text x="569" y="47" fill="#94a3b8" font-size="11">Fast/Timer Arbiter</text>
+    <text x="569" y="68" fill="#64748b" font-size="11">Direct vs Vectored PC</text>
+    <text x="569" y="81" fill="#64748b" font-size="10">Status: Planned</text>
+
+    <!-- Arrow 4 -->
+    <path d="M 720 45 L 735 45" stroke="#475569" stroke-width="2" stroke-dasharray="4"/>
+
+    <!-- F5 Box (PLANNED) -->
+    <rect x="740" y="0" width="140" height="90" rx="8" fill="url(#gradPending)" stroke="#475569" stroke-width="1"/>
+    <text x="754" y="26" fill="#cbd5e1" font-size="15" font-weight="600">F5: Stress</text>
+    <text x="754" y="47" fill="#94a3b8" font-size="11">LSU stalls &amp; aborts</text>
+    <text x="754" y="68" fill="#64748b" font-size="11">Nested traps / branch</text>
+    <text x="754" y="81" fill="#64748b" font-size="10">Status: Planned</text>
+  </g>
+
+  <!-- Section 2: Detailed Evidence Breakdown (Columns) -->
+  <g transform="translate(40, 215)">
+    <!-- Panel 1: Completed Common Infrastructure -->
+    <rect x="0" y="0" width="280" height="305" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect x="0" y="0" width="280" height="38" rx="8" fill="#0f172a"/>
+    <text x="16" y="24" fill="#38bdf8" font-size="14" font-weight="700">1. Common Reusable Memory VIPs</text>
+    <text x="16" y="62" fill="#4ade80" font-size="13">✔ sync_imem_sram.sv</text>
+    <text x="32" y="80" fill="#94a3b8" font-size="11">• 1-cycle synchronous SRAM</text>
+    <text x="32" y="96" fill="#94a3b8" font-size="11">• Parameterized DEPTH, BASE, RESET_PC</text>
+    <text x="32" y="112" fill="#94a3b8" font-size="11">• Out-of-range request trapping</text>
+    
+    <text x="16" y="142" fill="#4ade80" font-size="13">✔ lsu_dmem_responder.sv</text>
+    <text x="32" y="160" fill="#94a3b8" font-size="11">• Protocol req &amp;&amp; !stall &amp;&amp; !err</text>
+    <text x="32" y="176" fill="#94a3b8" font-size="11">• 4-bit byte enables (be[3:0])</text>
+    <text x="32" y="192" fill="#94a3b8" font-size="11">• No write suppression via flush</text>
+    <text x="32" y="208" fill="#94a3b8" font-size="11">• Accepted store effect reporting</text>
+    
+    <text x="16" y="238" fill="#4ade80" font-size="13">✔ Verification/lib/memory/</text>
+    <text x="32" y="256" fill="#94a3b8" font-size="11">• Reusable across any core/SoC bench</text>
+    <text x="32" y="272" fill="#94a3b8" font-size="11">• Zero framework bloat</text>
+
+    <!-- Panel 2: Verified Testbench & Harness -->
+    <rect x="300" y="0" width="280" height="305" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect x="300" y="0" width="280" height="38" rx="8" fill="#0f172a"/>
+    <text x="316" y="24" fill="#38bdf8" font-size="14" font-weight="700">2. F0 Harness &amp; Execution</text>
+    <text x="316" y="62" fill="#4ade80" font-size="13">✔ core_trap_observe.sv</text>
+    <text x="332" y="80" fill="#94a3b8" font-size="11">• Read-only taps (PCD, InstrD, ResultW)</text>
+    <text x="332" y="96" fill="#94a3b8" font-size="11">• Physical GPR writeback gating</text>
+    
+    <text x="316" y="126" fill="#4ade80" font-size="13">✔ tb_core_trap_lean.sv</text>
+    <text x="332" y="144" fill="#94a3b8" font-size="11">• Reset release on negedge clk</text>
+    <text x="332" y="160" fill="#94a3b8" font-size="11">• Dynamic PC &amp; instruction pairing check</text>
+    <text x="332" y="176" fill="#94a3b8" font-size="11">• 4 verified GPR commits (LUI/ADDI)</text>
+    <text x="332" y="192" fill="#94a3b8" font-size="11">• 1 accepted store (SW 0x5a @ 0x80001000)</text>
+    <text x="332" y="208" fill="#94a3b8" font-size="11">• Built-in cycle watchdog</text>
+
+    <text x="316" y="238" fill="#4ade80" font-size="13">✔ Dual-configuration &amp; Negative</text>
+    <text x="332" y="256" fill="#94a3b8" font-size="11">• Baseline run: PASS @ 145ns</text>
+    <text x="332" y="272" fill="#94a3b8" font-size="11">• RESET_PC offset (0x80000040): PASS</text>
+    <text x="332" y="288" fill="#94a3b8" font-size="11">• Intentional fault check: Caught &amp; FAIL</text>
+
+    <!-- Panel 3: Remote Server & Next Stage -->
+    <rect x="600" y="0" width="280" height="305" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+    <rect x="600" y="0" width="280" height="38" rx="8" fill="#0f172a"/>
+    <text x="616" y="24" fill="#38bdf8" font-size="14" font-weight="700">3. EDA Server &amp; Next Stage</text>
+    <text x="616" y="62" fill="#4ade80" font-size="13">✔ Remote Cadence Xcelium 24.09</text>
+    <text x="632" y="80" fill="#94a3b8" font-size="11">• Automated run via ssh vlsi</text>
+    <text x="632" y="96" fill="#94a3b8" font-size="11">• SHM waveform dumps preserved</text>
+    <text x="632" y="112" fill="#94a3b8" font-size="11">• UCM / UCD coverage database created</text>
+
+    <text x="616" y="142" fill="#f59e0b" font-size="13">⚠ Known Limits of F0</text>
+    <text x="632" y="160" fill="#94a3b8" font-size="11">• 6-instruction smoke test only</text>
+    <text x="632" y="176" fill="#94a3b8" font-size="11">• DUT toggle cov: 13.27% (not signoff)</text>
+    <text x="632" y="192" fill="#94a3b8" font-size="11">• Functional covergroups disabled</text>
+
+    <text x="616" y="222" fill="#60a5fa" font-size="13">➡ Next: Stage F1 (ECALL &amp; MRET)</text>
+    <text x="632" y="240" fill="#94a3b8" font-size="11">• Decoupled Reference Scoreboard</text>
+    <text x="632" y="256" fill="#94a3b8" font-size="11">• SVA: Zero ghost stores on flush</text>
+    <text x="632" y="272" fill="#94a3b8" font-size="11">• mepc / mtvec / mcause verification</text>
+    <text x="632" y="288" fill="#94a3b8" font-size="11">• Enable functional covergroups</text>
+  </g>
+</svg>

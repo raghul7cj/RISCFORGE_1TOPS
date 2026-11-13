@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CSR & Trap Verification - Part 2 Tutor Vision</title>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+</script>
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  body { font-family: var(--font-sans); line-height: 1.55; max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+  h2 { font-size: 1.2rem; margin: 1.6rem 0 .5rem; border-bottom: 1px solid var(--border, #ddd); padding-bottom: .25rem; }
+  h3 { font-size: 1.05rem; margin: 1.2rem 0 .35rem; }
+  p { margin: .5rem 0; }
+  .sub { color: var(--muted-foreground, #666); font-size: .9rem; margin: 0 0 1rem; }
+  .card { background: var(--card, #f7f7f8); border: 1px solid var(--border, #e2e2e2); border-radius: var(--radius, 8px); padding: 14px 16px; margin: .75rem 0; }
+  .card h3 { margin-top: 0; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; margin-right: 6px; }
+  .done { background: var(--success-surface, #d9f2e3); color: var(--success, #1a7f4b); }
+  .open { background: var(--warning-surface, #fff3cd); color: var(--warning, #8a6d00); }
+  .todo { background: var(--secondary, #eee); color: var(--muted-foreground, #555); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th, td { border: 1px solid var(--border, #ddd); padding: 6px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--secondary, #f0f0f0); }
+  code { font-family: var(--font-mono); font-size: .85em; background: var(--code-background, #f3f3f3); padding: 1px 4px; border-radius: 3px; }
+  .mermaid { background: var(--card, #fff); border: 1px solid var(--border, #ddd); border-radius: var(--radius, 8px); padding: 10px; margin: .75rem 0; }
+  ul { margin: .4rem 0 .4rem 1.2rem; }
+  li { margin: .25rem 0; }
+  .flow { font-family: var(--font-mono); font-size: .82rem; background: var(--code-background, #f3f3f3); padding: 10px 12px; border-radius: 6px; white-space: pre; overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<h1>CSR &amp; Trap Verification — Part 2</h1>
+<p class="sub">Tutor vision &amp; progress map · RISCFORGE 1TOPS SoC · target DUT: <code>riscv_core/rtl/riscv_core.v</code></p>
+
+<h2>1. The Big Picture — Why Part 2?</h2>
+<div class="card">
+  <p><strong>Part 1</strong> verified the CSR register file in isolation (124/124 checks, 100% block/expression coverage). It proved the <em>registers</em> behave.</p>
+  <p><strong>Part 2</strong> verifies the <em>whole pipeline's commitment to traps</em>: when an exception/interrupt fires, does the core correctly squash in-flight work, record <code>mepc</code>/<code>mcause</code>, redirect PC to <code>mtvec</code>, clear MIE, and later resume via <code>mret</code> — with <strong>zero ghost stores</strong>?</p>
+  <p>This is the hardest correctness property of a CPU. It can't be checked by unit tests alone — it needs the pipeline, memory, and CSR state observed together.</p>
+</div>
+
+<h2>2. Architecture — What We Built</h2>
+<div class="mermaid">
+flowchart LR
+  subgraph DUT["DUT: riscv_core (top.v)"]
+    IF[IF] --> ID[ID] --> EX[EX] --> MEM[MEM] --> WB[WB]
+    CSR[csr_regfile] --- WB
+    HU[hazard_unit] --- IF
+  end
+  IMEM[(IMEM SRAM\nresponsive model)] <--> IF
+  DMEM[(DMEM SRAM\nresponsive model)] <--> MEM
+  IRQ[IRQ Generator\nMSIP/MTIP/MEIP/fast] --> DUT
+  TB[TB Driver\nprograms + scoreboard] --> IMEM
+  TB --> IRQ
+  SVA[SVA Library\ncore_pipeline_sva\ncore_stage_sva] -. observes .-> DUT
+  COV[Functional Coverage\nmcause / preemption /\nvectored vs direct] -. observes .-> DUT
+  style DUT fill:#eef,stroke:#88a
+</div>
+<p class="sub">The DUT is driven by legal programs loaded into a canonical synchronous SRAM model. An independent scoreboard predicts retirement. SVA observes pipeline state — never the expected ISA results.</p>
+
+<div class="grid">
+  <div class="card">
+    <h3>Lean principles</h3>
+    <ul>
+      <li>Max 1–2 files read per task (routing map first).</li>
+      <li>Shared SVA written <strong>once</strong>, reused 4× (D/E/M/W).</li>
+      <li>Memory model is <strong>canonical &amp; reusable</strong> (<code>Verification/lib/memory</code>).</li>
+      <li>Scoreboard freezes predictions <em>before</em> reset release.</li>
+      <li>Legal programs support overwrites — not just NOP loops.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Key invariant</h3>
+    <ul>
+      <li><code>mepc</code> = exact faulting/interrupted PC.</li>
+      <li><code>mtvec</code> redirect cycle-exact (direct &amp; vectored).</li>
+      <li>Pipeline flush squashes IF/ID/EX/MEM — no ghost RF/DMEM stores.</li>
+      <li><code>mret</code> restores MIE/MPIE and resumes cleanly.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>3. Progress Dashboard</h2>
+<div class="mermaid">
+gantt
+  title Milestone Progress
+  dateFormat  YYYY-MM-DD
+  section Part 1
+  CSR regfile unit (124/124) :done, p1, 2026-10-01, 2026-10-20
+  section Part 2
+  F0.1 semantic checking :done, f01, 2026-10-21, 2026-10-28
+  F0.2 pipeline infra + SVA :done, f02, 2026-10-29, 2026-11-05
+  F0.2 open finding WB-01 :active, wb, 2026-11-05, 2026-11-13
+  F1 trap/return signoff :todo, f1, 2026-11-14, 2026-11-30
+  F2 SoC ISR loop (future) :todo, f2, 2026-12-01, 2026-12-31
+</gantt>
+</div>
+
+<table>
+  <tr><th>Milestone</th><th>Status</th><th>What</th></tr>
+  <tr><td><strong>F0.1</strong></td><td><span class="badge done">DONE</span></td><td>Semantic checking retained; common scoreboard freezes predicted retirement.</td></tr>
+  <tr><td><strong>F0.2</strong></td><td><span class="badge done">DONE</span></td><td>Pipeline-checking infra + shared SVA; 5 positive scenarios passed incl. 1- &amp; 3-cycle waits; 2 assertion self-tests failed correctly.</td></tr>
+  <tr><td><strong>F02-WB-01</strong></td><td><span class="badge open">OPEN</span></td><td>Repeated GPR write-enable during WB stall (duplicate attempts, identical value). Needs contract decision.</td></tr>
+  <tr><td><strong>F1</strong></td><td><span class="badge todo">NOT STARTED</span></td><td>Trap/return signoff: mepc, mcause, MIE/MPIE, mtvec redirect, mret resume, M/W flush, no ghost stores.</td></tr>
+  <tr><td><strong>F2</strong></td><td><span class="badge todo">FUTURE</span></td><td>SoC-level interrupt event + ISR loop verification.</td></tr>
+</table>
+
+<h2>4. The Open Finding — F02-WB-01 (Tutor Explanation)</h2>
+<div class="card">
+  <p><strong>What happened:</strong> Under a 1- and 3-cycle memory wait, the core kept asserting the physical GPR write-enable every cycle while WB retirement was stalled. The written value was <em>identical</em> each time.</p>
+  <p><strong>Why it matters:</strong> This is <em>duplicate write attempts</em>, not data corruption — but the contract is ambiguous: must RF writes be <em>commit-qualified</em> (only on actual retirement), or is <em>idempotent replay</em> acceptable?</p>
+  <p><strong>Why we didn't "fix" it yet:</strong> It's a <strong>design-contract question</strong>, not a bug fix. Changing the RTL or relaxing the checker would hide the ambiguity. We preserved both outcomes (ordinary stream + NOP-before-store fixture) and recorded waveform evidence.</p>
+  <p><strong>Decision needed before F1:</strong> Pick commit-qualified vs. idempotent-replay, then encode it as an SVA invariant. Everything downstream (trap squashing, ghost-store checks) depends on this answer.</p>
+</div>
+
+<h2>5. Six Trap Scenarios (F1 Target)</h2>
+<table>
+  <tr><th>ID</th><th>Scenario</th><th>Invariant</th></tr>
+  <tr><td>TRAP-01</td><td>Illegal instruction</td><td><code>mcause=2</code>, <code>mepc=bad_pc</code>, PC→mtvec, no RF write.</td></tr>
+  <tr><td>TRAP-02</td><td>ECALL</td><td><code>mcause=11</code>, MPIE←MIE, MIE←0, redirect.</td></tr>
+  <tr><td>TRAP-03</td><td>Load/store fault</td><td><code>mcause=4/6</code>, <code>mtval=bad_addr</code>, no memory write completes.</td></tr>
+  <tr><td>TRAP-04</td><td>Ext/timer IRQ</td><td>Halt stream, vector to handler, mepc=next unretired PC, MIE←0.</td></tr>
+  <tr><td>TRAP-05</td><td>Masking &amp; priority</td><td>MEIP&gt;MTIP&gt;MSIP; masked IRQs stay pending in mip.</td></tr>
+  <tr><td>TRAP-06</td><td>MRET &amp; nested</td><td>PC←mepc, MIE←MPIE, MPIE←1, clean resume.</td></tr>
+</table>
+
+<h2>6. Execution Pipeline (How a Run Works)</h2>
+<div class="flow">
+PowerShell: . Vlsi.ps1 ; Invoke-VlsiRun -Manifest core-trap-lean.json
+   ↓
+scp sources → ssh vlsi (Tailscale)
+   ↓
+xrun (Xcelium 24.09) compiles + simulates (fast mode: no waves/HTML)
+   ↓
+IMC coverage extract → pack logs/summaries → scp back (12.7 KB, &lt;1s)
+   ↓
+Local: Verification/artifacts/vlsi_auto/&lt;run_id&gt;/results/
+   ↓
+Inspect code_summary.txt, metrics_summary.txt, simulation.log
+(Final mode: + waves.shm, code_html, code_details.txt)
+</div>
+
+<h2>7. What's Reusable (Don't Rebuild)</h2>
+<ul>
+  <li><code>Verification/lib/core/sva/</code> — stage + pipeline SVA (written once).</li>
+  <li><code>Verification/lib/memory/</code> — canonical responsive SRAM model.</li>
+  <li><code>Verification/lib/core/</code> — types, scoreboard, RV32 semantics, observation IF.</li>
+  <li>Runner: <code>scripts/vlsi/</code> + <code>Vlsi.ps1</code> (compression + fast/final modes).</li>
+</ul>
+
+<h2>8. Tutor's Reading Order (If You Want to Go Deeper)</h2>
+<ol>
+  <li><code>Verification/HANDOFF_PART2_CORE_TRAP.md</code> — contract &amp; scenarios.</li>
+  <li><code>Verification/tb_core_trap_lean/ARCHITECTURE.md</code> — F0.2 evidence + open finding.</li>
+  <li><code>Verification/tb_core_trap_lean/F02_FINDINGS.md</code> — WB-01 detail + waveform.</li>
+  <li><code>Verification/lib/core/sva/core_pipeline_sva.sv</code> — the reusable SVA.</li>
+  <li><code>.agents/skills/lean-digital-verification/SKILL.md</code> — methodology.</li>
+</ol>
+
+<p class="sub" style="margin-top:1.5rem;">End of tutor vision. Ask me to zoom into any section (e.g., "explain F02-WB-01 waveform", "draw the trap entry timing", "what's commit-qualified vs idempotent").</p>
+
+</body>
+</html>
