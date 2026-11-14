@@ -184,8 +184,8 @@ module csr_regfile #(
       else if (csr_write_en_normal_i) begin
         case (csr_waddr_normal_i)
           MSTATUS_ADDR:  mstatus_r  <= (csr_wdata_normal_i & 32'h0000188A) | (mstatus_r & ~32'h0000188A);
-          MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'hFFFF0888) | (mie_r & ~32'hFFFF0888);
-          MTVEC_ADDR:    mtvec_r    <= (csr_wdata_normal_i & 32'hFFFFFFFC) | (mtvec_r & ~32'hFFFFFFFC);
+          MIE_ADDR:      mie_r      <= (csr_wdata_normal_i & 32'hFFFF0880) | (mie_r & ~32'hFFFF0880);
+          MTVEC_ADDR:    mtvec_r    <= {csr_wdata_normal_i[31:2], 1'b0, (csr_wdata_normal_i[1:0] == 2'b01)};
           MSCRATCH_ADDR: mscratch_r <= csr_wdata_normal_i;
           MEPC_ADDR:     mepc_r     <= {csr_wdata_normal_i[31:2], 2'b00};
           MCAUSE_ADDR:   mcause_r   <= csr_wdata_normal_i;
@@ -202,19 +202,13 @@ module csr_regfile #(
   end
 
   // ============================================================================
-  // MSIP Storage
+  // Software Interrupt (MSIP) Handling
   // ============================================================================
-  reg msip_r;
-  always @(posedge clk_i or negedge rst_n_i) begin : msip_storage
-    if (!rst_n_i)
-      msip_r <= 1'b0;
-    else if (csr_write_en_mret_i && (csr_waddr_mret_i == MIP_ADDR))
-      msip_r <= csr_wdata_mret_i[3];
-    else if (csr_write_en_normal_i && (csr_waddr_normal_i == MIP_ADDR))
-      msip_r <= csr_wdata_normal_i[3];
-  end
-
-  assign mip_w = {fast_intr_i, 4'b0, ext_intr_i, 3'b0, timer_intr_i, 3'b0, (msip_r || msft_intr_i), 3'b0};
+  // In this single-hart standalone profile without CLINT, MSI is omitted.
+  // Per RISC-V Privileged ISA Specification (v1.13):
+  // MSIP in mip and MSIE in mie are hardwired to read-only zero.
+  // Direct CSR writes to mip cannot set MSIP.
+  assign mip_w = {fast_intr_i, 4'b0, ext_intr_i, 3'b0, timer_intr_i, 3'b0, msft_intr_i, 3'b0};
 
   // ============================================================================
   // Sideband Outputs
